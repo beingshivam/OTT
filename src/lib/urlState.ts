@@ -28,9 +28,20 @@ export function readFilters(defaults: Pick<Filters, 'weekId' | 'region'>): Filte
   };
 }
 
-export function writeFilters(f: Filters, defaults: Pick<Filters, 'weekId' | 'region'>): void {
+/**
+ * `pinWeek` is false while the week was chosen *for* the reader — the landing
+ * jump to the nearest stocked week. Writing that into the URL would freeze a
+ * bookmark or a shared link to whichever week happened to be current when it was
+ * copied, which is precisely wrong for a page about what's new this week. Only an
+ * explicit week change belongs in the URL.
+ */
+export function writeFilters(
+  f: Filters,
+  defaults: Pick<Filters, 'weekId' | 'region'>,
+  pinWeek: boolean,
+): void {
   const p = new URLSearchParams();
-  if (f.weekId !== defaults.weekId) p.set('w', f.weekId);
+  if (pinWeek && f.weekId !== defaults.weekId) p.set('w', f.weekId);
   if (f.region !== defaults.region) p.set('r', f.region);
   if (f.platforms.length) p.set('p', f.platforms.join(','));
   if (f.kinds.length) p.set('t', f.kinds.join(','));

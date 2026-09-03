@@ -43,6 +43,11 @@ export default function App() {
   const [filters, setFilters] = useState<Filters>(() =>
     readFilters({ weekId: weekIdFor(new Date()), region: 'IN' }),
   );
+  // A week the reader actually asked for — via the arrows, or an inbound ?w —
+  // is worth keeping in the URL. The landing auto-jump is not.
+  const [weekPinned, setWeekPinned] = useState(
+    () => new URLSearchParams(window.location.search).has('w'),
+  );
 
   // Restore device preferences before the first paint of real content so the
   // region never visibly flips underneath the user.
@@ -85,8 +90,8 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    writeFilters(filters, { weekId: currentWeek, region: prefs.region });
-  }, [filters, currentWeek, prefs.region]);
+    writeFilters(filters, { weekId: currentWeek, region: prefs.region }, weekPinned);
+  }, [filters, currentWeek, prefs.region, weekPinned]);
 
   useEffect(() => {
     const onScroll = () => setStuck(window.scrollY > 8);
@@ -129,8 +134,15 @@ export default function App() {
     return diff;
   }, [filters.weekId, currentWeek]);
 
-  const stepWeek = (delta: number) =>
+  const stepWeek = (delta: number) => {
+    setWeekPinned(true);
     update({ weekId: addDays(filters.weekId, delta * 7) });
+  };
+
+  const goToCurrentWeek = () => {
+    setWeekPinned(true);
+    update({ weekId: currentWeek });
+  };
 
   const lineupOn =
     prefs.platforms.length > 0 &&
@@ -212,7 +224,7 @@ export default function App() {
           </button>
           <span className="weeknav__label">{relativeWeekLabel(filters.weekId, today)}</span>
           {weekOffset !== 0 && (
-            <button className="weeknav__today" onClick={() => update({ weekId: currentWeek })}>
+            <button className="weeknav__today" onClick={goToCurrentWeek}>
               Back to this week
             </button>
           )}
@@ -307,7 +319,7 @@ export default function App() {
             </p>
             <div className="empty__actions">
               {weekOffset !== 0 && (
-                <button className="btn btn--lg" onClick={() => update({ weekId: currentWeek })}>
+                <button className="btn btn--lg" onClick={goToCurrentWeek}>
                   Go to this week
                 </button>
               )}
