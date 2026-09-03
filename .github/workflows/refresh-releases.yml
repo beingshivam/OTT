@@ -40,19 +40,18 @@ jobs:
         id: creds
         env:
           TMDB_TOKEN: ${{ secrets.TMDB_TOKEN }}
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
           TMDB_TOKEN_VAR: ${{ vars.TMDB_TOKEN }}
-          SECRETS_JSON: ${{ toJSON(secrets) }}
         run: |
-          echo "Repository secret TMDB_TOKEN: ${#TMDB_TOKEN} characters"
-          echo "Repository variable TMDB_TOKEN: ${#TMDB_TOKEN_VAR} characters"
+          echo "Secret TMDB_TOKEN:   ${#TMDB_TOKEN} characters"
+          echo "Secret TMDB_API_KEY: ${#TMDB_API_KEY} characters"
+          echo "Variable TMDB_TOKEN: ${#TMDB_TOKEN_VAR} characters"
 
-          # Names only, never values — settles which repo the secret actually
-          # landed on when the settings page says one thing and the job another.
-          python3 -c "
-          import json, os
-          names = sorted(json.loads(os.environ['SECRETS_JSON']))
-          print('Secret names visible to this job:', ', '.join(names) or '(none)')
-          "
+          # Either credential works — the scripts pick the auth scheme by shape.
+          if [ -z "$TMDB_TOKEN" ] && [ -n "$TMDB_API_KEY" ]; then
+            echo "TMDB_TOKEN=$TMDB_API_KEY" >> "$GITHUB_ENV"
+            TMDB_TOKEN="$TMDB_API_KEY"
+          fi
 
           if [ -n "$TMDB_TOKEN" ]; then
             echo "ready=true" >> "$GITHUB_OUTPUT"
@@ -69,7 +68,7 @@ jobs:
       - name: Rebuild the feed
         if: steps.creds.outputs.ready == 'true'
         env:
-          TMDB_TOKEN: ${{ secrets.TMDB_TOKEN }}
+          TMDB_TOKEN: ${{ secrets.TMDB_TOKEN || secrets.TMDB_API_KEY }}
           REGIONS: ${{ vars.REGIONS || 'IN,US' }}
         run: |
           node scripts/fetch-releases.mjs \
@@ -81,7 +80,7 @@ jobs:
       - name: Attach artwork and metadata
         if: steps.creds.outputs.ready == 'true'
         env:
-          TMDB_TOKEN: ${{ secrets.TMDB_TOKEN }}
+          TMDB_TOKEN: ${{ secrets.TMDB_TOKEN || secrets.TMDB_API_KEY }}
         run: node scripts/enrich-releases.mjs
 
       - name: Commit the updated calendar

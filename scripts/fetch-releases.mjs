@@ -22,7 +22,7 @@ const OUT = resolve(ROOT, 'public/data/releases.json');
 const API = 'https://api.themoviedb.org/3';
 const IMG = 'https://image.tmdb.org/t/p';
 
-const TOKEN = process.env.TMDB_TOKEN;
+const TOKEN = process.env.TMDB_TOKEN || process.env.TMDB_API_KEY;
 const REGIONS = (process.env.REGIONS ?? 'IN,US').split(',').map((r) => r.trim()).filter(Boolean);
 
 const args = process.argv.slice(2);
@@ -35,12 +35,34 @@ const WEEKS_AHEAD = argNum('weeks-ahead', 2);
 
 if (!TOKEN) {
   console.error(
-    'TMDB_TOKEN is not set.\n' +
-      'Get a v4 API Read Access Token at https://www.themoviedb.org/settings/api, then:\n' +
+    'No TMDB credential found (set TMDB_TOKEN or TMDB_API_KEY).\n' +
+      'Either works — the v4 API Read Access Token or the v3 API Key, from\n' +
+      'https://www.themoviedb.org/settings/api. Then:\n' +
       '  TMDB_TOKEN=... npm run refresh\n' +
       'The existing feed has been left untouched.',
   );
   process.exit(1);
+}
+
+/**
+ * TMDB hands out two credentials and they authenticate differently:
+ *   - the v4 "API Read Access Token", a JWT, sent as `Authorization: Bearer`
+ *   - the v3 "API Key", 32 hex characters, sent as an `api_key` query param
+ * People reach for whichever the site showed them first, so accept both and
+ * pick the scheme from the shape of the value rather than making it their
+ * problem.
+ */
+const IS_JWT = /^ey[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/.test(TOKEN);
+
+function authHeaders() {
+  return IS_JWT
+    ? { Authorization: `Bearer ${TOKEN}`, accept: 'application/json' }
+    : { accept: 'application/json' };
+}
+
+function applyAuth(url) {
+  if (!IS_JWT) url.searchParams.set('api_key', TOKEN);
+  return url;
 }
 
 // ---------------------------------------------------------------- registry --
@@ -71,9 +93,7 @@ async function tmdb(path, params = {}) {
   if (calls++ > 0) await new Promise((r) => setTimeout(r, 60));
 
   for (let attempt = 0; attempt < 4; attempt++) {
-    const res = await fetch(url, {
-      headers: { Authorization: `Bearer ${TOKEN}`, accept: 'application/json' },
-    });
+    const res = await fetch(applyAuth(url), { headers: authHeaders() });
     if (res.ok) return res.json();
     if (res.status === 429) {
       const wait = Number(res.headers.get('retry-after') ?? 2) * 1000;

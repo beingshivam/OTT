@@ -131,8 +131,11 @@ poster for the wrong film is worse than no poster — it's confidently wrong, an
 the generated fallback already looks intentional. Expect some titles, especially
 brand-new regional ones, to keep their generated art until TMDB catalogues them.
 
-Get a token — the **API Read Access Token**, not the v3 key — from
-<https://www.themoviedb.org/settings/api>.
+Get a credential from <https://www.themoviedb.org/settings/api>. **Either one
+works** — the v4 *API Read Access Token* (a long `eyJ...` JWT) or the v3
+*API Key* (32 hex characters). The scripts detect which you gave them and pick
+the matching auth scheme, so there is nothing to get wrong. In CI the secret may
+be named `TMDB_TOKEN` or `TMDB_API_KEY`.
 
 Options: `--weeks-back N` (backfill history, default 2) and `--weeks-ahead N`
 (pull upcoming weeks, default 2). Set `REGIONS=IN,US` to control which regions get
