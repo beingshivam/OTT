@@ -30,8 +30,10 @@ const argNum = (name, fallback) => {
   const i = args.indexOf(`--${name}`);
   return i >= 0 && args[i + 1] ? Number(args[i + 1]) : fallback;
 };
-const WEEKS_BACK = argNum('weeks-back', 2);
-const WEEKS_AHEAD = argNum('weeks-ahead', 2);
+// A release calendar is read forwards more than backwards — "what's coming" is
+// the question people bring to it — so the window leans ahead.
+const WEEKS_BACK = argNum('weeks-back', 3);
+const WEEKS_AHEAD = argNum('weeks-ahead', 4);
 
 if (!TOKEN) {
   console.error(

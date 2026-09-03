@@ -10,10 +10,10 @@ on:
     inputs:
       weeks_back:
         description: 'Weeks of history to backfill'
-        default: '2'
+        default: '3'
       weeks_ahead:
         description: 'Weeks of upcoming releases to pull'
-        default: '2'
+        default: '4'
 
 concurrency:
   group: refresh-releases
@@ -72,8 +72,8 @@ jobs:
           REGIONS: ${{ vars.REGIONS || 'IN,US' }}
         run: |
           node scripts/fetch-releases.mjs \
-            --weeks-back "${{ inputs.weeks_back || 2 }}" \
-            --weeks-ahead "${{ inputs.weeks_ahead || 2 }}"
+            --weeks-back "${{ inputs.weeks_back || 3 }}" \
+            --weeks-ahead "${{ inputs.weeks_ahead || 4 }}"
 
       # Separate pass so curated rows — which discover never returns — still get
       # posters, synopses, cast and runtimes attached.

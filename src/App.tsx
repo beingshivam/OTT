@@ -142,6 +142,15 @@ export default function App() {
     return { list: sortReleases(releases.filter((r) => r.regions.includes(filters.region)), 'trending'), live: false };
   }, [feed, releases, filters.region]);
 
+  /** Weeks the feed actually carries, for the empty state to offer. */
+  const stockedWeeks = useMemo(
+    () =>
+      (feed?.weeks ?? []).filter((w) =>
+        w.releases.some((r) => r.regions.includes(filters.region)),
+      ),
+    [feed, filters.region],
+  );
+
   const thisWeekTitles = useMemo(
     () => new Set(releases.map((r) => normalise(r.title))),
     [releases],
@@ -328,16 +337,35 @@ export default function App() {
             </span>
             <h3>Nothing scheduled here yet</h3>
             <p>
-              {formatWeekRange(filters.weekId)} hasn't been pulled into the calendar. New weeks land
-              every Friday morning, and past weeks fill in when the catalogue backfills.
+              {formatWeekRange(filters.weekId)} hasn't been pulled into the calendar yet. The
+              refresh covers several weeks either side, so past and upcoming weeks fill in once it
+              runs.
             </p>
-            <div className="empty__actions">
-              {weekOffset !== 0 && (
-                <button className="btn btn--lg" onClick={goToCurrentWeek}>
-                  Go to this week
-                </button>
-              )}
-            </div>
+            {/* A dead end otherwise: say which weeks do have data and go there in
+                one tap, rather than leaving the arrows to be guessed at. */}
+            {stockedWeeks.length > 0 && (
+              <>
+                <p style={{ marginTop: -4 }}>
+                  Right now the calendar covers{' '}
+                  {stockedWeeks.length === 1 ? 'one week' : `${stockedWeeks.length} weeks`}:
+                </p>
+                <div className="empty__actions">
+                  {stockedWeeks.map((w) => (
+                    <button
+                      key={w.id}
+                      className="btn btn--lg"
+                      onClick={() => {
+                        setWeekPinned(true);
+                        update({ weekId: w.id });
+                      }}
+                    >
+                      {formatWeekRange(w.id)}
+                      <span className="btn__count">{w.releases.length}</span>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         )}
 
