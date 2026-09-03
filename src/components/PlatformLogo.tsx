@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { BRAND_MARKS } from '../data/brand-marks';
 import { inkOn, platform } from '../data/platforms';
 
 /**
@@ -52,10 +53,23 @@ export function PlatformLogo({ platformId, size = 22, className = '' }: Props) {
     '--ink': inkOn(p.accent),
   } as React.CSSProperties;
 
+  // Best available, in order: TMDB's full-colour provider logo, then an
+  // authentic Simple Icons glyph, then the monogram.
   if (url && !failed) {
     return (
       <span className={`logo-box ${className}`} style={style}>
         <img src={url} alt="" loading="lazy" decoding="async" onError={() => setFailed(true)} />
+      </span>
+    );
+  }
+
+  const brand = BRAND_MARKS[platformId];
+  if (brand) {
+    return (
+      <span className={`logo-box logo-box--glyph ${className}`} style={style} aria-hidden="true">
+        <svg viewBox="0 0 24 24" role="img">
+          <path d={brand.path} />
+        </svg>
       </span>
     );
   }

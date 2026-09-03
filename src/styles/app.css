@@ -703,6 +703,17 @@ a {
   object-fit: contain;
 }
 
+/* Real brand glyph, in the same tile as the monograms so a board that mixes the
+   two still reads as one system. */
+.logo-box--glyph {
+  background: linear-gradient(140deg, var(--pa), var(--pb));
+}
+.logo-box--glyph svg {
+  width: 66%;
+  height: 66%;
+  fill: var(--ink, #fff);
+}
+
 .logo-box--mark {
   background: linear-gradient(140deg, var(--pa), var(--pb));
   color: var(--ink, #fff);

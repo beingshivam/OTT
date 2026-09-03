@@ -12,7 +12,8 @@
     "refresh": "node scripts/fetch-releases.mjs && node scripts/enrich-releases.mjs && node scripts/fetch-logos.mjs",
     "build:single": "npm run build && node scripts/build-single.mjs",
     "enrich": "node scripts/enrich-releases.mjs",
-    "logos": "node scripts/fetch-logos.mjs"
+    "logos": "node scripts/fetch-logos.mjs",
+    "brand-marks": "node scripts/build-brand-marks.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
@@ -22,6 +23,7 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^6.1.1",
+    "simple-icons": "^16.29.0",
     "typescript": "^5.6.3",
     "vite": "^8.2.2"
   }
