@@ -1,10 +1,13 @@
+import { useState } from 'react';
 import { platform } from '../data/platforms';
 
 /**
- * Most weekly-calendar rows arrive before anyone has published artwork, and a
- * wall of grey placeholders kills the page. So every title gets a deterministic
- * generated poster keyed off its name and platform — same title, same art, every
- * visit — and the real image simply takes over once the feed has one.
+ * Renders real artwork when the feed has it, and falls back to generated art
+ * when it doesn't — or when the image fails to load, which matters because
+ * artwork URLs come from a third party and can rot between refreshes.
+ *
+ * The fallback is deterministic: the same title always gets the same art, so
+ * the page looks composed rather than random, and stable across visits.
  */
 
 function hash(str: string): number {
@@ -23,18 +26,22 @@ interface Props {
   className?: string;
   /** Suppress the typographic title (used behind a sheet that prints its own). */
   quiet?: boolean;
+  /** Real artwork above the fold shouldn't wait for the lazy loader. */
+  eager?: boolean;
 }
 
-export function PosterArt({ title, platformId, imageUrl, className = 'art', quiet }: Props) {
-  if (imageUrl) {
+export function PosterArt({ title, platformId, imageUrl, className = 'art', quiet, eager }: Props) {
+  const [failed, setFailed] = useState(false);
+
+  if (imageUrl && !failed) {
     return (
       <img
-        className={className}
+        className={`${className} art--photo`}
         src={imageUrl}
-        alt=""
-        loading="lazy"
+        alt={`${title} poster`}
+        loading={eager ? 'eager' : 'lazy'}
         decoding="async"
-        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+        onError={() => setFailed(true)}
       />
     );
   }
@@ -52,7 +59,7 @@ export function PosterArt({ title, platformId, imageUrl, className = 'art', quie
       style={
         {
           '--a1': `color-mix(in oklab, ${accent} ${55 + (h % 20)}%, #1a1024)`,
-          '--a2': `hsl(${(hash(platformId + title) % 360)}deg 45% ${lift}%)`,
+          '--a2': `hsl(${hash(platformId + title) % 360}deg 45% ${lift}%)`,
           filter: `hue-rotate(${shift * 0.25}deg)`,
         } as React.CSSProperties
       }

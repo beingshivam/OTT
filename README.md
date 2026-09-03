@@ -75,6 +75,24 @@ cp .env.example .env        # then paste your token in
 TMDB_TOKEN=... npm run refresh
 ```
 
+`refresh` runs two passes, and the split is the important part:
+
+1. **`fetch-releases.mjs`** discovers what's dropping, via TMDB's discover and
+   watch-provider endpoints. Curated rows already in the feed are kept — discover
+   never returns most regional Indian titles, so a rebuild adds to the hand-checked
+   calendar instead of replacing it.
+2. **`enrich-releases.mjs`** attaches the artwork: posters, backdrops, synopses,
+   ratings, runtimes, cast and director, matched by title.
+
+Run the second on its own with `npm run enrich` (add `--force` to re-fetch rows
+that already have artwork, `--verbose` to see what didn't match).
+
+**Matching is deliberately strict.** A candidate is accepted only on an exact
+normalised title match with a plausible year; anything less is left alone. A
+poster for the wrong film is worse than no poster — it's confidently wrong, and
+the generated fallback already looks intentional. Expect some titles, especially
+brand-new regional ones, to keep their generated art until TMDB catalogues them.
+
 Get a token — the **API Read Access Token**, not the v3 key — from
 <https://www.themoviedb.org/settings/api>.
 
@@ -130,9 +148,11 @@ A few decisions worth knowing about:
   scheduled and how the calendars people already read are laid out.
 - **Results are always grouped by release day.** Sorting reorders titles *within*
   a day rather than dissolving the calendar, which is the thing being aggregated.
-- **Titles with no artwork get generated poster art**, keyed off the title and
-  platform so it's stable across visits. Most calendar rows arrive before anyone
-  has published a poster, and a wall of grey placeholders kills the page.
+- **Real artwork when it exists, generated art when it doesn't.** Posters come
+  from TMDB via the enrich pass. Anything unmatched — or whose image URL later
+  rots — falls back to art keyed off the title and platform, stable across
+  visits. Most calendar rows arrive before anyone has published a poster, and a
+  wall of grey placeholders kills the page.
 - **Filters live in the URL.** "Every Tamil film this week" is a link, not a
   screenshot.
 - **Personalisation without accounts.** Pick your platforms once; it's kept in

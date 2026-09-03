@@ -9,8 +9,9 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit false --emitDeclarationOnly false --pretty",
-    "refresh": "node scripts/fetch-releases.mjs",
-    "build:single": "npm run build && node scripts/build-single.mjs"
+    "refresh": "node scripts/fetch-releases.mjs && node scripts/enrich-releases.mjs",
+    "build:single": "npm run build && node scripts/build-single.mjs",
+    "enrich": "node scripts/enrich-releases.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

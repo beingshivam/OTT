@@ -114,6 +114,10 @@ export default function App() {
   const week = weekById(feed, filters.weekId);
   const releases = week?.releases ?? [];
   const facets = useMemo(() => facetsFor(releases, filters.region), [releases, filters.region]);
+  const missingArtwork = useMemo(
+    () => releases.filter((r) => r.regions.includes(filters.region) && !r.posterUrl).length,
+    [releases, filters.region],
+  );
   const visible = useMemo(() => applyFilters(releases, filters), [releases, filters]);
 
   const weekOffset = useMemo(() => {
@@ -240,13 +244,16 @@ export default function App() {
           )}
         </div>
 
-        {feed?.source === 'sample' && (
+        {feed?.source === 'sample' && missingArtwork > 0 && (
           <p className="notice">
             <span aria-hidden="true">📅</span>
             <span>
-              <strong>Sample schedule.</strong> Titles, platforms, languages and dates come from a
-              published release calendar. Posters, ratings and synopses arrive on the first live
-              refresh — <code>npm run refresh</code>, or Friday's job.
+              <strong>Curated schedule.</strong> Titles, platforms, languages and dates come from a
+              published release calendar.{' '}
+              {missingArtwork === facets.total
+                ? 'Posters, ratings and synopses arrive on the first catalogue refresh'
+                : `${missingArtwork} of these are still waiting on artwork`}{' '}
+              — <code>npm run refresh</code>, or the twice-weekly job.
             </span>
           </p>
         )}

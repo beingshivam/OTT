@@ -11,7 +11,7 @@ export async function loadFeed(signal?: AbortSignal): Promise<ReleaseFeed> {
   const embedded = document.getElementById('dropday-feed')?.textContent;
   if (embedded) return normalise(JSON.parse(embedded) as ReleaseFeed);
 
-  const url = `${import.meta.env.BASE_URL}data/releases.json`;
+  const url = new URL('data/releases.json', document.baseURI).href;
   const res = await fetch(url, { signal, cache: 'no-cache' });
   if (!res.ok) throw new Error(`Could not load the release feed (${res.status})`);
   return normalise((await res.json()) as ReleaseFeed);

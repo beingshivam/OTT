@@ -56,6 +56,14 @@ jobs:
             --weeks-back "${{ inputs.weeks_back || 2 }}" \
             --weeks-ahead "${{ inputs.weeks_ahead || 2 }}"
 
+      # Separate pass so curated rows — which discover never returns — still get
+      # posters, synopses, cast and runtimes attached.
+      - name: Attach artwork and metadata
+        if: steps.creds.outputs.ready == 'true'
+        env:
+          TMDB_TOKEN: ${{ secrets.TMDB_TOKEN }}
+        run: node scripts/enrich-releases.mjs
+
       - name: Commit the updated calendar
         if: steps.creds.outputs.ready == 'true'
         run: |

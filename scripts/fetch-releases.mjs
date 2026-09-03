@@ -169,6 +169,16 @@ async function providersFor(isMovie, id, region) {
   }
 }
 
+/** Fold case and punctuation so a curated title and a discovered one compare equal. */
+function normTitle(t) {
+  return (t ?? '')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
 async function buildWeek(weekId, platforms, index) {
   const from = weekId;
   const to = iso(new Date(new Date(`${weekId}T00:00:00Z`).getTime() + 6 * DAY));
@@ -226,11 +236,31 @@ const platforms = await loadPlatforms();
 const index = providerIndex(platforms);
 console.log(`Mapped ${index.size} TMDB providers across ${platforms.length} platforms.`);
 
+// Curated rows are hand-checked and cover regional titles TMDB's discover
+// endpoints miss entirely, so a rebuild adds to them rather than replacing them.
+const previous = await readFile(OUT, 'utf8')
+  .then((raw) => JSON.parse(raw))
+  .catch(() => ({ weeks: [] }));
+const curatedByWeek = new Map(
+  previous.weeks.map((w) => [w.id, w.releases.filter((r) => r.sample)]),
+);
+
 const weeks = [];
 for (const id of weekIds()) {
   process.stdout.write(`Building week ${id} … `);
   const week = await buildWeek(id, platforms, index);
-  console.log(`${week.releases.length} releases`);
+
+  const curated = curatedByWeek.get(id) ?? [];
+  if (curated.length) {
+    // Drop a discovered row when a curated row already covers that title, so a
+    // week never lists the same film twice under two different ids.
+    const claimed = new Set(curated.map((r) => normTitle(r.title)));
+    const fresh = week.releases.filter((r) => !claimed.has(normTitle(r.title)));
+    week.releases = [...curated, ...fresh].sort((a, b) => (b.heat ?? 0) - (a.heat ?? 0));
+    console.log(`${fresh.length} discovered + ${curated.length} curated`);
+  } else {
+    console.log(`${week.releases.length} releases`);
+  }
   weeks.push(week);
 }
 
