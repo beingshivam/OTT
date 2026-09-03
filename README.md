@@ -30,9 +30,14 @@ BASE_PATH=/ott/ npm run build
 
 `.github/workflows/deploy.yml` publishes the site to **GitHub Pages** on every
 push to the default branch, and again whenever the calendar refresh commits new
-data. It sets the base path from the repo name and switches Pages on via the API
-on its first run, so there is no setting to flip beforehand — merge to `main` and
-the site goes up at `https://<user>.github.io/<repo>/`.
+data. It sets the base path from the repo name, so the site lands at
+`https://<user>.github.io/<repo>/`.
+
+**One-time setup:** turn Pages on under *Settings › Pages › Source: **GitHub
+Actions***. Creating a Pages site needs repo-admin scope, which the Actions token
+deliberately doesn't have, so this can't be automated from inside the workflow.
+Until it's enabled the workflow still builds and stays green, logging a notice
+instead — flip the setting, re-run it, and the site goes up.
 
 If your account restricts Pages for private repos, either make the repo public or
 point Vercel/Netlify/Cloudflare Pages at it instead — build command `npm run
