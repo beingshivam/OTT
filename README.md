@@ -31,7 +31,8 @@ BASE_PATH=/ott/ npm run build
 `.github/workflows/deploy.yml` publishes the site to **GitHub Pages** on every
 push to the default branch, and again whenever the calendar refresh commits new
 data. It sets the base path from the repo name, so the site lands at
-`https://<user>.github.io/<repo>/`.
+`https://<user>.github.io/<repo>/` — or under `/<repo>/` on your custom domain if
+Pages has one configured. The deploy job prints the resolved URL.
 
 **One-time setup:** turn Pages on under *Settings › Pages › Source: **GitHub
 Actions***. Creating a Pages site needs repo-admin scope, which the Actions token
