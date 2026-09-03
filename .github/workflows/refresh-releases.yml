@@ -41,9 +41,18 @@ jobs:
         env:
           TMDB_TOKEN: ${{ secrets.TMDB_TOKEN }}
           TMDB_TOKEN_VAR: ${{ vars.TMDB_TOKEN }}
+          SECRETS_JSON: ${{ toJSON(secrets) }}
         run: |
           echo "Repository secret TMDB_TOKEN: ${#TMDB_TOKEN} characters"
           echo "Repository variable TMDB_TOKEN: ${#TMDB_TOKEN_VAR} characters"
+
+          # Names only, never values — settles which repo the secret actually
+          # landed on when the settings page says one thing and the job another.
+          python3 -c "
+          import json, os
+          names = sorted(json.loads(os.environ['SECRETS_JSON']))
+          print('Secret names visible to this job:', ', '.join(names) or '(none)')
+          "
 
           if [ -n "$TMDB_TOKEN" ]; then
             echo "ready=true" >> "$GITHUB_OUTPUT"
