@@ -64,6 +64,12 @@ export interface ReleaseFeed {
   generatedAt: string;
   source: 'tmdb' | 'sample';
   weeks: ReleaseWeek[];
+  /**
+   * What's actually hot right now, regardless of when it came out — a title
+   * that dropped a month ago and is peaking this week belongs here and could
+   * never surface from a single week's rows. Absent until a live refresh runs.
+   */
+  trending?: Release[];
 }
 
 export type SortKey = 'trending' | 'newest' | 'rating' | 'az';

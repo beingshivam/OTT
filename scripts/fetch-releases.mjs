@@ -250,6 +250,57 @@ async function buildWeek(weekId, platforms, index) {
   return { id: weekId, start: from, end: to, releases };
 }
 
+/**
+ * What's hot right now, independent of the release calendar. A title that came
+ * out weeks ago and is peaking today is exactly what a weekly view misses, so
+ * this comes from TMDB's own trending signal rather than from our rows.
+ *
+ * Only titles we can actually point at a platform are kept — "trending, but
+ * nowhere you can watch it" is a dead end on a page whose job is where to watch.
+ */
+async function buildTrending(index) {
+  const byId = new Map();
+
+  for (const region of REGIONS) {
+    const { results = [] } = await tmdb('/trending/all/week');
+
+    for (const item of results.slice(0, 20)) {
+      if (item.media_type !== 'movie' && item.media_type !== 'tv') continue;
+      const isMovie = item.media_type === 'movie';
+
+      const key = `trend-${isMovie ? 'm' : 't'}-${item.id}`;
+      const existing = byId.get(key);
+      if (existing) {
+        existing.regions = [...new Set([...existing.regions, region])];
+        continue;
+      }
+
+      const providerIds = await providersFor(isMovie, item.id, region);
+      const mapped = [...new Set(providerIds.map((p) => index.get(p)).filter(Boolean))];
+      if (!mapped.length) continue;
+
+      const genres = await genreNames(isMovie ? 'movie' : 'tv', item.genre_ids);
+      byId.set(key, {
+        id: key,
+        title: item.title ?? item.name,
+        kind: classify(isMovie, genres),
+        platforms: mapped,
+        languages: [item.original_language].filter(Boolean),
+        genres,
+        releaseDate: item.release_date ?? item.first_air_date ?? '',
+        regions: [region],
+        rating: item.vote_count > 20 ? Number(item.vote_average?.toFixed(1)) : undefined,
+        heat: heatFrom(item.popularity, item.vote_average, item.vote_count),
+        synopsis: item.overview || undefined,
+        posterUrl: item.poster_path ? `${IMG}/w500${item.poster_path}` : undefined,
+        backdropUrl: item.backdrop_path ? `${IMG}/w780${item.backdrop_path}` : undefined,
+      });
+    }
+  }
+
+  return [...byId.values()].sort((a, b) => (b.heat ?? 0) - (a.heat ?? 0)).slice(0, 12);
+}
+
 // --------------------------------------------------------------------- main --
 
 const platforms = await loadPlatforms();
@@ -284,6 +335,10 @@ for (const id of weekIds()) {
   weeks.push(week);
 }
 
+process.stdout.write('Building trending … ');
+const trending = await buildTrending(index);
+console.log(`${trending.length} titles`);
+
 const total = weeks.reduce((n, w) => n + w.releases.length, 0);
 if (total === 0) {
   console.error('TMDB returned nothing at all — refusing to overwrite the feed with an empty file.');
@@ -293,6 +348,10 @@ if (total === 0) {
 await mkdir(dirname(OUT), { recursive: true });
 await writeFile(
   OUT,
-  JSON.stringify({ generatedAt: new Date().toISOString(), source: 'tmdb', weeks }, null, 2) + '\n',
+  JSON.stringify(
+    { generatedAt: new Date().toISOString(), source: 'tmdb', weeks, trending },
+    null,
+    2,
+  ) + '\n',
 );
 console.log(`Wrote ${total} releases across ${weeks.length} weeks to ${OUT} (${calls} API calls).`);

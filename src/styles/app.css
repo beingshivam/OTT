@@ -1054,10 +1054,17 @@ a {
   white-space: nowrap;
 }
 
-.strip__where {
-  font-size: 11px;
-  color: var(--text-3);
-  white-space: nowrap;
+/* Marks a trending title that is also landing this week — the overlap between
+   "popular right now" and "new right now" is the interesting case. */
+.strip__new {
+  flex: none;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  color: #fff;
 }
 
 /* -------------------------------------------------------- view toggle ---- */

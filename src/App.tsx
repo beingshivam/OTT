@@ -4,7 +4,7 @@ import { Controls } from './components/Controls';
 import { DetailSheet } from './components/DetailSheet';
 import { ReleaseCard } from './components/ReleaseCard';
 import { SetupCard } from './components/SetupCard';
-import { TrendingStrip } from './components/TrendingStrip';
+import { TrendingStrip, normalise } from './components/TrendingStrip';
 import {
   IconCalendar,
   IconChevronLeft,
@@ -14,7 +14,13 @@ import {
 } from './components/icons';
 import { PLATFORMS, REGIONS } from './data/platforms';
 import { loadFeed, weekById } from './lib/feed';
-import { applyFilters, facetsFor, activeFilterCount, EMPTY_FILTERS } from './lib/filters';
+import {
+  applyFilters,
+  facetsFor,
+  activeFilterCount,
+  sortReleases,
+  EMPTY_FILTERS,
+} from './lib/filters';
 import { DEFAULT_PREFS, guessRegion, loadPrefs, savePrefs, type Prefs } from './lib/prefs';
 import { readFilters, writeFilters } from './lib/urlState';
 import {
@@ -125,6 +131,22 @@ export default function App() {
   const week = weekById(feed, filters.weekId);
   const releases = week?.releases ?? [];
   const facets = useMemo(() => facetsFor(releases, filters.region), [releases, filters.region]);
+  /**
+   * Prefer the live trending signal, which spans everything currently popular
+   * rather than only what happens to land this week. Fall back to ranking the
+   * week itself — and tell the strip which it got, so the label stays true.
+   */
+  const trendingNow = useMemo(() => {
+    const live = (feed?.trending ?? []).filter((r) => r.regions.includes(filters.region));
+    if (live.length >= 3) return { list: live, live: true };
+    return { list: sortReleases(releases.filter((r) => r.regions.includes(filters.region)), 'trending'), live: false };
+  }, [feed, releases, filters.region]);
+
+  const thisWeekTitles = useMemo(
+    () => new Set(releases.map((r) => normalise(r.title))),
+    [releases],
+  );
+
   const missingArtwork = useMemo(
     () => releases.filter((r) => r.regions.includes(filters.region) && !r.posterUrl).length,
     [releases, filters.region],
@@ -322,7 +344,12 @@ export default function App() {
         {feed && !error && facets.total > 0 && (
           <>
             {activeFilterCount(filters) === 0 && (
-              <TrendingStrip releases={visible} onOpen={setSelected} />
+              <TrendingStrip
+                releases={trendingNow.list}
+                live={trendingNow.live}
+                thisWeekIds={thisWeekTitles}
+                onOpen={setSelected}
+              />
             )}
 
             {visible.length === 0 ? (
