@@ -28,11 +28,39 @@ BASE_PATH=/ott/ npm run build
 
 ## Hosting
 
-`.github/workflows/deploy.yml` publishes the site to **GitHub Pages** on every
+### Cloudflare Pages — `dropday.pages.dev`
+
+The primary deploy. Free, unlimited bandwidth, no build-minute cap, and it reads
+the `public/_headers` and `public/_redirects` files in this repo.
+
+1. <https://dash.cloudflare.com> → **Workers & Pages** → **Create** → **Pages** →
+   **Connect to Git**, and authorise `beingshivam/OTT`.
+2. **Project name:** `dropday` — this is what sets the `dropday.pages.dev`
+   address, so it has to match the name you want.
+3. **Production branch:** the repo's default branch.
+4. **Framework preset:** Vite. **Build command:** `npm run build`.
+   **Output directory:** `dist`.
+5. Save and deploy.
+
+No environment variables are needed here. Cloudflare only serves the committed
+`releases.json`; nothing at request time ever talks to TMDB.
+
+**How a refresh reaches the site:** the GitHub Action rebuilds the calendar and
+commits it → that commit triggers a Cloudflare build → the new week is live.
+`TMDB_TOKEN` stays a GitHub secret and is never needed by the host.
+
+### GitHub Pages
+
+Kept as a second, independent deploy. `.github/workflows/deploy.yml` publishes on every
 push to the default branch, and again whenever the calendar refresh commits new
-data. It sets the base path from the repo name, so the site lands at
-`https://<user>.github.io/<repo>/` — or under `/<repo>/` on your custom domain if
-Pages has one configured. The deploy job prints the resolved URL.
+data. The build uses relative asset paths, so it serves correctly at
+`https://<user>.github.io/<repo>/` or under a custom domain. The deploy job
+prints the resolved URL.
+
+Note that a custom domain on your **user site** (`<user>.github.io`) claims
+project sites too: they get served from `<domain>/<repo>/`, and become
+unreachable if that domain's DNS doesn't point at GitHub. That's independent of
+this repo's settings — which is a good reason to keep Cloudflare as the primary.
 
 **One-time setup:** turn Pages on under *Settings › Pages › Source: **GitHub
 Actions***. Creating a Pages site needs repo-admin scope, which the Actions token
@@ -40,9 +68,11 @@ deliberately doesn't have, so this can't be automated from inside the workflow.
 Until it's enabled the workflow still builds and stays green, logging a notice
 instead — flip the setting, re-run it, and the site goes up.
 
-If your account restricts Pages for private repos, either make the repo public or
-point Vercel/Netlify/Cloudflare Pages at it instead — build command `npm run
-build`, output directory `dist`, no environment variables needed.
+### Netlify or Vercel
+
+Both work unchanged: build command `npm run build`, output directory `dist`, no
+environment variables. Netlify reads the same `_headers`/`_redirects`; Vercel
+uses `vercel.json`.
 
 ### One self-contained file
 
