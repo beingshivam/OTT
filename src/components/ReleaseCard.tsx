@@ -61,8 +61,12 @@ export function ReleaseCard({ release, onOpen, index = 0 }: Props) {
       <span className="card__body">
         <span className="card__title">{release.title}</span>
         <span className="card__sub">
-          {langs.slice(0, 2).join(', ')}
-          {langs.length > 2 ? ` +${langs.length - 2}` : ''}
+          {[
+            langs.slice(0, 2).join(', ') + (langs.length > 2 ? ` +${langs.length - 2}` : ''),
+            release.genres[0],
+          ]
+            .filter(Boolean)
+            .join(' · ')}
         </span>
       </span>
     </button>

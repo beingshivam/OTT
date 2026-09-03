@@ -148,11 +148,20 @@ function BoardRow({
             {release.title}
             {drop && <span className="row__drop">{drop}</span>}
             {release.drop?.finale && <span className="row__flag">FINALE</span>}
+            {release.rating != null && (
+              <span className="row__rating">★ {release.rating.toFixed(1)}</span>
+            )}
           </span>
+          {/* Type, language, genre — the three things that decide whether a
+              title is for you, in the order you'd ask them. */}
           <span className="row__meta">
-            {KIND_LABEL[release.kind] ?? release.kind}
-            {' · '}
-            {release.languages.map(languageName).join(', ')}
+            {[
+              KIND_LABEL[release.kind] ?? release.kind,
+              release.languages.map(languageName).join(', '),
+              release.genres.slice(0, 2).join(', '),
+            ]
+              .filter(Boolean)
+              .join(' · ')}
           </span>
         </span>
         {multiDay && <span className="row__day">{day.weekday}</span>}
