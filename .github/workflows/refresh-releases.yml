@@ -34,16 +34,27 @@ jobs:
 
       # Without a token there is nothing to fetch. That is a configuration gap,
       # not a broken build, so the job says so and stops green.
+      # Reports *where* the credential is, not just whether it's missing. The
+      # value is never printed — only its length — so the log stays safe to share.
       - name: Check for TMDB credentials
         id: creds
         env:
           TMDB_TOKEN: ${{ secrets.TMDB_TOKEN }}
+          TMDB_TOKEN_VAR: ${{ vars.TMDB_TOKEN }}
         run: |
-          if [ -z "$TMDB_TOKEN" ]; then
-            echo "::notice::TMDB_TOKEN is not set — skipping. Add it under Settings › Secrets › Actions to enable automatic refreshes."
-            echo "ready=false" >> "$GITHUB_OUTPUT"
-          else
+          echo "Repository secret TMDB_TOKEN: ${#TMDB_TOKEN} characters"
+          echo "Repository variable TMDB_TOKEN: ${#TMDB_TOKEN_VAR} characters"
+
+          if [ -n "$TMDB_TOKEN" ]; then
             echo "ready=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "ready=false" >> "$GITHUB_OUTPUT"
+          if [ -n "$TMDB_TOKEN_VAR" ]; then
+            echo "::warning title=Token is in the wrong place::TMDB_TOKEN was found under the Variables tab, not Secrets. Variables are printed in plain text in logs, so this job will not read a credential from there. Delete the variable and re-add it under Settings › Secrets and variables › Actions › Secrets › New repository secret."
+          else
+            echo "::notice title=No TMDB token::Nothing found in either Secrets or Variables. Add it at Settings › Secrets and variables › Actions › Secrets tab › New repository secret, named exactly TMDB_TOKEN. Environment secrets and Dependabot secrets are not visible to this job."
           fi
 
       - name: Rebuild the feed
