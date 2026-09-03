@@ -26,6 +26,28 @@ Pages under `/<repo>/`), set the base path:
 BASE_PATH=/ott/ npm run build
 ```
 
+## Hosting
+
+`.github/workflows/deploy.yml` publishes the site to **GitHub Pages** on every
+push to the default branch, and again whenever the calendar refresh commits new
+data. It sets the base path from the repo name and switches Pages on via the API
+on its first run, so there is no setting to flip beforehand — merge to `main` and
+the site goes up at `https://<user>.github.io/<repo>/`.
+
+If your account restricts Pages for private repos, either make the repo public or
+point Vercel/Netlify/Cloudflare Pages at it instead — build command `npm run
+build`, output directory `dist`, no environment variables needed.
+
+### One self-contained file
+
+```bash
+npm run build:single      # → dist/dropday.html
+```
+
+Everything — styles, script, and the release feed — inlined into a single HTML
+file with no relative fetches. It opens straight from `file://`, so it also works
+for hosts that take one page, or for handing someone a copy to read offline.
+
 ## Where the data comes from
 
 The app reads one static file: `public/data/releases.json`. That file is rebuilt

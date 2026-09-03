@@ -1,0 +1,62 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main, master]
+  # Lets a calendar refresh publish itself without waiting for the next push.
+  workflow_run:
+    workflows: ['Refresh release calendar']
+    types: [completed]
+  workflow_dispatch:
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Pages serves project sites from /<repo>/, so the bundle needs that base.
+      - name: Build
+        env:
+          BASE_PATH: /${{ github.event.repository.name }}/
+        run: npm run build
+
+      # Pages has no SPA fallback; serving index.html as 404.html keeps deep
+      # links working even though all state lives in the query string.
+      - name: Add 404 fallback
+        run: cp dist/index.html dist/404.html
+
+      # enablement turns Pages on via the API on the first run, so nobody has to
+      # flip a repo setting by hand before the first deploy.
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

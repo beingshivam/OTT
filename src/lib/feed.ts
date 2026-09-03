@@ -6,10 +6,18 @@ import type { ReleaseFeed, ReleaseWeek } from '../types';
  * key, the page is cacheable at the CDN edge, and the site survives TMDB downtime.
  */
 export async function loadFeed(signal?: AbortSignal): Promise<ReleaseFeed> {
+  // Single-file builds embed the feed in the page so the whole app is one
+  // self-contained HTML file that works from a file:// URL or a paste-in host.
+  const embedded = document.getElementById('dropday-feed')?.textContent;
+  if (embedded) return normalise(JSON.parse(embedded) as ReleaseFeed);
+
   const url = `${import.meta.env.BASE_URL}data/releases.json`;
   const res = await fetch(url, { signal, cache: 'no-cache' });
   if (!res.ok) throw new Error(`Could not load the release feed (${res.status})`);
-  const feed = (await res.json()) as ReleaseFeed;
+  return normalise((await res.json()) as ReleaseFeed);
+}
+
+function normalise(feed: ReleaseFeed): ReleaseFeed {
   feed.weeks.sort((a, b) => a.id.localeCompare(b.id));
   return feed;
 }
