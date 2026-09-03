@@ -199,16 +199,18 @@ export function Controls({ filters, facets, resultCount, onChange, onReset }: Pr
           </div>
         )}
 
-        <div className="summary" aria-live="polite">
-          <span>
-            <strong>{resultCount}</strong> of <strong>{facets.total}</strong> releases
-          </span>
-          {active > 0 && (
+        {/* Only worth the vertical space once it's telling you something the
+            header doesn't — i.e. once a filter is actually narrowing the week. */}
+        {active > 0 && (
+          <div className="summary" aria-live="polite">
+            <span>
+              <strong>{resultCount}</strong> of <strong>{facets.total}</strong> releases
+            </span>
             <button className="summary__clear" onClick={onReset}>
               Clear filters
             </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Board } from './components/Board';
 import { Controls } from './components/Controls';
 import { DetailSheet } from './components/DetailSheet';
 import { ReleaseCard } from './components/ReleaseCard';
 import { SetupCard } from './components/SetupCard';
-import { TrendingRail } from './components/TrendingRail';
+import { TrendingStrip } from './components/TrendingStrip';
 import {
   IconCalendar,
   IconChevronLeft,
@@ -48,6 +49,19 @@ export default function App() {
   const [weekPinned, setWeekPinned] = useState(
     () => new URLSearchParams(window.location.search).has('w'),
   );
+
+  // Board is the default: the whole week at a glance, the way the printed
+  // calendars do it. The poster grid stays available for browsing.
+  const [view, setView] = useState<'board' | 'grid'>(
+    () => (localStorage.getItem('dropday.view') === 'grid' ? 'grid' : 'board'),
+  );
+  useEffect(() => {
+    try {
+      localStorage.setItem('dropday.view', view);
+    } catch {
+      /* Storage is a convenience here, never a requirement. */
+    }
+  }, [view]);
 
   // Restore device preferences before the first paint of real content so the
   // region never visibly flips underneath the user.
@@ -230,42 +244,47 @@ export default function App() {
           )}
         </nav>
 
-        <h1 className="hero__title">
-          Everything new, <em>everywhere</em>, this week.
-        </h1>
+        {/* Deliberately small. The board below is what people came for, and a
+            full-bleed hero would push it under the fold — the exact failure of
+            every streaming app this replaces. */}
+        <p className="hero__eyebrow">Your guide to what's new</p>
+        <h1 className="hero__date">{formatWeekRange(filters.weekId)}</h1>
 
         <div className="hero__meta">
-          <span className="hero__range">{formatWeekRange(filters.weekId)}</span>
-          <span className="hero__sep" />
           <span>
-            {facets.total} {facets.total === 1 ? 'release' : 'releases'} across{' '}
-            {facets.platforms.length} {facets.platforms.length === 1 ? 'platform' : 'platforms'}
+            <strong>{facets.total}</strong> {facets.total === 1 ? 'release' : 'releases'} across{' '}
+            <strong>{facets.platforms.length}</strong>{' '}
+            {facets.platforms.length === 1 ? 'platform' : 'platforms'}
           </span>
           {prefs.platforms.length > 0 && (
-            <>
-              <span className="hero__sep" />
-              <button
-                className="btn"
-                data-active={lineupOn}
-                style={{ height: 30, fontSize: 12 }}
-                onClick={() => update({ platforms: lineupOn ? [] : prefs.platforms })}
-              >
-                {lineupOn ? 'Showing my lineup' : `My lineup (${prefs.platforms.length})`}
-              </button>
-            </>
+            <button
+              className="btn"
+              data-active={lineupOn}
+              style={{ height: 30, fontSize: 12 }}
+              onClick={() => update({ platforms: lineupOn ? [] : prefs.platforms })}
+            >
+              {lineupOn ? 'Showing my lineup' : `My lineup (${prefs.platforms.length})`}
+            </button>
           )}
+
+          <span className="viewtoggle" role="group" aria-label="Layout">
+            <button data-on={view === 'board'} onClick={() => setView('board')}>
+              Board
+            </button>
+            <button data-on={view === 'grid'} onClick={() => setView('grid')}>
+              Posters
+            </button>
+          </span>
         </div>
 
+        {/* One line. It's honest context, not a headline, and every pixel here
+            pushes the board further under the fold. */}
         {feed?.source === 'sample' && missingArtwork > 0 && (
           <p className="notice">
             <span aria-hidden="true">📅</span>
             <span>
-              <strong>Curated schedule.</strong> Titles, platforms, languages and dates come from a
-              published release calendar.{' '}
-              {missingArtwork === facets.total
-                ? 'Posters, ratings and synopses arrive on the first catalogue refresh'
-                : `${missingArtwork} of these are still waiting on artwork`}{' '}
-              — <code>npm run refresh</code>, or the twice-weekly job.
+              <strong>Curated schedule</strong> — {missingArtwork} of {facets.total} still awaiting
+              artwork and synopses.
             </span>
           </p>
         )}
@@ -330,7 +349,7 @@ export default function App() {
         {feed && !error && facets.total > 0 && (
           <>
             {activeFilterCount(filters) === 0 && (
-              <TrendingRail releases={visible} onOpen={setSelected} />
+              <TrendingStrip releases={visible} onOpen={setSelected} />
             )}
 
             {visible.length === 0 ? (
@@ -352,6 +371,8 @@ export default function App() {
                   </button>
                 </div>
               </div>
+            ) : view === 'board' ? (
+              <Board releases={visible} onOpen={setSelected} multiDay={byDay.length > 1} />
             ) : (
               byDay.map(([date, list]) => {
                 const d = formatDay(date);
