@@ -2,7 +2,6 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main, master]
   # Lets a calendar refresh publish itself without waiting for the next push.
   workflow_run:
     workflows: ['Refresh release calendar']
@@ -20,6 +19,11 @@ permissions:
 
 jobs:
   build:
+    # Only the default branch publishes — resolved at run time rather than
+    # hardcoded, so this keeps working whatever that branch is renamed to.
+    if: >-
+      github.event_name != 'push' ||
+      github.ref_name == github.event.repository.default_branch
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
