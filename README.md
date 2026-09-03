@@ -28,22 +28,24 @@ BASE_PATH=/ott/ npm run build
 
 ## Hosting
 
-### Cloudflare Pages — `dropday.pages.dev`
+### Cloudflare — the primary deploy
 
-The primary deploy. Free, unlimited bandwidth, no build-minute cap, and it reads
-the `public/_headers` and `public/_redirects` files in this repo.
+Connecting the repo in the Cloudflare dashboard creates a **Workers** project
+(new projects no longer land on Pages), which deploys with `npx wrangler deploy`
+and serves at `dropday.<your-subdomain>.workers.dev`.
 
-1. <https://dash.cloudflare.com> → **Workers & Pages** → **Create** → **Pages** →
-   **Connect to Git**, and authorise `beingshivam/OTT`.
-2. **Project name:** `dropday` — this is what sets the `dropday.pages.dev`
-   address, so it has to match the name you want.
-3. **Production branch:** the repo's default branch.
-4. **Framework preset:** Vite. **Build command:** `npm run build`.
-   **Output directory:** `dist`.
-5. Save and deploy.
+`wrangler.jsonc` in the repo root drives that deploy. It is deliberately
+**assets-only** — no Worker script, nothing running at request time — because the
+release feed is a committed file, not an API call. It also pins the project name
+and turns on single-page-application handling so unknown paths serve the app.
 
-No environment variables are needed here. Cloudflare only serves the committed
-`releases.json`; nothing at request time ever talks to TMDB.
+That explicit config matters: without it, `wrangler deploy` tries to auto-detect
+the framework, reaches for `@cloudflare/vite-plugin`, and fails its own version
+check. With it, framework detection is bypassed entirely.
+
+Build settings in the dashboard: **build command** `npm run build`,
+**output directory** `dist`, **production branch** the repo's default branch.
+No environment variables — Cloudflare only serves the committed `releases.json`.
 
 **How a refresh reaches the site:** the GitHub Action rebuilds the calendar and
 commits it → that commit triggers a Cloudflare build → the new week is live.

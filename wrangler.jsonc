@@ -1,0 +1,17 @@
+{
+  // Explicit config so `wrangler deploy` uses it instead of trying to
+  // auto-configure from a detected framework — that path pulls in
+  // @cloudflare/vite-plugin and fails the build on its own version checks.
+  "name": "dropday",
+  "compatibility_date": "2026-09-03",
+
+  // Assets-only: there is no Worker script, just the built static site.
+  // Nothing runs at request time, which is the whole point of the design —
+  // the release feed is a file, not an API call.
+  "assets": {
+    "directory": "./dist",
+    // Every view lives in the query string, so unknown paths serve the app
+    // rather than a 404.
+    "not_found_handling": "single-page-application"
+  }
+}
