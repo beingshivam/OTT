@@ -1,2 +1,0 @@
-# All view state lives in the query string, so every path resolves to the app.
-/*  /index.html  200

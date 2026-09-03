@@ -39,6 +39,11 @@ and serves at `dropday.<your-subdomain>.workers.dev`.
 release feed is a committed file, not an API call. It also pins the project name
 and turns on single-page-application handling so unknown paths serve the app.
 
+There is deliberately **no `_redirects` file**. A `/* /index.html 200` rule
+conflicts with that SPA handling — Cloudflare normalises `/index.html` back to
+`/`, which re-matches the rule, and the deploy is rejected for an infinite loop.
+`not_found_handling` covers the same ground on its own.
+
 That explicit config matters: without it, `wrangler deploy` tries to auto-detect
 the framework, reaches for `@cloudflare/vite-plugin`, and fails its own version
 check. With it, framework detection is bypassed entirely.
@@ -73,8 +78,9 @@ instead — flip the setting, re-run it, and the site goes up.
 ### Netlify or Vercel
 
 Both work unchanged: build command `npm run build`, output directory `dist`, no
-environment variables. Netlify reads the same `_headers`/`_redirects`; Vercel
-uses `vercel.json`.
+environment variables. Netlify reads the same `_headers`; Vercel uses
+`vercel.json`. Neither needs an SPA rewrite — every view lives in the query
+string, so `/` is the only route the app ever serves.
 
 ### One self-contained file
 
