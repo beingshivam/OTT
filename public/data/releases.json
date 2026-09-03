@@ -1,0 +1,465 @@
+{
+  "generatedAt": "2026-09-03T00:00:00.000Z",
+  "source": "sample",
+  "weeks": [
+    {
+      "id": "2026-09-04",
+      "start": "2026-09-04",
+      "end": "2026-09-10",
+      "releases": [
+        {
+          "id": "nf-dhamaal-4",
+          "title": "Dhamaal 4",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "hi"
+          ],
+          "genres": [
+            "Comedy"
+          ],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "IN"
+          ],
+          "heat": 92,
+          "sample": true
+        },
+        {
+          "id": "nf-korean-kanakaraju",
+          "title": "Korean Kanakaraju",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "hi"
+          ],
+          "genres": [],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "IN"
+          ],
+          "heat": 70,
+          "sample": true
+        },
+        {
+          "id": "nf-gdn",
+          "title": "G.D.N.",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "hi"
+          ],
+          "genres": [],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "IN"
+          ],
+          "heat": 66,
+          "sample": true
+        },
+        {
+          "id": "nf-minecraft-movie",
+          "title": "A Minecraft Movie",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "hi"
+          ],
+          "genres": [
+            "Adventure",
+            "Family",
+            "Comedy"
+          ],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "IN"
+          ],
+          "heat": 88,
+          "sample": true
+        },
+        {
+          "id": "nf-teenage-wasteland",
+          "title": "Teenage Wasteland",
+          "kind": "documentary",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Documentary"
+          ],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 58,
+          "sample": true
+        },
+        {
+          "id": "nf-earle-meets-world",
+          "title": "Earle Meets World",
+          "kind": "reality",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Reality"
+          ],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 61,
+          "sample": true,
+          "drop": {
+            "season": 1,
+            "fullSeason": true
+          }
+        },
+        {
+          "id": "pv-jagamae-sangeetham",
+          "title": "Jagamae Sangeetham",
+          "kind": "series",
+          "platforms": [
+            "prime"
+          ],
+          "languages": [
+            "te"
+          ],
+          "genres": [],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "IN"
+          ],
+          "heat": 74,
+          "sample": true,
+          "drop": {
+            "season": 1,
+            "fullSeason": true
+          }
+        },
+        {
+          "id": "jh-the-court",
+          "title": "The Court",
+          "kind": "series",
+          "platforms": [
+            "jiohotstar"
+          ],
+          "languages": [
+            "hi"
+          ],
+          "genres": [],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "IN"
+          ],
+          "heat": 80,
+          "sample": true,
+          "drop": {
+            "season": 1,
+            "fullSeason": true
+          }
+        },
+        {
+          "id": "sl-unmadham",
+          "title": "Unmadham",
+          "kind": "film",
+          "platforms": [
+            "sonyliv"
+          ],
+          "languages": [
+            "hi"
+          ],
+          "genres": [],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "IN"
+          ],
+          "heat": 55,
+          "sample": true
+        },
+        {
+          "id": "sn-dc-bloody-valentine",
+          "title": "DC: The Bloody Valentine",
+          "kind": "film",
+          "platforms": [
+            "sunnxt"
+          ],
+          "languages": [
+            "ta",
+            "te",
+            "kn",
+            "ml"
+          ],
+          "genres": [],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "IN"
+          ],
+          "heat": 63,
+          "sample": true
+        },
+        {
+          "id": "ss-arulvaan",
+          "title": "Arulvaan",
+          "kind": "film",
+          "platforms": [
+            "simplysouth"
+          ],
+          "languages": [
+            "ta"
+          ],
+          "genres": [],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "IN"
+          ],
+          "heat": 52,
+          "sample": true
+        },
+        {
+          "id": "hc-puratawn",
+          "title": "Puratawn",
+          "kind": "film",
+          "platforms": [
+            "hoichoi"
+          ],
+          "languages": [
+            "bn"
+          ],
+          "genres": [],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "IN"
+          ],
+          "heat": 57,
+          "sample": true
+        },
+        {
+          "id": "ah-yellow-elephant",
+          "title": "The Yellow Elephant",
+          "kind": "film",
+          "platforms": [
+            "aha"
+          ],
+          "languages": [
+            "ta"
+          ],
+          "genres": [],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "IN"
+          ],
+          "heat": 54,
+          "sample": true
+        },
+        {
+          "id": "at-mayday",
+          "title": "Mayday",
+          "kind": "film",
+          "platforms": [
+            "appletv"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 76,
+          "sample": true
+        },
+        {
+          "id": "at-dark-matter-s2e2",
+          "title": "Dark Matter",
+          "kind": "series",
+          "platforms": [
+            "appletv"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Sci-Fi",
+            "Thriller"
+          ],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 78,
+          "sample": true,
+          "drop": {
+            "season": 2,
+            "episode": 2
+          }
+        },
+        {
+          "id": "at-silo-s3e10",
+          "title": "Silo",
+          "kind": "series",
+          "platforms": [
+            "appletv"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Sci-Fi",
+            "Drama"
+          ],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 90,
+          "sample": true,
+          "drop": {
+            "season": 3,
+            "episode": 10,
+            "finale": true
+          }
+        },
+        {
+          "id": "th-mirzapur-the-movie",
+          "title": "Mirzapur: The Movie",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "hi"
+          ],
+          "genres": [
+            "Crime",
+            "Drama"
+          ],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "IN"
+          ],
+          "heat": 95,
+          "sample": true
+        },
+        {
+          "id": "th-jeevan-bheema-yojana",
+          "title": "Jeevan Bheema Yojana",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "hi"
+          ],
+          "genres": [],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "IN"
+          ],
+          "heat": 68,
+          "sample": true
+        },
+        {
+          "id": "th-mahaprabhu-jagannath",
+          "title": "Mahaprabhu Jagannath",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "hi",
+            "or"
+          ],
+          "genres": [],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "IN"
+          ],
+          "heat": 64,
+          "sample": true
+        },
+        {
+          "id": "sh-parasomnia",
+          "title": "Parasomnia",
+          "kind": "film",
+          "platforms": [
+            "shudder"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Horror"
+          ],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "US"
+          ],
+          "heat": 60,
+          "sample": true
+        },
+        {
+          "id": "hb-fuze",
+          "title": "Fuze",
+          "kind": "film",
+          "platforms": [
+            "hbomax"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Action",
+            "Thriller"
+          ],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "US"
+          ],
+          "heat": 71,
+          "sample": true
+        },
+        {
+          "id": "hu-signal-one",
+          "title": "Signal One",
+          "kind": "film",
+          "platforms": [
+            "hulu"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Thriller"
+          ],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "US"
+          ],
+          "heat": 62,
+          "sample": true
+        }
+      ]
+    }
+  ]
+}
