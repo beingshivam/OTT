@@ -36,7 +36,6 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [prefs, setPrefs] = useState<Prefs>(DEFAULT_PREFS);
   const [selected, setSelected] = useState<Release | null>(null);
-  const [stuck, setStuck] = useState(false);
 
   const today = useMemo(() => new Date(), []);
   const currentWeek = useMemo(() => weekIdFor(today), [today]);
@@ -106,13 +105,6 @@ export default function App() {
   useEffect(() => {
     writeFilters(filters, { weekId: currentWeek, region: prefs.region }, weekPinned);
   }, [filters, currentWeek, prefs.region, weekPinned]);
-
-  useEffect(() => {
-    const onScroll = () => setStuck(window.scrollY > 8);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
 
   const update = useCallback((next: Partial<Filters>) => {
     setFilters((f) => ({ ...f, ...next }));
@@ -186,15 +178,18 @@ export default function App() {
         Skip to releases
       </a>
 
-      <header className="nav" data-stuck={stuck}>
-        <div className="shell nav__inner">
+      {/* Identity, week and controls in one band. A dedicated nav row carried a
+          logo and a region picker and cost 60px of a page that promises the
+          whole week at a glance. */}
+      <div className="shell weekbar">
+        <div className="weekbar__brand">
           <span className="logo">
             <span className="logo__mark">
               <IconPlay />
             </span>
             dropday<span className="logo__dot">.</span>
           </span>
-          <div className="nav__actions">
+          <div className="weekbar__region">
             <label className="region">
               <span aria-hidden="true">
                 {REGIONS.find((r) => r.code === filters.region)?.flag ?? '🌐'}
@@ -216,10 +211,8 @@ export default function App() {
             </label>
           </div>
         </div>
-      </header>
 
-      <div className="shell hero">
-        <nav className="weeknav" aria-label="Change week">
+        <div className="weekbar__week">
           <button
             className="weeknav__btn"
             onClick={() => stepWeek(-1)}
@@ -228,6 +221,7 @@ export default function App() {
           >
             <IconChevronLeft />
           </button>
+          <h1 className="weekbar__date">{formatWeekRange(filters.weekId)}</h1>
           <button
             className="weeknav__btn"
             onClick={() => stepWeek(1)}
@@ -236,37 +230,28 @@ export default function App() {
           >
             <IconChevronRight />
           </button>
-          <span className="weeknav__label">{relativeWeekLabel(filters.weekId, today)}</span>
+          <span className="weekbar__rel">{relativeWeekLabel(filters.weekId, today)}</span>
           {weekOffset !== 0 && (
             <button className="weeknav__today" onClick={goToCurrentWeek}>
-              Back to this week
+              This week
             </button>
           )}
-        </nav>
+        </div>
 
-        {/* Deliberately small. The board below is what people came for, and a
-            full-bleed hero would push it under the fold — the exact failure of
-            every streaming app this replaces. */}
-        <p className="hero__eyebrow">Your guide to what's new</p>
-        <h1 className="hero__date">{formatWeekRange(filters.weekId)}</h1>
-
-        <div className="hero__meta">
-          <span>
-            <strong>{facets.total}</strong> {facets.total === 1 ? 'release' : 'releases'} across{' '}
-            <strong>{facets.platforms.length}</strong>{' '}
-            {facets.platforms.length === 1 ? 'platform' : 'platforms'}
+        <div className="weekbar__right">
+          <span className="weekbar__count">
+            <strong>{facets.total}</strong> releases ·{' '}
+            <strong>{facets.platforms.length}</strong> platforms
           </span>
           {prefs.platforms.length > 0 && (
             <button
-              className="btn"
+              className="btn btn--sm"
               data-active={lineupOn}
-              style={{ height: 30, fontSize: 12 }}
               onClick={() => update({ platforms: lineupOn ? [] : prefs.platforms })}
             >
-              {lineupOn ? 'Showing my lineup' : `My lineup (${prefs.platforms.length})`}
+              {lineupOn ? 'My lineup' : `My lineup (${prefs.platforms.length})`}
             </button>
           )}
-
           <span className="viewtoggle" role="group" aria-label="Layout">
             <button data-on={view === 'board'} onClick={() => setView('board')}>
               Board
@@ -276,18 +261,6 @@ export default function App() {
             </button>
           </span>
         </div>
-
-        {/* One line. It's honest context, not a headline, and every pixel here
-            pushes the board further under the fold. */}
-        {feed?.source === 'sample' && missingArtwork > 0 && (
-          <p className="notice">
-            <span aria-hidden="true">📅</span>
-            <span>
-              <strong>Curated schedule</strong> — {missingArtwork} of {facets.total} still awaiting
-              artwork and synopses.
-            </span>
-          </p>
-        )}
       </div>
 
       <Controls
@@ -400,6 +373,18 @@ export default function App() {
           </>
         )}
 
+        {/* Context, not a headline — so it sits with the other provenance notes
+            rather than between the reader and the week. */}
+        {feed?.source === 'sample' && missingArtwork > 0 && (
+          <p className="notice">
+            <span aria-hidden="true">📅</span>
+            <span>
+              <strong>Curated schedule</strong> — {missingArtwork} of {facets.total} titles still
+              awaiting artwork and synopses.
+            </span>
+          </p>
+        )}
+
         <footer className="footer">
           <div className="footer__stack">
             <span>dropday — every new release, every platform, one page.</span>
@@ -414,7 +399,7 @@ export default function App() {
                 })}
               </span>
             )}
-            <span>Refreshes every Friday</span>
+            <span>Refreshes Tuesdays &amp; Fridays</span>
           </div>
         </footer>
       </main>

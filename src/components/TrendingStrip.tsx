@@ -1,4 +1,5 @@
-import { platform } from '../data/platforms';
+import { PlatformLogo } from './PlatformLogo';
+import { inkOn, platform } from '../data/platforms';
 import type { Release } from '../types';
 
 /**
@@ -28,11 +29,11 @@ export function TrendingStrip({ releases, onOpen }: Props) {
               <button
                 className="strip__item"
                 onClick={() => onOpen(r)}
-                style={{ '--pa': p.accent } as React.CSSProperties}
+                style={{ '--pa': p.accent, '--ink': inkOn(p.accent) } as React.CSSProperties}
               >
                 <span className="strip__rank">{i + 1}</span>
+                <PlatformLogo platformId={p.id} size={18} />
                 <span className="strip__title">{r.title}</span>
-                <span className="strip__where">{p.short}</span>
               </button>
             </li>
           );

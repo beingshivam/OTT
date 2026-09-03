@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { IconChevronDown, IconClose, IconSearch, IconSliders } from './icons';
+import { PlatformLogo } from './PlatformLogo';
 import { KIND_LABEL, languageName, platform } from '../data/platforms';
 import { activeFilterCount, toggle } from '../lib/filters';
 import type { Filters, SortKey, TitleKind } from '../types';
@@ -129,15 +130,20 @@ export function Controls({ filters, facets, resultCount, onChange, onReset }: Pr
         <div className="chips" role="group" aria-label="Filter by platform">
           {facets.platforms.map(([id, n]) => {
             const p = platform(id);
+            const on = filters.platforms.includes(id);
             return (
-              <Chip
+              <button
                 key={id}
-                label={p.short}
-                count={n}
-                accent={p.accent}
-                on={filters.platforms.includes(id)}
+                className="chip chip--logo"
+                data-on={on}
+                aria-pressed={on}
+                style={{ '--chip-accent': p.accent } as React.CSSProperties}
                 onClick={() => onChange({ platforms: toggle(filters.platforms, id) })}
-              />
+              >
+                <PlatformLogo platformId={id} size={18} />
+                {p.short}
+                <span className="chip__n">{n}</span>
+              </button>
             );
           })}
         </div>

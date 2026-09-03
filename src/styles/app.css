@@ -28,7 +28,8 @@
   --shadow-card: 0 18px 40px -18px rgba(0, 0, 0, 0.9);
   --shadow-pop: 0 40px 80px -30px rgba(0, 0, 0, 0.95);
 
-  --nav-h: 60px;
+  /* The nav band was folded into the week bar; the controls now stick to the top. */
+  --nav-h: 0px;
   --page-x: clamp(16px, 4vw, 56px);
   --max-w: 1440px;
 
@@ -615,6 +616,12 @@ a {
   color: rgba(255, 255, 255, 0.72);
 }
 
+/* A logo carries the identity, so the accent dot would be saying it twice. */
+.chip--logo {
+  padding-left: 6px;
+  gap: 8px;
+}
+
 .panel {
   display: grid;
   gap: 18px;
@@ -673,6 +680,123 @@ a {
 }
 .summary__clear:hover {
   color: var(--text);
+}
+
+/* --------------------------------------------------------- platform ---- */
+
+.logo-box {
+  width: var(--logo-size, 22px);
+  height: var(--logo-size, 22px);
+  flex: none;
+  border-radius: 6px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  /* Provider logos are supplied on white or transparent grounds and vary wildly
+     in padding, so give them one consistent plate rather than letting each set
+     its own optical size. */
+  background: #fff;
+}
+.logo-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.logo-box--mark {
+  background: linear-gradient(140deg, var(--pa), var(--pb));
+  color: var(--ink, #fff);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  font-size: calc(var(--logo-size, 22px) * 0.46);
+  text-transform: none;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+.logo-box--mark[data-len='3'] {
+  font-size: calc(var(--logo-size, 22px) * 0.34);
+}
+.logo-box--mark[data-len='4'] {
+  font-size: calc(var(--logo-size, 22px) * 0.27);
+}
+
+/* ------------------------------------------------------------ weekbar ---- */
+
+.weekbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  padding-top: 14px;
+  padding-bottom: 12px;
+}
+
+/* Three groups that sit on one line when there's room and stack cleanly when
+   there isn't — rather than one long flex row that wraps mid-control. */
+.weekbar__brand,
+.weekbar__week {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.weekbar__brand {
+  gap: 12px;
+}
+
+.weekbar__brand::after {
+  content: '';
+  width: 1px;
+  height: 22px;
+  background: var(--line);
+}
+
+.weekbar__region {
+  display: flex;
+  align-items: center;
+}
+
+.weekbar__date {
+  margin: 0 2px;
+  font-size: clamp(19px, 2.5vw, 27px);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+}
+
+.weekbar__rel {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+
+.weekbar__right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.weekbar__count {
+  font-size: 13px;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+.weekbar__count strong {
+  color: var(--text);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.btn--sm {
+  height: 30px;
+  padding: 0 12px;
+  font-size: 12px;
 }
 
 /* -------------------------------------------------------------- board ---- */
@@ -897,7 +1021,7 @@ a {
   display: grid;
   place-items: center;
   background: var(--pa);
-  color: #fff;
+  color: var(--ink, #fff);
   font-size: 10px;
   font-weight: 800;
   flex: none;
@@ -1610,8 +1734,31 @@ a {
     grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
     gap: 14px;
   }
-  .hero {
-    padding-top: 14px;
+  /* Each group gets its own full-width row, so nothing wraps mid-control. */
+  .weekbar {
+    gap: 8px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+  .weekbar__brand,
+  .weekbar__week,
+  .weekbar__right {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .weekbar__brand::after {
+    display: none;
+  }
+  /* The date already says which week it is. */
+  .weekbar__rel {
+    display: none;
+  }
+  .weekbar__week {
+    gap: 6px;
+  }
+  .weekbar__date {
+    font-size: 20px;
+    margin-inline: 0;
   }
   /* Two columns even on a phone: single-title services pair up instead of each
      taking a full-width band, which is what makes the printed calendars work. */

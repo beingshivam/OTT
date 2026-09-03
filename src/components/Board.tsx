@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { KIND_ICON } from './icons';
+import { PlatformLogo } from './PlatformLogo';
 import { dropLabel } from './ReleaseCard';
 import { KIND_LABEL, languageName, platform } from '../data/platforms';
 import { formatDay } from '../lib/week';
@@ -66,6 +67,7 @@ export function Board({ releases, onOpen, multiDay }: Props) {
                 aria-label={p.name}
               >
                 <header className="panel-card__head">
+                  <PlatformLogo platformId={id} size={24} />
                   <span className="panel-card__name">{p.name}</span>
                   <span className="panel-card__count">{list.length}</span>
                 </header>

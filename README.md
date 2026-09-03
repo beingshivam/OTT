@@ -122,8 +122,14 @@ TMDB_TOKEN=... npm run refresh
 2. **`enrich-releases.mjs`** attaches the artwork: posters, backdrops, synopses,
    ratings, runtimes, cast and director, matched by title.
 
-Run the second on its own with `npm run enrich` (add `--force` to re-fetch rows
-that already have artwork, `--verbose` to see what didn't match).
+3. **`fetch-logos.mjs`** writes `public/data/logos.json` — real platform logos
+   from TMDB's watch-provider list. It's the only source that carries JioHotstar,
+   SonyLIV, Sun NXT, hoichoi, aha and Simply South alongside the global services;
+   icon sets like Simple Icons stop at the American platforms, which would leave
+   the board half-branded.
+
+Run them individually with `npm run enrich` (add `--force` to re-fetch rows that
+already have artwork, `--verbose` to see what didn't match) and `npm run logos`.
 
 **Matching is deliberately strict.** A candidate is accepted only on an exact
 normalised title match with a plausible year; anything less is left alone. A
@@ -184,6 +190,17 @@ scripts/fetch-releases.mjs   the TMDB → releases.json pipeline
 ```
 
 A few decisions worth knowing about:
+
+- **The board is the product, not a poster grid.** The thing people already
+  forward on WhatsApp is one dense image: platform-grouped, readable at a glance,
+  no scrolling, and no artwork at all. It beats a streaming-app browse grid
+  because a wall of posters is exactly what you're trying to escape when you ask
+  what's new. So the board is the default view and the poster grid is the
+  alternative. Whole week, one screen on desktop.
+- **Platform logos carry the wayfinding.** Nobody reads "Netflix", they spot the
+  red N. Real logos come from TMDB; until they're fetched, a monogram in the
+  brand colour stands in. Ink colour is picked from the accent's luminance, since
+  brands like Apple TV+ are near-white and would swallow white text.
 
 - **Weeks run Friday → Thursday**, because that's how releases are actually
   scheduled and how the calendars people already read are laid out.
