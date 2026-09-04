@@ -18,75 +18,20 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadEnv } from './env.mjs';
+import { callCount, requireToken, tmdb } from './tmdb.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
-// Read .env first, so the credential never has to go on a command line.
-loadEnv();
 const FEED = resolve(ROOT, 'public/data/releases.json');
 const API = 'https://api.themoviedb.org/3';
 const IMG = 'https://image.tmdb.org/t/p';
 
-const TOKEN = process.env.TMDB_TOKEN || process.env.TMDB_API_KEY;
 const FORCE = process.argv.includes('--force');
 const VERBOSE = process.argv.includes('--verbose');
 
-if (!TOKEN) {
-  console.error(
-    'No TMDB credential found (set TMDB_TOKEN or TMDB_API_KEY).\n' +
-      'Either works — the v4 API Read Access Token or the v3 API Key, from\n' +
-      'https://www.themoviedb.org/settings/api. Then:\n' +
-      '  put it in .env (copy .env.example), then: npm run enrich\n' +
-      'The feed has been left untouched.',
-  );
-  process.exit(1);
-}
+requireToken();
 
-/**
- * TMDB hands out two credentials and they authenticate differently:
- *   - the v4 "API Read Access Token", a JWT, sent as `Authorization: Bearer`
- *   - the v3 "API Key", 32 hex characters, sent as an `api_key` query param
- * People reach for whichever the site showed them first, so accept both and
- * pick the scheme from the shape of the value rather than making it their
- * problem.
- */
-const IS_JWT = /^ey[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/.test(TOKEN);
 
-function authHeaders() {
-  return IS_JWT
-    ? { Authorization: `Bearer ${TOKEN}`, accept: 'application/json' }
-    : { accept: 'application/json' };
-}
-
-function applyAuth(url) {
-  if (!IS_JWT) url.searchParams.set('api_key', TOKEN);
-  return url;
-}
-
-let calls = 0;
-async function tmdb(path, params = {}) {
-  const url = new URL(API + path);
-  for (const [k, v] of Object.entries(params)) {
-    if (v !== undefined && v !== null && v !== '') url.searchParams.set(k, String(v));
-  }
-  if (calls++ > 0) await new Promise((r) => setTimeout(r, 60));
-
-  for (let attempt = 0; attempt < 4; attempt++) {
-    const res = await fetch(applyAuth(url), { headers: authHeaders() });
-    if (res.ok) return res.json();
-    if (res.status === 429) {
-      await new Promise((r) => setTimeout(r, Number(res.headers.get('retry-after') ?? 2) * 1000));
-      continue;
-    }
-    if (res.status >= 500) {
-      await new Promise((r) => setTimeout(r, 2 ** attempt * 500));
-      continue;
-    }
-    throw new Error(`TMDB ${res.status} ${res.statusText} for ${url.pathname}`);
-  }
-  throw new Error(`TMDB kept failing for ${url.pathname}`);
-}
 
 /** Fold case, accents and punctuation so "G.D.N." and "GDN" compare equal. */
 function norm(s) {
@@ -199,5 +144,5 @@ for (const week of feed.weeks) {
 feed.enrichedAt = new Date().toISOString();
 await writeFile(FEED, JSON.stringify(feed, null, 2) + '\n');
 console.log(
-  `\nEnriched ${matched} title(s); ${skipped} left with generated art. ${calls} API calls.`,
+  `\nEnriched ${matched} title(s); ${skipped} left with generated art. ${callCount()} API calls.`,
 );

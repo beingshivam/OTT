@@ -15,41 +15,16 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadEnv } from './env.mjs';
+import { callCount, requireToken, tmdb } from './tmdb.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
-// Read .env first, so the credential never has to go on a command line.
-loadEnv();
 const OUT = resolve(ROOT, 'public/data/logos.json');
 const API = 'https://api.themoviedb.org/3';
 const IMG = 'https://image.tmdb.org/t/p/w154';
 
-const TOKEN = process.env.TMDB_TOKEN || process.env.TMDB_API_KEY;
-if (!TOKEN) {
-  console.error(
-    'No TMDB credential found (set TMDB_TOKEN or TMDB_API_KEY).\n' +
-      'Either the v4 API Read Access Token or the v3 API Key works.\n' +
-      'The existing logos file has been left untouched.',
-  );
-  process.exit(1);
-}
+requireToken();
 
-const IS_JWT = /^ey[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/.test(TOKEN);
-
-async function tmdb(path, params = {}) {
-  const url = new URL(API + path);
-  for (const [k, v] of Object.entries(params)) url.searchParams.set(k, String(v));
-  if (!IS_JWT) url.searchParams.set('api_key', TOKEN);
-
-  const res = await fetch(url, {
-    headers: IS_JWT
-      ? { Authorization: `Bearer ${TOKEN}`, accept: 'application/json' }
-      : { accept: 'application/json' },
-  });
-  if (!res.ok) throw new Error(`TMDB ${res.status} ${res.statusText} for ${url.pathname}`);
-  return res.json();
-}
 
 /** Parse the registry rather than duplicating it — one source of truth. */
 const src = await readFile(resolve(ROOT, 'src/data/platforms.ts'), 'utf8');
