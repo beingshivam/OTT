@@ -64,9 +64,19 @@ console.log(`TMDB returned logos for ${providers.size} providers.`);
 
 const logos = {};
 const missing = [];
+/**
+ * A platform that lists provider ids but matches none of the live ones has gone
+ * stale — the service rebranded and TMDB issued a new id. That is worth calling
+ * out separately from Theatres, which has no provider by design: a stale entry
+ * silently matches nothing in discover, so the platform looks like a quiet week
+ * rather than a broken mapping. JioHotstar sat like that behind a one-line log
+ * message, showing a single title, until someone went looking.
+ */
+const stale = [];
 for (const { id, tmdb: ids } of platforms) {
   const hit = ids.find((n) => providers.has(n));
   if (hit) logos[id] = `${IMG}${providers.get(hit)}`;
+  else if (ids.length) stale.push(id);
   else missing.push(id);
 }
 
@@ -75,6 +85,19 @@ await writeFile(OUT, JSON.stringify(logos, null, 2) + '\n');
 
 console.log(`Wrote ${Object.keys(logos).length} logos to ${OUT}.`);
 if (missing.length) {
-  // Theatres has no provider by design; anything else here keeps its monogram.
-  console.log(`No provider logo for: ${missing.join(', ')} — these keep the monogram lockup.`);
+  // No provider ids at all — Theatres, by design. Keeps the monogram lockup.
+  console.log(`No provider to look up for: ${missing.join(', ')} — these keep the monogram lockup.`);
+}
+
+if (stale.length) {
+  const list = stale.join(', ');
+  // ::warning is a no-op locally and a highlighted annotation on the Actions run
+  // summary, which is the only place anyone would notice this unattended.
+  console.log(
+    `::warning title=Stale provider ids::${list} — every TMDB provider id in the registry for ` +
+      `${stale.length === 1 ? 'this platform is' : 'these platforms are'} dead, so ` +
+      `${stale.length === 1 ? 'it matches' : 'they match'} nothing in discover and ` +
+      `${stale.length === 1 ? 'shows' : 'show'} no logo. The service has probably rebranded. ` +
+      `Run: npm run providers -- ${stale.join(' ')}`,
+  );
 }
