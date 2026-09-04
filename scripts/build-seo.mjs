@@ -28,7 +28,24 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const HTML = resolve(ROOT, 'dist/index.html');
 const FEED = resolve(ROOT, 'dist/data/releases.json');
 
-const SITE_URL = (process.env.SITE_URL ?? 'https://firstday.newreleases.workers.dev').replace(/\/$/, '');
+/**
+ * A canonical pointing at a host that does not serve the site is worse than no
+ * canonical at all, so this is derived rather than typed twice: the Worker name
+ * comes from wrangler.jsonc — the same value that decides the real subdomain —
+ * and cannot drift from it. Only the account subdomain lives here, because it is
+ * account-level and not expressed anywhere in the repo.
+ *
+ * On a custom domain, set SITE_URL in the Cloudflare build's environment
+ * variables (Workers › Settings › Build) and that wins outright.
+ */
+const CF_ACCOUNT_SUBDOMAIN = 'newreleases';
+const workerName =
+  (await readFile(resolve(ROOT, 'wrangler.jsonc'), 'utf8')).match(/"name"\s*:\s*"([^"]+)"/)?.[1] ??
+  'firstday';
+
+const SITE_URL = (
+  process.env.SITE_URL ?? `https://${workerName}.${CF_ACCOUNT_SUBDOMAIN}.workers.dev`
+).replace(/\/$/, '');
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const esc = (s) =>
