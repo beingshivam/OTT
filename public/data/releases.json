@@ -1,12 +1,1583 @@
 {
-  "generatedAt": "2026-09-03T00:00:00.000Z",
-  "source": "sample",
+  "generatedAt": "2026-09-04T17:22:38.592Z",
+  "source": "tmdb",
   "weeks": [
+    {
+      "id": "2026-08-14",
+      "start": "2026-08-14",
+      "end": "2026-08-20",
+      "releases": [
+        {
+          "id": "t-303351",
+          "title": "Blood Sacrifice",
+          "kind": "series",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "sv"
+          ],
+          "genres": [
+            "Drama",
+            "Crime",
+            "Mystery"
+          ],
+          "releaseDate": "2026-08-20",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "rating": 6.6,
+          "heat": 60,
+          "synopsis": "Following the brutal murder of two police officers, a tenacious detective reluctantly joins forces with his estranged ex-cop father to catch the killer.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/8iFUWLKBAWDrJ9rOunscgIDrGQ1.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/z6mnJhvFbAgM1UTL87NWjJLhK26.jpg"
+        },
+        {
+          "id": "m-1676318",
+          "title": "Back to the 90s",
+          "kind": "film",
+          "platforms": [
+            "prime"
+          ],
+          "languages": [
+            "de"
+          ],
+          "genres": [
+            "Romance",
+            "Comedy",
+            "Music"
+          ],
+          "releaseDate": "2026-08-18",
+          "regions": [
+            "US"
+          ],
+          "heat": 38,
+          "synopsis": "When a mysterious glitch sends a rising boyband back to 1995 - just days before the biggest showcase of their lives - the five friends race to reverse the time slip. But as unexpected connections form and the past pulls them in deeper, getting home means confronting what they're willing to leave behind - and who they truly are to each other.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/tCOvMa7bXHiRlOuhQvUOeSF0kPn.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/wJaqJIBZB8D5rPTwQDnGyhTX6RB.jpg"
+        },
+        {
+          "id": "m-1741201",
+          "title": "Chompoo: Lost​ &​ Forgotten​",
+          "kind": "documentary",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "th"
+          ],
+          "genres": [
+            "Documentary"
+          ],
+          "releaseDate": "2026-08-20",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 35,
+          "synopsis": "When a young girl vanishes from a remote village, the frantic police hunt become a media frenzy. But who turned a suspected criminal into a celebrity?",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/hrbzPEGyu33JyepFvSe6EkN35yq.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/uU6NBiVlJgdOt6EodmbEvs8tlpI.jpg"
+        },
+        {
+          "id": "t-312523",
+          "title": "S&X",
+          "kind": "series",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "ja"
+          ],
+          "genres": [
+            "Drama"
+          ],
+          "releaseDate": "2026-08-20",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 35,
+          "synopsis": "At his clinic, sex therapist Ichito Shimotori treats diverse and intimate sexual issues with sincerity. Yet, he secretly hides a struggle of his own.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/iyBgwNr5I7CW1Mf7ulPgdz3Y5Ax.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/iTmOvi8vZeFntt3q7BuWsPugmal.jpg"
+        },
+        {
+          "id": "m-1490260",
+          "title": "Whitmer Thomas: Terminal Crew of Dudes",
+          "kind": "film",
+          "platforms": [
+            "hbomax"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Comedy",
+            "Music"
+          ],
+          "releaseDate": "2026-08-14",
+          "regions": [
+            "US"
+          ],
+          "heat": 33,
+          "synopsis": "Comedian, musician, and actor Whitmer Thomas digs into his small-town Alabama upbringing and his ongoing quest to be cool.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/rPNtLjfJ6txQF0q53qzF2mRfu1v.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/kEhHDIBzN72wcsHI7J7NQgf6Css.jpg"
+        },
+        {
+          "id": "m-1589248",
+          "title": "My Best Friend, His Girlfriend and Me",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "de"
+          ],
+          "genres": [
+            "Comedy"
+          ],
+          "releaseDate": "2026-08-14",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "rating": 6.2,
+          "heat": 31,
+          "synopsis": "Olli and Matze are best friends living, working and planning to travel the world together — until Matze's romance with Rebecca turns it all upside down.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/aWLshM7DZECutuQVpMfhDiPZUQC.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/oAFBdUTyyJZ7EMImZAdMGuPvt6V.jpg"
+        },
+        {
+          "id": "m-1688804",
+          "title": "Freefall: A Reckoning for Boeing",
+          "kind": "documentary",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Documentary"
+          ],
+          "releaseDate": "2026-08-14",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "rating": 6.9,
+          "heat": 27,
+          "synopsis": "Following the highly publicized death of Boeing whistleblower John Barnett, the investigation continues into the once-iconic aviation giant, uncovering startling new revelations and insider accounts in the wake of a deepening corporate crisis..",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/oadqt3V5c8j5ZIbYkdfQLcWzI4C.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/dYOH6BTxKmf1LTnQPZR3XxRvLrc.jpg"
+        },
+        {
+          "id": "m-1750516",
+          "title": "Pallaburusu",
+          "kind": "film",
+          "platforms": [
+            "prime"
+          ],
+          "languages": [
+            "te"
+          ],
+          "genres": [
+            "Comedy",
+            "Drama"
+          ],
+          "releaseDate": "2026-08-14",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 25,
+          "synopsis": "A 70 year old widower asks his son to buy him a toothbrush for his toothache. When the son fails to do this simple errand, their already strained father-son relationship becomes comically worse through a series of escalating events.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/sZsHYS3ckPoSUBnEB5J3CiE3oBV.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/w2HSqxbdgkN6d6Rg5HvCUaMpG7x.jpg"
+        },
+        {
+          "id": "t-331674",
+          "title": "The Sex Slave",
+          "kind": "documentary",
+          "platforms": [
+            "hbomax"
+          ],
+          "languages": [
+            "sv"
+          ],
+          "genres": [
+            "Documentary",
+            "Crime"
+          ],
+          "releaseDate": "2026-08-14",
+          "regions": [
+            "US"
+          ],
+          "heat": 25,
+          "synopsis": "A harrowing two-part documentary chronicling how a mother of five suddenly found herself being sold to unknown men... by her own partner.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/oQbbalt2tkUGerpDyjDXefwEDLi.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/dqpULBcBjsTLbawXKQy2DKjoRwe.jpg"
+        },
+        {
+          "id": "t-323557",
+          "title": "Lion",
+          "kind": "documentary",
+          "platforms": [
+            "disney",
+            "hulu"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Documentary"
+          ],
+          "releaseDate": "2026-08-19",
+          "regions": [
+            "US"
+          ],
+          "heat": 25,
+          "synopsis": "The extraordinary true story of lion cub Kio, on his journey to become a king.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/mvFQIZo2DG1pyiINL2bDa5QNR4O.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/xc5PQ22igs1F3OyJ1vXVTZW6793.jpg"
+        },
+        {
+          "id": "m-1736062",
+          "title": "Disney Worldbuilders",
+          "kind": "documentary",
+          "platforms": [
+            "disney"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Documentary"
+          ],
+          "releaseDate": "2026-08-16",
+          "regions": [
+            "US"
+          ],
+          "heat": 24,
+          "synopsis": "We sit down with some of the key figures shaping Disney’s most enduring stories for a series of intimate conversations about their early years, first sparks, and formative Disney memories — and how the worlds they once dreamed up are now taking shape at Disney destinations around the globe.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/fNhn4MpcGWkBPgGz62Ds0xlQIdA.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/86UbkaAlNaD2dJ93SOhCzP4gOz7.jpg"
+        },
+        {
+          "id": "m-1626188",
+          "title": "Novak Djokovic: The Wolf in Winter",
+          "kind": "documentary",
+          "platforms": [
+            "prime"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Documentary"
+          ],
+          "releaseDate": "2026-08-20",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 22,
+          "synopsis": "He's conquered every title in tennis, including an Olympic gold. So why is Novak Djokovic still playing? The Wolf in Winter embeds with the greatest tennis player of all time as he returned to the Australian Open in 2025, capturing the obsession, the preparation, and the fire that won't go out even when there's nothing left to prove.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/4VvaFy9Z5C879akw3XJ31XK4lWO.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/1upwdMUTDkEI5vm22d4D09cFWkU.jpg"
+        },
+        {
+          "id": "t-326901",
+          "title": "Take a Hike!",
+          "kind": "reality",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "ko"
+          ],
+          "genres": [
+            "Reality"
+          ],
+          "releaseDate": "2026-08-18",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 22,
+          "synopsis": "Four celebrity hiking newbies end up forming a club to tackle Korea's snow‑capped peaks. Can they figure out why on earth people go to the mountains?",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/ya3p0meUJJ92gjFRFcZ1C3TJ0nO.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/giJzZvC9p6QdSi9tCgcOJZcw2hY.jpg"
+        },
+        {
+          "id": "t-331946",
+          "title": "A Beautiful Obsession",
+          "kind": "documentary",
+          "platforms": [
+            "prime",
+            "peacock"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Documentary"
+          ],
+          "releaseDate": "2026-08-19",
+          "regions": [
+            "US"
+          ],
+          "heat": 21,
+          "synopsis": "An intimate, raw portrait of Manchester City FC across two era-defining seasons. With unprecedented access, the film follows their worst run in decades and fightback to glory.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/sMGr6FeYhA799ZU50r4wjt5HVdV.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/kqaqrGjVthqrK2kcjQEIeDYAAdH.jpg"
+        },
+        {
+          "id": "t-294722",
+          "title": "The Dynasty: UConn Huskies",
+          "kind": "documentary",
+          "platforms": [
+            "appletv"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Documentary"
+          ],
+          "releaseDate": "2026-08-20",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 20,
+          "synopsis": "Go inside the most dominant program in college basketball history as Geno Auriemma pushes his players to the limit to win 12 titles. Rebecca Lobo, Diana Taurasi, Paige Bueckers, and more reveal what it takes to survive UConn and build a dynasty.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/5lZ0NLV93fIx8yIWT38h8rt5u2I.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/6dBzbLqznXgpe5z9ZIqqD0mxwac.jpg"
+        },
+        {
+          "id": "m-1738070",
+          "title": "Kelsey Cook: Happy Hour",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Comedy"
+          ],
+          "releaseDate": "2026-08-18",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 14,
+          "synopsis": "In this candid and clever stand-up special, Kelsey Cook explores \"hangxiety,\" relives a plane bathroom nightmare and breaks down dating a literal Chad.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/rbvVm5OPzWGypYJzFMylMJ0wMWG.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/hJg5pJ0uayECfRq3A59AL6T1BV0.jpg"
+        },
+        {
+          "id": "m-1750855",
+          "title": "Disney Princess: The Ultimate Concert Celebration",
+          "kind": "film",
+          "platforms": [
+            "disney"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Music",
+            "Family",
+            "History"
+          ],
+          "releaseDate": "2026-08-16",
+          "regions": [
+            "US"
+          ],
+          "heat": 13,
+          "synopsis": "Disney Princess: The Ultimate Concert Celebration at Disneyland Resort brings together the largest gathering of Disney Princess stars ever assembled, celebrating the iconic stories across animation, live-action, stage, and music. This one-of-a-kind concert will transform the night skies with dazzling lights, sweeping projections, and sky-high fountains creating a truly immersive world where the music, magic, and legacy of Disney Princesses shine like never before.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/2YyWdtnpbJRmvSvBHttJlTEAWTy.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/auP3rYRZDEkCpxzUMztdrmytWMg.jpg"
+        },
+        {
+          "id": "t-331466",
+          "title": "Outer Banks: The Official Podcast",
+          "kind": "series",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Talk"
+          ],
+          "releaseDate": "2026-08-20",
+          "regions": [
+            "US"
+          ],
+          "heat": 13,
+          "synopsis": "Host Ria Ciuffo sits down with Outer Banks stars Chase Stokes, Madelyn Cline, Carlacia Grant, Jonathan Daviss, and Madison Bailey to celebrate the series' five-season run.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/iQfFUQ7SeTDhI6sCvs0Q0HzIk3h.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/BPr9MNytUJqjvvPgpYYgVVQByK.jpg"
+        },
+        {
+          "id": "m-1231624",
+          "title": "He Loves Me Not",
+          "kind": "film",
+          "platforms": [
+            "prime"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Romance",
+            "Comedy"
+          ],
+          "releaseDate": "2026-08-20",
+          "regions": [
+            "US"
+          ],
+          "heat": 11,
+          "synopsis": "An aspiring actress chosen as a wild card for a reality TV dating show uses a secret elixir to win the heart of the star, but when her deception is revealed, she discovers a messy but real chance for love.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/nLGZpK2ShMnwGFBmHRoc1DXV49r.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/rnHDBgYUAFPmQqlayAsZ9Udh2D4.jpg"
+        },
+        {
+          "id": "t-320936",
+          "title": "The Rotten Files with Stephanie Soo",
+          "kind": "series",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Crime",
+            "Talk"
+          ],
+          "releaseDate": "2026-08-14",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 10,
+          "synopsis": "Stephanie Soo dives deep into today's most explosive cases to uncover killers and predators who thought their stories would stay buried.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/as9XgYO5GG8gON5tGckKeYdpfDQ.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/aDdbMas98lyOdspbSqWpqbho5Wx.jpg"
+        },
+        {
+          "id": "t-331999",
+          "title": "Disney Sidekick Adventures",
+          "kind": "series",
+          "platforms": [
+            "disney"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [],
+          "releaseDate": "2026-08-17",
+          "regions": [
+            "US"
+          ],
+          "heat": 7
+        },
+        {
+          "id": "m-1748883",
+          "title": "Cradle of Coaches",
+          "kind": "documentary",
+          "platforms": [
+            "peacock"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Documentary"
+          ],
+          "releaseDate": "2026-08-17",
+          "regions": [
+            "US"
+          ],
+          "heat": 5,
+          "synopsis": "This documentary delves into the history of remarkable leaders, their groundbreaking achievements, and the profound connections that have shaped football’s greatest coaching legacy.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/uSYZTGXMt9pSgIPjXCJjJhy2OD1.jpg"
+        },
+        {
+          "id": "t-333396",
+          "title": "World's Most Evil Women",
+          "kind": "series",
+          "platforms": [
+            "prime"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [],
+          "releaseDate": "2026-08-17",
+          "regions": [
+            "US"
+          ],
+          "heat": 3,
+          "synopsis": "World's Most Evil Women unmasks those who traded compassion for cruelty, committing acts so horrific they shattered entire communities.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/gbQLqw3M04foNG0SNeuvaBDQcKe.jpg"
+        }
+      ]
+    },
+    {
+      "id": "2026-08-21",
+      "start": "2026-08-21",
+      "end": "2026-08-27",
+      "releases": [
+        {
+          "id": "m-1621552",
+          "title": "Facing El Chapo",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "es"
+          ],
+          "genres": [
+            "Crime",
+            "Action",
+            "Thriller"
+          ],
+          "releaseDate": "2026-08-21",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "rating": 8.8,
+          "heat": 86,
+          "synopsis": "Two Mexican officers must survive the final hours of their shift after crossing a ruthless cartel boss.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/z8eF0ACFFKtIZ4pUeo02PCzxRVO.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/c4U96GrPRfnNrS01mBtqnocvlLJ.jpg"
+        },
+        {
+          "id": "m-1516698",
+          "title": "The Last Sunrise",
+          "kind": "film",
+          "platforms": [
+            "prime"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Romance",
+            "Drama"
+          ],
+          "releaseDate": "2026-08-26",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "rating": 6.7,
+          "heat": 82,
+          "synopsis": "Ry, a college student with a chronic illness, escapes to Mallorca for the summer with her mother, where she unexpectedly falls for a local and begins to embrace living in the moment. But as her condition worsens and long-hidden family secrets come to light, everything she has found before summer's end is threatened.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/3PWJqDfygN0YNNjWsDUOXclCp3h.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/zFCWfU2ViMIm38G1W8UsnSpqmWn.jpg"
+        },
+        {
+          "id": "m-860508",
+          "title": "The Whisper Man",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Crime",
+            "Drama",
+            "Thriller"
+          ],
+          "releaseDate": "2026-08-27",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "rating": 6.7,
+          "heat": 80,
+          "synopsis": "When his young son vanishes, a widower enlists help from his estranged father, a retired detective who put away the serial killer now linked to the case.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/6UqflU8Qqkz7Dq4swJPqs0ZJjY4.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/xSJJQeAp9GBFmiKusysTRG6jQjt.jpg"
+        },
+        {
+          "id": "t-299952",
+          "title": "The Early Spring",
+          "kind": "series",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "zh"
+          ],
+          "genres": [
+            "Drama"
+          ],
+          "releaseDate": "2026-08-26",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 61,
+          "synopsis": "New to Beijing, Shang Zhitao crosses paths with Luan Nian, a true creative genius. Bold and open-hearted, she grows stronger step by step and gradually breaks through the defenses around Luan's guarded heart. Drawn to each other, they find themselves caught in an intense, on-again, off-again relationship in the urban jungle. To love is to summon all your courage and leave no regrets, to heal each other, and to grow together. But when love and her career pull her in different directions, she puts her career first. When she has come into her own and he has learned to soften his sharp edges, they finally stand as equals, ready to write a new ending together...",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/yiAzR6wGqjyAotZ4DvFvFeo8QS0.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/oUFUvEMCBP80e4eYsfVfxC8n7ih.jpg"
+        },
+        {
+          "id": "m-1729723",
+          "title": "Yellow Mirror",
+          "kind": "film",
+          "platforms": [
+            "disney"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Animation",
+            "Comedy",
+            "Science Fiction"
+          ],
+          "releaseDate": "2026-08-26",
+          "regions": [
+            "US"
+          ],
+          "rating": 8.1,
+          "heat": 45,
+          "synopsis": "A defective lamp reveals a heartbreaking truth about what Homer believes is reality, and an AI-powered tablet befriends and controls Maggie. The Simpsons struggle to find the light through two dark tales of the curious and bizarre.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/1zdGvJAuuXC7dA3eV61OtUJNyjQ.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/rFjlsx5IygrHmBqr0KsVolAHhy7.jpg"
+        },
+        {
+          "id": "m-1538273",
+          "title": "Pyaar Prema Kalyanam",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "ta"
+          ],
+          "genres": [
+            "Romance",
+            "Comedy",
+            "Drama"
+          ],
+          "releaseDate": "2026-08-21",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 42,
+          "synopsis": "When a bride refuses to leave her family home after marriage, her husband must find out if he can adjust to life under his in-laws' roof.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/AjaNAeMXOrK9n0YqGqX0Lz5qxYu.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/jgsptBYJbuO7omWLOj1HNsqvgLM.jpg"
+        },
+        {
+          "id": "t-275224",
+          "title": "My Name Is Gutierrez",
+          "kind": "series",
+          "platforms": [
+            "disney",
+            "hulu"
+          ],
+          "languages": [
+            "es"
+          ],
+          "genres": [
+            "Comedy",
+            "Drama"
+          ],
+          "releaseDate": "2026-08-26",
+          "regions": [
+            "US"
+          ],
+          "rating": 9.3,
+          "heat": 38,
+          "synopsis": "Deputy Commissioner Gutierrez competes with the CIA to solve the murder of the Russian Ambassador with his unique style.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/7zT7FbS0mwJdjKoPPX7xOhySlNN.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/a5BYpkrmhSdHiGrW5IU30PgKAmR.jpg"
+        },
+        {
+          "id": "m-1732625",
+          "title": "LEGO Disney Princess: Magical Mayhem",
+          "kind": "film",
+          "platforms": [
+            "disney"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Animation",
+            "Fantasy",
+            "Comedy",
+            "Adventure"
+          ],
+          "releaseDate": "2026-08-21",
+          "regions": [
+            "US"
+          ],
+          "heat": 37,
+          "synopsis": "During a heavy rainstorm, the Princess characters and their sidekick friends take in animals in need while enjoying a cozy day in their castle. But when the animals run amok, chaos erupts. Sleuthing reveals a mischievous villain behind it all, and with teamwork, quick thinking, and help from an unexpected friend, the Princess characters must restore order and save their home.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/3tCKtHBq9LC5Vd8S1UHVocZDj0l.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/kBrBcgdite6vpa6VkYEcjZuof7z.jpg"
+        },
+        {
+          "id": "t-331616",
+          "title": "Death of the Pastor's Wife",
+          "kind": "documentary",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Documentary",
+            "Crime"
+          ],
+          "releaseDate": "2026-08-26",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "rating": 7.8,
+          "heat": 36,
+          "synopsis": "What happened to Mica Miller? This documentary series retraces her promising life, toxic marriage and the mysterious circumstances of her death.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/o8H6HmQNt2qx5bIfmvuI6VJn13A.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/gXX5VDz1jh0Adqo8a8QPHJthiEl.jpg"
+        },
+        {
+          "id": "t-326879",
+          "title": "The Airport Chaplain",
+          "kind": "series",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Drama"
+          ],
+          "releaseDate": "2026-08-26",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 31,
+          "synopsis": "Airport Chaplain Tobias Wallace is convinced the airport couldn’t possibly run without his 24/7 devotion. But new Terminal Manager Mira Ansari-Cole is convinced he’s a walking liability.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/fptacsSVdDDcP3TWIq5OLtOH7UM.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/7INMRw6nEu9jpZucRtfvgrtFAVT.jpg"
+        },
+        {
+          "id": "m-1739186",
+          "title": "Untold: The Testimony of Vince Young",
+          "kind": "documentary",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Documentary"
+          ],
+          "releaseDate": "2026-08-25",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 26,
+          "synopsis": "After delivering one of the greatest performances in Rose Bowl history, Texas Longhorns legend Vince Young was the NFL's next big thing, and for a while, he was. But a career riddled by injuries, conflict and sudden loss tells a far more complicated story than the highlight reels ever showed.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/A1n4bOedczRdAm3JRBmbg35deCD.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/eVOuDbCLElehZr1U5aZtK1yAU3f.jpg"
+        },
+        {
+          "id": "m-1740313",
+          "title": "Stamptown",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Comedy"
+          ],
+          "releaseDate": "2026-08-25",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 26,
+          "synopsis": "Blending the wild worlds of circus and comedy, anarchic acts collide for this raunchy and explicit variety show - clothing not guaranteed.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/dGQUiIOa93d6U6tQAaXKoITUoEY.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/13A0rWXcWuTR3cTY9dKT6tICxzM.jpg"
+        },
+        {
+          "id": "t-329987",
+          "title": "9/11: Reunited",
+          "kind": "documentary",
+          "platforms": [
+            "disney",
+            "hulu"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Documentary"
+          ],
+          "releaseDate": "2026-08-21",
+          "regions": [
+            "US"
+          ],
+          "heat": 25,
+          "synopsis": "The story of September 11 through the eyes of survivors who experienced life-or-death moments with strangers that day and now want to meet again.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/gRRbtlz7Lyygch0UOWr5Iso0LVk.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/97MBKEskobZSHT0f0wzZVRYd2fg.jpg"
+        },
+        {
+          "id": "t-331796",
+          "title": "Mom Knows Best?",
+          "kind": "reality",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "pt"
+          ],
+          "genres": [
+            "Reality"
+          ],
+          "releaseDate": "2026-08-26",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 20,
+          "synopsis": "Nine mothers compete to prove they know their children best; they wager money on predicting their children's choices and discover that their children can still surprise them.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/ohJueiAc8cpxwYAY3njS5NCiMu5.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/NlcTfpNZbjTE1mHWwsw6f6GIa.jpg"
+        },
+        {
+          "id": "t-330438",
+          "title": "The Girls: A Khloé Kardashian Project",
+          "kind": "reality",
+          "platforms": [
+            "hulu"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Reality"
+          ],
+          "releaseDate": "2026-08-21",
+          "regions": [
+            "US"
+          ],
+          "heat": 17,
+          "synopsis": "They're building empires. They're building families. They're always unfiltered. Welcome to The Girls, where Khloé Kardashian's inner circle of real-life besties are raising babies, running businesses, and surviving brutally honest group chats. From surprise proposals to solo parenting, glam getaways to growing pains, this is the new era of reality TV where the chaos is couture — and the bonds are unbreakable.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/8P12ytuz41DKCBSpjX3Ntev177Z.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/3wbETP2ujDBQ1GdajfVwTDJTKoe.jpg"
+        },
+        {
+          "id": "t-328714",
+          "title": "Totally '90s House",
+          "kind": "documentary",
+          "platforms": [
+            "hbomax"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Reality",
+            "Documentary"
+          ],
+          "releaseDate": "2026-08-26",
+          "regions": [
+            "US"
+          ],
+          "heat": 17,
+          "synopsis": "Follows two teams of '90s television idols with a passion for design and renovation as they scour the country for houses stuck in the 1990s - think honey oak cabinets, sponge-painted walls and mirrored closets - with each team ultimately picking their perfect throwback in need of a major overhaul.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/yiP2MpPL0wQbDgxEj34kwpLW9rF.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/yMit8W73YZHQKBN0DzIa26evgMs.jpg"
+        },
+        {
+          "id": "m-1470480",
+          "title": "God Is Shy",
+          "kind": "film",
+          "platforms": [
+            "mubi"
+          ],
+          "languages": [
+            "fr"
+          ],
+          "genres": [
+            "Animation",
+            "Mystery",
+            "Fantasy",
+            "Horror",
+            "Drama"
+          ],
+          "releaseDate": "2026-08-27",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 14,
+          "synopsis": "During a train ride, Ariel and Paul pass the time sketching their deepest fears. Their game takes an unexpected turn when Gilda, a mysterious passenger, intrudes on their exchange. Yet, her relationship with fear seems far less innocent than their playful drawings.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/9TcNiAZoVHVtvUhlAHJ1kObsqaB.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/mHH06LwSeYt0bqSLswZTXgoUOem.jpg"
+        },
+        {
+          "id": "t-332379",
+          "title": "Countdown to Avengers: Doomsday Official Podcast",
+          "kind": "series",
+          "platforms": [
+            "disney"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Talk"
+          ],
+          "releaseDate": "2026-08-27",
+          "regions": [
+            "US"
+          ],
+          "heat": 14,
+          "synopsis": "Iman Vellani and Frank Alvarez host a rewatch of films from Marvel Studios' The Infinity Saga, working their way to Avengers: Doomsday. Together, they revisit each film with a recap and a conversation about which themes and characters may continue to have future implications.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/jQKt9R0LRWGXYF4TfhyrIrqqvv3.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/kuS2wdKyXBc5kdgDdHx02Yi3zDF.jpg"
+        },
+        {
+          "id": "m-1756450",
+          "title": "The Last Salute",
+          "kind": "documentary",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Documentary"
+          ],
+          "releaseDate": "2026-08-26",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 13,
+          "synopsis": "Chronicles the MiG-21's final chapter in the Indian Air Force, showcasing stories of generations of fighter pilots who flew it.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/vcwG27XxJ7adAOfYiON8IjPUfSX.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/nBi3xDc9psoSVt5aN87fEKDHrgh.jpg"
+        },
+        {
+          "id": "m-1757220",
+          "title": "Dolly: An NBC News Special",
+          "kind": "documentary",
+          "platforms": [
+            "peacock"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Documentary"
+          ],
+          "releaseDate": "2026-08-26",
+          "regions": [
+            "US"
+          ],
+          "heat": 13,
+          "synopsis": "A look back at Dolly Parton's remarkable journey to stardom, her groundbreaking career and her lasting impact far beyond music.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/ozf8MilklXjBg2R3R95uT7hXOFL.jpg"
+        },
+        {
+          "id": "t-329451",
+          "title": "Wishbone Kitchen",
+          "kind": "series",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Talk"
+          ],
+          "releaseDate": "2026-08-26",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 6,
+          "synopsis": "Pull up a kitchen stool and press play. Each week, Meredith Hayden — the voice behind Wishbone Kitchen — sits down to talk cozy, crave-worthy recipes, real kitchen tips, and the small rituals that turn a house into a home. It's the kind of podcast that makes you want to light a candle, pour a glass of wine, and press record on your own kitchen story.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/n1AVpdC74p2Nz7K4d6meEVrOBYA.jpg"
+        }
+      ]
+    },
+    {
+      "id": "2026-08-28",
+      "start": "2026-08-28",
+      "end": "2026-09-03",
+      "releases": [
+        {
+          "id": "m-1386315",
+          "title": "The Runner",
+          "kind": "film",
+          "platforms": [
+            "prime"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Thriller"
+          ],
+          "releaseDate": "2026-09-03",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "rating": 6.2,
+          "heat": 81,
+          "synopsis": "Maia Marten, a brilliant London lawyer, has her life shattered by a single call on her morning run: her son has been taken. To get him back, she must keep running, obey every ruthless command, and trust no one-each second a test of how far a mother will go to save her child.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/uxCaBoYXsDC4A0SqTm3SISj0OwK.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/ziXF8wIBguHNCeplNthUlDTCZP8.jpg"
+        },
+        {
+          "id": "m-1631807",
+          "title": "The Secret Woman",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "da"
+          ],
+          "genres": [
+            "Drama",
+            "Thriller",
+            "Mystery"
+          ],
+          "releaseDate": "2026-08-28",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "rating": 6.3,
+          "heat": 67,
+          "synopsis": "After discovering she has a family and a shipping empire, a woman with amnesia returns to a wealthy and seemingly perfect past to uncover why she left.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/5FC5vUHFz0fbJOd0bhyzJpCSLrc.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/ziOpmyZufqM7IusfThzBr1E9wqa.jpg"
+        },
+        {
+          "id": "m-1471168",
+          "title": "Barreda",
+          "kind": "film",
+          "platforms": [
+            "prime"
+          ],
+          "languages": [
+            "es"
+          ],
+          "genres": [
+            "Drama",
+            "Crime",
+            "History"
+          ],
+          "releaseDate": "2026-08-28",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "rating": 7,
+          "heat": 64,
+          "synopsis": "A fictionalized drama film based on one of the most shocking crimes in Argentina's history. In 1992, Ricardo Barreda was an unassuming dentist, brutally murdered his wife, mother-in-law, and two adult daughters in their family home. Branding himself as a victim, Ricardo Barreda ignited a media storm and fueled a national scandal.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/hnr0QkZSDLlrJTvU2ecco65wcHo.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/4pXBWLKMew7Xmtq3OgMQxTHp060.jpg"
+        },
+        {
+          "id": "t-290193",
+          "title": "Mousetrap",
+          "kind": "series",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "ko"
+          ],
+          "genres": [
+            "Crime",
+            "Drama",
+            "Mystery"
+          ],
+          "releaseDate": "2026-08-28",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "rating": 7.7,
+          "heat": 54,
+          "synopsis": "A reclusive writer wakes to find his identity stolen — and must ally with a ruthless loan shark to reclaim his life from a man known as \"The Rat.\"",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/2mwgHfOyrFrmvozjFoEXHRdfGhv.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/3bHz9dYSZ5XDxY0zDaBpYgUOhE2.jpg"
+        },
+        {
+          "id": "m-1731694",
+          "title": "LEGO Star Wars: The Mandalorian",
+          "kind": "film",
+          "platforms": [
+            "disney"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Animation",
+            "Science Fiction",
+            "Adventure",
+            "Family",
+            "Action"
+          ],
+          "releaseDate": "2026-09-02",
+          "regions": [
+            "US"
+          ],
+          "heat": 47,
+          "synopsis": "The Mandalorian and Grogu join their misfit allies for an epic party, celebrating their heroism. As friends regale the crowd with tales of their adventures, a pirate threat looms.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/x3HEvYXWOW6WHqsHmg2MUVy3SLm.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/upecGaCuQOIbSpdz85mrJ395UMg.jpg"
+        },
+        {
+          "id": "t-290234",
+          "title": "Lovesick",
+          "kind": "series",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "es"
+          ],
+          "genres": [
+            "Drama"
+          ],
+          "releaseDate": "2026-09-02",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 46,
+          "synopsis": "Set during the Mexican Revolution, follow Emilia Sauri, a woman torn between two passionate loves while navigating a world dominated by violence and revolution.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/91s80WxRqIirFSpGVtiXJoS1GA5.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/avfnPYtyKXjgnhqtKAt1PZO2h5I.jpg"
+        },
+        {
+          "id": "t-305644",
+          "title": "Four Hands, Two Sonatas",
+          "kind": "series",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "ko"
+          ],
+          "genres": [
+            "Drama"
+          ],
+          "releaseDate": "2026-08-29",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 46,
+          "synopsis": "When two young pianists from completely different worlds meet at an elite music high school, the melodies of their lives become intimately intertwined.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/a7p6htiJKx68USDAcilJ5rzKAWB.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/fYL4I6cezb06BHhQlrNjNhy7jhf.jpg"
+        },
+        {
+          "id": "m-1355228",
+          "title": "Gandhari",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "hi"
+          ],
+          "genres": [
+            "Action",
+            "Drama",
+            "Thriller"
+          ],
+          "releaseDate": "2026-09-03",
+          "regions": [
+            "IN"
+          ],
+          "heat": 43,
+          "synopsis": "When a mother loses her eyesight and her daughter in a kidnapping, she takes matters into her own hands to hunt down those responsible.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/hCHei97aPYCCsh4vicz9X0wmdFV.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/sT5WVT8LzvDwIbfy9BGXK0fvf3s.jpg"
+        },
+        {
+          "id": "t-292558",
+          "title": "All the Truth in My Lies",
+          "kind": "series",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "es"
+          ],
+          "genres": [
+            "Drama",
+            "Comedy"
+          ],
+          "releaseDate": "2026-08-28",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 38,
+          "synopsis": "Two roommates join a bachelorette road trip, where unspoken feelings ignite and shake up their entire friend group.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/2udseY0mzsvkytPcSL4Vp612M1D.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/h3QvZs2bqRmN2hfVd1FZ9XrCZDm.jpg"
+        },
+        {
+          "id": "m-1137844",
+          "title": "Mayday",
+          "kind": "film",
+          "platforms": [
+            "appletv"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Comedy",
+            "Action"
+          ],
+          "releaseDate": "2026-09-02",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 33,
+          "synopsis": "When a U.S. Navy pilot on a top-secret mission during the Cold War gets trapped behind enemy lines, his only chance at survival is to form an alliance with an eccentric ex-KGB agent.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/hVXjX1jLZ1ljFSNGXpjJfbTUOa7.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/4gyx49ibwQslyrwuUS1c58PJEEd.jpg"
+        },
+        {
+          "id": "m-1752159",
+          "title": "Turning Point: Generation 9/11",
+          "kind": "documentary",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Documentary"
+          ],
+          "releaseDate": "2026-09-02",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 32,
+          "synopsis": "A quarter-century after September 11th, the attacks' ripple effects persist across generations. Orphaned children, War on Terror journalists, young Afghans, and U.S. Marines shaped by the 2021 withdrawal share their stories.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/6DVDbbneXuhFHmqGvTVko2sVz0o.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/z2Uf0yntMjY0XG87YfoqeHjIUGD.jpg"
+        },
+        {
+          "id": "m-1550338",
+          "title": "The Last Scene",
+          "kind": "film",
+          "platforms": [
+            "disney"
+          ],
+          "languages": [
+            "tr"
+          ],
+          "genres": [
+            "Drama",
+            "Romance"
+          ],
+          "releaseDate": "2026-08-28",
+          "regions": [
+            "US"
+          ],
+          "heat": 31,
+          "synopsis": "Selen is a woman with the extraordinary ability to foresee other people’s futures in her dreams. Determined to use this gift to change her own life and the fate of those around her, she unexpectedly finds herself drawn into a dangerous love story. When she crosses paths with Kemal, their connection sparks both passion and peril, forcing Selen to make choices that will shape both of their destinies.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/vQ69OZWDZ90ktHcW2Ku01ht4eis.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/1lN0J2L4j0U2gtwZtfjET5tYbtc.jpg"
+        },
+        {
+          "id": "m-1739202",
+          "title": "Untold: Raygun: Breaking Badly",
+          "kind": "documentary",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Documentary"
+          ],
+          "releaseDate": "2026-09-01",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 29,
+          "synopsis": "Nobody, least of all Rachael Gunn, expected to be an Olympian. But as Raygun’s performance at the 2024 Paris Olympics went viral overnight, so did an avalanche of memes, misinformation, and conspiracy theories questioning how she ever got there.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/3pnlJjsGtrUp3cPEOLzkR0sPQAK.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/iBik58vWTbO3s9GgUW86v7fYqfZ.jpg"
+        },
+        {
+          "id": "m-1744876",
+          "title": "Fito Páez: The World Within a Song",
+          "kind": "documentary",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "es"
+          ],
+          "genres": [
+            "Documentary",
+            "Music"
+          ],
+          "releaseDate": "2026-09-03",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 24,
+          "synopsis": "A documentary film that observes, listens to, and interacts with Fito Páez from a place of profound intimacy. The camera, almost invisible, witnesses his every move, accompanying him for over a year during recordings, rehearsals, tours, and performances in major cities across Latin America, Europe, and the United States. It is also a journey through the life of one of the greatest Spanish-language artists: his loves and heartbreaks, children and friendships, excesses, tragedies, failures, and successes.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/5Olp4wGl2XEGkjVebukgZljYW3Q.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/tThekN7w7Kyo41FGrrKYfC0ViVE.jpg"
+        },
+        {
+          "id": "t-201596",
+          "title": "The Producer",
+          "kind": "series",
+          "platforms": [
+            "hbomax"
+          ],
+          "languages": [
+            "zh"
+          ],
+          "genres": [
+            "Drama"
+          ],
+          "releaseDate": "2026-08-28",
+          "regions": [
+            "US"
+          ],
+          "heat": 19,
+          "synopsis": "A reckless young graduate becomes the assistant to a demanding music producer, and their clashes turn into an unlikely partnership as they take on the music industry's biggest challenges.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/cgSraTdFC2AkqnGLqmlkSPkWci2.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/zys6h8TehDtnL5YQSldSYlVkNY1.jpg"
+        },
+        {
+          "id": "t-333058",
+          "title": "Welcome to the Family: The Murder of Dan Markel",
+          "kind": "documentary",
+          "platforms": [
+            "hulu"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Crime",
+            "Documentary"
+          ],
+          "releaseDate": "2026-09-01",
+          "regions": [
+            "US"
+          ],
+          "heat": 19,
+          "synopsis": "How far would you go for your family? The brutal murder of a prominent law professor in Tallahassee, Florida reveals the dark secrets of a wealthy family. A series of larger-than-life suspects leads to a mind-bending story of a murder-for-hire-plot, a messy custody battle, ex-lovers – and family dentistry. With exclusive access to those at the center of this extraordinary story, many of whom have never spoken before, this is the definitive telling of a case which took 11 years to solve.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/2Do6U54cg31Y9DWWmjT69O6lFow.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/lS5LRAuxTxkLih9VYI71PdW2jIN.jpg"
+        },
+        {
+          "id": "m-1750165",
+          "title": "NXT Heatwave 2026",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Action"
+          ],
+          "releaseDate": "2026-08-30",
+          "regions": [
+            "IN"
+          ],
+          "heat": 16,
+          "synopsis": "The 2026 NXT Heatwave was a professional wrestling television special and livestreaming event produced by WWE. It was the fifth annual Heatwave produced by WWE for its developmental brand NXT and the 12th Heatwave overall. The event took place on Sunday, August 30, 2026, at Bert Ogden Arena in Edinburg, Texas, United States - right after Lucha Libre AAA Worldwide's Ola de Calor event in the same venue.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/rcBcZpRISLKqBstSrMI3b5zoSA0.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/aLPhYm7EtUwLSefcCvZ0FS6CL2u.jpg"
+        },
+        {
+          "id": "m-1752154",
+          "title": "9/11: United We Stand -- 25 Years Later",
+          "kind": "documentary",
+          "platforms": [
+            "hulu"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Documentary"
+          ],
+          "releaseDate": "2026-09-01",
+          "regions": [
+            "US"
+          ],
+          "heat": 15,
+          "synopsis": "Explore how sports, music, Broadway and comedy helped Americans rediscover joy and begin to heal in the wake of the 9/11 attacks.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/3BGYcEQnVjVzImecgXcm1xtzdEV.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/4fCWRcsKjEB2AXKaIBBomBQPQ5x.jpg"
+        },
+        {
+          "id": "t-331239",
+          "title": "Gang War Oslo",
+          "kind": "documentary",
+          "platforms": [
+            "hbomax"
+          ],
+          "languages": [
+            "no"
+          ],
+          "genres": [
+            "Documentary"
+          ],
+          "releaseDate": "2026-08-28",
+          "regions": [
+            "US"
+          ],
+          "heat": 15,
+          "synopsis": "An inside look at Norway's criminal landscape since the 1980s -- as told by those who ruled the streets and lived to share their stories.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/ypHIuHmGWSSIJgiYtUofLKU9Lib.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/bTAcrJQNQlZrOTf3ugBiAXLfkmA.jpg"
+        },
+        {
+          "id": "m-1749166",
+          "title": "Jared Freid: The Family Plan",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Comedy"
+          ],
+          "releaseDate": "2026-09-01",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 11,
+          "synopsis": "The special finds Freid keeping his issues “in the family,” joking about everything from vacationing with his parents to a Karen video that hits close to home.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/pbkEx1zKRsffOhg3Gfqv7cGkVgJ.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/2f09TFiCXdf6IRnzVVmhyAP7BdF.jpg"
+        },
+        {
+          "id": "m-1760508",
+          "title": "正义必胜",
+          "kind": "documentary",
+          "platforms": [
+            "lionsgate"
+          ],
+          "languages": [
+            "zh"
+          ],
+          "genres": [
+            "Documentary"
+          ],
+          "releaseDate": "2026-09-03",
+          "regions": [
+            "IN"
+          ],
+          "heat": 2,
+          "posterUrl": "https://image.tmdb.org/t/p/w500/6TU1Z0GGldytyl39zIttaFYqOZu.jpg"
+        }
+      ]
+    },
     {
       "id": "2026-09-04",
       "start": "2026-09-04",
       "end": "2026-09-10",
       "releases": [
+        {
+          "id": "th-mirzapur-the-movie",
+          "title": "Mirzapur: The Movie",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "hi"
+          ],
+          "genres": [
+            "Crime",
+            "Thriller"
+          ],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "IN"
+          ],
+          "heat": 95,
+          "sample": true,
+          "posterUrl": "https://image.tmdb.org/t/p/w500/jAt8u6MMIMnExmG6bN02EQyB0KR.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w1280/fjaR5w0LoRb20LN6DaYxmolWE4p.jpg",
+          "synopsis": "The battle for Mirzapur's throne escalates as old enemies resurface and new threats emerge. Blood debts must be paid while power-hungry contenders fight to control the city's violent underworld.",
+          "runtimeMinutes": 197,
+          "cast": [
+            "Pankaj Tripathi",
+            "Ali Fazal",
+            "Divyendu Sharma",
+            "Jitendra Kumar",
+            "Ravi Kishan"
+          ],
+          "director": "Gurmmeet Singh"
+        },
         {
           "id": "nf-dhamaal-4",
           "title": "Dhamaal 4",
@@ -25,43 +1596,57 @@
             "IN"
           ],
           "heat": 92,
-          "sample": true
+          "sample": true,
+          "posterUrl": "https://image.tmdb.org/t/p/w500/oVij5aEEE6iI4PxB4i0CgKp8h0m.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w1280/nC4xjCI9wRICnxf7Lu9k3F4PFk2.jpg",
+          "synopsis": "The Dhamaal boys are back for another treasure hunt, facing hilarious challenges in their quest for the Treasure of Life.",
+          "runtimeMinutes": 143,
+          "cast": [
+            "Ajay Devgn",
+            "Arshad Warsi",
+            "Riteish Deshmukh",
+            "Javed Jaffrey",
+            "Sanjay Mishra"
+          ],
+          "director": "Indra Kumar"
         },
         {
-          "id": "nf-korean-kanakaraju",
-          "title": "Korean Kanakaraju",
-          "kind": "film",
+          "id": "at-silo-s3e10",
+          "title": "Silo",
+          "kind": "series",
           "platforms": [
-            "netflix"
+            "appletv"
           ],
           "languages": [
-            "hi"
+            "en"
           ],
-          "genres": [],
+          "genres": [
+            "Sci-Fi & Fantasy",
+            "Drama"
+          ],
           "releaseDate": "2026-09-04",
           "regions": [
-            "IN"
+            "IN",
+            "US"
           ],
-          "heat": 70,
-          "sample": true
-        },
-        {
-          "id": "nf-gdn",
-          "title": "G.D.N.",
-          "kind": "film",
-          "platforms": [
-            "netflix"
-          ],
-          "languages": [
-            "hi"
-          ],
-          "genres": [],
-          "releaseDate": "2026-09-04",
-          "regions": [
-            "IN"
-          ],
-          "heat": 66,
-          "sample": true
+          "heat": 90,
+          "sample": true,
+          "drop": {
+            "season": 3,
+            "episode": 10,
+            "finale": true
+          },
+          "posterUrl": "https://image.tmdb.org/t/p/w500/gMYZZvnkVNTqSVnVCphWbPXwWwb.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w1280/uTWhbLc7Bj4qNSdW3ZvZKL8cOHv.jpg",
+          "synopsis": "In a ruined and toxic future, thousands live in a giant silo deep underground. After its sheriff breaks a cardinal rule and residents die mysteriously, engineer Juliette starts to uncover shocking secrets and the truth about the silo.",
+          "rating": 8.2,
+          "cast": [
+            "Rebecca Ferguson",
+            "Common",
+            "Chinaza Uche",
+            "Ashley Zukerman",
+            "Shane McRae"
+          ]
         },
         {
           "id": "nf-minecraft-movie",
@@ -74,37 +1659,375 @@
             "hi"
           ],
           "genres": [
-            "Adventure",
             "Family",
-            "Comedy"
+            "Fantasy",
+            "Comedy",
+            "Adventure"
           ],
           "releaseDate": "2026-09-04",
           "regions": [
             "IN"
           ],
           "heat": 88,
-          "sample": true
+          "sample": true,
+          "posterUrl": "https://image.tmdb.org/t/p/w500/yFHHfHcUgGAxziP1C3lLt0q2T4s.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w1280/2Nti3gYAX513wvhp8IiLL6ZDyOm.jpg",
+          "synopsis": "Four misfits find themselves struggling with ordinary problems when they are suddenly pulled through a mysterious portal into the Overworld: a bizarre, cubic wonderland that thrives on imagination. To get back home, they'll have to master this world while embarking on a magical quest with an unexpected, expert crafter, Steve.",
+          "rating": 6.2,
+          "runtimeMinutes": 101,
+          "cast": [
+            "Jason Momoa",
+            "Jack Black",
+            "Sebastian Eugene Hansen",
+            "Emma Myers",
+            "Danielle Brooks"
+          ],
+          "director": "Jared Hess"
         },
         {
-          "id": "nf-teenage-wasteland",
-          "title": "Teenage Wasteland",
-          "kind": "documentary",
+          "id": "jh-the-court",
+          "title": "The Court",
+          "kind": "series",
           "platforms": [
-            "netflix"
+            "jiohotstar"
+          ],
+          "languages": [
+            "hi"
+          ],
+          "genres": [],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "IN"
+          ],
+          "heat": 80,
+          "sample": true,
+          "drop": {
+            "season": 1,
+            "fullSeason": true
+          },
+          "posterUrl": "https://image.tmdb.org/t/p/w500/q3A6C5pwmX0VGrmI7D5HgXVH3VE.jpg",
+          "synopsis": "The Court is an American legal drama television series that aired from March 26 until April 9, 2002.",
+          "runtimeMinutes": 60,
+          "cast": [
+            "Craig Bierko",
+            "Chris Sarandon",
+            "Hill Harper",
+            "Pat Hingle",
+            "Diahann Carroll"
+          ]
+        },
+        {
+          "id": "at-dark-matter-s2e2",
+          "title": "Dark Matter",
+          "kind": "series",
+          "platforms": [
+            "appletv"
           ],
           "languages": [
             "en"
           ],
           "genres": [
-            "Documentary"
+            "Sci-Fi & Fantasy",
+            "Drama"
           ],
           "releaseDate": "2026-09-04",
           "regions": [
             "IN",
             "US"
           ],
-          "heat": 58,
+          "heat": 78,
+          "sample": true,
+          "drop": {
+            "season": 2,
+            "episode": 2
+          },
+          "posterUrl": "https://image.tmdb.org/t/p/w500/2DPmTlv8F0V1TQBPmlsGOVOhtWk.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w1280/iBc82qaA05ntzSnrVndw8scv4Bn.jpg",
+          "synopsis": "Jason Dessen is abducted into an alternate version of his life. To get back to his real family, he embarks on a harrowing journey to save them from the most terrifying foe imaginable: himself.",
+          "rating": 7.8,
+          "cast": [
+            "Joel Edgerton",
+            "Jennifer Connelly",
+            "Alice Braga",
+            "Jimmi Simpson",
+            "Dayo Okeniyi"
+          ]
+        },
+        {
+          "id": "at-mayday",
+          "title": "Mayday",
+          "kind": "film",
+          "platforms": [
+            "appletv"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Comedy",
+            "Action"
+          ],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 76,
+          "sample": true,
+          "posterUrl": "https://image.tmdb.org/t/p/w500/hVXjX1jLZ1ljFSNGXpjJfbTUOa7.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w1280/4gyx49ibwQslyrwuUS1c58PJEEd.jpg",
+          "synopsis": "When a U.S. Navy pilot on a top-secret mission during the Cold War gets trapped behind enemy lines, his only chance at survival is to form an alliance with an eccentric ex-KGB agent.",
+          "runtimeMinutes": 110,
+          "cast": [
+            "Ryan Reynolds",
+            "Kenneth Branagh",
+            "Maria Bakalova",
+            "Marcin Dorociński",
+            "David Morse"
+          ],
+          "director": "Jonathan Goldstein"
+        },
+        {
+          "id": "pv-jagamae-sangeetham",
+          "title": "Jagamae Sangeetham",
+          "kind": "series",
+          "platforms": [
+            "prime"
+          ],
+          "languages": [
+            "te"
+          ],
+          "genres": [
+            "Drama"
+          ],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "IN"
+          ],
+          "heat": 74,
+          "sample": true,
+          "drop": {
+            "season": 1,
+            "fullSeason": true
+          },
+          "posterUrl": "https://image.tmdb.org/t/p/w500/aEfuAAgMpePYJc99wFe19dMVst4.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w1280/b8pcIMqEAhLZ9EkYjqIPloGRrTT.jpg",
+          "synopsis": "Set in Vaikuntapuram, a sacred temple town nestled between the banks of the Godavari and the neon lights of pop stardom, a disciplined heir to a musical throne and a fame-weary singer strike a forbidden chord. To protect a century of heritage, they must navigate a landscape of family secrets, masked identities, and the heavy price of finding their own voices.",
+          "cast": [
+            "Prakash Raj",
+            "Madhoo",
+            "Srikanth",
+            "Akshay Lagusani",
+            "Sushmita Shetty"
+          ],
+          "director": "Palnati Surya Pratap"
+        },
+        {
+          "id": "hb-fuze",
+          "title": "Fuze",
+          "kind": "film",
+          "platforms": [
+            "hbomax"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Action",
+            "Crime",
+            "Thriller"
+          ],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "US"
+          ],
+          "heat": 71,
+          "sample": true,
+          "posterUrl": "https://image.tmdb.org/t/p/w500/oMFdQE5hMJ9JjhNORegwTo0GKmh.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w1280/8wIaBCeGv3UhIn5CJOWQGHT1Cif.jpg",
+          "synopsis": "An unexploded WWII bomb is discovered on a busy construction site in the centre of London. Chaos ensues as the military and police begin a mass evacuation against a ticking clock.",
+          "rating": 7.3,
+          "runtimeMinutes": 96,
+          "cast": [
+            "Aaron Taylor-Johnson",
+            "Theo James",
+            "Gugu Mbatha-Raw",
+            "Elham Ehsas",
+            "Sam Worthington"
+          ],
+          "director": "David Mackenzie"
+        },
+        {
+          "id": "nf-korean-kanakaraju",
+          "title": "Korean Kanakaraju",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "hi"
+          ],
+          "genres": [
+            "Horror",
+            "Action",
+            "Comedy"
+          ],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "IN"
+          ],
+          "heat": 70,
+          "sample": true,
+          "posterUrl": "https://image.tmdb.org/t/p/w500/cl35nsSE0zDvIrvFewLtM748SBf.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w1280/qMcVNK71eq1oWWbAt62ZLEkEQnO.jpg",
+          "synopsis": "Follows a Rayalaseema youth named Kanakaraju whose life upends when a vessel from Korea brings a spirit that possesses him, transforming him into Korean Kanakaraju.",
+          "runtimeMinutes": 165,
+          "cast": [
+            "Varun Tej",
+            "Ritika Nayak",
+            "Sunil Varma",
+            "Satya",
+            "VTV Ganesh"
+          ],
+          "director": "Merlapaka Gandhi"
+        },
+        {
+          "id": "th-jeevan-bheema-yojana",
+          "title": "Jeevan Bheema Yojana",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "hi"
+          ],
+          "genres": [],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "IN"
+          ],
+          "heat": 68,
+          "sample": true,
+          "posterUrl": "https://image.tmdb.org/t/p/w500/nl19sTioWY4IShvakjyRaB3r8tF.jpg",
+          "cast": [
+            "Arshad Warsi",
+            "Vijay Raaz",
+            "Sanjeeda Sheikh",
+            "Pooja Chopra",
+            "Brijendra Kala"
+          ],
+          "director": "Abhishek Dogra"
+        },
+        {
+          "id": "nf-gdn",
+          "title": "G.D.N.",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "hi"
+          ],
+          "genres": [
+            "Drama"
+          ],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "IN"
+          ],
+          "heat": 66,
+          "sample": true,
+          "posterUrl": "https://image.tmdb.org/t/p/w500/f4CJS8MgxHalhCNQQCoHNN7wD0b.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w1280/hR0QpzOO2Gx1Lt7KxqKFWZvj5Vl.jpg",
+          "synopsis": "Based on the life of G.D. Naidu, the 'Edison of India', dramatising his groundbreaking innovations, his industrial contributions, and conflicts with authorities—including struggles where his work and international dealings faced severe scrutiny and opposition.",
+          "runtimeMinutes": 146,
+          "cast": [
+            "R. Madhavan",
+            "Priyamani",
+            "Sathyaraj",
+            "Jayaram",
+            "Dushara Vijayan"
+          ],
+          "director": "Krishnakumar Ramakumar"
+        },
+        {
+          "id": "th-mahaprabhu-jagannath",
+          "title": "Mahaprabhu Jagannath",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "hi",
+            "or"
+          ],
+          "genres": [
+            "Animation",
+            "Adventure",
+            "Family"
+          ],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "IN"
+          ],
+          "heat": 64,
+          "sample": true,
+          "synopsis": "Lord Jagannath, a form of Hindu God Vishnu venerated across Odisha and widely worshipped throughout India, is the presiding deity of the 12th-century Puri temple and the subject of the annual Rath Yatra chariot festival, one of the country’s largest religious gatherings."
+        },
+        {
+          "id": "sn-dc-bloody-valentine",
+          "title": "DC: The Bloody Valentine",
+          "kind": "film",
+          "platforms": [
+            "sunnxt"
+          ],
+          "languages": [
+            "ta",
+            "te",
+            "kn",
+            "ml"
+          ],
+          "genres": [],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "IN"
+          ],
+          "heat": 63,
           "sample": true
+        },
+        {
+          "id": "hu-signal-one",
+          "title": "Signal One",
+          "kind": "film",
+          "platforms": [
+            "hulu"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Mystery",
+            "Science Fiction"
+          ],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "US"
+          ],
+          "heat": 62,
+          "sample": true,
+          "posterUrl": "https://image.tmdb.org/t/p/w500/bi7Aeaozl51cd5K6vAn8tI1lOW0.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w1280/3gN540zmAiJW1v6mFoNiciamxc2.jpg",
+          "synopsis": "A computer scientist is invited by a tech billionaire to join his private facility on a Caribbean island to investigate extraterrestrial matter on Earth. When they make contact beyond our world, chaos erupts as we’re left to wonder: do they come in peace?",
+          "rating": 6.6,
+          "runtimeMinutes": 87,
+          "cast": [
+            "Isabelle Fuhrman",
+            "Josh Hutcherson",
+            "David Thewlis",
+            "Dennis Quaid",
+            "Vanessa Smythe"
+          ],
+          "director": "Jonathan Sobol"
         },
         {
           "id": "nf-earle-meets-world",
@@ -129,256 +2052,13 @@
           "drop": {
             "season": 1,
             "fullSeason": true
-          }
-        },
-        {
-          "id": "pv-jagamae-sangeetham",
-          "title": "Jagamae Sangeetham",
-          "kind": "series",
-          "platforms": [
-            "prime"
-          ],
-          "languages": [
-            "te"
-          ],
-          "genres": [],
-          "releaseDate": "2026-09-04",
-          "regions": [
-            "IN"
-          ],
-          "heat": 74,
-          "sample": true,
-          "drop": {
-            "season": 1,
-            "fullSeason": true
-          }
-        },
-        {
-          "id": "jh-the-court",
-          "title": "The Court",
-          "kind": "series",
-          "platforms": [
-            "jiohotstar"
-          ],
-          "languages": [
-            "hi"
-          ],
-          "genres": [],
-          "releaseDate": "2026-09-04",
-          "regions": [
-            "IN"
-          ],
-          "heat": 80,
-          "sample": true,
-          "drop": {
-            "season": 1,
-            "fullSeason": true
-          }
-        },
-        {
-          "id": "sl-unmadham",
-          "title": "Unmadham",
-          "kind": "film",
-          "platforms": [
-            "sonyliv"
-          ],
-          "languages": [
-            "hi"
-          ],
-          "genres": [],
-          "releaseDate": "2026-09-04",
-          "regions": [
-            "IN"
-          ],
-          "heat": 55,
-          "sample": true
-        },
-        {
-          "id": "sn-dc-bloody-valentine",
-          "title": "DC: The Bloody Valentine",
-          "kind": "film",
-          "platforms": [
-            "sunnxt"
-          ],
-          "languages": [
-            "ta",
-            "te",
-            "kn",
-            "ml"
-          ],
-          "genres": [],
-          "releaseDate": "2026-09-04",
-          "regions": [
-            "IN"
-          ],
-          "heat": 63,
-          "sample": true
-        },
-        {
-          "id": "hc-puratawn",
-          "title": "Puratawn",
-          "kind": "film",
-          "platforms": [
-            "hoichoi"
-          ],
-          "languages": [
-            "bn"
-          ],
-          "genres": [],
-          "releaseDate": "2026-09-04",
-          "regions": [
-            "IN"
-          ],
-          "heat": 57,
-          "sample": true
-        },
-        {
-          "id": "ah-yellow-elephant",
-          "title": "The Yellow Elephant",
-          "kind": "film",
-          "platforms": [
-            "aha"
-          ],
-          "languages": [
-            "ta"
-          ],
-          "genres": [],
-          "releaseDate": "2026-09-04",
-          "regions": [
-            "IN"
-          ],
-          "heat": 54,
-          "sample": true
-        },
-        {
-          "id": "at-mayday",
-          "title": "Mayday",
-          "kind": "film",
-          "platforms": [
-            "appletv"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [],
-          "releaseDate": "2026-09-04",
-          "regions": [
-            "IN",
-            "US"
-          ],
-          "heat": 76,
-          "sample": true
-        },
-        {
-          "id": "at-dark-matter-s2e2",
-          "title": "Dark Matter",
-          "kind": "series",
-          "platforms": [
-            "appletv"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Sci-Fi",
-            "Thriller"
-          ],
-          "releaseDate": "2026-09-04",
-          "regions": [
-            "IN",
-            "US"
-          ],
-          "heat": 78,
-          "sample": true,
-          "drop": {
-            "season": 2,
-            "episode": 2
-          }
-        },
-        {
-          "id": "at-silo-s3e10",
-          "title": "Silo",
-          "kind": "series",
-          "platforms": [
-            "appletv"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Sci-Fi",
-            "Drama"
-          ],
-          "releaseDate": "2026-09-04",
-          "regions": [
-            "IN",
-            "US"
-          ],
-          "heat": 90,
-          "sample": true,
-          "drop": {
-            "season": 3,
-            "episode": 10,
-            "finale": true
-          }
-        },
-        {
-          "id": "th-mirzapur-the-movie",
-          "title": "Mirzapur: The Movie",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "hi"
-          ],
-          "genres": [
-            "Crime",
-            "Drama"
-          ],
-          "releaseDate": "2026-09-04",
-          "regions": [
-            "IN"
-          ],
-          "heat": 95,
-          "sample": true
-        },
-        {
-          "id": "th-jeevan-bheema-yojana",
-          "title": "Jeevan Bheema Yojana",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "hi"
-          ],
-          "genres": [],
-          "releaseDate": "2026-09-04",
-          "regions": [
-            "IN"
-          ],
-          "heat": 68,
-          "sample": true
-        },
-        {
-          "id": "th-mahaprabhu-jagannath",
-          "title": "Mahaprabhu Jagannath",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "hi",
-            "or"
-          ],
-          "genres": [],
-          "releaseDate": "2026-09-04",
-          "regions": [
-            "IN"
-          ],
-          "heat": 64,
-          "sample": true
+          },
+          "posterUrl": "https://image.tmdb.org/t/p/w500/yFO0pVWGeuIwuCuRpzqTPIm7Rah.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w1280/9AXg79cDJe8SClhoy6jRSS4vAIt.jpg",
+          "synopsis": "Alix Earle, a hugely popular Gen Z figure, reveals her true self and a behind-the-scenes look at her family life in this unfiltered, unscripted show.",
+          "cast": [
+            "Alix Earle"
+          ]
         },
         {
           "id": "sh-parasomnia",
@@ -398,50 +2078,567 @@
             "US"
           ],
           "heat": 60,
-          "sample": true
+          "sample": true,
+          "posterUrl": "https://image.tmdb.org/t/p/w500/sDBHihihRvhwPvcVptu1jXMWpri.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w1280/yJKZ7MpvFKRtnusAxNMdweMZK6J.jpg",
+          "synopsis": "After her friend vanishes, Riley must confront the demon from her night terrors that may have crossed into reality, while facing her own tragic past.",
+          "runtimeMinutes": 85,
+          "cast": [
+            "Jasmine Mathews",
+            "RJ Brown",
+            "Sally Stewart",
+            "Stephen Barrington",
+            "Danny Brown"
+          ],
+          "director": "James Ross II"
         },
         {
-          "id": "hb-fuze",
-          "title": "Fuze",
-          "kind": "film",
+          "id": "nf-teenage-wasteland",
+          "title": "Teenage Wasteland",
+          "kind": "documentary",
           "platforms": [
-            "hbomax"
+            "netflix"
           ],
           "languages": [
             "en"
           ],
           "genres": [
-            "Action",
-            "Thriller"
+            "Documentary"
           ],
           "releaseDate": "2026-09-04",
           "regions": [
+            "IN",
             "US"
           ],
-          "heat": 71,
-          "sample": true
+          "heat": 58,
+          "sample": true,
+          "posterUrl": "https://image.tmdb.org/t/p/w500/vRZ9gMr02HJFn3EOKNcXzP2vD54.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w1280/fkfDGk9L7Ihj8FCjbaNt2Gqdo3Q.jpg",
+          "synopsis": "Inspired by an unconventional teacher, a group of teenagers in upstate New York in the early 1990s make a student film and uncover a vast conspiracy that is poisoning their community. Thirty years later, they revisit their film and confront the legacy of this transformative experience.",
+          "runtimeMinutes": 110,
+          "cast": [
+            "Fred Isseks",
+            "Jeffrey Dutemple",
+            "Rachel Raimist",
+            "David Birmingham"
+          ],
+          "director": "Amanda McBaine"
         },
         {
-          "id": "hu-signal-one",
-          "title": "Signal One",
+          "id": "hc-puratawn",
+          "title": "Puratawn",
           "kind": "film",
           "platforms": [
-            "hulu"
+            "hoichoi"
           ],
           "languages": [
-            "en"
+            "bn"
+          ],
+          "genres": [
+            "Family",
+            "Drama"
+          ],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "IN"
+          ],
+          "heat": 57,
+          "sample": true,
+          "posterUrl": "https://image.tmdb.org/t/p/w500/dXpkJVmOnZzoaLAuhxY2IImlWz.jpg",
+          "synopsis": "In Puratawn, Ritika and Rajeev visit her ancestral house in Konnagar (in West Bengal’s Hooghly district) to attend her mother's 80th birthday celebration, only to discover her mother's deteriorating mental state, forcing Ritika to confront this difficult reality and its permanence.",
+          "runtimeMinutes": 102,
+          "cast": [
+            "Sharmila Tagore",
+            "Rituparna Sengupta",
+            "Indraneil Sengupta",
+            "Ekavali Khanna",
+            "Subhrajit Dutta"
+          ],
+          "director": "Suman Ghosh"
+        },
+        {
+          "id": "sl-unmadham",
+          "title": "Unmadham",
+          "kind": "film",
+          "platforms": [
+            "sonyliv"
+          ],
+          "languages": [
+            "hi"
           ],
           "genres": [
             "Thriller"
           ],
           "releaseDate": "2026-09-04",
           "regions": [
+            "IN"
+          ],
+          "heat": 55,
+          "sample": true,
+          "posterUrl": "https://image.tmdb.org/t/p/w500/6AIMHBUY6PCHVYASWZ0GcTA9Kph.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w1280/o0Ai0yCq1jyLE3K55Nk3bAl4D9h.jpg",
+          "synopsis": "A police constable reopens a long-forgotten case and experiences an unsettling world.",
+          "runtimeMinutes": 141,
+          "cast": [
+            "Kunchacko Boban",
+            "Lijomol Jose",
+            "Raina Radhakrishnan",
+            "Gokulan",
+            "Vigneshwar Suresh"
+          ],
+          "director": "Kiran Das"
+        },
+        {
+          "id": "ah-yellow-elephant",
+          "title": "The Yellow Elephant",
+          "kind": "film",
+          "platforms": [
+            "aha"
+          ],
+          "languages": [
+            "ta"
+          ],
+          "genres": [],
+          "releaseDate": "2026-09-04",
+          "regions": [
+            "IN"
+          ],
+          "heat": 54,
+          "sample": true,
+          "posterUrl": "https://image.tmdb.org/t/p/w500/eUclgdW7wRJfe5NANxtJiagcn3y.jpg",
+          "synopsis": "A documentary on human–elephant conflict",
+          "director": "Baskar Arumugam"
+        },
+        {
+          "id": "m-1744783",
+          "title": "Intermission",
+          "kind": "film",
+          "platforms": [
+            "mubi"
+          ],
+          "languages": [
+            "ko"
+          ],
+          "genres": [
+            "Animation"
+          ],
+          "releaseDate": "2026-09-05",
+          "regions": [
             "US"
           ],
-          "heat": 62,
-          "sample": true
+          "heat": 8,
+          "synopsis": "After the lead of the school musical is rendered suddenly indisposed, her understudy has a few moments before she has to step up and fill her shoes.",
+          "backdropUrl": "https://image.tmdb.org/t/p/w1280/dQGgyVru9kbFxJandf9T350eCEN.jpg",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/1WPOZOsiSicHOHzbrUPyrtsnXMH.jpg",
+          "runtimeMinutes": 4,
+          "cast": [
+            "Emily Gin",
+            "Madeleine Curry",
+            "Maggie Cameron",
+            "Dylan Sparano",
+            "Lola Ochoa"
+          ],
+          "director": "Tia Gilles"
+        }
+      ]
+    },
+    {
+      "id": "2026-09-11",
+      "start": "2026-09-11",
+      "end": "2026-09-17",
+      "releases": []
+    },
+    {
+      "id": "2026-09-18",
+      "start": "2026-09-18",
+      "end": "2026-09-24",
+      "releases": []
+    },
+    {
+      "id": "2026-09-25",
+      "start": "2026-09-25",
+      "end": "2026-10-01",
+      "releases": [
+        {
+          "id": "m-1363286",
+          "title": "Demonte Colony 3",
+          "kind": "film",
+          "platforms": [
+            "sunnxt",
+            "prime"
+          ],
+          "languages": [
+            "ta"
+          ],
+          "genres": [
+            "Horror",
+            "Thriller"
+          ],
+          "releaseDate": "2026-10-01",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 13,
+          "posterUrl": "https://image.tmdb.org/t/p/w500/rtIXvC3ShBY6dyogJYTkoTxB48D.jpg"
+        },
+        {
+          "id": "m-1588205",
+          "title": "Without Looking Back",
+          "kind": "film",
+          "platforms": [
+            "prime"
+          ],
+          "languages": [
+            "ru"
+          ],
+          "genres": [
+            "Drama",
+            "Comedy"
+          ],
+          "releaseDate": "2026-10-01",
+          "regions": [
+            "US"
+          ],
+          "heat": 13,
+          "synopsis": "A story about friendship and a crime that never happened. The main characters are Sonya and Zhenya. One day, they push a guy who was bothering them to the ground and, thinking they've killed him, go on the run.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/8PAlx8IcKchpYf3kIp4zYYdCmQh.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/ueKGFWTxtBCqzU0AnwNF5ZmlTVW.jpg"
+        },
+        {
+          "id": "m-1731954",
+          "title": "Libera nos: Il trionfo sul male",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "fr"
+          ],
+          "genres": [],
+          "releaseDate": "2026-09-30",
+          "regions": [
+            "IN"
+          ],
+          "heat": 6,
+          "posterUrl": "https://image.tmdb.org/t/p/w500/9EeiLJoP00zXT0ztU6K2Z0vZSrr.jpg"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-02",
+      "start": "2026-10-02",
+      "end": "2026-10-08",
+      "releases": [
+        {
+          "id": "m-1269325",
+          "title": "Drishyam: The Conclusion",
+          "kind": "film",
+          "platforms": [
+            "prime"
+          ],
+          "languages": [
+            "hi"
+          ],
+          "genres": [
+            "Thriller",
+            "Drama",
+            "Mystery"
+          ],
+          "releaseDate": "2026-10-02",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 16,
+          "synopsis": "Years after outsmarting the police, Vijay Salgaonkar's past resurfaces when a new evidence threatens to expose his secret. As the investigation reopens, he must outwit the system once again to save his family.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/67FsF2kpgEZ1T5Qos4adgqm9dLf.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/9jIJrwbDTH92027rIrR2R0HM0Qe.jpg"
         }
       ]
     }
-  ]
+  ],
+  "trending": [
+    {
+      "id": "trend-t-108978",
+      "title": "Reacher",
+      "kind": "series",
+      "platforms": [
+        "prime"
+      ],
+      "languages": [
+        "en"
+      ],
+      "genres": [
+        "Action & Adventure",
+        "Crime"
+      ],
+      "releaseDate": "2022-02-03",
+      "regions": [
+        "IN",
+        "US"
+      ],
+      "rating": 8.1,
+      "heat": 96,
+      "synopsis": "Jack Reacher, a veteran military police investigator, has just recently entered civilian life. Reacher is a drifter, carrying no phone and the barest of essentials as he travels the country and explores the nation he once served.",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/f1VCQIG2iCyOookdgOzwtUpwWC0.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w780/pF0qkRsrHkdYadPWY9AMeFZfcwk.jpg"
+    },
+    {
+      "id": "trend-t-125988",
+      "title": "Silo",
+      "kind": "series",
+      "platforms": [
+        "appletv"
+      ],
+      "languages": [
+        "en"
+      ],
+      "genres": [
+        "Sci-Fi & Fantasy",
+        "Drama"
+      ],
+      "releaseDate": "2023-05-04",
+      "regions": [
+        "IN",
+        "US"
+      ],
+      "rating": 8.2,
+      "heat": 88,
+      "synopsis": "In a ruined and toxic future, thousands live in a giant silo deep underground. After its sheriff breaks a cardinal rule and residents die mysteriously, engineer Juliette starts to uncover shocking secrets and the truth about the silo.",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/gMYZZvnkVNTqSVnVCphWbPXwWwb.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w780/uTWhbLc7Bj4qNSdW3ZvZKL8cOHv.jpg"
+    },
+    {
+      "id": "trend-m-1339713",
+      "title": "Obsession",
+      "kind": "film",
+      "platforms": [
+        "peacock"
+      ],
+      "languages": [
+        "en"
+      ],
+      "genres": [
+        "Horror",
+        "Thriller"
+      ],
+      "releaseDate": "2026-05-13",
+      "regions": [
+        "US"
+      ],
+      "rating": 8.2,
+      "heat": 84,
+      "synopsis": "After breaking the mysterious \"One Wish Willow\" to win his crush's heart, a hopeless romantic finds himself getting exactly what he asked for but soon discovers that some desires come at a dark, sinister price.",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/bRwnj8WEKBCvmfeUNOukJPwB43K.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w780/rZfmzpixLKLR3Hg2u0WgC7XLFl8.jpg"
+    },
+    {
+      "id": "trend-m-1386315",
+      "title": "The Runner",
+      "kind": "film",
+      "platforms": [
+        "prime"
+      ],
+      "languages": [
+        "en"
+      ],
+      "genres": [
+        "Thriller"
+      ],
+      "releaseDate": "2026-09-03",
+      "regions": [
+        "IN",
+        "US"
+      ],
+      "rating": 6.2,
+      "heat": 81,
+      "synopsis": "Maia Marten, a brilliant London lawyer, has her life shattered by a single call on her morning run: her son has been taken. To get him back, she must keep running, obey every ruthless command, and trust no one-each second a test of how far a mother will go to save her child.",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/uxCaBoYXsDC4A0SqTm3SISj0OwK.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w780/ziXF8wIBguHNCeplNthUlDTCZP8.jpg"
+    },
+    {
+      "id": "trend-m-860508",
+      "title": "The Whisper Man",
+      "kind": "film",
+      "platforms": [
+        "netflix"
+      ],
+      "languages": [
+        "en"
+      ],
+      "genres": [
+        "Crime",
+        "Drama",
+        "Thriller"
+      ],
+      "releaseDate": "2026-08-27",
+      "regions": [
+        "IN",
+        "US"
+      ],
+      "rating": 6.7,
+      "heat": 80,
+      "synopsis": "When his young son vanishes, a widower enlists help from his estranged father, a retired detective who put away the serial killer now linked to the case.",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/6UqflU8Qqkz7Dq4swJPqs0ZJjY4.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w780/xSJJQeAp9GBFmiKusysTRG6jQjt.jpg"
+    },
+    {
+      "id": "trend-t-30984",
+      "title": "Bleach",
+      "kind": "anime",
+      "platforms": [
+        "netflix",
+        "crunchyroll",
+        "sonyliv",
+        "lionsgate"
+      ],
+      "languages": [
+        "ja"
+      ],
+      "genres": [
+        "Action & Adventure",
+        "Animation",
+        "Sci-Fi & Fantasy"
+      ],
+      "releaseDate": "2004-10-05",
+      "regions": [
+        "IN",
+        "US"
+      ],
+      "rating": 8.4,
+      "heat": 79,
+      "synopsis": "For as long as he can remember, Ichigo Kurosaki has been able to see ghosts. But when he meets Rukia, a Soul Reaper who battles evil spirits known as Hollows, he finds his life is changed forever. Now, with a newfound wealth of spiritual energy, Ichigo discovers his true calling: to protect the living and the dead from evil.",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/2EewmxXe72ogD0EaWM8gqa0ccIw.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w780/o0NsbcIvsllg6CJX0FBFY8wWbsn.jpg"
+    },
+    {
+      "id": "trend-t-236235",
+      "title": "The Gentlemen",
+      "kind": "series",
+      "platforms": [
+        "netflix"
+      ],
+      "languages": [
+        "en"
+      ],
+      "genres": [
+        "Comedy",
+        "Drama",
+        "Crime"
+      ],
+      "releaseDate": "2024-03-07",
+      "regions": [
+        "IN",
+        "US"
+      ],
+      "rating": 7.8,
+      "heat": 78,
+      "synopsis": "When aristocratic Eddie inherits the family estate, he discovers that it's home to an enormous weed empire — and its proprietors aren't going anywhere.",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/2l0gBLpjcWo4ivmbHUhFIw3KGDn.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w780/PqIW7PA74YBURz5slZkxc0K5Pl.jpg"
+    },
+    {
+      "id": "trend-t-196322",
+      "title": "Dark Matter",
+      "kind": "series",
+      "platforms": [
+        "appletv",
+        "prime"
+      ],
+      "languages": [
+        "en"
+      ],
+      "genres": [
+        "Sci-Fi & Fantasy",
+        "Drama"
+      ],
+      "releaseDate": "2024-05-07",
+      "regions": [
+        "IN",
+        "US"
+      ],
+      "rating": 7.8,
+      "heat": 74,
+      "synopsis": "Jason Dessen is abducted into an alternate version of his life. To get back to his real family, he embarks on a harrowing journey to save them from the most terrifying foe imaginable: himself.",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/2DPmTlv8F0V1TQBPmlsGOVOhtWk.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w780/iBc82qaA05ntzSnrVndw8scv4Bn.jpg"
+    },
+    {
+      "id": "trend-m-1083381",
+      "title": "Backrooms",
+      "kind": "film",
+      "platforms": [
+        "sonyliv"
+      ],
+      "languages": [
+        "en"
+      ],
+      "genres": [
+        "Horror",
+        "Mystery",
+        "Science Fiction"
+      ],
+      "releaseDate": "2026-05-27",
+      "regions": [
+        "IN",
+        "US"
+      ],
+      "rating": 7.1,
+      "heat": 73,
+      "synopsis": "A strange doorway appears in the basement of a furniture showroom.",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/rhGx6E3qRNMgj3i5su2oukNHwIQ.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w780/dqmMWNWfLnExDRpMtIMqI97GQFR.jpg"
+    },
+    {
+      "id": "trend-t-287238",
+      "title": "Furious",
+      "kind": "series",
+      "platforms": [
+        "disney",
+        "hulu"
+      ],
+      "languages": [
+        "en"
+      ],
+      "genres": [
+        "Drama",
+        "Crime"
+      ],
+      "releaseDate": "2026-07-27",
+      "regions": [
+        "US"
+      ],
+      "rating": 7.2,
+      "heat": 70,
+      "synopsis": "FBI agent Alice Black is on the hunt for a mysterious and calculating female serial killer. Both walk their own paths toward justice, and as their lives start to intertwine, the line between right and wrong begins to blur.",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/xnxxrEKtBaIcI1ewq50pLkOMU6u.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w780/iAOPgUlh7inOebFrUFHAjnFRCGS.jpg"
+    },
+    {
+      "id": "trend-t-247168",
+      "title": "Chad Powers",
+      "kind": "series",
+      "platforms": [
+        "disney",
+        "hulu"
+      ],
+      "languages": [
+        "en"
+      ],
+      "genres": [
+        "Comedy"
+      ],
+      "releaseDate": "2025-09-30",
+      "regions": [
+        "US"
+      ],
+      "rating": 8,
+      "heat": 66,
+      "synopsis": "Eight years after an unforgivable mistake nukes his promising college football career, hotshot quarterback Russ Holliday tries to resurrect his dreams by disguising himself as Chad Powers - a talented oddball who walks on to the struggling South Georgia Catfish.",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/buPiLEtOQ7kJrRh9FsXucjkZeJn.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w780/wGmJg0wHBpifiHFsC6VgAOlQTge.jpg"
+    }
+  ],
+  "enrichedAt": "2026-09-04T17:22:53.584Z"
 }
