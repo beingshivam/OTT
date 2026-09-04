@@ -67,11 +67,11 @@ export default function App() {
   // Board is the default: the whole week at a glance, the way the printed
   // calendars do it. The poster grid stays available for browsing.
   const [view, setView] = useState<'board' | 'grid'>(
-    () => (localStorage.getItem('dropday.view') === 'grid' ? 'grid' : 'board'),
+    () => (localStorage.getItem('firstday.view') === 'grid' ? 'grid' : 'board'),
   );
   useEffect(() => {
     try {
-      localStorage.setItem('dropday.view', view);
+      localStorage.setItem('firstday.view', view);
     } catch {
       /* Storage is a convenience here, never a requirement. */
     }
@@ -139,7 +139,7 @@ export default function App() {
   }, []);
 
   const addWeeklyReminder = useCallback(() => {
-    download(weeklyReminder(window.location.origin), 'dropday-friday.ics');
+    download(weeklyReminder(window.location.origin), 'firstday-friday.ics');
   }, []);
 
   const updatePrefs = useCallback((next: Partial<Prefs>) => {
@@ -264,7 +264,7 @@ export default function App() {
             <span className="logo__mark">
               <IconPlay />
             </span>
-            dropday<span className="logo__dot">.</span>
+            firstday<span className="logo__dot">.</span>
           </span>
           <div className="weekbar__region">
             <label className="region">
@@ -524,7 +524,7 @@ export default function App() {
 
         <footer className="footer">
           <div className="footer__stack">
-            <span>dropday — every new release, every platform, one page.</span>
+            <span>firstday — every new release, every platform, one page.</span>
             <button className="footer__link" onClick={addWeeklyReminder}>
               <IconCalendar />
               Remind me every Friday

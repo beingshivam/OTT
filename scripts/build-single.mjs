@@ -21,7 +21,7 @@ const DIST = resolve(ROOT, 'dist');
 
 const args = process.argv.slice(2);
 const fragment = args.includes('--fragment');
-const outFile = resolve(ROOT, args.find((a) => !a.startsWith('--')) ?? 'dist/dropday.html');
+const outFile = resolve(ROOT, args.find((a) => !a.startsWith('--')) ?? 'dist/firstday.html');
 
 const FONTS =
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@1&display=swap';
@@ -42,7 +42,7 @@ const [css, js, feed] = await Promise.all([
   readFile(resolve(ROOT, 'public/data/releases.json'), 'utf8'),
 ]);
 
-const title = fragment ? 'dropday' : 'dropday — everything new, everywhere, this week';
+const title = fragment ? 'firstday' : 'firstday — everything new, everywhere, this week';
 
 const head = `<title>${title}</title>
 <link rel="stylesheet" href="${FONTS}" />
@@ -52,7 +52,7 @@ ${css}
 
 const body = `<div id="root"></div>
 
-<script id="dropday-feed" type="application/json">
+<script id="firstday-feed" type="application/json">
 ${safe(feed)}
 </script>
 

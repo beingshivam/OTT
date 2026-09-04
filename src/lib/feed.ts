@@ -8,7 +8,7 @@ import type { ReleaseFeed, ReleaseWeek } from '../types';
 export async function loadFeed(signal?: AbortSignal): Promise<ReleaseFeed> {
   // Single-file builds embed the feed in the page so the whole app is one
   // self-contained HTML file that works from a file:// URL or a paste-in host.
-  const embedded = document.getElementById('dropday-feed')?.textContent;
+  const embedded = document.getElementById('firstday-feed')?.textContent;
   if (embedded) return normalise(JSON.parse(embedded) as ReleaseFeed);
 
   const url = new URL('data/releases.json', document.baseURI).href;

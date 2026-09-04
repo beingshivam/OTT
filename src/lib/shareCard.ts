@@ -7,7 +7,7 @@ import type { Release } from '../types';
 /**
  * Renders the current week as a shareable PNG.
  *
- * The thing dropday competes with is an image people forward on WhatsApp. Rather
+ * The thing firstday competes with is an image people forward on WhatsApp. Rather
  * than fight that behaviour, this feeds it: export exactly what's on screen —
  * filters and all — as a card sized for a chat thread, with the URL on it. Every
  * forward is then a link back, which makes sharing the growth loop rather than a
@@ -198,7 +198,7 @@ export async function renderShareCard(opts: Options): Promise<Blob> {
 
   ctx.fillStyle = '#f2f4f9';
   ctx.font = font(30, 700);
-  ctx.fillText('dropday', PAD + 54, y + 29);
+  ctx.fillText('firstday', PAD + 54, y + 29);
 
   y += 92;
   ctx.fillStyle = '#7d8494';

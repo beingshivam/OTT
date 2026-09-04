@@ -1,4 +1,4 @@
-# dropday — product brief
+# firstday — product brief
 
 ## The problem
 

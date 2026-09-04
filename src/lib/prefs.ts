@@ -4,7 +4,14 @@
  * a personal feed, and nothing leaves the browser.
  */
 
-const KEY = 'dropday.prefs.v1';
+const KEY = 'firstday.prefs.v1';
+
+/**
+ * The site was called dropday before this. Anyone who had already picked their
+ * platforms would otherwise silently lose them on the rename and be shown the
+ * onboarding card again, which reads as the app forgetting them.
+ */
+const LEGACY_KEY = 'dropday.prefs.v1';
 
 export interface Prefs {
   platforms: string[];
@@ -23,7 +30,7 @@ export const DEFAULT_PREFS: Prefs = {
 
 export function loadPrefs(): Prefs {
   try {
-    const raw = localStorage.getItem(KEY);
+    const raw = localStorage.getItem(KEY) ?? localStorage.getItem(LEGACY_KEY);
     if (!raw) return DEFAULT_PREFS;
     const parsed = JSON.parse(raw) as Partial<Prefs>;
     return {

@@ -2,7 +2,7 @@
   // Explicit config so `wrangler deploy` uses it instead of trying to
   // auto-configure from a detected framework — that path pulls in
   // @cloudflare/vite-plugin and fails the build on its own version checks.
-  "name": "dropday",
+  "name": "firstday",
   "compatibility_date": "2026-09-03",
 
   // Assets-only: there is no Worker script, just the built static site.

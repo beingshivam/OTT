@@ -1,4 +1,4 @@
-# dropday
+# firstday
 
 **Everything new, everywhere, this week.** One page that shows every film, series,
 documentary and theatrical release landing across Netflix, Prime Video, JioHotstar,
@@ -32,7 +32,7 @@ BASE_PATH=/ott/ npm run build
 
 Connecting the repo in the Cloudflare dashboard creates a **Workers** project
 (new projects no longer land on Pages), which deploys with `npx wrangler deploy`
-and serves at `dropday.<your-subdomain>.workers.dev`.
+and serves at `firstday.<your-subdomain>.workers.dev`.
 
 `wrangler.jsonc` in the repo root drives that deploy. It is deliberately
 **assets-only** — no Worker script, nothing running at request time — because the
@@ -85,7 +85,7 @@ string, so `/` is the only route the app ever serves.
 ### One self-contained file
 
 ```bash
-npm run build:single      # → dist/dropday.html
+npm run build:single      # → dist/firstday.html
 ```
 
 Everything — styles, script, and the release feed — inlined into a single HTML

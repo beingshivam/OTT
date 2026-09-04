@@ -47,7 +47,7 @@ export function ShareWeek({ releases, filters }: Props) {
         filterNote: describe(filters),
         siteUrl: window.location.origin,
       });
-      const file = new File([blob], `dropday-${filters.weekId}.png`, { type: 'image/png' });
+      const file = new File([blob], `firstday-${filters.weekId}.png`, { type: 'image/png' });
       const text = `What's new ${formatWeekRange(filters.weekId)} — ${window.location.href}`;
 
       if (navigator.canShare?.({ files: [file] })) {
