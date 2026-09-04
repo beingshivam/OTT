@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { KIND_ICON } from './icons';
 import { PlatformLogo } from './PlatformLogo';
 import { dropLabel } from './ReleaseCard';
-import { KIND_LABEL, languageName, platform } from '../data/platforms';
+import { platform } from '../data/platforms';
+import { metaLine } from '../lib/format';
 import { formatDay } from '../lib/week';
 import type { Release } from '../types';
 
@@ -154,15 +155,7 @@ function BoardRow({
           </span>
           {/* Type, language, genre — the three things that decide whether a
               title is for you, in the order you'd ask them. */}
-          <span className="row__meta">
-            {[
-              KIND_LABEL[release.kind] ?? release.kind,
-              release.languages.map(languageName).join(', '),
-              release.genres.slice(0, 2).join(', '),
-            ]
-              .filter(Boolean)
-              .join(' · ')}
-          </span>
+          <span className="row__meta">{metaLine(release)}</span>
         </span>
         {multiDay && <span className="row__day">{day.weekday}</span>}
       </button>

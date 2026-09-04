@@ -63,7 +63,7 @@ export function ReleaseCard({ release, onOpen, index = 0 }: Props) {
         <span className="card__sub">
           {[
             langs.slice(0, 2).join(', ') + (langs.length > 2 ? ` +${langs.length - 2}` : ''),
-            release.genres[0],
+            release.genres.find((g) => g.toLowerCase() !== (KIND_LABEL[release.kind] ?? '').toLowerCase()),
           ]
             .filter(Boolean)
             .join(' · ')}

@@ -52,7 +52,11 @@ export function DetailSheet({ release, onClose }: Props) {
     }
   }
 
-  const watchUrl = release.watchUrl ?? p.homeUrl;
+  // Land on the title, not the homepage. On a phone these https links are
+  // universal links, so the installed app opens instead of the browser.
+  const watchUrl =
+    release.watchUrl ??
+    (p.searchUrl ? p.searchUrl.replace('{q}', encodeURIComponent(release.title)) : p.homeUrl);
 
   return (
     <div
@@ -143,10 +147,28 @@ export function DetailSheet({ release, onClose }: Props) {
           )}
 
           <div className="sheet__actions">
-            <a className="btn btn--primary" href={watchUrl} target="_blank" rel="noreferrer">
-              <IconPlay />
-              {p.theatrical ? 'Book tickets' : `Open ${p.short}`}
-            </a>
+            {/* One button per place it's actually available, not just the first. */}
+            {release.platforms.map((id, i) => {
+              const target = platform(id);
+              const href =
+                i === 0
+                  ? watchUrl
+                  : target.searchUrl
+                    ? target.searchUrl.replace('{q}', encodeURIComponent(release.title))
+                    : target.homeUrl;
+              return (
+                <a
+                  key={id}
+                  className={i === 0 ? 'btn btn--primary' : 'btn btn--lg'}
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <IconPlay />
+                  {target.theatrical ? 'Book tickets' : `Open ${target.short}`}
+                </a>
+              );
+            })}
             {release.trailerUrl && (
               <a className="btn btn--lg" href={release.trailerUrl} target="_blank" rel="noreferrer">
                 <IconExternal />

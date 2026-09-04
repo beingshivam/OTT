@@ -4,6 +4,7 @@ import { Controls } from './components/Controls';
 import { DetailSheet } from './components/DetailSheet';
 import { ReleaseCard } from './components/ReleaseCard';
 import { SetupCard } from './components/SetupCard';
+import { ShareWeek } from './components/ShareWeek';
 import { TrendingStrip, normalise } from './components/TrendingStrip';
 import {
   IconCalendar,
@@ -22,6 +23,8 @@ import {
   EMPTY_FILTERS,
 } from './lib/filters';
 import { DEFAULT_PREFS, guessRegion, loadPrefs, savePrefs, type Prefs } from './lib/prefs';
+import { download } from './lib/download';
+import { weeklyReminder } from './lib/reminder';
 import { readFilters, writeFilters } from './lib/urlState';
 import {
   addDays,
@@ -118,6 +121,10 @@ export default function App() {
 
   const resetFilters = useCallback(() => {
     setFilters((f) => ({ ...f, ...EMPTY_FILTERS }));
+  }, []);
+
+  const addWeeklyReminder = useCallback(() => {
+    download(weeklyReminder(window.location.origin), 'dropday-friday.ics');
   }, []);
 
   const updatePrefs = useCallback((next: Partial<Prefs>) => {
@@ -283,6 +290,7 @@ export default function App() {
               {lineupOn ? 'My lineup' : `My lineup (${prefs.platforms.length})`}
             </button>
           )}
+          <ShareWeek releases={visible} filters={filters} />
           <span className="viewtoggle" role="group" aria-label="Layout">
             <button data-on={view === 'board'} onClick={() => setView('board')}>
               Board
@@ -443,6 +451,10 @@ export default function App() {
         <footer className="footer">
           <div className="footer__stack">
             <span>dropday — every new release, every platform, one page.</span>
+            <button className="footer__link" onClick={addWeeklyReminder}>
+              <IconCalendar />
+              Remind me every Friday
+            </button>
           </div>
           <div className="footer__stack">
             {feed && (
