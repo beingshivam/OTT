@@ -2,6 +2,9 @@ name: Refresh release calendar
 
 # New titles land on Friday in India and midweek almost everywhere else, so the
 # calendar is rebuilt twice a week rather than once. Times are UTC.
+#
+# Scheduled workflows only ever run on the repository's default branch — if the
+# default branch changes, this schedule moves with it.
 on:
   schedule:
     - cron: '30 19 * * 4' # Thu 19:30 UTC — Friday ~01:00 IST, ahead of the Friday drops
@@ -32,10 +35,13 @@ jobs:
         with:
           node-version: 22
 
-      # Without a token there is nothing to fetch. That is a configuration gap,
-      # not a broken build, so the job says so and stops green.
       # Reports *where* the credential is, not just whether it's missing. The
       # value is never printed — only its length — so the log stays safe to share.
+      #
+      # This step stays green even with nothing configured, so the diagnostics
+      # below always get a chance to print. The staleness guard at the end of the
+      # job is what actually turns a missing token into a failure someone hears
+      # about.
       - name: Check for TMDB credentials
         id: creds
         env:
@@ -49,7 +55,6 @@ jobs:
 
           # Either credential works — the scripts pick the auth scheme by shape.
           if [ -z "$TMDB_TOKEN" ] && [ -n "$TMDB_API_KEY" ]; then
-            echo "TMDB_TOKEN=$TMDB_API_KEY" >> "$GITHUB_ENV"
             TMDB_TOKEN="$TMDB_API_KEY"
           fi
 
@@ -62,10 +67,11 @@ jobs:
           if [ -n "$TMDB_TOKEN_VAR" ]; then
             echo "::warning title=Token is in the wrong place::TMDB_TOKEN was found under the Variables tab, not Secrets. Variables are printed in plain text in logs, so this job will not read a credential from there. Delete the variable and re-add it under Settings › Secrets and variables › Actions › Secrets › New repository secret."
           else
-            echo "::notice title=No TMDB token::Nothing found in either Secrets or Variables. Add it at Settings › Secrets and variables › Actions › Secrets tab › New repository secret, named exactly TMDB_TOKEN. Environment secrets and Dependabot secrets are not visible to this job."
+            echo "::warning title=No TMDB token::Nothing found in either Secrets or Variables. Add it at Settings › Secrets and variables › Actions › Secrets tab › New repository secret, named exactly TMDB_TOKEN. Environment secrets and Dependabot secrets are not visible to this job."
           fi
 
       - name: Rebuild the feed
+        id: fetch
         if: steps.creds.outputs.ready == 'true'
         env:
           TMDB_TOKEN: ${{ secrets.TMDB_TOKEN || secrets.TMDB_API_KEY }}
@@ -77,22 +83,41 @@ jobs:
 
       # Separate pass so curated rows — which discover never returns — still get
       # posters, synopses, cast and runtimes attached.
+      #
+      # Enrichment is decoration: a calendar with the right titles and no posters
+      # is still the product, but a calendar frozen three weeks in the past is
+      # not. So a failure here must not cost us the refresh that already
+      # succeeded — it is recorded and the run carries on to commit.
       - name: Attach artwork and metadata
-        if: steps.creds.outputs.ready == 'true'
+        id: enrich
+        if: steps.fetch.outcome == 'success'
+        continue-on-error: true
         env:
           TMDB_TOKEN: ${{ secrets.TMDB_TOKEN || secrets.TMDB_API_KEY }}
         run: node scripts/enrich-releases.mjs
 
       # Provider logos change rarely, but they cost two calls and keep the board
-      # branded without shipping anyone's trademarked assets in the repo.
+      # branded without shipping anyone's trademarked assets in the repo. Same
+      # reasoning as above: nice to have, never worth losing the refresh over.
       - name: Fetch platform logos
-        if: steps.creds.outputs.ready == 'true'
+        id: logos
+        if: steps.fetch.outcome == 'success'
+        continue-on-error: true
         env:
           TMDB_TOKEN: ${{ secrets.TMDB_TOKEN || secrets.TMDB_API_KEY }}
         run: node scripts/fetch-logos.mjs
 
+      - name: Note any partial pass
+        if: steps.enrich.outcome == 'failure' || steps.logos.outcome == 'failure'
+        run: |
+          echo "::warning title=Refreshed, but not fully enriched::The calendar itself rebuilt and will be published. Enrichment: ${{ steps.enrich.outcome }}. Logos: ${{ steps.logos.outcome }}. TMDB drops connections under load, and the next run picks up whatever was missed — no action needed unless it repeats."
+
+      # Pushing the data is what triggers the Cloudflare build, so this is the
+      # step that actually publishes. Rebase first: a human push between the
+      # checkout and here would otherwise reject this one and lose the refresh
+      # until the next run.
       - name: Commit the updated calendar
-        if: steps.creds.outputs.ready == 'true'
+        if: steps.fetch.outcome == 'success'
         run: |
           if git diff --quiet -- public/data/releases.json public/data/logos.json; then
             echo "::notice::Calendar already up to date — nothing to commit."
@@ -102,4 +127,57 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add public/data/releases.json public/data/logos.json
           git commit -m "chore(data): refresh release calendar"
-          git push
+
+          for attempt in 1 2 3; do
+            if git push; then
+              exit 0
+            fi
+            echo "Push rejected — rebasing onto the branch and retrying ($attempt/3)."
+            git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
+            sleep $((attempt * 5))
+          done
+          echo "::error title=Could not publish the refresh::The calendar rebuilt but could not be pushed after three attempts."
+          exit 1
+
+      # The single check that matters, and the reason this job can be left alone.
+      #
+      # Every way this can quietly stop working — no token, an expired token, a
+      # TMDB outage, a broken script, a rejected push — ends the same way: the
+      # published feed stops moving while the job still reports success. A notice
+      # in a log nobody opens is not a safety net. So the run fails when the feed
+      # on disk has gone stale, because a failed scheduled workflow is the one
+      # thing GitHub actually emails you about.
+      #
+      # The window allows a full missed week: two runs land per week, so this
+      # only trips after roughly three consecutive failures, never on one bad
+      # night.
+      - name: Guard against a stale calendar
+        if: always()
+        env:
+          MAX_AGE_DAYS: ${{ vars.MAX_FEED_AGE_DAYS || 9 }}
+          CREDS_READY: ${{ steps.creds.outputs.ready }}
+        run: |
+          node -e '
+            const fs = require("fs");
+            const max = Number(process.env.MAX_AGE_DAYS);
+            const feed = JSON.parse(fs.readFileSync("public/data/releases.json", "utf8"));
+            const days = (Date.now() - Date.parse(feed.generatedAt)) / 86400000;
+            const age = days.toFixed(1);
+
+            // No credential means this job can never refresh anything, however
+            // fresh the committed feed still looks today. Say so on the first
+            // run rather than waiting for the data to rot into the window below.
+            if (process.env.CREDS_READY !== "true") {
+              console.log("::error title=The refresh cannot run::No TMDB credential is configured, so this job did nothing and the calendar will freeze where it is. The credentials step above says exactly where to add it.");
+              process.exit(1);
+            }
+            if (feed.source !== "tmdb") {
+              console.log(`::error title=The calendar is not live data::The feed still reads source "${feed.source}", so the site is serving the seeded sample rather than real releases. Add the TMDB_TOKEN secret (see the credentials step above) and re-run this workflow.`);
+              process.exit(1);
+            }
+            if (days > max) {
+              console.log(`::error title=The calendar has gone stale::Last rebuilt ${age} days ago, past the ${max}-day limit. Open the earlier steps in this run to see which one stopped working — a missing or expired TMDB token is the usual cause.`);
+              process.exit(1);
+            }
+            console.log(`Calendar is ${age} days old — within the ${max}-day limit.`);
+          '
