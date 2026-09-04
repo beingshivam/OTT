@@ -1,5 +1,6 @@
 import { KIND_ICON } from './icons';
 import { PosterArt } from './PosterArt';
+import { Rating } from './Rating';
 import { KIND_LABEL, languageName, platform } from '../data/platforms';
 import type { Release } from '../types';
 
@@ -56,6 +57,7 @@ export function ReleaseCard({ release, onOpen, index = 0 }: Props) {
             {KIND_LABEL[release.kind] ?? release.kind}
           </span>
           {drop && <span className="card__drop">{drop}</span>}
+          <Rating release={release} className="card__rating" />
         </span>
       </div>
       <span className="card__body">

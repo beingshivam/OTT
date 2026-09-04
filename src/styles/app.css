@@ -965,13 +965,35 @@ a {
   color: var(--text-2);
 }
 
-.row__rating {
+/* Score and day chip, right-aligned together so the numbers form a column. */
+.row__end {
+  margin-left: auto;
   flex: none;
-  font-size: 10.5px;
-  font-weight: 700;
-  color: #ffc94a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 1px;
+}
+
+/*
+ * Quiet by default, gold only when the score has earned it. A star on every row
+ * is the signal people want; a *gold* star on every row is nineteen competing
+ * highlights and no signal at all. tabular-nums keeps the decimals aligned down
+ * the panel so a column of scores reads as a column.
+ */
+.rating {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 650;
+  color: var(--text-3);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+}
+.rating[data-strong] {
+  color: #ffc94a;
 }
 .row__flag {
   background: linear-gradient(135deg, var(--brand), var(--brand-2));
@@ -988,8 +1010,15 @@ a {
 }
 
 .row__day {
-  margin-left: auto;
   flex: none;
+  /* Constant width across WED/THU/FRI. Letter-spacing makes them differ by a
+     few pixels otherwise, which walks the score beside them out of line down
+     the panel — the one thing a column of numbers must not do. A floor is not
+     enough here: "Wed" renders wider than "Fri", so this is a fixed width set
+     to the widest of the seven. */
+  width: 40px;
+  box-sizing: border-box;
+  text-align: center;
   font-size: 9.5px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -1355,6 +1384,17 @@ a {
   font-weight: 600;
   color: rgba(255, 255, 255, 0.85);
 }
+/* Sits over the poster gradient, so it needs to hold its own against artwork
+   rather than against the panel ground the board version uses. */
+.card__rating {
+  margin-left: auto;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.82);
+}
+.card__rating[data-strong] {
+  color: #ffc94a;
+}
+
 .card__kind {
   display: inline-flex;
   align-items: center;

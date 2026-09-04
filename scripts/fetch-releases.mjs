@@ -114,6 +114,17 @@ function heatFrom(popularity, voteAverage, voteCount) {
   return Math.round(Math.min(100, pop * 0.8 + quality));
 }
 
+/**
+ * How few votes a score can rest on before it is noise rather than signal.
+ *
+ * This sat at 20, which is a sound bar for a global release and far too high
+ * for the regional cinema this calendar is mostly made of — it left four out of
+ * five titles with no score at all. Lowered so smaller films get one, with the
+ * vote count carried alongside so the board can show a thinly-voted score
+ * quietly instead of pretending it carries the same weight.
+ */
+const MIN_VOTES = 5;
+
 function providerIndex(platforms) {
   const index = new Map();
   for (const p of platforms) for (const id of p.tmdb) index.set(id, p.id);
@@ -230,7 +241,8 @@ async function buildWeek(weekId, platforms, index) {
             genres,
             releaseDate: item.release_date ?? item.first_air_date ?? from,
             regions: [region],
-            rating: item.vote_count > 20 ? Number(item.vote_average?.toFixed(1)) : undefined,
+            rating: item.vote_count >= MIN_VOTES ? Number(item.vote_average?.toFixed(1)) : undefined,
+        votes: item.vote_count || undefined,
             heat: heatFrom(item.popularity, item.vote_average, item.vote_count),
             synopsis: item.overview || undefined,
             posterUrl: item.poster_path ? `${IMG}/w500${item.poster_path}` : undefined,
@@ -278,7 +290,8 @@ async function buildWeek(weekId, platforms, index) {
             genres,
             releaseDate: item.release_date ?? from,
             regions: [region],
-            rating: item.vote_count > 20 ? Number(item.vote_average?.toFixed(1)) : undefined,
+            rating: item.vote_count >= MIN_VOTES ? Number(item.vote_average?.toFixed(1)) : undefined,
+        votes: item.vote_count || undefined,
             heat: heatFrom(item.popularity, item.vote_average, item.vote_count),
             synopsis: item.overview || undefined,
             posterUrl: item.poster_path ? `${IMG}/w500${item.poster_path}` : undefined,
@@ -341,7 +354,8 @@ async function buildTrending(index) {
         genres,
         releaseDate: item.release_date ?? item.first_air_date ?? '',
         regions: [region],
-        rating: item.vote_count > 20 ? Number(item.vote_average?.toFixed(1)) : undefined,
+        rating: item.vote_count >= MIN_VOTES ? Number(item.vote_average?.toFixed(1)) : undefined,
+        votes: item.vote_count || undefined,
         heat: heatFrom(item.popularity, item.vote_average, item.vote_count),
         synopsis: item.overview || undefined,
         posterUrl: item.poster_path ? `${IMG}/w500${item.poster_path}` : undefined,

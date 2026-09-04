@@ -118,7 +118,12 @@ for (const week of feed.weeks) {
     if (hit.poster_path) release.posterUrl = `${IMG}/w500${hit.poster_path}`;
     if (hit.backdrop_path) release.backdropUrl = `${IMG}/w1280${hit.backdrop_path}`;
     if (hit.overview) release.synopsis = hit.overview;
-    if (hit.vote_count > 20) release.rating = Number(hit.vote_average.toFixed(1));
+    // Same bar as the discover pass, kept in step deliberately: a title should
+    // not gain or lose its score depending on which pass happened to find it.
+    if (hit.vote_count >= 5) {
+      release.rating = Number(hit.vote_average.toFixed(1));
+      release.votes = hit.vote_count;
+    }
 
     // Runtime, genres and cast only exist on the detail endpoint.
     try {

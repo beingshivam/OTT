@@ -33,8 +33,20 @@ export interface Release {
   regions: string[];
   drop?: DropInfo;
   runtimeMinutes?: number;
-  /** 0–10, TMDB-style. Undefined for unrated/too-new titles. */
+  /**
+   * 0–10, from TMDB's own audience score — not IMDb, which is a different
+   * voting population and usually lands a few tenths away.
+   *
+   * Undefined for a title nobody has scored yet, which is most of what a
+   * release calendar carries: nothing has a rating before it comes out.
+   */
   rating?: number;
+  /**
+   * How many votes that score rests on. A 9.0 from six people and a 9.0 from
+   * six thousand are not the same claim, and the board leans on this to decide
+   * which scores are worth drawing the eye to.
+   */
+  votes?: number;
   /** 0–100 popularity used for the Trending sort. Higher is hotter. */
   heat?: number;
   synopsis?: string;

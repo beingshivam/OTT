@@ -104,7 +104,16 @@ export function DetailSheet({ release, onClose }: Props) {
             {drop?.fullSeason && <span className="pill">Full season</span>}
             {drop?.finale && <span className="pill">Finale</span>}
             {release.certification && <span className="pill">{release.certification}</span>}
-            {release.rating != null && <span className="pill">★ {release.rating.toFixed(1)}</span>}
+            {release.rating != null && (
+              <span
+                className="pill"
+                title={`${release.rating.toFixed(1)} on TMDB${
+                  release.votes ? `, from ${release.votes.toLocaleString()} votes` : ''
+                }`}
+              >
+                ★ {release.rating.toFixed(1)}
+              </span>
+            )}
           </div>
 
           <div className="sheet__actions sheet__actions--lead">

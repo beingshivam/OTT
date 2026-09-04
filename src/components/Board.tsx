@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { KIND_ICON } from './icons';
 import { PlatformLogo } from './PlatformLogo';
+import { Rating } from './Rating';
 import { dropLabel } from './ReleaseCard';
 import { platform } from '../data/platforms';
 import { metaLine } from '../lib/format';
@@ -218,15 +219,18 @@ function BoardRow({
             {release.title}
             {drop && <span className="row__drop">{drop}</span>}
             {release.drop?.finale && <span className="row__flag">FINALE</span>}
-            {release.rating != null && (
-              <span className="row__rating">★ {release.rating.toFixed(1)}</span>
-            )}
           </span>
           {/* Type, language, genre — the three things that decide whether a
               title is for you, in the order you'd ask them. */}
           <span className="row__meta">{metaLine(release)}</span>
         </span>
-        {multiDay && <span className="row__day">{day.weekday}</span>}
+        {/* Score and day share one right-hand column. Both are fixed width, so
+            the numbers line up down the panel and a missing score leaves a gap
+            rather than shunting the row around. */}
+        <span className="row__end">
+          <Rating release={release} />
+          {multiDay && <span className="row__day">{day.weekday}</span>}
+        </span>
       </button>
     </li>
   );
