@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-04T17:22:38.592Z",
+  "generatedAt": "2026-09-04T18:12:51.252Z",
   "source": "tmdb",
   "weeks": [
     {
@@ -2640,5 +2640,5 @@
       "backdropUrl": "https://image.tmdb.org/t/p/w780/wGmJg0wHBpifiHFsC6VgAOlQTge.jpg"
     }
   ],
-  "enrichedAt": "2026-09-04T17:22:53.584Z"
+  "enrichedAt": "2026-09-04T18:12:52.372Z"
 }
