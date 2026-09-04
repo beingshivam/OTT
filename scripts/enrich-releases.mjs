@@ -12,14 +12,18 @@
  * looks intentional. So a candidate is accepted only on an exact normalised
  * title match with a plausible year, and everything else is left alone.
  *
- * Usage: TMDB_TOKEN=... node scripts/enrich-releases.mjs [--force] [--verbose]
+ * Usage: npm run enrich [-- --force] [-- --verbose]   (reads .env)
  */
 
 import { readFile, writeFile } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { loadEnv } from './env.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+
+// Read .env first, so the credential never has to go on a command line.
+loadEnv();
 const FEED = resolve(ROOT, 'public/data/releases.json');
 const API = 'https://api.themoviedb.org/3';
 const IMG = 'https://image.tmdb.org/t/p';
@@ -33,7 +37,7 @@ if (!TOKEN) {
     'No TMDB credential found (set TMDB_TOKEN or TMDB_API_KEY).\n' +
       'Either works — the v4 API Read Access Token or the v3 API Key, from\n' +
       'https://www.themoviedb.org/settings/api. Then:\n' +
-      '  TMDB_TOKEN=... npm run enrich\n' +
+      '  put it in .env (copy .env.example), then: npm run enrich\n' +
       'The feed has been left untouched.',
   );
   process.exit(1);

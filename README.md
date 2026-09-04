@@ -109,9 +109,17 @@ Deliberately a **build-time** pull rather than a browser call:
 ### Refreshing by hand
 
 ```bash
-cp .env.example .env        # then paste your token in
-TMDB_TOKEN=... npm run refresh
+cp .env.example .env        # Windows: copy .env.example .env
+# paste your token into .env, then:
+npm run refresh
 ```
+
+The scripts read `.env` themselves, so the credential never goes on a command
+line. That matters beyond tidiness: `TMDB_TOKEN=... npm run refresh` is bash
+syntax and fails outright on Windows `cmd.exe`, and `set TMDB_TOKEN="x"` there
+silently keeps the quotes as part of the value. A file avoids both.
+
+A real environment variable still wins over `.env`, which is what CI relies on.
 
 `refresh` runs two passes, and the split is the important part:
 

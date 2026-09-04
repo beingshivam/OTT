@@ -7,7 +7,8 @@
  *   - the site is a static file that a CDN can cache and serve instantly,
  *   - and if TMDB is down on a Friday morning, last week's file still serves.
  *
- * Usage:  TMDB_TOKEN=... node scripts/fetch-releases.mjs [--weeks-back 2] [--weeks-ahead 2]
+ * Usage:  npm run refresh   (reads .env; TMDB_TOKEN in the environment also works)
+ *          node scripts/fetch-releases.mjs [--weeks-back 3] [--weeks-ahead 4]
  *
  * The token is a TMDB v4 "API Read Access Token" from
  * https://www.themoviedb.org/settings/api
@@ -16,8 +17,12 @@
 import { writeFile, mkdir, readFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { loadEnv } from './env.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+
+// Read .env first, so the credential never has to go on a command line.
+loadEnv();
 const OUT = resolve(ROOT, 'public/data/releases.json');
 const API = 'https://api.themoviedb.org/3';
 const IMG = 'https://image.tmdb.org/t/p';
@@ -40,7 +45,7 @@ if (!TOKEN) {
     'No TMDB credential found (set TMDB_TOKEN or TMDB_API_KEY).\n' +
       'Either works — the v4 API Read Access Token or the v3 API Key, from\n' +
       'https://www.themoviedb.org/settings/api. Then:\n' +
-      '  TMDB_TOKEN=... npm run refresh\n' +
+      '  put it in .env (copy .env.example), then: npm run refresh\n' +
       'The existing feed has been left untouched.',
   );
   process.exit(1);

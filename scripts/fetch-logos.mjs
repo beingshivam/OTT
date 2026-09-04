@@ -9,14 +9,18 @@
  * stop there, which would leave the board half-branded — worse than a
  * consistent monogram system.
  *
- * Usage: TMDB_TOKEN=... node scripts/fetch-logos.mjs
+ * Usage: npm run logos   (reads .env)
  */
 
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { loadEnv } from './env.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+
+// Read .env first, so the credential never has to go on a command line.
+loadEnv();
 const OUT = resolve(ROOT, 'public/data/logos.json');
 const API = 'https://api.themoviedb.org/3';
 const IMG = 'https://image.tmdb.org/t/p/w154';
