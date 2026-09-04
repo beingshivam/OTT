@@ -2,8 +2,8 @@
 
 **Everything new, everywhere, this week.** One page that shows every film, series,
 documentary and theatrical release landing across Netflix, Prime Video, JioHotstar,
-Apple TV+, SonyLIV, Sun NXT, hoichoi, aha, Shudder, HBO Max, Hulu and more — plus
-what's opening in theatres.
+Apple TV+, ZEE5, SonyLIV, Sun NXT, hoichoi, aha, Shudder, HBO Max, Hulu and more —
+plus what's opening in theatres.
 
 No login. No account. No app to install.
 
@@ -124,7 +124,7 @@ TMDB_TOKEN=... npm run refresh
 
 3. **`fetch-logos.mjs`** writes `public/data/logos.json` — real platform logos
    from TMDB's watch-provider list. It's the only source that carries JioHotstar,
-   SonyLIV, Sun NXT, hoichoi, aha and Simply South alongside the global services;
+   ZEE5, SonyLIV, Sun NXT, hoichoi and aha alongside the global services;
    icon sets like Simple Icons stop at the American platforms, which would leave
    the board half-branded.
 
@@ -143,8 +143,9 @@ works** — the v4 *API Read Access Token* (a long `eyJ...` JWT) or the v3
 the matching auth scheme, so there is nothing to get wrong. In CI the secret may
 be named `TMDB_TOKEN` or `TMDB_API_KEY`.
 
-Options: `--weeks-back N` (backfill history, default 2) and `--weeks-ahead N`
-(pull upcoming weeks, default 2). Set `REGIONS=IN,US` to control which regions get
+Options: `--weeks-back N` (backfill history, default 3) and `--weeks-ahead N`
+(pull upcoming weeks, default 4) — the window leans forward because a release
+calendar is read forwards. Set `REGIONS=IN,US` to control which regions get
 watch-provider lookups.
 
 ### Refreshing automatically

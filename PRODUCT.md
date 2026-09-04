@@ -92,7 +92,7 @@ is to answer the question and get out of the way.
 ## What comes next, in order
 
 1. **More sources.** TMDB is thin on regional Indian OTT. Add JustWatch and direct
-   platform feeds to cover Sun NXT, hoichoi, aha and Simply South properly.
+   platform feeds to cover ZEE5, Sun NXT, hoichoi and aha properly.
 2. **Trailer inline.** The single highest-intent action after "what's new" is
    "show me."
 3. **Add to calendar.** One tap to put a Friday release on your actual calendar —

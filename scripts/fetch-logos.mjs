@@ -4,7 +4,7 @@
  * logo URLs on TMDB's image CDN.
  *
  * TMDB's watch-provider list is the only source that carries the Indian
- * services (JioHotstar, SonyLIV, Sun NXT, hoichoi, aha, Simply South) alongside
+ * services (JioHotstar, ZEE5, SonyLIV, Sun NXT, hoichoi, aha) alongside
  * the global ones. Icon sets like Simple Icons cover the American platforms and
  * stop there, which would leave the board half-branded — worse than a
  * consistent monogram system.

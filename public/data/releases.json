@@ -215,24 +215,6 @@
           "sample": true
         },
         {
-          "id": "ss-arulvaan",
-          "title": "Arulvaan",
-          "kind": "film",
-          "platforms": [
-            "simplysouth"
-          ],
-          "languages": [
-            "ta"
-          ],
-          "genres": [],
-          "releaseDate": "2026-09-04",
-          "regions": [
-            "IN"
-          ],
-          "heat": 52,
-          "sample": true
-        },
-        {
           "id": "hc-puratawn",
           "title": "Puratawn",
           "kind": "film",
