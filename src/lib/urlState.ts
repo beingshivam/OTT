@@ -29,20 +29,28 @@ export function readFilters(defaults: Pick<Filters, 'weekId' | 'region'>): Filte
 }
 
 /**
- * `pinWeek` is false while the week was chosen *for* the reader — the landing
- * jump to the nearest stocked week. Writing that into the URL would freeze a
+ * `pinned` separates what the reader chose from what was chosen for them.
+ *
+ * The landing jump to the nearest stocked week, and the region guessed from the
+ * browser locale, are both defaults — writing them into the URL would freeze a
  * bookmark or a shared link to whichever week happened to be current when it was
- * copied, which is precisely wrong for a page about what's new this week. Only an
- * explicit week change belongs in the URL.
+ * copied, which is precisely wrong for a page about what's new this week.
+ *
+ * An explicit choice is the opposite: it has to survive the link, and for the
+ * region it is written unconditionally rather than compared against the default.
+ * Comparing was the bug — picking a region also saved it as the reader's own
+ * default, so the two were equal by the time this ran and `r` was never written
+ * at all. Sharing a US board sent a link that rendered as India for anyone whose
+ * own default was India.
  */
 export function writeFilters(
   f: Filters,
   defaults: Pick<Filters, 'weekId' | 'region'>,
-  pinWeek: boolean,
+  pinned: { week: boolean; region: boolean },
 ): void {
   const p = new URLSearchParams();
-  if (pinWeek && f.weekId !== defaults.weekId) p.set('w', f.weekId);
-  if (f.region !== defaults.region) p.set('r', f.region);
+  if (pinned.week && f.weekId !== defaults.weekId) p.set('w', f.weekId);
+  if (pinned.region) p.set('r', f.region);
   if (f.platforms.length) p.set('p', f.platforms.join(','));
   if (f.kinds.length) p.set('t', f.kinds.join(','));
   if (f.languages.length) p.set('l', f.languages.join(','));

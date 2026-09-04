@@ -860,6 +860,23 @@ a {
   text-overflow: ellipsis;
 }
 
+/* The tail of a long panel, folded away so the board stays a glance. Full
+   width and quiet, so it reads as part of the panel rather than an action. */
+.panel-card__more {
+  display: block;
+  width: 100%;
+  padding: 8px 12px 10px;
+  color: var(--text-3);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  border-top: 1px solid var(--line);
+}
+.panel-card__more:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.03);
+}
+
 .panel-card__count {
   margin-left: auto;
   min-width: 19px;
@@ -1894,4 +1911,67 @@ a {
 .search input::-webkit-search-decoration {
   -webkit-appearance: none;
   appearance: none;
+}
+
+/* ------------------------------------------------------- touch targets ---- */
+
+/*
+ * This is a phone-first page, and on a phone most of its controls were shorter
+ * than a fingertip: the week arrows 34px, the layout toggle 26, the region
+ * picker 20, the trending chips 30. iOS asks for 44 and Android for 48, and
+ * missing a week arrow on a calendar is the kind of small miss that makes a
+ * page feel cheap.
+ *
+ * Keyed on `pointer: coarse` rather than a width breakpoint, so it follows the
+ * input device rather than guessing from the viewport — a touch laptop gets the
+ * larger targets and a narrow desktop window keeps the compact ones.
+ */
+@media (pointer: coarse) {
+  .weeknav__btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  /* The pill was already tall enough; the <select> inside it was not, and the
+     select is what actually receives the tap. Stretch it to fill so the whole
+     pill is the target rather than a 20px sliver through the middle of it. */
+  .region {
+    min-height: 44px;
+    position: relative;
+  }
+  .region select {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    /* Keeps the flag and label visible underneath while the select takes the
+       hit area; the chosen value is already rendered by the flag beside it. */
+    opacity: 0;
+  }
+
+  .btn--sm {
+    height: 40px;
+  }
+
+  .viewtoggle button {
+    min-height: 38px;
+    padding-inline: 16px;
+  }
+
+  .chip {
+    min-height: 40px;
+  }
+
+  .strip__item {
+    height: 40px;
+  }
+
+  .panel-card__more {
+    min-height: 44px;
+  }
+
+  /* Inline in a sentence, so it grows by padding rather than by height. */
+  .footer__link {
+    padding-block: 12px;
+  }
 }

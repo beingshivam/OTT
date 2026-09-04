@@ -17,9 +17,26 @@ export function parseISODate(iso: string): Date {
   return new Date(Date.UTC(y, m - 1, d));
 }
 
-/** The Friday on or before `date`. */
+/**
+ * The reader's own calendar date, as a UTC-midnight Date.
+ *
+ * Release dates are calendar dates, not instants — "4 Sep" means that day
+ * wherever you are. Reading them off UTC instead of the local clock put the page
+ * on the wrong day for a slice of every day: at 1:30am in India the UTC date was
+ * still yesterday, and at 9pm on a Thursday in California UTC had already rolled
+ * to Friday, which jumped the whole page to next week while it was still
+ * Thursday for the reader.
+ *
+ * Building a UTC-midnight Date out of the *local* components keeps every
+ * downstream getUTC* call correct without scattering timezone handling around.
+ */
+function localMidnight(date: Date): Date {
+  return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+}
+
+/** The Friday on or before `date`, in the reader's timezone. */
 export function weekStartFor(date: Date): Date {
-  const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+  const d = localMidnight(date);
   // getUTCDay(): Sun=0 … Fri=5. Days to walk back to the most recent Friday.
   const back = (d.getUTCDay() + 2) % 7;
   return new Date(d.getTime() - back * DAY_MS);
@@ -75,5 +92,5 @@ export function relativeWeekLabel(weekId: string, today = new Date()): string {
 }
 
 export function isToday(iso: string, today = new Date()): boolean {
-  return iso === toISODate(today);
+  return iso === toISODate(localMidnight(today));
 }

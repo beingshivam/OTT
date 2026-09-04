@@ -60,6 +60,12 @@ export default function App() {
   const [weekPinned, setWeekPinned] = useState(
     () => new URLSearchParams(window.location.search).has('w'),
   );
+  // Same distinction for the region: an inbound ?r, or a deliberate switch, is
+  // the reader's choice and belongs in every link they copy from here. The
+  // locale guess is not.
+  const [regionPinned, setRegionPinned] = useState(
+    () => new URLSearchParams(window.location.search).has('r'),
+  );
 
   // Board is the default: the whole week at a glance, the way the printed
   // calendars do it. The poster grid stays available for browsing.
@@ -119,8 +125,12 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    writeFilters(filters, { weekId: currentWeek, region: prefs.region }, weekPinned);
-  }, [filters, currentWeek, prefs.region, weekPinned]);
+    writeFilters(
+      filters,
+      { weekId: currentWeek, region: prefs.region },
+      { week: weekPinned, region: regionPinned },
+    );
+  }, [filters, currentWeek, prefs.region, weekPinned, regionPinned]);
 
   const update = useCallback((next: Partial<Filters>) => {
     setFilters((f) => ({ ...f, ...next }));
@@ -254,6 +264,7 @@ export default function App() {
               <select
                 value={filters.region}
                 onChange={(e) => {
+                  setRegionPinned(true);
                   update({ region: e.target.value, platforms: [] });
                   updatePrefs({ region: e.target.value });
                 }}

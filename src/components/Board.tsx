@@ -21,6 +21,18 @@ import type { Release } from '../types';
  * browse, but it is the alternative, not the front door.
  */
 
+/**
+ * Rows to show before a panel collapses behind a "show more".
+ *
+ * Cinema listings run to eighteen titles in a good week while most streaming
+ * panels carry one, and an uncapped panel is three times the height of every
+ * other column — no packing can balance that, so the board ended in a wall of
+ * regional films beside a screen of dead space. The whole promise here is the
+ * week at a glance, so the tail folds away. Rows arrive sorted by heat, so the
+ * titles that survive the cut are the ones worth seeing first.
+ */
+const PANEL_MAX = 8;
+
 interface Props {
   releases: Release[];
   onOpen: (r: Release) => void;
@@ -66,38 +78,75 @@ export function Board({ releases, onOpen, multiDay }: Props) {
     <div className="board">
       {columns.map((column, i) => (
         <div className="board__col" key={i}>
-          {column.map(([id, list]) => {
-            const p = platform(id);
-            return (
-              <section
-                className="panel-card"
-                key={id}
-                style={{ '--pa': p.accent, '--pb': p.accent2 ?? p.accent } as React.CSSProperties}
-                data-theatrical={p.theatrical ? 'true' : undefined}
-                aria-label={p.name}
-              >
-                <header className="panel-card__head">
-                  <PlatformLogo platformId={id} size={24} />
-                  <span className="panel-card__name">{p.name}</span>
-                  <span className="panel-card__count">{list.length}</span>
-                </header>
-                <ul className="panel-card__list">
-                  {list.map((r) => (
-                    <BoardRow
-                      key={r.id + id}
-                      release={r}
-                      onOpen={onOpen}
-                      multiDay={multiDay}
-                      major={major.has(r.id)}
-                    />
-                  ))}
-                </ul>
-              </section>
-            );
-          })}
+          {column.map(([id, list]) => (
+            <PanelCard
+              key={id}
+              platformId={id}
+              releases={list}
+              onOpen={onOpen}
+              multiDay={multiDay}
+              major={major}
+            />
+          ))}
         </div>
       ))}
     </div>
+  );
+}
+
+function PanelCard({
+  platformId,
+  releases,
+  onOpen,
+  multiDay,
+  major,
+}: {
+  platformId: string;
+  releases: Release[];
+  onOpen: (r: Release) => void;
+  multiDay: boolean;
+  major: Set<string>;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const p = platform(platformId);
+  const hidden = releases.length - PANEL_MAX;
+  const shown = expanded ? releases : releases.slice(0, PANEL_MAX);
+
+  return (
+    <section
+      className="panel-card"
+      style={{ '--pa': p.accent, '--pb': p.accent2 ?? p.accent } as React.CSSProperties}
+      data-theatrical={p.theatrical ? 'true' : undefined}
+      aria-label={p.name}
+    >
+      <header className="panel-card__head">
+        <PlatformLogo platformId={platformId} size={24} />
+        <span className="panel-card__name">{p.name}</span>
+        {/* The count stays the true total, so a collapsed panel never
+            under-reports the week. */}
+        <span className="panel-card__count">{releases.length}</span>
+      </header>
+      <ul className="panel-card__list">
+        {shown.map((r) => (
+          <BoardRow
+            key={r.id + platformId}
+            release={r}
+            onOpen={onOpen}
+            multiDay={multiDay}
+            major={major.has(r.id)}
+          />
+        ))}
+      </ul>
+      {hidden > 0 && (
+        <button
+          className="panel-card__more"
+          onClick={() => setExpanded((v) => !v)}
+          aria-expanded={expanded}
+        >
+          {expanded ? 'Show less' : `+${hidden} more`}
+        </button>
+      )}
+    </section>
   );
 }
 
@@ -119,7 +168,10 @@ function packColumns(panels: Panel[], count: number): Panel[][] {
     columns[shortest].push(panel);
     // Header, one row per title, and the gap below the panel. Approximate is
     // fine — this only decides placement, the browser still does the layout.
-    heights[shortest] += 38 + panel[1].length * 44 + 14;
+    // Collapsed height: what the panel actually occupies on arrival. Packing on
+    // the full length would reserve a column for rows nobody has asked to see.
+    const rows = Math.min(panel[1].length, PANEL_MAX);
+    heights[shortest] += 38 + rows * 44 + (panel[1].length > PANEL_MAX ? 30 : 0) + 14;
   }
   return columns.filter((c) => c.length > 0);
 }
