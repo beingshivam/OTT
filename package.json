@@ -6,7 +6,7 @@
   "description": "Every new release, every platform, one page.",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && node scripts/build-seo.mjs",
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit false --emitDeclarationOnly false --pretty",
     "refresh": "node scripts/fetch-releases.mjs && node scripts/enrich-releases.mjs && node scripts/fetch-logos.mjs",
