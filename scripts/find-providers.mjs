@@ -44,9 +44,17 @@ for (const [, id, ids] of src.matchAll(/\{\s*id:\s*'([^']+)'[\s\S]*?tmdb:\s*\[([
 }
 
 const found = new Map();
+const skipped = [];
 for (const region of REGIONS) {
   for (const kind of ['movie', 'tv']) {
-    const { results = [] } = await tmdb(`/watch/providers/${kind}`, { watch_region: region });
+    // One flaky call should narrow the answer, not destroy it.
+    let results;
+    try {
+      ({ results = [] } = await tmdb(`/watch/providers/${kind}`, { watch_region: region }));
+    } catch (err) {
+      skipped.push(`${kind}/${region}: ${err.message}`);
+      continue;
+    }
     for (const p of results) {
       const entry = found.get(p.provider_id) ?? {
         // A provider without a name would otherwise take the whole lookup down.
@@ -60,7 +68,13 @@ for (const region of REGIONS) {
   }
 }
 
-console.log(`Searched ${found.size} providers across ${REGIONS.join(', ')}.\n`);
+if (!found.size) {
+  console.error('Could not reach TMDB at all:\n  ' + skipped.join('\n  '));
+  process.exit(1);
+}
+console.log(`Searched ${found.size} providers across ${REGIONS.join(', ')}.`);
+if (skipped.length) console.log(`(incomplete — ${skipped.length} list(s) failed: ${skipped.join('; ')})`);
+console.log('');
 
 for (const term of terms) {
   const needle = term.toLowerCase();

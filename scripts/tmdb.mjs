@@ -55,7 +55,7 @@ export async function tmdb(path, params = {}) {
   if (calls++ > 0) await sleep(60);
 
   let lastError;
-  for (let attempt = 0; attempt < 5; attempt++) {
+  for (let attempt = 0; attempt < ATTEMPTS; attempt++) {
     try {
       const res = await fetch(url, { headers });
 
@@ -78,11 +78,24 @@ export async function tmdb(path, params = {}) {
       // the kind of thing worth retrying over a run of several hundred calls.
       if (err instanceof Error && err.message.startsWith('TMDB ')) throw err;
       lastError = err;
-      await sleep(2 ** attempt * 600);
+      // Backoff up to ~20s in total: some networks reset TLS to TMDB in bursts,
+      // and giving up in nine seconds turns a blip into a failed run.
+      await sleep(Math.min(2 ** attempt * 800, 8000));
     }
   }
 
   throw new Error(
-    `TMDB request failed after 5 attempts for ${url.pathname}: ${lastError?.message ?? 'unknown'}`,
+    `TMDB request failed after ${ATTEMPTS} attempts for ${url.pathname}: ${describe(lastError)}`,
   );
+}
+
+const ATTEMPTS = 6;
+
+/** fetch throws a bare "fetch failed"; the actionable detail is in the cause. */
+function describe(err) {
+  if (!err) return 'unknown error';
+  const cause = err.cause;
+  const code = cause?.code ?? cause?.errno;
+  const detail = cause?.message ?? err.message;
+  return code ? `${detail} (${code})` : detail;
 }

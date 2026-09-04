@@ -37,13 +37,28 @@ const platforms = [
 
 // One call per region per media type covers every provider we care about.
 const providers = new Map();
+const failed = [];
 for (const region of ['IN', 'US']) {
   for (const kind of ['movie', 'tv']) {
-    const { results = [] } = await tmdb(`/watch/providers/${kind}`, { watch_region: region });
+    let results;
+    try {
+      ({ results = [] } = await tmdb(`/watch/providers/${kind}`, { watch_region: region }));
+    } catch (err) {
+      // Keep going: the other three lists usually cover the same providers, and
+      // writing most of the logos beats losing the pass to one dropped socket.
+      failed.push(`${kind}/${region}`);
+      console.warn(`  ! ${kind}/${region} list unavailable: ${err.message}`);
+      continue;
+    }
     for (const p of results) {
       if (p.logo_path && !providers.has(p.provider_id)) providers.set(p.provider_id, p.logo_path);
     }
   }
+}
+
+if (!providers.size) {
+  console.error('No provider lists could be fetched — leaving the existing logos untouched.');
+  process.exit(1);
 }
 console.log(`TMDB returned logos for ${providers.size} providers.`);
 
