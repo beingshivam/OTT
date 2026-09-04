@@ -3,7 +3,6 @@ import { Board } from './components/Board';
 import { Controls } from './components/Controls';
 import { DetailSheet } from './components/DetailSheet';
 import { ReleaseCard } from './components/ReleaseCard';
-import { SetupCard } from './components/SetupCard';
 import { ShareWeek } from './components/ShareWeek';
 import { TrendingStrip, normalise } from './components/TrendingStrip';
 import {
@@ -14,7 +13,7 @@ import {
   IconSearch,
 } from './components/icons';
 import { BRAND, TAGLINE } from './data/brand';
-import { PLATFORMS, REGIONS } from './data/platforms';
+import { REGIONS } from './data/platforms';
 import { loadFeed, weekById } from './lib/feed';
 import {
   applyFilters,
@@ -26,7 +25,7 @@ import {
 import { DEFAULT_PREFS, guessRegion, loadPrefs, savePrefs, type Prefs } from './lib/prefs';
 import { download } from './lib/download';
 import { weeklyReminder } from './lib/reminder';
-import { nextRefreshLabel, relativeTime } from './lib/freshness';
+import { nextRefreshLabel, refreshDaysLabel, relativeTime } from './lib/freshness';
 import { suggestions } from './lib/suggest';
 import { useKeyboard } from './lib/useKeyboard';
 import { readFilters, writeFilters } from './lib/urlState';
@@ -58,9 +57,6 @@ export default function App() {
   );
   // A week the reader actually asked for — via the arrows, or an inbound ?w —
   // is worth keeping in the URL. The landing auto-jump is not.
-  /** True when the lineup filter was applied for them, so we can say so. */
-  const [lineupAuto, setLineupAuto] = useState(false);
-
   const [weekPinned, setWeekPinned] = useState(
     () => new URLSearchParams(window.location.search).has('w'),
   );
@@ -88,21 +84,10 @@ export default function App() {
   // region never visibly flips underneath the user.
   useEffect(() => {
     const stored = loadPrefs();
-    const resolved: Prefs = stored.onboarded
-      ? stored
-      : { ...stored, region: stored.region || guessRegion() };
+    const resolved: Prefs = { region: stored.region || guessRegion() };
     setPrefs(resolved);
-    const params = new URLSearchParams(window.location.search);
-    const fromUrl = params.get('r');
+    const fromUrl = new URLSearchParams(window.location.search).get('r');
     if (!fromUrl) setFilters((f) => ({ ...f, region: resolved.region }));
-
-    // Someone who has said what they subscribe to should land on their own week.
-    // A shared link always wins, so an inbound ?p is left alone, and the active
-    // "My lineup" pill makes the narrowing visible rather than silent.
-    if (resolved.onboarded && resolved.platforms.length > 0 && !params.get('p')) {
-      setFilters((f) => ({ ...f, platforms: resolved.platforms }));
-      setLineupAuto(true);
-    }
   }, []);
 
   useEffect(() => {
@@ -223,21 +208,8 @@ export default function App() {
     blocked: selected !== null,
   });
 
-  /**
-   * Whether the *reader* has narrowed the week, as opposed to us pre-applying
-   * their saved lineup. The distinction matters: gating on the raw filter count
-   * hid the trending strip from every returning user with a lineup — the very
-   * people the strip exists for.
-   */
-  const lineupApplied =
-    prefs.platforms.length > 0 &&
-    filters.platforms.length === prefs.platforms.length &&
-    prefs.platforms.every((p) => filters.platforms.includes(p));
-
-  const userNarrowed =
-    activeFilterCount(filters) > (lineupAuto && lineupApplied ? filters.platforms.length : 0);
-
-  const lineupOn = lineupApplied;
+  /** Trending is a browse aid; once the reader has narrowed the week it is noise. */
+  const userNarrowed = activeFilterCount(filters) > 0;
 
   const byDay = useMemo(() => {
     const map = new Map<string, Release[]>();
@@ -250,11 +222,6 @@ export default function App() {
       .map((d) => [d, map.get(d) ?? []] as const)
       .filter(([, list]) => list.length > 0);
   }, [visible, filters.weekId]);
-
-  const platformsInRegion = PLATFORMS.filter((p) => p.regions.includes(filters.region)).map(
-    (p) => p.id,
-  );
-  const languagesInRegion = facets.languages.slice(0, 10).map(([code]) => code);
 
   return (
     <>
@@ -341,15 +308,6 @@ export default function App() {
               Updated {relativeTime(feed.generatedAt)}
             </span>
           )}
-          {prefs.platforms.length > 0 && (
-            <button
-              className="btn btn--sm"
-              data-active={lineupOn}
-              onClick={() => update({ platforms: lineupOn ? [] : prefs.platforms })}
-            >
-              {lineupOn ? 'My lineup' : `My lineup (${prefs.platforms.length})`}
-            </button>
-          )}
           <ShareWeek releases={visible} filters={filters} />
           <span className="viewtoggle" role="group" aria-label="Layout">
             <button data-on={view === 'board'} onClick={() => setView('board')}>
@@ -371,16 +329,6 @@ export default function App() {
       />
 
       <main className="shell" id="main">
-        {!prefs.onboarded && feed && facets.total > 0 && (
-          <SetupCard
-            prefs={prefs}
-            platformOptions={platformsInRegion}
-            languageOptions={languagesInRegion}
-            onChange={updatePrefs}
-            onDone={() => updatePrefs({ onboarded: true })}
-          />
-        )}
-
         {error && (
           <div className="empty">
             <span className="empty__icon">
@@ -439,20 +387,6 @@ export default function App() {
 
         {feed && !error && facets.total > 0 && (
           <>
-            {lineupAuto && lineupOn && (
-              <p className="lineup-note">
-                Showing your lineup —{' '}
-                <button
-                  onClick={() => {
-                    setLineupAuto(false);
-                    update({ platforms: [] });
-                  }}
-                >
-                  show everything
-                </button>
-              </p>
-            )}
-
             {!userNarrowed && (
               <TrendingStrip
                 releases={trendingNow.list}
@@ -545,7 +479,7 @@ export default function App() {
             </button>
           </div>
           <div className="footer__stack">
-            <span>Refreshes Tuesdays &amp; Fridays</span>
+            <span>Refreshes {refreshDaysLabel()}</span>
           </div>
         </footer>
       </main>

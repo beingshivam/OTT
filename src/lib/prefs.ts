@@ -1,31 +1,19 @@
 /**
- * "No login, nothing" still leaves room for personalisation — we just keep it on
- * the device. Picking your platforms and languages once turns the whole page into
- * a personal feed, and nothing leaves the browser.
+ * The one thing worth remembering between visits: which region's calendar you
+ * read. Kept on the device, so there is still nothing to sign in to.
  */
 
 const KEY = 'dropday.prefs.v1';
 
-/**
- * The site briefly shipped as firstday. Anyone who picked their platforms during
- * that window would otherwise silently lose them and be shown the onboarding
- * card again, which reads as the app forgetting them. Cheap to keep reading.
- */
+/** The site briefly shipped as firstday; anyone who set a region then keeps it. */
 const LEGACY_KEY = 'firstday.prefs.v1';
 
 export interface Prefs {
-  platforms: string[];
-  languages: string[];
   region: string;
-  /** Set once the user has answered (or dismissed) the setup prompt. */
-  onboarded: boolean;
 }
 
 export const DEFAULT_PREFS: Prefs = {
-  platforms: [],
-  languages: [],
   region: 'IN',
-  onboarded: false,
 };
 
 export function loadPrefs(): Prefs {
@@ -33,12 +21,11 @@ export function loadPrefs(): Prefs {
     const raw = localStorage.getItem(KEY) ?? localStorage.getItem(LEGACY_KEY);
     if (!raw) return DEFAULT_PREFS;
     const parsed = JSON.parse(raw) as Partial<Prefs>;
-    return {
-      platforms: Array.isArray(parsed.platforms) ? parsed.platforms : [],
-      languages: Array.isArray(parsed.languages) ? parsed.languages : [],
-      region: typeof parsed.region === 'string' ? parsed.region : DEFAULT_PREFS.region,
-      onboarded: Boolean(parsed.onboarded),
-    };
+    // Older builds also stored a platform/language "lineup" here. That was set
+    // through an onboarding card that no longer exists, so the keys are read
+    // past rather than migrated — the filter bar covers the same ground, and
+    // the URL carries it, without interrupting anyone on arrival.
+    return { region: typeof parsed.region === 'string' ? parsed.region : DEFAULT_PREFS.region };
   } catch {
     // Private mode, blocked storage, corrupted value — none of it should break the page.
     return DEFAULT_PREFS;

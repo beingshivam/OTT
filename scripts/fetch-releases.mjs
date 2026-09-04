@@ -22,7 +22,6 @@ import { callCount, requireToken, tmdb } from './tmdb.mjs';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 const OUT = resolve(ROOT, 'public/data/releases.json');
-const API = 'https://api.themoviedb.org/3';
 const IMG = 'https://image.tmdb.org/t/p';
 
 const REGIONS = (process.env.REGIONS ?? 'IN,US').split(',').map((r) => r.trim()).filter(Boolean);
@@ -37,6 +36,15 @@ const argNum = (name, fallback) => {
 const WEEKS_BACK = argNum('weeks-back', 3);
 const WEEKS_AHEAD = argNum('weeks-ahead', 4);
 
+/**
+ * Cinema listings are sorted by popularity, and one page is where the titles
+ * anyone is waiting for live. A second page mostly adds long-tail regional
+ * bookings — up to eighty rows a week across both regions, against a board that
+ * carries about twenty in total — which would bury the streaming columns rather
+ * than inform anyone.
+ */
+const THEATRICAL_PAGES = 1;
+
 requireToken();
 
 
@@ -48,11 +56,14 @@ requireToken();
  */
 async function loadPlatforms() {
   const src = await readFile(resolve(ROOT, 'src/data/platforms.ts'), 'utf8');
-  const rows = [...src.matchAll(/\{\s*id:\s*'([^']+)'[\s\S]*?tmdb:\s*\[([^\]]*)\][\s\S]*?regions:\s*\[([^\]]*)\]/g)];
-  return rows.map(([, id, tmdb, regions]) => ({
+  const rows = [...src.matchAll(/\{\s*id:\s*'([^']+)'[\s\S]*?tmdb:\s*\[([^\]]*)\][\s\S]*?regions:\s*\[([^\]]*)\](.*)/g)];
+  return rows.map(([, id, tmdb, regions, rest]) => ({
     id,
     tmdb: tmdb.split(',').map((n) => Number(n.trim())).filter(Number.isFinite),
     regions: [...regions.matchAll(/'([^']+)'/g)].map((m) => m[1]),
+    // Cinema is not a watch provider, so it carries no TMDB ids and is filled
+    // from the theatrical release dates instead.
+    theatrical: /theatrical:\s*true/.test(rest),
   }));
 }
 
@@ -126,6 +137,37 @@ async function discover({ isMovie, region, from, to, page }) {
   });
 }
 
+/**
+ * Films opening in cinemas that week, per region.
+ *
+ * Two problems fall out of the same gap. Discover was only ever asked for
+ * titles that already have a streaming provider, and TMDB assigns providers
+ * *after* a title is available — so every future week came back completely
+ * empty, and a release calendar that cannot answer "what's out next Friday" has
+ * failed at its one job. Meanwhile "In Theatres" was carried entirely by
+ * hand-written rows that lived only inside the generated feed, so they were one
+ * rebuild away from vanishing once their week aged out of the window.
+ *
+ * Theatrical dates are announced weeks ahead and TMDB carries them, keyed by
+ * region. Asking for them fixes both: upcoming weeks fill up, and the cinema
+ * column becomes real data instead of a hand-maintained list.
+ *
+ * `release_date` (not `primary_release_date`) with `region` is what respects a
+ * country's own dates — a film out in India this week may have opened in the US
+ * months ago. Types 2 and 3 are limited and wide theatrical.
+ */
+async function discoverTheatrical({ region, from, to, page }) {
+  return tmdb('/discover/movie', {
+    'release_date.gte': from,
+    'release_date.lte': to,
+    region,
+    with_release_type: '2|3',
+    sort_by: 'popularity.desc',
+    include_adult: false,
+    page,
+  });
+}
+
 async function providersFor(isMovie, id, region) {
   try {
     const data = await tmdb(`/${isMovie ? 'movie' : 'tv'}/${id}/watch/providers`);
@@ -150,6 +192,10 @@ function normTitle(t) {
 }
 
 async function buildWeek(weekId, platforms, index) {
+  const cinema = platforms.find((p) => p.theatrical);
+  const theatricalId = cinema?.id;
+  const theatricalRegions = cinema?.regions ?? [];
+
   const from = weekId;
   const to = iso(new Date(new Date(`${weekId}T00:00:00Z`).getTime() + 6 * DAY));
   /** @type {Map<string, any>} */
@@ -196,6 +242,54 @@ async function buildWeek(weekId, platforms, index) {
     }
   }
 
+  // Cinema openings, folded in on the same keys so a film that is both showing
+  // and streaming stays one row carrying both platforms rather than appearing
+  // twice under two ids.
+  if (theatricalId) {
+    for (const region of REGIONS) {
+      if (!theatricalRegions.includes(region)) continue;
+      for (let page = 1; page <= THEATRICAL_PAGES; page++) {
+        let data;
+        try {
+          data = await discoverTheatrical({ region, from, to, page });
+        } catch {
+          // One region's cinema listing failing should cost that listing, not
+          // the whole week that has already been assembled above.
+          break;
+        }
+        if (!data.results?.length) break;
+
+        for (const item of data.results) {
+          const key = `m-${item.id}`;
+          const existing = byId.get(key);
+          if (existing) {
+            existing.platforms = [...new Set([...existing.platforms, theatricalId])];
+            existing.regions = [...new Set([...existing.regions, region])];
+            continue;
+          }
+
+          const genres = await genreNames('movie', item.genre_ids);
+          byId.set(key, {
+            id: key,
+            title: item.title ?? item.name,
+            kind: classify(true, genres),
+            platforms: [theatricalId],
+            languages: [item.original_language].filter(Boolean),
+            genres,
+            releaseDate: item.release_date ?? from,
+            regions: [region],
+            rating: item.vote_count > 20 ? Number(item.vote_average?.toFixed(1)) : undefined,
+            heat: heatFrom(item.popularity, item.vote_average, item.vote_count),
+            synopsis: item.overview || undefined,
+            posterUrl: item.poster_path ? `${IMG}/w500${item.poster_path}` : undefined,
+            backdropUrl: item.backdrop_path ? `${IMG}/w780${item.backdrop_path}` : undefined,
+          });
+        }
+        if (page >= (data.total_pages ?? 1)) break;
+      }
+    }
+  }
+
   const releases = [...byId.values()].sort((a, b) => (b.heat ?? 0) - (a.heat ?? 0));
   return { id: weekId, start: from, end: to, releases };
 }
@@ -211,23 +305,31 @@ async function buildWeek(weekId, platforms, index) {
 async function buildTrending(index) {
   const byId = new Map();
 
-  for (const region of REGIONS) {
-    const { results = [] } = await tmdb('/trending/all/week');
+  // TMDB's trending list is global — there is no watch_region on it — so it is
+  // fetched once and then tested against each region's providers. Fetching it
+  // per region spent a call to get the same list back, and worse, the second
+  // pass added the region to every title it had already seen without ever
+  // checking whether it was watchable there: an India-only JioHotstar title
+  // would claim to be streaming in the US.
+  const { results = [] } = await tmdb('/trending/all/week');
 
+  for (const region of REGIONS) {
     for (const item of results.slice(0, 20)) {
       if (item.media_type !== 'movie' && item.media_type !== 'tv') continue;
       const isMovie = item.media_type === 'movie';
 
+      const providerIds = await providersFor(isMovie, item.id, region);
+      const mapped = [...new Set(providerIds.map((p) => index.get(p)).filter(Boolean))];
+      // Not watchable in this region: it earns neither a row nor this region.
+      if (!mapped.length) continue;
+
       const key = `trend-${isMovie ? 'm' : 't'}-${item.id}`;
       const existing = byId.get(key);
       if (existing) {
+        existing.platforms = [...new Set([...existing.platforms, ...mapped])];
         existing.regions = [...new Set([...existing.regions, region])];
         continue;
       }
-
-      const providerIds = await providersFor(isMovie, item.id, region);
-      const mapped = [...new Set(providerIds.map((p) => index.get(p)).filter(Boolean))];
-      if (!mapped.length) continue;
 
       const genres = await genreNames(isMovie ? 'movie' : 'tv', item.genre_ids);
       byId.set(key, {

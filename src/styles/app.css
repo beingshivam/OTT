@@ -1692,46 +1692,6 @@ a {
   padding: 0 18px;
 }
 
-/* --------------------------------------------------------- onboarding ---- */
-
-.setup {
-  margin-bottom: 32px;
-  padding: clamp(20px, 3vw, 28px);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--line);
-  background: linear-gradient(150deg, rgba(255, 77, 77, 0.09), rgba(122, 162, 255, 0.07) 70%,
-      transparent);
-  position: relative;
-  overflow: hidden;
-}
-.setup h3 {
-  margin: 0 0 6px;
-  font-size: clamp(18px, 2.6vw, 22px);
-  font-weight: 680;
-  letter-spacing: -0.03em;
-}
-.setup p {
-  margin: 0 0 16px;
-  color: var(--text-2);
-  font-size: 14px;
-  max-width: 56ch;
-}
-.setup__dismiss {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  color: var(--text-3);
-}
-.setup__dismiss:hover {
-  color: var(--text);
-  background: var(--surface-2);
-}
-
 /* ------------------------------------------------------------ footer ---- */
 
 .footer {
@@ -1914,22 +1874,6 @@ a {
   border-radius: 50%;
   background: #2fd47a;
   box-shadow: 0 0 8px rgba(47, 212, 122, 0.7);
-}
-
-/* Auto-applied filtering has to announce itself, or the week looks wrong. */
-.lineup-note {
-  margin: 0 0 16px;
-  font-size: 13px;
-  color: var(--text-3);
-}
-.lineup-note button {
-  color: var(--text-2);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  font-weight: 550;
-}
-.lineup-note button:hover {
-  color: var(--text);
 }
 
 /* The week's biggest titles carry a little more weight, so the board has a
