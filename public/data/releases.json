@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-04T18:54:36.432Z",
+  "generatedAt": "2026-09-04T18:57:44.661Z",
   "source": "tmdb",
   "weeks": [
     {
@@ -61,32 +61,6 @@
           "backdropUrl": "https://image.tmdb.org/t/p/w780/b9q9VmbXDvJmTziRqkwdEmFdwhr.jpg"
         },
         {
-          "id": "m-372058",
-          "title": "Your Name.",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "ja"
-          ],
-          "genres": [
-            "Animation",
-            "Romance",
-            "Drama"
-          ],
-          "releaseDate": "2017-04-07",
-          "regions": [
-            "US"
-          ],
-          "rating": 8.5,
-          "votes": 12942,
-          "heat": 61,
-          "synopsis": "High schoolers Mitsuha and Taki are complete strangers living separate lives. But one night, they suddenly switch places. Mitsuha wakes up in Taki’s body, and he in hers. This bizarre occurrence continues to happen randomly, and the two must adjust their lives around each other.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/vfJFJPepRKapMd5G2ro7klIRysq.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/mMtUybQ6hL24FXo0F3Z4j2KG7kZ.jpg"
-        },
-        {
           "id": "t-303351",
           "title": "Blood Sacrifice",
           "kind": "series",
@@ -112,32 +86,6 @@
           "synopsis": "Following the brutal murder of two police officers, a tenacious detective reluctantly joins forces with his estranged ex-cop father to catch the killer.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/8iFUWLKBAWDrJ9rOunscgIDrGQ1.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/z6mnJhvFbAgM1UTL87NWjJLhK26.jpg"
-        },
-        {
-          "id": "m-396535",
-          "title": "Train to Busan",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "ko"
-          ],
-          "genres": [
-            "Action",
-            "Horror",
-            "Thriller"
-          ],
-          "releaseDate": "2016-07-22",
-          "regions": [
-            "US"
-          ],
-          "rating": 7.8,
-          "votes": 8675,
-          "heat": 60,
-          "synopsis": "When a zombie virus pushes Korea into a state of emergency, those trapped on an express train to Busan must fight for their own survival.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/vNVFt6dtcqnI7hqa6LFBUibuFiw.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/brnfCYyz8EMbBrHgmh8sCwBi5i1.jpg"
         },
         {
           "id": "m-1185806",
@@ -168,32 +116,6 @@
           "backdropUrl": "https://image.tmdb.org/t/p/w780/6TSxLmwT7j1ugtKi8NyMmdzWAGj.jpg"
         },
         {
-          "id": "m-313369",
-          "title": "La La Land",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Comedy",
-            "Drama",
-            "Romance"
-          ],
-          "releaseDate": "2016-12-09",
-          "regions": [
-            "US"
-          ],
-          "rating": 7.9,
-          "votes": 18429,
-          "heat": 58,
-          "synopsis": "Mia, an aspiring actress, serves lattes to movie stars in between auditions and Sebastian, a jazz musician, scrapes by playing cocktail party gigs in dingy bars, but as success mounts they are faced with decisions that begin to fray the fragile fabric of their love affair, and the dreams they worked so hard to maintain in each other threaten to rip them apart.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/uDO8zWDhfWwoFdKS4fzkUJt0Rf0.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/nlPCdZlHtRNcF6C9hzUH4ebmV1w.jpg"
-        },
-        {
           "id": "m-1240889",
           "title": "Teenage Sex and Death at Camp Miasma",
           "kind": "film",
@@ -208,7 +130,7 @@
             "Horror",
             "Romance"
           ],
-          "releaseDate": "2026-08-07",
+          "releaseDate": "2026-08-14",
           "regions": [
             "US"
           ],
@@ -218,30 +140,6 @@
           "synopsis": "After years of slapdash sequels and waning fandom, the Camp Miasma slasher franchise is handed over to an enthusiastic young director for resurrection. But when she visits the original's star, a now-reclusive actress shrouded in mystery, the two women fall into a blood-soaked world of desire, fear, and delirium.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/5Cz1EJOKpZ8hqvBNZYF9C2zTB2T.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/qIYpBVW114AShXorGvnEUZGgueS.jpg"
-        },
-        {
-          "id": "m-11171",
-          "title": "Mysterious Skin",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Drama"
-          ],
-          "releaseDate": "2005-05-06",
-          "regions": [
-            "US"
-          ],
-          "rating": 7.7,
-          "votes": 1352,
-          "heat": 46,
-          "synopsis": "A teenage hustler and a young man obsessed with alien abductions cross paths, together discovering a horrible, liberating truth.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/wgSwDqhl6Rt3cuSCwt5sNpPna3x.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/yiNHoIFUlFAByjXkTDdJOK9nw2Z.jpg"
         },
         {
           "id": "m-1408162",
@@ -393,30 +291,6 @@
           "synopsis": "At his clinic, sex therapist Ichito Shimotori treats diverse and intimate sexual issues with sincerity. Yet, he secretly hides a struggle of his own.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/iyBgwNr5I7CW1Mf7ulPgdz3Y5Ax.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/iTmOvi8vZeFntt3q7BuWsPugmal.jpg"
-        },
-        {
-          "id": "m-2171",
-          "title": "Wet Hot American Summer",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Comedy"
-          ],
-          "releaseDate": "2001-07-27",
-          "regions": [
-            "US"
-          ],
-          "rating": 6.2,
-          "votes": 916,
-          "heat": 35,
-          "synopsis": "It's the last day of Camp Firewood's season, but there's still time for the big talent show, a little romance… and for everyone to be wiped out by the piece of NASA's Skylab that's hurtling toward Earth.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/AaqZVlzoVOoT65QgikMVw0CqNlf.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/boct1C0KWZ533T6o5qjFVfaUpSt.jpg"
         },
         {
           "id": "m-1490260",
@@ -877,7 +751,7 @@
           "genres": [
             "Drama"
           ],
-          "releaseDate": "2026-08-07",
+          "releaseDate": "2026-08-14",
           "regions": [
             "US"
           ],
@@ -1594,7 +1468,7 @@
             "Horror",
             "Romance"
           ],
-          "releaseDate": "2026-08-07",
+          "releaseDate": "2026-08-21",
           "regions": [
             "US"
           ],
@@ -1834,7 +1708,7 @@
             "Drama",
             "Comedy"
           ],
-          "releaseDate": "2026-08-07",
+          "releaseDate": "2026-08-21",
           "regions": [
             "US"
           ],
@@ -1984,7 +1858,7 @@
             "Drama",
             "Thriller"
           ],
-          "releaseDate": "2026-08-14",
+          "releaseDate": "2026-08-21",
           "regions": [
             "US"
           ],
@@ -2229,7 +2103,7 @@
           "genres": [
             "Drama"
           ],
-          "releaseDate": "2026-08-07",
+          "releaseDate": "2026-08-21",
           "regions": [
             "US"
           ],
@@ -3334,7 +3208,7 @@
             "Horror",
             "Mystery"
           ],
-          "releaseDate": "2026-08-21",
+          "releaseDate": "2026-08-28",
           "regions": [
             "US"
           ],
@@ -4113,7 +3987,7 @@
             "Crime",
             "Drama"
           ],
-          "releaseDate": "2026-08-26",
+          "releaseDate": "2026-09-04",
           "regions": [
             "IN"
           ],
@@ -4533,33 +4407,6 @@
           "director": "James Ross II"
         },
         {
-          "id": "m-920",
-          "title": "Cars",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Animation",
-            "Adventure",
-            "Comedy",
-            "Family"
-          ],
-          "releaseDate": "2006-06-09",
-          "regions": [
-            "US"
-          ],
-          "rating": 7,
-          "votes": 15458,
-          "heat": 59,
-          "synopsis": "Lightning McQueen, a hotshot rookie race car driven to succeed, discovers that life is about the journey, not the finish line, when he finds himself unexpectedly detoured in the sleepy Route 66 town of Radiator Springs. On route across the country to the big Piston Cup Championship in California to compete against two seasoned pros, McQueen gets to know the town's offbeat characters.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/2Touk3m5gzsqr1VsvxypdyHY5ci.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/sOLgkBKf1gjMRc4yXxM5aciXdfr.jpg"
-        },
-        {
           "id": "nf-teenage-wasteland",
           "title": "Teenage Wasteland",
           "kind": "documentary",
@@ -4622,56 +4469,6 @@
             "Subhrajit Dutta"
           ],
           "director": "Suman Ghosh"
-        },
-        {
-          "id": "m-615",
-          "title": "The Passion of the Christ",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Drama"
-          ],
-          "releaseDate": "2004-02-25",
-          "regions": [
-            "US"
-          ],
-          "rating": 7.5,
-          "votes": 5319,
-          "heat": 57,
-          "synopsis": "A graphic portrayal of the last twelve hours of Jesus of Nazareth's life.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/rBM5o2HpmCfDejuIPybI09tkY3V.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/4840rkbpsiuow5ew155oVKcqJwj.jpg"
-        },
-        {
-          "id": "m-149",
-          "title": "Akira",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "ja"
-          ],
-          "genres": [
-            "Animation",
-            "Science Fiction",
-            "Action"
-          ],
-          "releaseDate": "1989-12-25",
-          "regions": [
-            "US"
-          ],
-          "rating": 7.9,
-          "votes": 4950,
-          "heat": 57,
-          "synopsis": "A secret military project endangers Neo-Tokyo when it turns a biker gang member into a rampaging psychic psychopath that only two teenagers and a group of psychics can stop.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/neZ0ykEsPqxamsX6o5QNUFILQrz.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/fK40VGYIm7hmKrLJ26fgPQU0qRG.jpg"
         },
         {
           "id": "m-1671548",
@@ -4807,32 +4604,6 @@
           "backdropUrl": "https://image.tmdb.org/t/p/w780/o1UvmHqE2fh0Z62wls5bdrNtBN2.jpg"
         },
         {
-          "id": "m-9327",
-          "title": "The Nutty Professor",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Comedy",
-            "Science Fiction",
-            "Romance"
-          ],
-          "releaseDate": "1996-06-28",
-          "regions": [
-            "US"
-          ],
-          "rating": 5.6,
-          "votes": 3194,
-          "heat": 39,
-          "synopsis": "When beautiful Carla Purty joins the university faculty, genetic professor Dr. Sherman Klump grows desperate to whittle his 400-pound frame down to size and win her heart. So, with one swig of his experimental fat-reducing serum, Sherman becomes 'Buddy Love', a fast-talking, pumped-up, plumped down Don Juan.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/fMtb5aZoLRNbMnCkatFsTmPRfl5.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/gHFuLHxruielBcMEZx1WowxbRWS.jpg"
-        },
-        {
           "id": "m-1127625",
           "title": "The Salt Path",
           "kind": "film",
@@ -4845,7 +4616,7 @@
           "genres": [
             "Drama"
           ],
-          "releaseDate": "2026-08-28",
+          "releaseDate": "2026-09-04",
           "regions": [
             "US"
           ],
@@ -4897,7 +4668,7 @@
             "Comedy",
             "Drama"
           ],
-          "releaseDate": "2026-08-21",
+          "releaseDate": "2026-09-04",
           "regions": [
             "IN",
             "US"
@@ -4973,7 +4744,7 @@
             "Drama",
             "Comedy"
           ],
-          "releaseDate": "2026-08-28",
+          "releaseDate": "2026-09-04",
           "regions": [
             "US"
           ],
@@ -5400,29 +5171,6 @@
           "synopsis": "King, Queen, Jack, and Ace-four misfits surviving through petty crimes in Chennai-found their world turned upside down when COVID-19 lockdowns shut down public transport, their main source of income. Desperate for a way out, King discovered an audio recording about a bungalow filled with black money, supposedly guarded by a lone watchman. Seeing it as their golden opportunity, the gang set out to execute the perfect heist. However, upon entering the bungalow, the door slammed shut behind them, and a chilling voice welcomed them. The so-called security guard was none other than Pulibaba, a notorious gangster. With a gun in hand, he forced them to surrender their belongings and made a sinister phone call: \"Doctor, the delivery is ready... Eight kidneys.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/zcHMRPurZAF9SOrKIwT2WtjX9JH.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/ikKdgB2wHJo17OF2R9ejllsYPgk.jpg"
-        },
-        {
-          "id": "m-864687",
-          "title": "Aanaparambile WorldCup",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "ml"
-          ],
-          "genres": [
-            "Drama",
-            "Thriller"
-          ],
-          "releaseDate": "2022-11-25",
-          "regions": [
-            "IN"
-          ],
-          "votes": 1,
-          "heat": 6,
-          "synopsis": "A small village in the northern part of Kerala is getting ready to witness the football World Cup. The life of a nine-year-old boy, an ardent football fan, is transformed when an unexpected guest arrives in his life.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/gaGOyxBTFPqHS9Nb1KhUlvfZKpP.jpg"
         }
       ]
     },
@@ -5431,34 +5179,6 @@
       "start": "2026-09-11",
       "end": "2026-09-17",
       "releases": [
-        {
-          "id": "m-1857",
-          "title": "The Transformers: The Movie",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Animation",
-            "Science Fiction",
-            "Action",
-            "Adventure",
-            "Family"
-          ],
-          "releaseDate": "1986-08-08",
-          "regions": [
-            "US"
-          ],
-          "rating": 7.2,
-          "votes": 625,
-          "heat": 44,
-          "synopsis": "The Autobots must stop a colossal planet-consuming robot who goes after the Autobot Matrix of Leadership. At the same time, they must defend themselves against an all-out attack from the Decepticons.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/xJ5W0mOAWCVaXmU0pBZh4NjSRv2.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/e0djmN1YD6NcbLX6T0nSNKIvrrT.jpg"
-        },
         {
           "id": "m-1377237",
           "title": "Runner",
@@ -5636,7 +5356,7 @@
           "genres": [
             "Drama"
           ],
-          "releaseDate": "2026-06-05",
+          "releaseDate": "2026-09-11",
           "regions": [
             "US"
           ],
@@ -5889,7 +5609,7 @@
             "en"
           ],
           "genres": [],
-          "releaseDate": "2026-03-25",
+          "releaseDate": "2026-09-11",
           "regions": [
             "US"
           ],
@@ -6029,32 +5749,6 @@
           "heat": 8,
           "synopsis": "A teenager joins his grandmother at a mahjong game, where he encounters a mysterious woman threatening to unravel secrets from their family's past.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/5tPwTiCmBhO14o2NLmQqfpy0HYs.jpg"
-        },
-        {
-          "id": "m-1709924",
-          "title": "Unrequited Love",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Drama"
-          ],
-          "releaseDate": "2023-12-02",
-          "regions": [
-            "US"
-          ],
-          "heat": 8,
-          "synopsis": "Dramatic love fight break up between to lovers.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/hXiiAnQphIct1EPJHQtweRuJIyT.jpg",
-          "runtimeMinutes": 3,
-          "cast": [
-            "Mandy Taylor"
-          ],
-          "director": "Evan J. Warner"
         },
         {
           "id": "m-1756487",
@@ -6224,58 +5918,6 @@
       "end": "2026-09-24",
       "releases": [
         {
-          "id": "m-9323",
-          "title": "Ghost in the Shell",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "ja"
-          ],
-          "genres": [
-            "Action",
-            "Animation",
-            "Science Fiction"
-          ],
-          "releaseDate": "1996-03-29",
-          "regions": [
-            "US"
-          ],
-          "rating": 7.9,
-          "votes": 4027,
-          "heat": 51,
-          "synopsis": "In the year 2029, the barriers of our world have been broken down by the net and by cybernetics, but this brings new vulnerability to humans in the form of brain-hacking. When a highly-wanted hacker known as 'The Puppetmaster' begins involving them in politics, Section 9, a group of cybernetically enhanced cops, are called in to investigate and stop the Puppetmaster.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/9gC88zYUBARRSThcG93MvW14sqx.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/jIpagj2Dud9g3ZVJFvaWikEWsYz.jpg"
-        },
-        {
-          "id": "m-14919",
-          "title": "Batman: Mask of the Phantasm",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Animation",
-            "Crime",
-            "Mystery"
-          ],
-          "releaseDate": "1993-12-25",
-          "regions": [
-            "US"
-          ],
-          "rating": 7.5,
-          "votes": 1287,
-          "heat": 48,
-          "synopsis": "Andrea Beaumont leaves her father to return to Gotham, rekindling an old romance with Bruce Wayne. At the same time, a mysterious figure begins to hunt down Gotham's criminals, wrongly implicating Batman in the murders. Now on the run from the law, Batman must find and stop the culprit, while also navigating his relationship with Andrea.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/hT4ehUteagUrhUOHAtmYiY7mp5l.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/cMUuAgVsMWOCawXonZ4D1dSMd6h.jpg"
-        },
-        {
           "id": "m-1423191",
           "title": "Resident Evil",
           "kind": "film",
@@ -6435,7 +6077,7 @@
           "genres": [
             "Drama"
           ],
-          "releaseDate": "2026-09-11",
+          "releaseDate": "2026-09-18",
           "regions": [
             "US"
           ],
@@ -6987,58 +6629,6 @@
       "end": "2026-10-01",
       "releases": [
         {
-          "id": "m-299534",
-          "title": "Avengers: Endgame",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Adventure",
-            "Science Fiction",
-            "Action"
-          ],
-          "releaseDate": "2019-04-26",
-          "regions": [
-            "US"
-          ],
-          "rating": 8.2,
-          "votes": 28541,
-          "heat": 69,
-          "synopsis": "After the devastating events of Avengers: Infinity War, the universe is in ruins due to the efforts of the Mad Titan, Thanos. With the help of remaining allies, the Avengers must assemble once more in order to undo Thanos' actions and restore order to the universe once and for all, no matter what consequences may be in store.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/ulzhLuWrPK07P1YkdWQLZnQh1JL.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/7RyHsO4yDXtBv1zUU3mTpHeQ0d5.jpg"
-        },
-        {
-          "id": "m-128",
-          "title": "Princess Mononoke",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "ja"
-          ],
-          "genres": [
-            "Adventure",
-            "Fantasy",
-            "Animation"
-          ],
-          "releaseDate": "1999-10-29",
-          "regions": [
-            "US"
-          ],
-          "rating": 8.3,
-          "votes": 9240,
-          "heat": 59,
-          "synopsis": "Ashitaka, a prince of the disappearing Emishi people, is cursed by a demonized boar god and must journey to the west to find a cure. Along the way, he encounters San, a young human woman fighting to protect the forest, and Lady Eboshi, who is trying to destroy it. Ashitaka must find a way to bring balance to this conflict.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/cMYCDADoLKLbB83g4WnJegaZimC.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/gl0jzn4BupSbL2qMVeqrjKkF9Js.jpg"
-        },
-        {
           "id": "m-1263337",
           "title": "Heart of the Beast",
           "kind": "film",
@@ -7197,7 +6787,7 @@
             "Drama",
             "Romance"
           ],
-          "releaseDate": "2026-09-23",
+          "releaseDate": "2026-09-25",
           "regions": [
             "US"
           ],
@@ -7550,7 +7140,7 @@
             "Comedy",
             "Drama"
           ],
-          "releaseDate": "2026-02-28",
+          "releaseDate": "2026-09-25",
           "regions": [
             "US"
           ],
@@ -8150,7 +7740,7 @@
             "Drama",
             "Crime"
           ],
-          "releaseDate": "2026-09-25",
+          "releaseDate": "2026-10-02",
           "regions": [
             "US"
           ],
@@ -8957,5 +8547,5 @@
       "backdropUrl": "https://image.tmdb.org/t/p/w780/3bHz9dYSZ5XDxY0zDaBpYgUOhE2.jpg"
     }
   ],
-  "enrichedAt": "2026-09-04T18:54:39.156Z"
+  "enrichedAt": "2026-09-04T18:57:48.574Z"
 }
