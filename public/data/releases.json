@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-04T18:27:46.998Z",
+  "generatedAt": "2026-09-04T18:54:36.432Z",
   "source": "tmdb",
   "weeks": [
     {
@@ -27,6 +27,7 @@
             "IN"
           ],
           "rating": 8.3,
+          "votes": 251,
           "heat": 86,
           "synopsis": "Two intergalactic cops, new recruit John Stewart and Lantern legend Hal Jordan, are drawn into a dark, Earth-based mystery as they investigate a murder in the American heartland.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/gpC7h43xPMEV3goYMQShfJbTtLq.jpg",
@@ -53,6 +54,7 @@
             "US"
           ],
           "rating": 6.3,
+          "votes": 438,
           "heat": 66,
           "synopsis": "After a mysterious cosmic event rips Oak Street from suburbia and transports their neighborhood to someplace unknown, the Platt family soon discovers that their very survival depends on them sticking together as they navigate their now unrecognizable surroundings.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/fYXqpgPmHMphSF2W30GbTeJVIa5.jpg",
@@ -78,6 +80,7 @@
             "US"
           ],
           "rating": 8.5,
+          "votes": 12942,
           "heat": 61,
           "synopsis": "High schoolers Mitsuha and Taki are complete strangers living separate lives. But one night, they suddenly switch places. Mitsuha wakes up in Taki’s body, and he in hers. This bizarre occurrence continues to happen randomly, and the two must adjust their lives around each other.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/vfJFJPepRKapMd5G2ro7klIRysq.jpg",
@@ -104,6 +107,7 @@
             "US"
           ],
           "rating": 6.6,
+          "votes": 44,
           "heat": 60,
           "synopsis": "Following the brutal murder of two police officers, a tenacious detective reluctantly joins forces with his estranged ex-cop father to catch the killer.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/8iFUWLKBAWDrJ9rOunscgIDrGQ1.jpg",
@@ -129,6 +133,7 @@
             "US"
           ],
           "rating": 7.8,
+          "votes": 8675,
           "heat": 60,
           "synopsis": "When a zombie virus pushes Korea into a state of emergency, those trapped on an express train to Busan must fight for their own survival.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/vNVFt6dtcqnI7hqa6LFBUibuFiw.jpg",
@@ -156,6 +161,7 @@
             "US"
           ],
           "rating": 7,
+          "votes": 44,
           "heat": 58,
           "synopsis": "The Paw Patrol lands on a mysterious dinosaur island after a storm, where they meet Rex, a stranded pup. When Humdinger's reckless mining triggers a volcano, the team faces their biggest rescue mission yet to save the island.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/qnin56Syy5rbG7KCaxWY7SPuy6p.jpg",
@@ -181,6 +187,7 @@
             "US"
           ],
           "rating": 7.9,
+          "votes": 18429,
           "heat": 58,
           "synopsis": "Mia, an aspiring actress, serves lattes to movie stars in between auditions and Sebastian, a jazz musician, scrapes by playing cocktail party gigs in dingy bars, but as success mounts they are faced with decisions that begin to fray the fragile fabric of their love affair, and the dreams they worked so hard to maintain in each other threaten to rip them apart.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/uDO8zWDhfWwoFdKS4fzkUJt0Rf0.jpg",
@@ -206,6 +213,7 @@
             "US"
           ],
           "rating": 6.7,
+          "votes": 93,
           "heat": 55,
           "synopsis": "After years of slapdash sequels and waning fandom, the Camp Miasma slasher franchise is handed over to an enthusiastic young director for resurrection. But when she visits the original's star, a now-reclusive actress shrouded in mystery, the two women fall into a blood-soaked world of desire, fear, and delirium.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/5Cz1EJOKpZ8hqvBNZYF9C2zTB2T.jpg",
@@ -229,6 +237,7 @@
             "US"
           ],
           "rating": 7.7,
+          "votes": 1352,
           "heat": 46,
           "synopsis": "A teenage hustler and a young man obsessed with alien abductions cross paths, together discovering a horrible, liberating truth.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/wgSwDqhl6Rt3cuSCwt5sNpPna3x.jpg",
@@ -252,6 +261,8 @@
           "regions": [
             "IN"
           ],
+          "rating": 7,
+          "votes": 11,
           "heat": 43,
           "synopsis": "Sanjay Vishwanath is an acclaimed professional handgunner in his 40s with a major stake in fame and wealth. When he comes across a woman named Maddy in her 20s, their dynamic poses many issues that they must come to terms with.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/vEMiPLEXfzF9NUzUkROtyDVZ4Ln.jpg",
@@ -275,6 +286,8 @@
           "regions": [
             "US"
           ],
+          "rating": 7.2,
+          "votes": 16,
           "heat": 43,
           "synopsis": "President Ronald Reagan races against time to salvage a deal with Soviet leader Mikhail Gorbachev that could dismantle nuclear arsenals—or ignite disaster. With pressure mounting on all sides, every word spoken brings the world closer to peace... or destruction.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/vCIQeQ2ynVqEjIvtbOXGnKtcgAX.jpg",
@@ -299,6 +312,8 @@
           "regions": [
             "US"
           ],
+          "rating": 5.9,
+          "votes": 20,
           "heat": 38,
           "synopsis": "When a mysterious glitch sends a rising boyband back to 1995 - just days before the biggest showcase of their lives - the five friends race to reverse the time slip. But as unexpected connections form and the past pulls them in deeper, getting home means confronting what they're willing to leave behind - and who they truly are to each other.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/tCOvMa7bXHiRlOuhQvUOeSF0kPn.jpg",
@@ -323,6 +338,8 @@
           "regions": [
             "US"
           ],
+          "rating": 5.8,
+          "votes": 17,
           "heat": 38,
           "synopsis": "Two codependent best friends living paycheck to paycheck and bong rip to bong rip get caught in a case of mistaken identity that throws their lives into chaos.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/iEJshwO6g4WKTP4HJgCHRTJMWEd.jpg",
@@ -346,6 +363,8 @@
             "IN",
             "US"
           ],
+          "rating": 5.1,
+          "votes": 10,
           "heat": 35,
           "synopsis": "When a young girl vanishes from a remote village, the frantic police hunt become a media frenzy. But who turned a suspected criminal into a celebrity?",
           "posterUrl": "https://image.tmdb.org/t/p/w500/hrbzPEGyu33JyepFvSe6EkN35yq.jpg",
@@ -369,6 +388,7 @@
             "IN",
             "US"
           ],
+          "votes": 4,
           "heat": 35,
           "synopsis": "At his clinic, sex therapist Ichito Shimotori treats diverse and intimate sexual issues with sincerity. Yet, he secretly hides a struggle of his own.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/iyBgwNr5I7CW1Mf7ulPgdz3Y5Ax.jpg",
@@ -392,6 +412,7 @@
             "US"
           ],
           "rating": 6.2,
+          "votes": 916,
           "heat": 35,
           "synopsis": "It's the last day of Camp Firewood's season, but there's still time for the big talent show, a little romance… and for everyone to be wiped out by the piece of NASA's Skylab that's hurtling toward Earth.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/AaqZVlzoVOoT65QgikMVw0CqNlf.jpg",
@@ -441,6 +462,7 @@
             "US"
           ],
           "rating": 6.2,
+          "votes": 36,
           "heat": 31,
           "synopsis": "Olli and Matze are best friends living, working and planning to travel the world together — until Matze's romance with Rebecca turns it all upside down.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/aWLshM7DZECutuQVpMfhDiPZUQC.jpg",
@@ -466,6 +488,7 @@
             "US"
           ],
           "rating": 6.5,
+          "votes": 33,
           "heat": 30,
           "synopsis": "Deep within the backwoods of rural Oklahoma, charismatic and musically gifted Amziah King herds a bluegrass-playing band of misfits while overseeing the premier honey-making operation in town. When Amziah’s estranged foster daughter unexpectedly returns, Amziah leaps at the possibility to renew connection and create a family business. But the honey game is ruthless, and Amziah’s rivals threaten to destroy everything he has built.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/3iVDCDS1VwHIm95PjWEPwsfdhaf.jpg",
@@ -490,6 +513,7 @@
             "IN",
             "US"
           ],
+          "votes": 4,
           "heat": 29,
           "synopsis": "Aamir Ali, a notorious gold smuggling kingpin who inherited his multi-million dollar criminal enterprise from a lineage of gangsters, is drawn into a web of vengeance, legacy and power.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/cAl7uuRojdxysptYBj9Mg0czGmI.jpg",
@@ -516,6 +540,7 @@
             "US"
           ],
           "rating": 8,
+          "votes": 22,
           "heat": 29,
           "synopsis": "Eight grassroot mortals use their street smarts and hilarious schemes to defy powerful gods, earning their title as the Eight Immortals.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/wJ9FLxq3Q6D4ve8TUepYsr0PL3p.jpg",
@@ -541,6 +566,7 @@
             "US"
           ],
           "rating": 6.9,
+          "votes": 34,
           "heat": 27,
           "synopsis": "Following the highly publicized death of Boeing whistleblower John Barnett, the investigation continues into the once-iconic aviation giant, uncovering startling new revelations and insider accounts in the wake of a deepening corporate crisis..",
           "posterUrl": "https://image.tmdb.org/t/p/w500/oadqt3V5c8j5ZIbYkdfQLcWzI4C.jpg",
@@ -616,6 +642,7 @@
             "IN",
             "US"
           ],
+          "votes": 4,
           "heat": 25,
           "synopsis": "The extraordinary true story of lion cub Kio, on his journey to become a king.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/mvFQIZo2DG1pyiINL2bDa5QNR4O.jpg",
@@ -639,6 +666,7 @@
           "regions": [
             "US"
           ],
+          "votes": 1,
           "heat": 25,
           "synopsis": "A harrowing two-part documentary chronicling how a mother of five suddenly found herself being sold to unknown men... by her own partner.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/oQbbalt2tkUGerpDyjDXefwEDLi.jpg",
@@ -686,6 +714,8 @@
             "IN",
             "US"
           ],
+          "rating": 8.4,
+          "votes": 5,
           "heat": 22,
           "synopsis": "He's conquered every title in tennis, including an Olympic gold. So why is Novak Djokovic still playing? The Wolf in Winter embeds with the greatest tennis player of all time as he returned to the Australian Open in 2025, capturing the obsession, the preparation, and the fire that won't go out even when there's nothing left to prove.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/4VvaFy9Z5C879akw3XJ31XK4lWO.jpg",
@@ -709,6 +739,7 @@
             "IN",
             "US"
           ],
+          "votes": 1,
           "heat": 22,
           "synopsis": "Four celebrity hiking newbies end up forming a club to tackle Korea's snow‑capped peaks. Can they figure out why on earth people go to the mountains?",
           "posterUrl": "https://image.tmdb.org/t/p/w500/ya3p0meUJJ92gjFRFcZ1C3TJ0nO.jpg",
@@ -732,6 +763,8 @@
           "regions": [
             "US"
           ],
+          "rating": 7.2,
+          "votes": 8,
           "heat": 22,
           "synopsis": "Three friends journey from Kansas City to Los Angeles, mistakenly believing that their band is opening for Green Day on New Year’s Eve.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/aebmSpFu1lUV78PtOpqMUn4d82B.jpg",
@@ -755,6 +788,7 @@
           "regions": [
             "US"
           ],
+          "votes": 4,
           "heat": 21,
           "synopsis": "An intimate, raw portrait of Manchester City FC across two era-defining seasons. With unprecedented access, the film follows their worst run in decades and fightback to glory.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/sMGr6FeYhA799ZU50r4wjt5HVdV.jpg",
@@ -800,6 +834,7 @@
           "regions": [
             "IN"
           ],
+          "votes": 1,
           "heat": 20,
           "synopsis": "The journey to Bigg Boss Malayalam 8 begins in Agnipareeksha, where commoner contestants battle for a place in the Bigg Boss House.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/1GboWZREUaFkx11V4DtkLpQsiOs.jpg",
@@ -823,6 +858,7 @@
             "IN",
             "US"
           ],
+          "votes": 2,
           "heat": 20,
           "synopsis": "Go inside the most dominant program in college basketball history as Geno Auriemma pushes his players to the limit to win 12 titles. Rebecca Lobo, Diana Taurasi, Paige Bueckers, and more reveal what it takes to survive UConn and build a dynasty.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/5lZ0NLV93fIx8yIWT38h8rt5u2I.jpg",
@@ -845,6 +881,7 @@
           "regions": [
             "US"
           ],
+          "votes": 2,
           "heat": 19,
           "synopsis": "Legendary New York poet Ed Saxberger's forgotten works captivate an eccentric group of young creatives, reigniting his artistic passion. Their intrigue intertwines with the bewitching presence of actress Gloria.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/bcyXE0p4XmZUlcxvTDbvdG9lgsN.jpg",
@@ -891,6 +928,8 @@
           "regions": [
             "US"
           ],
+          "rating": 5.2,
+          "votes": 9,
           "heat": 18,
           "synopsis": "The late 1970s, somewhere in the Mediterranean: Marcos Timoleon, a tycoon, is throwing a lavish, extravagant birthday party for Sofia on his exclusive private island. The party is a perfect excuse for various people in his life to approach him with their own agendas.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/sXN4IvB4hM2AYYx9BhdzhokrjvH.jpg",
@@ -982,6 +1021,7 @@
             "IN",
             "US"
           ],
+          "votes": 2,
           "heat": 14,
           "synopsis": "In this candid and clever stand-up special, Kelsey Cook explores \"hangxiety,\" relives a plane bathroom nightmare and breaks down dating a literal Chad.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/rbvVm5OPzWGypYJzFMylMJ0wMWG.jpg",
@@ -1006,6 +1046,7 @@
           "regions": [
             "US"
           ],
+          "votes": 3,
           "heat": 13,
           "synopsis": "Disney Princess: The Ultimate Concert Celebration at Disneyland Resort brings together the largest gathering of Disney Princess stars ever assembled, celebrating the iconic stories across animation, live-action, stage, and music. This one-of-a-kind concert will transform the night skies with dazzling lights, sweeping projections, and sky-high fountains creating a truly immersive world where the music, magic, and legacy of Disney Princesses shine like never before.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/2YyWdtnpbJRmvSvBHttJlTEAWTy.jpg",
@@ -1028,6 +1069,8 @@
           "regions": [
             "US"
           ],
+          "rating": 7.5,
+          "votes": 6,
           "heat": 13,
           "synopsis": "Host Ria Ciuffo sits down with Outer Banks stars Chase Stokes, Madelyn Cline, Carlacia Grant, Jonathan Daviss, and Madison Bailey to celebrate the series' five-season run.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/iQfFUQ7SeTDhI6sCvs0Q0HzIk3h.jpg",
@@ -1120,6 +1163,7 @@
           "regions": [
             "IN"
           ],
+          "votes": 1,
           "heat": 10,
           "synopsis": "When an unexpected turn of events shatters a young civil engineer's life, he is forced to confront his past, his beliefs, and his destiny.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/sFMsghGXgauQJbdeW8mF0qM0ZGX.jpg"
@@ -1185,6 +1229,7 @@
           "regions": [
             "US"
           ],
+          "votes": 1,
           "heat": 7
         },
         {
@@ -1346,6 +1391,7 @@
             "US"
           ],
           "rating": 8.8,
+          "votes": 494,
           "heat": 86,
           "synopsis": "Two Mexican officers must survive the final hours of their shift after crossing a ruthless cartel boss.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/z8eF0ACFFKtIZ4pUeo02PCzxRVO.jpg",
@@ -1371,6 +1417,7 @@
             "US"
           ],
           "rating": 6.4,
+          "votes": 271,
           "heat": 86,
           "synopsis": "After witnessing his billionaire boss' murder and being framed for the crime, Cole Reed boards a cargo ship on a one-man crusade to avenge his boss' death only to discover an international conspiracy.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/pu2VxGlpGwffOx292w18b1tv96j.jpg",
@@ -1397,6 +1444,7 @@
             "US"
           ],
           "rating": 7.9,
+          "votes": 68,
           "heat": 84,
           "synopsis": "A powerful drug cartel pulls the strings behind a facade of sun-soaked beaches as a gritty, violent underworld power struggle emerges during the crumbling of Portuguese colonial rule.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/uPDutjavZO22SbIngBezk173vSb.jpg",
@@ -1422,6 +1470,7 @@
             "US"
           ],
           "rating": 6.7,
+          "votes": 110,
           "heat": 82,
           "synopsis": "Ry, a college student with a chronic illness, escapes to Mallorca for the summer with her mother, where she unexpectedly falls for a local and begins to embrace living in the moment. But as her condition worsens and long-hidden family secrets come to light, everything she has found before summer's end is threatened.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/3PWJqDfygN0YNNjWsDUOXclCp3h.jpg",
@@ -1448,6 +1497,7 @@
             "US"
           ],
           "rating": 6.7,
+          "votes": 357,
           "heat": 80,
           "synopsis": "When his young son vanishes, a widower enlists help from his estranged father, a retired detective who put away the serial killer now linked to the case.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/6UqflU8Qqkz7Dq4swJPqs0ZJjY4.jpg",
@@ -1473,6 +1523,7 @@
             "US"
           ],
           "rating": 6.5,
+          "votes": 103,
           "heat": 66,
           "synopsis": "Gemma, a young mother raising her daughter in the house she grew up in, discovers she can travel into The Further, where she possesses an ability to bring what lives there back to the real world.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/4tTrW9dXCByS5wt2pXVWb58zNjz.jpg",
@@ -1496,6 +1547,8 @@
             "IN",
             "US"
           ],
+          "rating": 7.6,
+          "votes": 7,
           "heat": 61,
           "synopsis": "New to Beijing, Shang Zhitao crosses paths with Luan Nian, a true creative genius. Bold and open-hearted, she grows stronger step by step and gradually breaks through the defenses around Luan's guarded heart. Drawn to each other, they find themselves caught in an intense, on-again, off-again relationship in the urban jungle. To love is to summon all your courage and leave no regrets, to heal each other, and to grow together. But when love and her career pull her in different directions, she puts her career first. When she has come into her own and he has learned to soften his sharp edges, they finally stand as equals, ready to write a new ending together...",
           "posterUrl": "https://image.tmdb.org/t/p/w500/yiAzR6wGqjyAotZ4DvFvFeo8QS0.jpg",
@@ -1520,6 +1573,7 @@
             "US"
           ],
           "rating": 8.1,
+          "votes": 92,
           "heat": 61,
           "synopsis": "19-year-old Leah navigates a coming-of-age journey in the wake of a tragic car accident that claims her parents. Relocated to a coastal town under the care of her brother’s best friend Axel, Leah grapples with grief, haunting nightmares and a fractured sense of self.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/zqxIT48mWFsC4NSjGEHAcp1pjEo.jpg",
@@ -1545,6 +1599,7 @@
             "US"
           ],
           "rating": 6.7,
+          "votes": 93,
           "heat": 55,
           "synopsis": "After years of slapdash sequels and waning fandom, the Camp Miasma slasher franchise is handed over to an enthusiastic young director for resurrection. But when she visits the original's star, a now-reclusive actress shrouded in mystery, the two women fall into a blood-soaked world of desire, fear, and delirium.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/5Cz1EJOKpZ8hqvBNZYF9C2zTB2T.jpg",
@@ -1570,6 +1625,7 @@
             "US"
           ],
           "rating": 6.2,
+          "votes": 64,
           "heat": 46,
           "synopsis": "A modern family relocates to the countryside where the children discover a magical tree with eccentric residents. They're transported to fantastical lands, rekindling their family bond through adventures.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/udXvLxC5gAqN8SinemyFBEcHpTf.jpg",
@@ -1597,6 +1653,7 @@
             "US"
           ],
           "rating": 8.1,
+          "votes": 38,
           "heat": 45,
           "synopsis": "A defective lamp reveals a heartbreaking truth about what Homer believes is reality, and an AI-powered tablet befriends and controls Maggie. The Simpsons struggle to find the light through two dark tales of the curious and bizarre.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/1zdGvJAuuXC7dA3eV61OtUJNyjQ.jpg",
@@ -1622,6 +1679,8 @@
             "IN",
             "US"
           ],
+          "rating": 7.3,
+          "votes": 11,
           "heat": 42,
           "synopsis": "When a bride refuses to leave her family home after marriage, her husband must find out if he can adjust to life under his in-laws' roof.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/AjaNAeMXOrK9n0YqGqX0Lz5qxYu.jpg",
@@ -1647,6 +1706,7 @@
             "US"
           ],
           "rating": 7.3,
+          "votes": 519,
           "heat": 41,
           "synopsis": "A world-famous orchestra conductor discovers the brother he never knew he had — a school cafeteria worker who plays trombone in a local marching band. Detecting his brother's exceptional musical talent, he takes it upon himself to rectify the injustice of fate.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/6lATJ42bWGAIQ0cG2dzSZD8bNcL.jpg",
@@ -1673,6 +1733,7 @@
             "US"
           ],
           "rating": 7.4,
+          "votes": 282,
           "heat": 40,
           "synopsis": "When four distant cousins inherit a 19th-century home in Normandy, they decide to visit and examine their family history. No one has lived there since the 1940s, and the cousins are intrigued by all of the items they find there, little things that help them to understand their ancestor, Adèle Vermillard. Jumping back and forth in time, they meet the mysterious Adèle, whose bohemian lifestyle, and her relationships with the leading artists of the time, changes their lives.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/hPj1RiuhW72lIfa8UrIncDGSSD0.jpg",
@@ -1698,6 +1759,7 @@
             "US"
           ],
           "rating": 9.3,
+          "votes": 26,
           "heat": 38,
           "synopsis": "Deputy Commissioner Gutierrez competes with the CIA to solve the murder of the Russian Ambassador with his unique style.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/7zT7FbS0mwJdjKoPPX7xOhySlNN.jpg",
@@ -1725,6 +1787,8 @@
             "IN",
             "US"
           ],
+          "rating": 8,
+          "votes": 10,
           "heat": 37,
           "synopsis": "During a heavy rainstorm, the Princess characters and their sidekick friends take in animals in need while enjoying a cozy day in their castle. But when the animals run amok, chaos erupts. Sleuthing reveals a mischievous villain behind it all, and with teamwork, quick thinking, and help from an unexpected friend, the Princess characters must restore order and save their home.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/3tCKtHBq9LC5Vd8S1UHVocZDj0l.jpg",
@@ -1750,6 +1814,7 @@
             "US"
           ],
           "rating": 7.8,
+          "votes": 22,
           "heat": 36,
           "synopsis": "What happened to Mica Miller? This documentary series retraces her promising life, toxic marriage and the mysterious circumstances of her death.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/o8H6HmQNt2qx5bIfmvuI6VJn13A.jpg",
@@ -1774,6 +1839,7 @@
             "US"
           ],
           "rating": 7.5,
+          "votes": 39,
           "heat": 35,
           "synopsis": "A 19-year-old Anthony Bourdain travels to Provincetown and stumbles into the chaotic world of a restaurant kitchen, setting off a summer that will shape the course of his life.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/3WN0JWwRI7oGH7Ni2R6poVWej05.jpg",
@@ -1798,6 +1864,8 @@
           "regions": [
             "IN"
           ],
+          "rating": 8.7,
+          "votes": 15,
           "heat": 34,
           "synopsis": "Ashley's homecoming from abroad takes an emotional turn when a wedding next door stirs memories of her first love, Justin.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/rZPu64VDDftnU7NU1d2wrWuhOHm.jpg",
@@ -1821,6 +1889,7 @@
             "US"
           ],
           "rating": 6.7,
+          "votes": 24,
           "heat": 33,
           "synopsis": "Four lifelong friends realize that somewhere between careers, relationships, families, and everyday responsibilities, they’ve forgotten how to take care of themselves and each other. Burned out and overdue for a break, the women escape to a luxury spa retreat for an unforgettable weekend dedicated to fun, laughter, and a lot of really bad decisions.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/i3I19SbOyz6AIl0cSYdyVJRucMr.jpg",
@@ -1868,6 +1937,8 @@
             "IN",
             "US"
           ],
+          "rating": 6.6,
+          "votes": 18,
           "heat": 32,
           "synopsis": "An alcoholic with a violent past—living peacefully with his daughter beside a waterfall—decides to take Ayyappa Deeksha (a 41-day spiritual vow and period of intense austerity) at her request.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/sPePQmJRKkB14sGjB7zBkLJkaTW.jpg",
@@ -1891,6 +1962,8 @@
             "IN",
             "US"
           ],
+          "rating": 5,
+          "votes": 6,
           "heat": 31,
           "synopsis": "Airport Chaplain Tobias Wallace is convinced the airport couldn’t possibly run without his 24/7 devotion. But new Terminal Manager Mira Ansari-Cole is convinced he’s a walking liability.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/fptacsSVdDDcP3TWIq5OLtOH7UM.jpg",
@@ -1916,6 +1989,7 @@
             "US"
           ],
           "rating": 6.5,
+          "votes": 33,
           "heat": 30,
           "synopsis": "Deep within the backwoods of rural Oklahoma, charismatic and musically gifted Amziah King herds a bluegrass-playing band of misfits while overseeing the premier honey-making operation in town. When Amziah’s estranged foster daughter unexpectedly returns, Amziah leaps at the possibility to renew connection and create a family business. But the honey game is ruthless, and Amziah’s rivals threaten to destroy everything he has built.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/3iVDCDS1VwHIm95PjWEPwsfdhaf.jpg",
@@ -1940,6 +2014,7 @@
             "US"
           ],
           "rating": 5.3,
+          "votes": 28,
           "heat": 29,
           "synopsis": "A group of recent grads head out on a late night drive for grub, hoping to enjoy one final hangout before their paths diverge. Instead, they accidentally turn onto a never-ending, two-lane hellscape surrounded by untold horrors and cosmic forces beyond their understanding. Cramped together inside a Jeep Cherokee and with the miles stretching infinitely ahead, they face a choice: embrace their new existence or fight to escape it.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/6dfAGvZWbJnzWfSZ8gxFj63BNAH.jpg",
@@ -1963,6 +2038,8 @@
             "IN",
             "US"
           ],
+          "rating": 6.6,
+          "votes": 8,
           "heat": 26,
           "synopsis": "After delivering one of the greatest performances in Rose Bowl history, Texas Longhorns legend Vince Young was the NFL's next big thing, and for a while, he was. But a career riddled by injuries, conflict and sudden loss tells a far more complicated story than the highlight reels ever showed.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/A1n4bOedczRdAm3JRBmbg35deCD.jpg",
@@ -1986,6 +2063,7 @@
             "IN",
             "US"
           ],
+          "votes": 1,
           "heat": 26,
           "synopsis": "Blending the wild worlds of circus and comedy, anarchic acts collide for this raunchy and explicit variety show - clothing not guaranteed.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/dGQUiIOa93d6U6tQAaXKoITUoEY.jpg",
@@ -2033,6 +2111,7 @@
           "regions": [
             "US"
           ],
+          "votes": 4,
           "heat": 26,
           "synopsis": "Captured live over the course of GHOST’s two sold-out shows in Mexico City last year, 2 BIG TO RIG is the definitive document of the band's unforgettable SKELETOUR WORLD TOUR, presented in IMAX® in select locations.  Featuring the only pro-shot footage of Papa V Perpetua and his band of Nameless Ghouls from the phone-free SKELETOUR, 2 BIG TO RIG immerses the audience in the GHOST live ritual, including exclusive behind-the-scenes and backstage access.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/6h8iogSv0SUnFWa89Q2IGH4cEaB.jpg",
@@ -2058,6 +2137,7 @@
             "IN",
             "US"
           ],
+          "votes": 3,
           "heat": 25,
           "synopsis": "The story of September 11 through the eyes of survivors who experienced life-or-death moments with strangers that day and now want to meet again.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/gRRbtlz7Lyygch0UOWr5Iso0LVk.jpg",
@@ -2081,6 +2161,8 @@
           "regions": [
             "IN"
           ],
+          "rating": 6.1,
+          "votes": 13,
           "heat": 24,
           "synopsis": "Interpol agent Khalid Al-Azzazi joins forces with Ghali Abu Dawood from the 7 Dogs crime syndicate to fight drug trafficking.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/66n5bB6iYTWsWMz0mh3Qv7qmzIJ.jpg",
@@ -2128,6 +2210,7 @@
           "regions": [
             "US"
           ],
+          "votes": 3,
           "heat": 19,
           "synopsis": "Set in a near future society ruled by sentient A.I., a private eye investigates a murder case only to discover a rebel group capable of undermining the digital overlord. As the detective's identity slowly unravels, his world enters a state of hypnotic meltdown.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/sJEhuRJmGGuhzSHAHjgWiZGPIv.jpg",
@@ -2150,6 +2233,7 @@
           "regions": [
             "US"
           ],
+          "votes": 2,
           "heat": 19,
           "synopsis": "Legendary New York poet Ed Saxberger's forgotten works captivate an eccentric group of young creatives, reigniting his artistic passion. Their intrigue intertwines with the bewitching presence of actress Gloria.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/bcyXE0p4XmZUlcxvTDbvdG9lgsN.jpg",
@@ -2197,6 +2281,7 @@
             "IN",
             "US"
           ],
+          "votes": 2,
           "heat": 17,
           "synopsis": "They're building empires. They're building families. They're always unfiltered. Welcome to The Girls, where Khloé Kardashian's inner circle of real-life besties are raising babies, running businesses, and surviving brutally honest group chats. From surprise proposals to solo parenting, glam getaways to growing pains, this is the new era of reality TV where the chaos is couture — and the bonds are unbreakable.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/8P12ytuz41DKCBSpjX3Ntev177Z.jpg",
@@ -2618,6 +2703,7 @@
             "US"
           ],
           "rating": 7.8,
+          "votes": 122,
           "heat": 88,
           "synopsis": "After Acme products fail him one too many times in his dogged pursuit of the Roadrunner, Wile E. Coyote decides to hire a billboard lawyer to sue the Acme Corporation.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/orkLtdgMGiO9rTVMqJ1kKwrnup1.jpg",
@@ -2643,6 +2729,7 @@
             "US"
           ],
           "rating": 8.1,
+          "votes": 680,
           "heat": 83,
           "synopsis": "Professor Se-jeong is thrust into a bloody nightmare when a rapidly mutating virus is released during a biotech conference causing authorities to seal the facility. Trapped inside with no escape, Se-jeong along with a small group of survivors must fight to stay alive while the infected undergo horrific transformations.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/tN799oUR0f1gUKDYdMNrDaY7I51.jpg",
@@ -2667,6 +2754,7 @@
             "US"
           ],
           "rating": 6.2,
+          "votes": 142,
           "heat": 81,
           "synopsis": "Maia Marten, a brilliant London lawyer, has her life shattered by a single call on her morning run: her son has been taken. To get him back, she must keep running, obey every ruthless command, and trust no one-each second a test of how far a mother will go to save her child.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/uxCaBoYXsDC4A0SqTm3SISj0OwK.jpg",
@@ -2692,6 +2780,7 @@
             "US"
           ],
           "rating": 6.7,
+          "votes": 183,
           "heat": 71,
           "synopsis": "After the world's population has been ravaged by a pandemic, a man lives a lonesome existence in a Colorado airplane hangar with his dog and a dour gunman he has befriended. When a mysterious transmission comes through on the radio while he’s flying his old Cessna, it sparks a hunt for the provenance of the sound.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/5O616X9vmRzQdB68PHzBewPittd.jpg",
@@ -2718,6 +2807,7 @@
             "US"
           ],
           "rating": 6.3,
+          "votes": 47,
           "heat": 67,
           "synopsis": "After discovering she has a family and a shipping empire, a woman with amnesia returns to a wealthy and seemingly perfect past to uncover why she left.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/5FC5vUHFz0fbJOd0bhyzJpCSLrc.jpg",
@@ -2744,6 +2834,7 @@
             "US"
           ],
           "rating": 7,
+          "votes": 44,
           "heat": 64,
           "synopsis": "A fictionalized drama film based on one of the most shocking crimes in Argentina's history. In 1992, Ricardo Barreda was an unassuming dentist, brutally murdered his wife, mother-in-law, and two adult daughters in their family home. Branding himself as a victim, Ricardo Barreda ignited a media storm and fueled a national scandal.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/hnr0QkZSDLlrJTvU2ecco65wcHo.jpg",
@@ -2770,6 +2861,7 @@
             "US"
           ],
           "rating": 7.7,
+          "votes": 27,
           "heat": 54,
           "synopsis": "A reclusive writer wakes to find his identity stolen — and must ally with a ruthless loan shark to reclaim his life from a man known as \"The Rat.\"",
           "posterUrl": "https://image.tmdb.org/t/p/w500/2mwgHfOyrFrmvozjFoEXHRdfGhv.jpg",
@@ -2794,6 +2886,7 @@
             "US"
           ],
           "rating": 6.7,
+          "votes": 24,
           "heat": 51,
           "synopsis": "A criminal mastermind plans to fake his death for insurance money while framing his wife's lover. His wife plots to kill him for real and take it all. Both race to outmanoeuvre each other in a deadly battle of wits.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/glALx6QaIgw1u4joXsnfHTjWi6D.jpg",
@@ -2816,6 +2909,8 @@
           "regions": [
             "US"
           ],
+          "rating": 5.7,
+          "votes": 9,
           "heat": 51,
           "synopsis": "On a perilous climb across Thailand's Mount Kwan, two climbers become trapped thousands of feet above the ground, where vertigo-inducing heights, sheer exposure, and impossible odds turn every moment into a fight for survival.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/sY65bOZcjQqO6VdpOXLN5VcW61e.jpg",
@@ -2840,6 +2935,7 @@
             "US"
           ],
           "rating": 7,
+          "votes": 42,
           "heat": 48,
           "synopsis": "When a lovesick musician is given the wrong number for his dream girl, he teams up with a driven psychology student to find her. Together, they spark a hilarious campus-wide frenzy that tests their own hearts and ambitions along the way.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/bfEQ6C702oPsN4kzIiY7n4JsrxF.jpg",
@@ -2868,6 +2964,8 @@
             "IN",
             "US"
           ],
+          "rating": 7.5,
+          "votes": 10,
           "heat": 47,
           "synopsis": "The Mandalorian and Grogu join their misfit allies for an epic party, celebrating their heroism. As friends regale the crowd with tales of their adventures, a pirate threat looms.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/x3HEvYXWOW6WHqsHmg2MUVy3SLm.jpg",
@@ -2894,6 +2992,8 @@
           "regions": [
             "US"
           ],
+          "rating": 6.8,
+          "votes": 9,
           "heat": 47,
           "synopsis": "When Chloe develops a destructive new superpower, the Hero League orders her to an elite boarding school for superheroes to learn control of her abilities. Faced with the prospect of sending Chloe away for years, the Thundermans split apart, with Phoebe, Barb and Billy taking her into hiding. Max, Hank, and Nora track their rogue family members, until the two factions face off against each other in a full-on battle for the Thundermans’ future.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/16oqRrWVzQm6qdGfBxvziZ2UiMT.jpg",
@@ -2917,6 +3017,7 @@
             "IN",
             "US"
           ],
+          "votes": 2,
           "heat": 46,
           "synopsis": "Set during the Mexican Revolution, follow Emilia Sauri, a woman torn between two passionate loves while navigating a world dominated by violence and revolution.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/91s80WxRqIirFSpGVtiXJoS1GA5.jpg",
@@ -2940,6 +3041,8 @@
             "IN",
             "US"
           ],
+          "rating": 9.6,
+          "votes": 7,
           "heat": 46,
           "synopsis": "When two young pianists from completely different worlds meet at an elite music high school, the melodies of their lives become intimately intertwined.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/a7p6htiJKx68USDAcilJ5rzKAWB.jpg",
@@ -2964,6 +3067,7 @@
             "US"
           ],
           "rating": 8.3,
+          "votes": 29,
           "heat": 46,
           "synopsis": "A magical, singing orange unicorn holds his cast hostage in a surreal TV-show dimension, as he becomes more and more demented.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/6Lh4ZlsAISFQFVfLZ90sE9ycVnN.jpg",
@@ -2988,6 +3092,7 @@
           "regions": [
             "IN"
           ],
+          "votes": 3,
           "heat": 43,
           "synopsis": "When a mother loses her eyesight and her daughter in a kidnapping, she takes matters into her own hands to hunt down those responsible.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/hCHei97aPYCCsh4vicz9X0wmdFV.jpg",
@@ -3012,6 +3117,8 @@
             "IN",
             "US"
           ],
+          "rating": 7,
+          "votes": 6,
           "heat": 38,
           "synopsis": "Two roommates join a bachelorette road trip, where unspoken feelings ignite and shake up their entire friend group.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/2udseY0mzsvkytPcSL4Vp612M1D.jpg",
@@ -3035,6 +3142,7 @@
             "US"
           ],
           "rating": 6.7,
+          "votes": 94,
           "heat": 38,
           "synopsis": "The profound story of husband and wife Raynor and Moth Winn, who embark on a 630-mile trek after being forcibly removed from their home. Hoping that in nature they will find solace and a sense of acceptance, they walk through the beautiful but rugged coastlines of South West England - a journey that is exhilarating, challenging, and liberating in equal measure. THE SALT PATH is a powerful portrayal of home, and how it can be lost and rediscovered in the most unexpected ways.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/yBtmFkjzPzd6KvNgoJwwsm1nyXL.jpg",
@@ -3059,6 +3167,7 @@
             "IN"
           ],
           "rating": 7.5,
+          "votes": 39,
           "heat": 35,
           "synopsis": "A 19-year-old Anthony Bourdain travels to Provincetown and stumbles into the chaotic world of a restaurant kitchen, setting off a summer that will shape the course of his life.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/3WN0JWwRI7oGH7Ni2R6poVWej05.jpg",
@@ -3083,6 +3192,8 @@
             "IN",
             "US"
           ],
+          "rating": 7.2,
+          "votes": 14,
           "heat": 33,
           "synopsis": "When a U.S. Navy pilot on a top-secret mission during the Cold War gets trapped behind enemy lines, his only chance at survival is to form an alliance with an eccentric ex-KGB agent.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/hVXjX1jLZ1ljFSNGXpjJfbTUOa7.jpg",
@@ -3106,6 +3217,7 @@
             "IN",
             "US"
           ],
+          "votes": 3,
           "heat": 32,
           "synopsis": "A quarter-century after September 11th, the attacks' ripple effects persist across generations. Orphaned children, War on Terror journalists, young Afghans, and U.S. Marines shaped by the 2021 withdrawal share their stories.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/6DVDbbneXuhFHmqGvTVko2sVz0o.jpg",
@@ -3153,6 +3265,7 @@
           "regions": [
             "US"
           ],
+          "votes": 1,
           "heat": 31,
           "synopsis": "Selen is a woman with the extraordinary ability to foresee other people’s futures in her dreams. Determined to use this gift to change her own life and the fate of those around her, she unexpectedly finds herself drawn into a dangerous love story. When she crosses paths with Kemal, their connection sparks both passion and peril, forcing Selen to make choices that will shape both of their destinies.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/vQ69OZWDZ90ktHcW2Ku01ht4eis.jpg",
@@ -3176,6 +3289,7 @@
           "regions": [
             "US"
           ],
+          "votes": 3,
           "heat": 31,
           "synopsis": "When two unqualified bozos are hired to transfer a rich teen to rehab, their straightforward gig quickly spirals into dangerous mayhem.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/l1JFNC1SdgyXVr7BaD5ehaYBvOC.jpg",
@@ -3199,6 +3313,8 @@
             "IN",
             "US"
           ],
+          "rating": 6.6,
+          "votes": 5,
           "heat": 29,
           "synopsis": "Nobody, least of all Rachael Gunn, expected to be an Olympian. But as Raygun’s performance at the 2024 Paris Olympics went viral overnight, so did an avalanche of memes, misinformation, and conspiracy theories questioning how she ever got there.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/3pnlJjsGtrUp3cPEOLzkR0sPQAK.jpg",
@@ -3223,6 +3339,7 @@
             "US"
           ],
           "rating": 5.3,
+          "votes": 28,
           "heat": 29,
           "synopsis": "A group of recent grads head out on a late night drive for grub, hoping to enjoy one final hangout before their paths diverge. Instead, they accidentally turn onto a never-ending, two-lane hellscape surrounded by untold horrors and cosmic forces beyond their understanding. Cramped together inside a Jeep Cherokee and with the miles stretching infinitely ahead, they face a choice: embrace their new existence or fight to escape it.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/6dfAGvZWbJnzWfSZ8gxFj63BNAH.jpg",
@@ -3271,6 +3388,7 @@
           "regions": [
             "US"
           ],
+          "votes": 2,
           "heat": 25,
           "synopsis": "Forced to hide in the shadows, fugitive hero Erik Reed must clear his name to reunite with his family. Standing in his way is a mysterious villain obsessed with destroying the White Dragon for good.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/kaMEYF6bMuOO3z504EIm7P1zprT.jpg",
@@ -3295,6 +3413,7 @@
             "IN",
             "US"
           ],
+          "votes": 4,
           "heat": 24,
           "synopsis": "A documentary film that observes, listens to, and interacts with Fito Páez from a place of profound intimacy. The camera, almost invisible, witnesses his every move, accompanying him for over a year during recordings, rehearsals, tours, and performances in major cities across Latin America, Europe, and the United States. It is also a journey through the life of one of the greatest Spanish-language artists: his loves and heartbreaks, children and friendships, excesses, tragedies, failures, and successes.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/5Olp4wGl2XEGkjVebukgZljYW3Q.jpg",
@@ -3436,6 +3555,7 @@
           "regions": [
             "IN"
           ],
+          "votes": 4,
           "heat": 16,
           "synopsis": "The 2026 NXT Heatwave was a professional wrestling television special and livestreaming event produced by WWE. It was the fifth annual Heatwave produced by WWE for its developmental brand NXT and the 12th Heatwave overall. The event took place on Sunday, August 30, 2026, at Bert Ogden Arena in Edinburg, Texas, United States - right after Lucha Libre AAA Worldwide's Ola de Calor event in the same venue.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/rcBcZpRISLKqBstSrMI3b5zoSA0.jpg",
@@ -3460,6 +3580,7 @@
             "IN",
             "US"
           ],
+          "votes": 1,
           "heat": 16,
           "synopsis": "Two individuals initially exchange a simple \"Hi,\" but through a series of chance encounters, shared experiences, and deep conversations, they gradually develop a strong connection and eventually fall in love.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/4oXPb2fRTWBmIOxyyj2M64Nx33C.jpg",
@@ -3483,6 +3604,8 @@
           "regions": [
             "US"
           ],
+          "rating": 8,
+          "votes": 10,
           "heat": 16,
           "synopsis": "An elderly inmate serving a life sentence awaits a lonely death in solitary—until a voice calls out to him. It belongs to a balsam flower, Housenka, that speaks like a human. Through their 'conversation', the old man reflects on the life he's led.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/pFQrsh38XqJ31zZ9zQ3rrb7EepD.jpg",
@@ -3530,6 +3653,7 @@
           "regions": [
             "US"
           ],
+          "votes": 1,
           "heat": 16,
           "synopsis": "An aspiring teenage rock star trains for a marathon after hearing a mysterious voice.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/f0dJH9KrWIPShBiYdtwmx73G25W.jpg",
@@ -3552,6 +3676,7 @@
           "regions": [
             "US"
           ],
+          "votes": 1,
           "heat": 15,
           "synopsis": "Explore how sports, music, Broadway and comedy helped Americans rediscover joy and begin to heal in the wake of the 9/11 attacks.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/3BGYcEQnVjVzImecgXcm1xtzdEV.jpg",
@@ -3993,6 +4118,7 @@
             "IN"
           ],
           "rating": 7.9,
+          "votes": 68,
           "heat": 84,
           "synopsis": "A powerful drug cartel pulls the strings behind a facade of sun-soaked beaches as a gritty, violent underworld power struggle emerges during the crumbling of Portuguese colonial rule.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/uPDutjavZO22SbIngBezk173vSb.jpg",
@@ -4427,6 +4553,7 @@
             "US"
           ],
           "rating": 7,
+          "votes": 15458,
           "heat": 59,
           "synopsis": "Lightning McQueen, a hotshot rookie race car driven to succeed, discovers that life is about the journey, not the finish line, when he finds himself unexpectedly detoured in the sleepy Route 66 town of Radiator Springs. On route across the country to the big Piston Cup Championship in California to compete against two seasoned pros, McQueen gets to know the town's offbeat characters.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/2Touk3m5gzsqr1VsvxypdyHY5ci.jpg",
@@ -4514,6 +4641,7 @@
             "US"
           ],
           "rating": 7.5,
+          "votes": 5319,
           "heat": 57,
           "synopsis": "A graphic portrayal of the last twelve hours of Jesus of Nazareth's life.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/rBM5o2HpmCfDejuIPybI09tkY3V.jpg",
@@ -4539,6 +4667,7 @@
             "US"
           ],
           "rating": 7.9,
+          "votes": 4950,
           "heat": 57,
           "synopsis": "A secret military project endangers Neo-Tokyo when it turns a biker gang member into a rampaging psychic psychopath that only two teenagers and a group of psychics can stop.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/neZ0ykEsPqxamsX6o5QNUFILQrz.jpg",
@@ -4564,6 +4693,7 @@
             "US"
           ],
           "rating": 8.8,
+          "votes": 57,
           "heat": 56,
           "synopsis": "Xiaowei travels to Thailand to find his \"billionaire grandfather\" who is out of contact due to debt problems, but unexpectedly find the one who has been corresponding with his grandmother for years is not her husband.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/rjmhzdVS3Ia535pFawju857e2Na.jpg",
@@ -4644,6 +4774,7 @@
             "US"
           ],
           "rating": 6.6,
+          "votes": 53,
           "heat": 48,
           "synopsis": "During a chase inside a museum, Tom and Jerry find an ancient magical compass and end up being transported through time. Lost in a distant era, they will need to work together to find a way back home.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/5qttWFjsO62k88civZaDMHiBTvy.jpg",
@@ -4669,6 +4800,7 @@
             "US"
           ],
           "rating": 8.3,
+          "votes": 26,
           "heat": 40,
           "synopsis": "In the remote South Korean village of Hope Harbor, police chief Bum-seok and officer Sung-ae are called to investigate a mysterious creature wreaking havoc on the community. But all is not as it seems, and perceptions can be misleading. What begins as ignorance plants the seed of disaster, escalating through human conflict into a tragedy of cosmic proportions.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/bcK5naYzzfY0JBCgrPrsrbV6NO1.jpg",
@@ -4694,6 +4826,7 @@
             "US"
           ],
           "rating": 5.6,
+          "votes": 3194,
           "heat": 39,
           "synopsis": "When beautiful Carla Purty joins the university faculty, genetic professor Dr. Sherman Klump grows desperate to whittle his 400-pound frame down to size and win her heart. So, with one swig of his experimental fat-reducing serum, Sherman becomes 'Buddy Love', a fast-talking, pumped-up, plumped down Don Juan.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/fMtb5aZoLRNbMnCkatFsTmPRfl5.jpg",
@@ -4717,6 +4850,7 @@
             "US"
           ],
           "rating": 6.7,
+          "votes": 94,
           "heat": 38,
           "synopsis": "The profound story of husband and wife Raynor and Moth Winn, who embark on a 630-mile trek after being forcibly removed from their home. Hoping that in nature they will find solace and a sense of acceptance, they walk through the beautiful but rugged coastlines of South West England - a journey that is exhilarating, challenging, and liberating in equal measure. THE SALT PATH is a powerful portrayal of home, and how it can be lost and rediscovered in the most unexpected ways.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/yBtmFkjzPzd6KvNgoJwwsm1nyXL.jpg",
@@ -4741,6 +4875,8 @@
           "regions": [
             "US"
           ],
+          "rating": 6.9,
+          "votes": 8,
           "heat": 35,
           "synopsis": "When a rogue squad of genetically engineered super soldiers break loose in the desert, a badass Army sniper must unleash hell to protect her young daughter.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/cOGtvhc6Ij9KvzM6jZsfQyg0B0O.jpg",
@@ -4766,6 +4902,8 @@
             "IN",
             "US"
           ],
+          "rating": 8.7,
+          "votes": 15,
           "heat": 34,
           "synopsis": "Ashley's homecoming from abroad takes an emotional turn when a wedding next door stirs memories of her first love, Justin.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/rZPu64VDDftnU7NU1d2wrWuhOHm.jpg",
@@ -4790,6 +4928,7 @@
           "regions": [
             "US"
           ],
+          "votes": 4,
           "heat": 34,
           "synopsis": "A young Black FBI agent is sent into 1960s Mississippi to investigate a wave of brutal killings targeting civil rights leaders. Forced to work alongside notorious mafia hitman Greg Scarpa, he finds himself pulled into a deadly hunt where justice and vengeance begin to blur.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/f4hdIed8vh10O8TkQ1CkHS8MQ3G.jpg",
@@ -5280,6 +5419,7 @@
           "regions": [
             "IN"
           ],
+          "votes": 1,
           "heat": 6,
           "synopsis": "A small village in the northern part of Kerala is getting ready to witness the football World Cup. The life of a nine-year-old boy, an ardent football fan, is transformed when an unexpected guest arrives in his life.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/gaGOyxBTFPqHS9Nb1KhUlvfZKpP.jpg"
@@ -5313,6 +5453,7 @@
             "US"
           ],
           "rating": 7.2,
+          "votes": 625,
           "heat": 44,
           "synopsis": "The Autobots must stop a colossal planet-consuming robot who goes after the Autobot Matrix of Leadership. At the same time, they must defend themselves against an all-out attack from the Decepticons.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/xJ5W0mOAWCVaXmU0pBZh4NjSRv2.jpg",
@@ -5361,6 +5502,7 @@
           "regions": [
             "US"
           ],
+          "votes": 2,
           "heat": 37,
           "synopsis": "The Owens sisters must confront the dark curse that threatens to unravel their family once and for all.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/7jCV8dkRFK3DGJ4dTqlvrMTFPwZ.jpg",
@@ -5685,6 +5827,8 @@
           "regions": [
             "US"
           ],
+          "rating": 6.4,
+          "votes": 10,
           "heat": 12,
           "synopsis": "A worker from Northeast China is obsessed with his dream of flying his self-made flying-device.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/xCEwmQ8mKzgO70vJMY8vmytq5YE.jpg",
@@ -5771,6 +5915,7 @@
           "regions": [
             "US"
           ],
+          "votes": 1,
           "heat": 10,
           "synopsis": "A young, Juilliard-trained violist is still living at home with her parents in the heart of NYC, while trying to make a living playing gigs with her friends in the homes of strangers.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/dOxMS77IdgJtoFsSsk5V1nsWcUc.jpg",
@@ -6098,6 +6243,7 @@
             "US"
           ],
           "rating": 7.9,
+          "votes": 4027,
           "heat": 51,
           "synopsis": "In the year 2029, the barriers of our world have been broken down by the net and by cybernetics, but this brings new vulnerability to humans in the form of brain-hacking. When a highly-wanted hacker known as 'The Puppetmaster' begins involving them in politics, Section 9, a group of cybernetically enhanced cops, are called in to investigate and stop the Puppetmaster.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/9gC88zYUBARRSThcG93MvW14sqx.jpg",
@@ -6123,6 +6269,7 @@
             "US"
           ],
           "rating": 7.5,
+          "votes": 1287,
           "heat": 48,
           "synopsis": "Andrea Beaumont leaves her father to return to Gotham, rekindling an old romance with Bruce Wayne. At the same time, a mysterious figure begins to hunt down Gotham's criminals, wrongly implicating Batman in the murders. Now on the run from the law, Batman must find and stop the culprit, while also navigating his relationship with Andrea.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/hT4ehUteagUrhUOHAtmYiY7mp5l.jpg",
@@ -6170,6 +6317,7 @@
             "US"
           ],
           "rating": 6.8,
+          "votes": 165,
           "heat": 41,
           "synopsis": "A struggling writer in 1930s Soviet Moscow finds his life transformed when a mysterious professor arrives with his bizarre entourage, including a wisecracking trickster, a deadly assassin, a vampire maid, and a giant talking black cat, turning the city upside down while exposing the hypocrisy of those in power.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/jw172VAlwfYtWNWvhVrXZPW3jGT.jpg",
@@ -6217,6 +6365,8 @@
           "regions": [
             "US"
           ],
+          "rating": 6.7,
+          "votes": 12,
           "heat": 29,
           "synopsis": "Ivy is a teenager in remission from cancer, whose mum and dad insist she attend Children Run Free Camp, a summer retreat for young adults affected by cancer. However, as Ivy is reluctantly dragged through camp experience, she discovers new feelings with new friends.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/mXdejPfToSVFlEzv1QYoIh2N53e.jpg",
@@ -6266,6 +6416,7 @@
           "regions": [
             "US"
           ],
+          "votes": 1,
           "heat": 25,
           "synopsis": "A struggling primary school teacher begins to make some questionable decisions after one of her students is injured.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/sDgb5jVuZ6ZOh4YjtSMMnbovkCi.jpg",
@@ -6582,6 +6733,7 @@
             "US"
           ],
           "rating": 6.2,
+          "votes": 25,
           "heat": 13,
           "synopsis": "In a frontier landscape at the beginning of the 20th century, gunmen descend on a remote farmhouse, determined to exact revenge. Their target, a doctor — alone with his son and daughter — tries desperately to protect his children. Inevitably, bullets fly.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/AhljcpKJbqe9qr2HRGcAIztVeJa.jpg",
@@ -6854,6 +7006,7 @@
             "US"
           ],
           "rating": 8.2,
+          "votes": 28541,
           "heat": 69,
           "synopsis": "After the devastating events of Avengers: Infinity War, the universe is in ruins due to the efforts of the Mad Titan, Thanos. With the help of remaining allies, the Avengers must assemble once more in order to undo Thanos' actions and restore order to the universe once and for all, no matter what consequences may be in store.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/ulzhLuWrPK07P1YkdWQLZnQh1JL.jpg",
@@ -6879,6 +7032,7 @@
             "US"
           ],
           "rating": 8.3,
+          "votes": 9240,
           "heat": 59,
           "synopsis": "Ashitaka, a prince of the disappearing Emishi people, is cursed by a demonized boar god and must journey to the west to find a cure. Along the way, he encounters San, a young human woman fighting to protect the forest, and Lady Eboshi, who is trying to destroy it. Ashitaka must find a way to bring balance to this conflict.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/cMYCDADoLKLbB83g4WnJegaZimC.jpg",
@@ -7069,6 +7223,7 @@
           "regions": [
             "US"
           ],
+          "votes": 1,
           "heat": 17,
           "synopsis": "A traveling psychic who helps lost souls cross over encounters a powerful entity at a remote house. While investigating its origins, she uncovers dark secrets and faces a deadly threat from an unexpected source.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/jguB76QbAx6yExiOLIPvOaxW95b.jpg",
@@ -7790,6 +7945,7 @@
             "US"
           ],
           "rating": 7,
+          "votes": 42,
           "heat": 80,
           "synopsis": "In a notorious prison, an invisible force begins killing inmates brutally, compelling enemy gangs and corrupt guards to work together as they try to survive the mounting bloodshed.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/zxcMdx0w5Zmg8yZuuiS7CJ8vOea.jpg",
@@ -8187,6 +8343,8 @@
           "regions": [
             "US"
           ],
+          "rating": 5.9,
+          "votes": 7,
           "heat": 11,
           "synopsis": "In the late 1990s, Gavin Bain and Billy Boyd had their musical ambitions consistently ridiculed for having the 'wrong' accents, so they went for broke and reinvented themselves as Californian rappers. The duo re-recorded their own tracks with fake accents and turned up in London claiming to be an established duo on the Cali scene as well as childhood friends with Eminem. They quickly bagged themselves a record deal, a hefty sum in advances, and an appearance on MTV... until it all came crashing down.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/2tYRbCPZVQD1AjZ6YGMRx71lbDU.jpg",
@@ -8499,6 +8657,7 @@
         "US"
       ],
       "rating": 8.1,
+      "votes": 3210,
       "heat": 96,
       "synopsis": "Jack Reacher, a veteran military police investigator, has just recently entered civilian life. Reacher is a drifter, carrying no phone and the barest of essentials as he travels the country and explores the nation he once served.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/f1VCQIG2iCyOookdgOzwtUpwWC0.jpg",
@@ -8525,6 +8684,7 @@
         "US"
       ],
       "rating": 8.1,
+      "votes": 1458,
       "heat": 90,
       "synopsis": "Cruz Manuelos, a rough-around-the-edges but passionate young Marine, is recruited to join the CIA's Lioness Engagement Team to help bring down a terrorist organization from within. Joe, the station chief of the Lioness program, is tasked with training, managing and leading her female undercover operatives.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/rzpHPSEgPTpRs8EHbygwsOw7jC0.jpg",
@@ -8550,6 +8710,7 @@
         "US"
       ],
       "rating": 8.2,
+      "votes": 2561,
       "heat": 88,
       "synopsis": "In a ruined and toxic future, thousands live in a giant silo deep underground. After its sheriff breaks a cardinal rule and residents die mysteriously, engineer Juliette starts to uncover shocking secrets and the truth about the silo.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/gMYZZvnkVNTqSVnVCphWbPXwWwb.jpg",
@@ -8575,6 +8736,7 @@
         "IN"
       ],
       "rating": 8.3,
+      "votes": 251,
       "heat": 86,
       "synopsis": "Two intergalactic cops, new recruit John Stewart and Lantern legend Hal Jordan, are drawn into a dark, Earth-based mystery as they investigate a murder in the American heartland.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/gpC7h43xPMEV3goYMQShfJbTtLq.jpg",
@@ -8599,6 +8761,7 @@
         "US"
       ],
       "rating": 8.2,
+      "votes": 5281,
       "heat": 84,
       "synopsis": "After breaking the mysterious \"One Wish Willow\" to win his crush's heart, a hopeless romantic finds himself getting exactly what he asked for but soon discovers that some desires come at a dark, sinister price.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/bRwnj8WEKBCvmfeUNOukJPwB43K.jpg",
@@ -8624,6 +8787,7 @@
         "US"
       ],
       "rating": 6.7,
+      "votes": 110,
       "heat": 82,
       "synopsis": "Ry, a college student with a chronic illness, escapes to Mallorca for the summer with her mother, where she unexpectedly falls for a local and begins to embrace living in the moment. But as her condition worsens and long-hidden family secrets come to light, everything she has found before summer's end is threatened.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/3PWJqDfygN0YNNjWsDUOXclCp3h.jpg",
@@ -8648,6 +8812,7 @@
         "US"
       ],
       "rating": 6.2,
+      "votes": 145,
       "heat": 81,
       "synopsis": "Maia Marten, a brilliant London lawyer, has her life shattered by a single call on her morning run: her son has been taken. To get him back, she must keep running, obey every ruthless command, and trust no one-each second a test of how far a mother will go to save her child.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/uxCaBoYXsDC4A0SqTm3SISj0OwK.jpg",
@@ -8674,6 +8839,7 @@
         "US"
       ],
       "rating": 6.7,
+      "votes": 360,
       "heat": 80,
       "synopsis": "When his young son vanishes, a widower enlists help from his estranged father, a retired detective who put away the serial killer now linked to the case.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/6UqflU8Qqkz7Dq4swJPqs0ZJjY4.jpg",
@@ -8699,6 +8865,7 @@
         "US"
       ],
       "rating": 8.6,
+      "votes": 7540,
       "heat": 77,
       "synopsis": "Science teacher Ryland Grace wakes up on a spaceship light years from home with no recollection of who he is or how he got there. As his memory returns, he begins to uncover his mission: solve the riddle of the mysterious substance causing the sun to die out. He must call on his scientific knowledge and unorthodox ideas to save everything on Earth from extinction.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/yihdXomYb5kTeSivtFndMy5iDmf.jpg",
@@ -8726,6 +8893,7 @@
         "US"
       ],
       "rating": 7.2,
+      "votes": 93,
       "heat": 70,
       "synopsis": "FBI agent Alice Black is on the hunt for a mysterious and calculating female serial killer. Both walk their own paths toward justice, and as their lives start to intertwine, the line between right and wrong begins to blur.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/xnxxrEKtBaIcI1ewq50pLkOMU6u.jpg",
@@ -8755,6 +8923,7 @@
         "US"
       ],
       "rating": 8.8,
+      "votes": 5518,
       "heat": 69,
       "synopsis": "Years ago, the fearsome Pirate King, Gol D. Roger was executed leaving a huge pile of treasure and the famous \"One Piece\" behind. Whoever claims the \"One Piece\" will be named the new King of the Pirates.\n\nMonkey D. Luffy, a boy who consumed a \"Devil Fruit,\" decides to follow in the footsteps of his idol, the pirate Shanks, and find the One Piece. It helps, of course, that his body has the properties of rubber and that he's surrounded by a bevy of skilled fighters and thieves to help him along the way.\n\nLuffy will do anything to get the One Piece and become King of the Pirates!",
       "posterUrl": "https://image.tmdb.org/t/p/w500/dB4EDhre2dsC2kxYDavyKWqLQwi.jpg",
@@ -8781,11 +8950,12 @@
         "US"
       ],
       "rating": 7.7,
+      "votes": 27,
       "heat": 54,
       "synopsis": "A reclusive writer wakes to find his identity stolen — and must ally with a ruthless loan shark to reclaim his life from a man known as \"The Rat.\"",
       "posterUrl": "https://image.tmdb.org/t/p/w500/2mwgHfOyrFrmvozjFoEXHRdfGhv.jpg",
       "backdropUrl": "https://image.tmdb.org/t/p/w780/3bHz9dYSZ5XDxY0zDaBpYgUOhE2.jpg"
     }
   ],
-  "enrichedAt": "2026-09-04T18:27:51.723Z"
+  "enrichedAt": "2026-09-04T18:54:39.156Z"
 }
