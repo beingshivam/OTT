@@ -29,6 +29,15 @@ interface Props {
 }
 
 export function Board({ releases, onOpen, multiDay }: Props) {
+  // A theatrical Mirzapur and a single mid-season episode were rendering
+  // identically. Give the week's top few a heavier line so the eye has somewhere
+  // to land — emphasis, not a second hierarchy.
+  const major = new Set(
+    [...releases]
+      .sort((a, b) => (b.heat ?? 0) - (a.heat ?? 0))
+      .slice(0, Math.min(3, Math.floor(releases.length / 4)))
+      .map((r) => r.id),
+  );
   // Group by platform, then order panels by how much each has — the busiest
   // platform of the week leads, exactly as the printed calendars do it.
   const byPlatform = new Map<string, Release[]>();
@@ -74,7 +83,13 @@ export function Board({ releases, onOpen, multiDay }: Props) {
                 </header>
                 <ul className="panel-card__list">
                   {list.map((r) => (
-                    <BoardRow key={r.id + id} release={r} onOpen={onOpen} multiDay={multiDay} />
+                    <BoardRow
+                      key={r.id + id}
+                      release={r}
+                      onOpen={onOpen}
+                      multiDay={multiDay}
+                      major={major.has(r.id)}
+                    />
                   ))}
                 </ul>
               </section>
@@ -131,10 +146,12 @@ function BoardRow({
   release,
   onOpen,
   multiDay,
+  major,
 }: {
   release: Release;
   onOpen: (r: Release) => void;
   multiDay: boolean;
+  major?: boolean;
 }) {
   const Kind = KIND_ICON[release.kind] ?? KIND_ICON.film;
   const drop = dropLabel(release);
@@ -142,7 +159,7 @@ function BoardRow({
 
   return (
     <li>
-      <button className="row" onClick={() => onOpen(release)}>
+      <button className="row" data-major={major || undefined} onClick={() => onOpen(release)}>
         <Kind className="row__icon" />
         <span className="row__body">
           <span className="row__title">

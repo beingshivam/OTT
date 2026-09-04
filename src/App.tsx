@@ -25,6 +25,9 @@ import {
 import { DEFAULT_PREFS, guessRegion, loadPrefs, savePrefs, type Prefs } from './lib/prefs';
 import { download } from './lib/download';
 import { weeklyReminder } from './lib/reminder';
+import { nextRefreshLabel, relativeTime } from './lib/freshness';
+import { suggestions } from './lib/suggest';
+import { useKeyboard } from './lib/useKeyboard';
 import { readFilters, writeFilters } from './lib/urlState';
 import {
   addDays,
@@ -54,6 +57,9 @@ export default function App() {
   );
   // A week the reader actually asked for — via the arrows, or an inbound ?w —
   // is worth keeping in the URL. The landing auto-jump is not.
+  /** True when the lineup filter was applied for them, so we can say so. */
+  const [lineupAuto, setLineupAuto] = useState(false);
+
   const [weekPinned, setWeekPinned] = useState(
     () => new URLSearchParams(window.location.search).has('w'),
   );
@@ -79,8 +85,17 @@ export default function App() {
       ? stored
       : { ...stored, region: stored.region || guessRegion() };
     setPrefs(resolved);
-    const fromUrl = new URLSearchParams(window.location.search).get('r');
+    const params = new URLSearchParams(window.location.search);
+    const fromUrl = params.get('r');
     if (!fromUrl) setFilters((f) => ({ ...f, region: resolved.region }));
+
+    // Someone who has said what they subscribe to should land on their own week.
+    // A shared link always wins, so an inbound ?p is left alone, and the active
+    // "My lineup" pill makes the narrowing visible rather than silent.
+    if (resolved.onboarded && resolved.platforms.length > 0 && !params.get('p')) {
+      setFilters((f) => ({ ...f, platforms: resolved.platforms }));
+      setLineupAuto(true);
+    }
   }, []);
 
   useEffect(() => {
@@ -169,6 +184,13 @@ export default function App() {
   );
   const visible = useMemo(() => applyFilters(releases, filters), [releases, filters]);
 
+  // Only computed when the week comes back empty, so the extra passes over the
+  // other weeks cost nothing in the normal case.
+  const nearMisses = useMemo(
+    () => (visible.length === 0 ? suggestions(feed, filters) : []),
+    [feed, filters, visible.length],
+  );
+
   const weekOffset = useMemo(() => {
     const diff = Math.round(
       (new Date(`${filters.weekId}T00:00:00Z`).getTime() -
@@ -187,6 +209,12 @@ export default function App() {
     setWeekPinned(true);
     update({ weekId: currentWeek });
   };
+
+  useKeyboard({
+    onPrevWeek: () => stepWeek(-1),
+    onNextWeek: () => stepWeek(1),
+    blocked: selected !== null,
+  });
 
   const lineupOn =
     prefs.platforms.length > 0 &&
@@ -281,6 +309,15 @@ export default function App() {
             <strong>{facets.total}</strong> releases ·{' '}
             <strong>{facets.platforms.length}</strong> platforms
           </span>
+          {feed && (
+            <span
+              className="weekbar__fresh"
+              title={`Next refresh ${nextRefreshLabel()}`}
+            >
+              <i />
+              Updated {relativeTime(feed.generatedAt)}
+            </span>
+          )}
           {prefs.platforms.length > 0 && (
             <button
               className="btn btn--sm"
@@ -336,7 +373,7 @@ export default function App() {
           </div>
         )}
 
-        {!feed && !error && <LoadingGrid />}
+        {!feed && !error && <LoadingBoard view={view} />}
 
         {feed && !error && facets.total === 0 && (
           <div className="empty">
@@ -379,6 +416,20 @@ export default function App() {
 
         {feed && !error && facets.total > 0 && (
           <>
+            {lineupAuto && lineupOn && (
+              <p className="lineup-note">
+                Showing your lineup —{' '}
+                <button
+                  onClick={() => {
+                    setLineupAuto(false);
+                    update({ platforms: [] });
+                  }}
+                >
+                  show everything
+                </button>
+              </p>
+            )}
+
             {activeFilterCount(filters) === 0 && (
               <TrendingStrip
                 releases={trendingNow.list}
@@ -395,15 +446,27 @@ export default function App() {
                 </span>
                 <h3>No matches in this week</h3>
                 <p>
-                  Nothing here fits those filters. Loosen them, or step to another week — the
-                  filters carry over.
+                  {nearMisses.length
+                    ? 'Nothing fits all of those at once. Here is the closest thing that does:'
+                    : 'Nothing here fits those filters.'}
                 </p>
+                {/* Offering only "clear filters" is a shrug. Name the nearest
+                    thing that exists and take them there in one tap. */}
                 <div className="empty__actions">
+                  {nearMisses.map((s) => (
+                    <button
+                      key={s.label}
+                      className="btn btn--lg"
+                      onClick={() => {
+                        if (s.patch.weekId) setWeekPinned(true);
+                        update(s.patch);
+                      }}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
                   <button className="btn btn--lg" onClick={resetFilters}>
                     Clear filters
-                  </button>
-                  <button className="btn btn--lg" onClick={() => stepWeek(1)}>
-                    Try next week
                   </button>
                 </div>
               </div>
@@ -457,15 +520,6 @@ export default function App() {
             </button>
           </div>
           <div className="footer__stack">
-            {feed && (
-              <span>
-                Updated {new Date(feed.generatedAt).toLocaleDateString(undefined, {
-                  day: 'numeric',
-                  month: 'short',
-                  year: 'numeric',
-                })}
-              </span>
-            )}
             <span>Refreshes Tuesdays &amp; Fridays</span>
           </div>
         </footer>
@@ -476,14 +530,54 @@ export default function App() {
   );
 }
 
-function LoadingGrid() {
+/**
+ * The placeholder has to be the shape of the thing arriving, or the page
+ * visibly rearranges itself the moment data lands. This mirrors the board's own
+ * panel-and-row structure, with panel sizes varied so it reads as a real week
+ * rather than a uniform grid.
+ */
+function LoadingBoard({ view }: { view: 'board' | 'grid' }) {
+  if (view === 'grid') {
+    return (
+      <div className="grid" aria-hidden="true">
+        {Array.from({ length: 12 }, (_, i) => (
+          <div className="card" key={i} style={{ animationDelay: `${i * 20}ms` }}>
+            <div className="skel skel--poster" />
+            <div className="skel skel--line" style={{ width: '78%' }} />
+            <div className="skel skel--line" style={{ width: '46%' }} />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  const columns = [[3, 1], [6], [3, 1], [1, 1, 1]];
   return (
-    <div className="grid" aria-hidden="true">
-      {Array.from({ length: 12 }, (_, i) => (
-        <div className="card" key={i} style={{ animationDelay: `${i * 20}ms` }}>
-          <div className="skel skel--poster" />
-          <div className="skel skel--line" style={{ width: '78%' }} />
-          <div className="skel skel--line" style={{ width: '46%' }} />
+    <div className="board" aria-hidden="true">
+      {columns.map((column, ci) => (
+        <div className="board__col" key={ci}>
+          {column.map((rows, pi) => (
+            <div className="panel-card panel-card--skel" key={pi}>
+              <div className="panel-card__head">
+                <span className="skel" style={{ width: 24, height: 24, borderRadius: 6 }} />
+                <span className="skel skel--line" style={{ width: 84 }} />
+              </div>
+              <div className="panel-card__list">
+                {Array.from({ length: rows }, (_, ri) => (
+                  <div className="row" key={ri}>
+                    <span className="skel" style={{ width: 14, height: 14, borderRadius: 4, marginTop: 3 }} />
+                    <span className="row__body">
+                      <span className="skel skel--line" style={{ width: `${58 + ((ri * 13) % 32)}%` }} />
+                      <span
+                        className="skel skel--line"
+                        style={{ width: `${34 + ((ri * 7) % 20)}%`, height: 9, marginTop: 5 }}
+                      />
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       ))}
     </div>

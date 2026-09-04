@@ -1666,6 +1666,13 @@ a {
   gap: 10px;
   padding-top: 24px;
 }
+
+/* "Where can I watch this" is the question the sheet exists to answer, so the
+   answer sits directly under the title rather than below the metadata. */
+.sheet__actions--lead {
+  padding-top: 4px;
+  padding-bottom: 22px;
+}
 .btn--primary {
   height: 42px;
   padding: 0 20px;
@@ -1876,4 +1883,70 @@ a {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* The loading board borrows the real panel chrome but stays inert. */
+.panel-card--skel {
+  --pa: rgba(255, 255, 255, 0.14);
+  --pb: rgba(255, 255, 255, 0.08);
+}
+.panel-card--skel .panel-card__head {
+  border-left-color: rgba(255, 255, 255, 0.12);
+}
+.panel-card--skel .row {
+  cursor: default;
+}
+
+/* Freshness: a static feed can go stale invisibly, so say when it was built. */
+.weekbar__fresh {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-3);
+  white-space: nowrap;
+  cursor: help;
+}
+.weekbar__fresh i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #2fd47a;
+  box-shadow: 0 0 8px rgba(47, 212, 122, 0.7);
+}
+
+/* Auto-applied filtering has to announce itself, or the week looks wrong. */
+.lineup-note {
+  margin: 0 0 16px;
+  font-size: 13px;
+  color: var(--text-3);
+}
+.lineup-note button {
+  color: var(--text-2);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-weight: 550;
+}
+.lineup-note button:hover {
+  color: var(--text);
+}
+
+/* The week's biggest titles carry a little more weight, so the board has a
+   reading order instead of nineteen equal lines. */
+.row[data-major] .row__title {
+  font-size: 15px;
+  font-weight: 680;
+  letter-spacing: -0.018em;
+}
+.row[data-major] .row__icon {
+  color: var(--pa);
+  opacity: 0.95;
+}
+
+/* type="search" draws its own clear button in WebKit, which sat next to ours.
+   Ours stays: it is styled to the design and keyboard-reachable. */
+.search input::-webkit-search-cancel-button,
+.search input::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
 }

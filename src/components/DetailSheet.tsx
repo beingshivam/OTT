@@ -99,54 +99,7 @@ export function DetailSheet({ release, onClose }: Props) {
             {release.rating != null && <span className="pill">★ {release.rating.toFixed(1)}</span>}
           </div>
 
-          <dl className="sheet__grid">
-            <div className="sheet__stat">
-              <dt>Drops</dt>
-              <dd>{`${day.weekday}, ${day.day} ${day.month}`}</dd>
-            </div>
-            <div className="sheet__stat">
-              <dt>Languages</dt>
-              <dd>{release.languages.map(languageName).join(', ')}</dd>
-            </div>
-            <div className="sheet__stat">
-              <dt>Where</dt>
-              <dd>{release.platforms.map((id) => platform(id).name).join(', ')}</dd>
-            </div>
-            <div className="sheet__stat">
-              <dt>Runtime</dt>
-              <dd>{release.runtimeMinutes ? `${release.runtimeMinutes} min` : '—'}</dd>
-            </div>
-          </dl>
-
-          <div className="sheet__section">
-            <h4>Overview</h4>
-            <p>
-              {release.synopsis ??
-                'No synopsis yet — this title came in off the weekly release calendar. Details fill in automatically on the next catalogue refresh.'}
-            </p>
-          </div>
-
-          {release.genres.length > 0 && (
-            <div className="sheet__section">
-              <h4>Genres</h4>
-              <div className="sheet__pills" style={{ marginBottom: 0 }}>
-                {release.genres.map((g) => (
-                  <span className="pill" key={g}>
-                    {g}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {release.cast && release.cast.length > 0 && (
-            <div className="sheet__section">
-              <h4>Cast</h4>
-              <p>{release.cast.join(' · ')}</p>
-            </div>
-          )}
-
-          <div className="sheet__actions">
+          <div className="sheet__actions sheet__actions--lead">
             {/* One button per place it's actually available, not just the first. */}
             {release.platforms.map((id, i) => {
               const target = platform(id);
@@ -180,6 +133,57 @@ export function DetailSheet({ release, onClose }: Props) {
               {copied ? 'Copied' : 'Share'}
             </button>
           </div>
+
+          <dl className="sheet__grid">
+            <div className="sheet__stat">
+              <dt>Drops</dt>
+              <dd>{`${day.weekday}, ${day.day} ${day.month}`}</dd>
+            </div>
+            <div className="sheet__stat">
+              <dt>Languages</dt>
+              <dd>{release.languages.map(languageName).join(', ')}</dd>
+            </div>
+            {release.runtimeMinutes != null && (
+              <div className="sheet__stat">
+                <dt>Runtime</dt>
+                <dd>{release.runtimeMinutes} min</dd>
+              </div>
+            )}
+            {release.director && (
+              <div className="sheet__stat">
+                <dt>Director</dt>
+                <dd>{release.director}</dd>
+              </div>
+            )}
+          </dl>
+
+          {release.synopsis && (
+            <div className="sheet__section">
+              <h4>Overview</h4>
+              <p>{release.synopsis}</p>
+            </div>
+          )}
+
+          {release.genres.length > 0 && (
+            <div className="sheet__section">
+              <h4>Genres</h4>
+              <div className="sheet__pills" style={{ marginBottom: 0 }}>
+                {release.genres.map((g) => (
+                  <span className="pill" key={g}>
+                    {g}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {release.cast && release.cast.length > 0 && (
+            <div className="sheet__section">
+              <h4>Cast</h4>
+              <p>{release.cast.join(' · ')}</p>
+            </div>
+          )}
+
         </div>
       </div>
     </div>
