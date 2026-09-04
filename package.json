@@ -13,7 +13,8 @@
     "build:single": "npm run build && node scripts/build-single.mjs",
     "enrich": "node scripts/enrich-releases.mjs",
     "logos": "node scripts/fetch-logos.mjs",
-    "brand-marks": "node scripts/build-brand-marks.mjs"
+    "brand-marks": "node scripts/build-brand-marks.mjs",
+    "providers": "node scripts/find-providers.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
