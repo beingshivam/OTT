@@ -48,6 +48,11 @@ function fit(ctx: CanvasRenderingContext2D, text: string, max: number): string {
   return cut + '…';
 }
 
+/**
+ * Canvas `roundRect` only landed in Safari 16.4, and this is a share feature
+ * aimed squarely at phones — so on anything older it would throw and the button
+ * would just say "Try again" forever. Trace the path by hand instead.
+ */
 function roundRect(
   ctx: CanvasRenderingContext2D,
   x: number,
@@ -57,7 +62,17 @@ function roundRect(
   r: number,
 ) {
   ctx.beginPath();
-  ctx.roundRect(x, y, w, h, r);
+  if (typeof ctx.roundRect === 'function') {
+    ctx.roundRect(x, y, w, h, r);
+    return;
+  }
+  const radius = Math.min(r, w / 2, h / 2);
+  ctx.moveTo(x + radius, y);
+  ctx.arcTo(x + w, y, x + w, y + h, radius);
+  ctx.arcTo(x + w, y + h, x, y + h, radius);
+  ctx.arcTo(x, y + h, x, y, radius);
+  ctx.arcTo(x, y, x + w, y, radius);
+  ctx.closePath();
 }
 
 /** The platform mark, real glyph where we have one, monogram where we don't. */

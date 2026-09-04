@@ -216,10 +216,21 @@ export default function App() {
     blocked: selected !== null,
   });
 
-  const lineupOn =
+  /**
+   * Whether the *reader* has narrowed the week, as opposed to us pre-applying
+   * their saved lineup. The distinction matters: gating on the raw filter count
+   * hid the trending strip from every returning user with a lineup — the very
+   * people the strip exists for.
+   */
+  const lineupApplied =
     prefs.platforms.length > 0 &&
     filters.platforms.length === prefs.platforms.length &&
     prefs.platforms.every((p) => filters.platforms.includes(p));
+
+  const userNarrowed =
+    activeFilterCount(filters) > (lineupAuto && lineupApplied ? filters.platforms.length : 0);
+
+  const lineupOn = lineupApplied;
 
   const byDay = useMemo(() => {
     const map = new Map<string, Release[]>();
@@ -430,7 +441,7 @@ export default function App() {
               </p>
             )}
 
-            {activeFilterCount(filters) === 0 && (
+            {!userNarrowed && (
               <TrendingStrip
                 releases={trendingNow.list}
                 live={trendingNow.live}

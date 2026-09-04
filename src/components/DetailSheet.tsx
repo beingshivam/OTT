@@ -20,15 +20,23 @@ export function DetailSheet({ release, onClose }: Props) {
   const dropText = dropLabel(release);
 
   useEffect(() => {
+    // Remember what opened the sheet so focus can go back there on close.
+    // Without this, dismissing dropped focus to <body> and a keyboard user lost
+    // their place in the board entirely.
+    const opener = document.activeElement as HTMLElement | null;
+
     closeRef.current?.focus();
     document.body.classList.add('is-locked');
+
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
     window.addEventListener('keydown', onKey);
+
     return () => {
       document.body.classList.remove('is-locked');
       window.removeEventListener('keydown', onKey);
+      if (opener?.isConnected) opener.focus();
     };
   }, [onClose]);
 
