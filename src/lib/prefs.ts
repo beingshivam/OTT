@@ -4,14 +4,14 @@
  * a personal feed, and nothing leaves the browser.
  */
 
-const KEY = 'firstday.prefs.v1';
+const KEY = 'dropday.prefs.v1';
 
 /**
- * The site was called dropday before this. Anyone who had already picked their
- * platforms would otherwise silently lose them on the rename and be shown the
- * onboarding card again, which reads as the app forgetting them.
+ * The site briefly shipped as firstday. Anyone who picked their platforms during
+ * that window would otherwise silently lose them and be shown the onboarding
+ * card again, which reads as the app forgetting them. Cheap to keep reading.
  */
-const LEGACY_KEY = 'dropday.prefs.v1';
+const LEGACY_KEY = 'firstday.prefs.v1';
 
 export interface Prefs {
   platforms: string[];

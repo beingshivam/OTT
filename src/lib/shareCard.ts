@@ -1,3 +1,4 @@
+import { BRAND, TAGLINE } from '../data/brand';
 import { BRAND_MARKS } from '../data/brand-marks';
 import { inkOn, platform } from '../data/platforms';
 import { metaLine } from './format';
@@ -7,7 +8,7 @@ import type { Release } from '../types';
 /**
  * Renders the current week as a shareable PNG.
  *
- * The thing firstday competes with is an image people forward on WhatsApp. Rather
+ * The thing dropday competes with is an image people forward on WhatsApp. Rather
  * than fight that behaviour, this feeds it: export exactly what's on screen —
  * filters and all — as a card sized for a chat thread, with the URL on it. Every
  * forward is then a link back, which makes sharing the growth loop rather than a
@@ -198,7 +199,7 @@ export async function renderShareCard(opts: Options): Promise<Blob> {
 
   ctx.fillStyle = '#f2f4f9';
   ctx.font = font(30, 700);
-  ctx.fillText('firstday', PAD + 54, y + 29);
+  ctx.fillText(BRAND, PAD + 54, y + 29);
 
   y += 92;
   ctx.fillStyle = '#7d8494';
@@ -295,7 +296,7 @@ export async function renderShareCard(opts: Options): Promise<Blob> {
   ctx.fillStyle = '#7d8494';
   ctx.font = font(18, 500);
   ctx.textAlign = 'right';
-  ctx.fillText('Every new release, every platform, one page.', W - PAD, fy + 52);
+  ctx.fillText(TAGLINE[0].toUpperCase() + TAGLINE.slice(1), W - PAD, fy + 52);
   ctx.textAlign = 'left';
 
   return new Promise((resolve, reject) => {

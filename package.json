@@ -1,5 +1,5 @@
 {
-  "name": "firstday",
+  "name": "dropday",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -14,7 +14,8 @@
     "enrich": "node scripts/enrich-releases.mjs",
     "logos": "node scripts/fetch-logos.mjs",
     "brand-marks": "node scripts/build-brand-marks.mjs",
-    "providers": "node scripts/find-providers.mjs"
+    "providers": "node scripts/find-providers.mjs",
+    "og": "node scripts/build-og.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

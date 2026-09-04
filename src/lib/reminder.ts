@@ -1,7 +1,7 @@
 /**
  * A recurring Friday reminder, as a calendar file.
  *
- * firstday lives or dies on weekly return, which normally means push — and push
+ * dropday lives or dies on weekly return, which normally means push — and push
  * means a service worker plus a server holding subscriptions and VAPID keys.
  * That's a backend, and this site is deliberately a static file.
  *
@@ -10,6 +10,8 @@
  * and survives them never opening the site again. It is also trivially
  * cancellable, which a push subscription is not.
  */
+
+import { BRAND } from '../data/brand';
 
 const WEEKDAY = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
 
@@ -45,11 +47,11 @@ export function weeklyReminder(siteUrl: string): Blob {
   const lines = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//firstday//weekly release reminder//EN',
+    `PRODID:-//${BRAND}//weekly release reminder//EN`,
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
     'BEGIN:VEVENT',
-    `UID:firstday-weekly-${start.getTime()}@firstday`,
+    `UID:${BRAND}-weekly-${start.getTime()}@${BRAND}`,
     `DTSTAMP:${stamp(now)}`,
     `DTSTART:${stamp(start)}`,
     `DTEND:${stamp(end)}`,

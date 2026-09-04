@@ -23,6 +23,7 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { BRAND, HEADLINE } from './brand.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const HTML = resolve(ROOT, 'dist/index.html');
@@ -41,7 +42,7 @@ const FEED = resolve(ROOT, 'dist/data/releases.json');
 const CF_ACCOUNT_SUBDOMAIN = 'newreleases';
 const workerName =
   (await readFile(resolve(ROOT, 'wrangler.jsonc'), 'utf8')).match(/"name"\s*:\s*"([^"]+)"/)?.[1] ??
-  'firstday';
+  BRAND;
 
 const SITE_URL = (
   process.env.SITE_URL ?? `https://${workerName}.${CF_ACCOUNT_SUBDOMAIN}.workers.dev`
@@ -112,7 +113,7 @@ const platforms = [...new Set(rows.flatMap((r) => r.platforms))];
 
 // Lead with what people search for — "new releases this week", "OTT" — and keep
 // the brand at the end where a title tag usually carries it.
-const title = `New releases this week (${range}) — OTT & theatres | firstday`;
+const title = `New releases this week (${range}) — OTT & theatres | ${BRAND}`;
 const topPlatforms = [...new Set(rows.flatMap((r) => r.platforms))].map(pname).slice(0, 5);
 const description =
   `Every new film, series and show released this week — ${range}. ` +
@@ -161,7 +162,7 @@ const jsonLd = {
   '@graph': [
     {
       '@type': 'WebSite',
-      name: 'firstday',
+      name: BRAND,
       url: `${SITE_URL}/`,
       description: 'Every new release, every platform, one page.',
     },
@@ -193,7 +194,7 @@ let out = html
 
 const head = `    <link rel="canonical" href="${SITE_URL}/" />
     <meta property="og:url" content="${SITE_URL}/" />
-    <meta property="og:site_name" content="firstday" />
+    <meta property="og:site_name" content="${esc(BRAND)}" />
     <meta property="og:image" content="${SITE_URL}/og.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
@@ -225,6 +226,17 @@ await writeFile(
   resolve(ROOT, 'dist/robots.txt'),
   `User-agent: *\nAllow: /\n\nSitemap: ${SITE_URL}/sitemap.xml\n`,
 );
+
+/**
+ * The manifest names the app on a phone home screen, and it is a static file in
+ * public/ — so it is the one remaining place the brand could be left stale after
+ * a rename. Rewrite it here from the same constant rather than trust a copy.
+ */
+const MANIFEST = resolve(ROOT, 'dist/manifest.webmanifest');
+const manifest = JSON.parse(await readFile(MANIFEST, 'utf8'));
+manifest.name = `${BRAND} — ${HEADLINE}`;
+manifest.short_name = BRAND;
+await writeFile(MANIFEST, `${JSON.stringify(manifest, null, 2)}\n`);
 
 console.log(
   `SEO: titled "${title}"\n     prerendered ${rows.length} releases across ${byPlatform.size} platforms\n     sitemap with ${urls.length} urls, robots.txt, JSON-LD`,

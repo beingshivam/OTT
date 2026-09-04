@@ -13,6 +13,7 @@ import {
   IconPlay,
   IconSearch,
 } from './components/icons';
+import { BRAND, TAGLINE } from './data/brand';
 import { PLATFORMS, REGIONS } from './data/platforms';
 import { loadFeed, weekById } from './lib/feed';
 import {
@@ -66,12 +67,18 @@ export default function App() {
 
   // Board is the default: the whole week at a glance, the way the printed
   // calendars do it. The poster grid stays available for browsing.
-  const [view, setView] = useState<'board' | 'grid'>(
-    () => (localStorage.getItem('firstday.view') === 'grid' ? 'grid' : 'board'),
-  );
+  const [view, setView] = useState<'board' | 'grid'>(() => {
+    try {
+      return localStorage.getItem('dropday.view') === 'grid' ? 'grid' : 'board';
+    } catch {
+      // Blocked site data throws on read, not just on write — and unguarded
+      // here it would take the whole page down rather than lose a preference.
+      return 'board';
+    }
+  });
   useEffect(() => {
     try {
-      localStorage.setItem('firstday.view', view);
+      localStorage.setItem('dropday.view', view);
     } catch {
       /* Storage is a convenience here, never a requirement. */
     }
@@ -139,7 +146,7 @@ export default function App() {
   }, []);
 
   const addWeeklyReminder = useCallback(() => {
-    download(weeklyReminder(window.location.origin), 'firstday-friday.ics');
+    download(weeklyReminder(window.location.origin), `${BRAND}-friday.ics`);
   }, []);
 
   const updatePrefs = useCallback((next: Partial<Prefs>) => {
@@ -264,7 +271,12 @@ export default function App() {
             <span className="logo__mark">
               <IconPlay />
             </span>
-            firstday<span className="logo__dot">.</span>
+            {/* Wordmark and dot share one flex item, or the .logo gap pushes
+                the dot away from the name it belongs to. */}
+            <span>
+              {BRAND}
+              <span className="logo__dot">.</span>
+            </span>
           </span>
           <div className="weekbar__region">
             <label className="region">
@@ -524,7 +536,9 @@ export default function App() {
 
         <footer className="footer">
           <div className="footer__stack">
-            <span>firstday — every new release, every platform, one page.</span>
+            <span>
+              {BRAND} — {TAGLINE}
+            </span>
             <button className="footer__link" onClick={addWeeklyReminder}>
               <IconCalendar />
               Remind me every Friday
