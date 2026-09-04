@@ -1,10 +1,12 @@
 {
   "netflix": "https://image.tmdb.org/t/p/w154/rK1KljqmbvO9HQa1PBFLILWah72.png",
   "prime": "https://image.tmdb.org/t/p/w154/gMZdpavHmxFNnLpMHwVxfqeux2g.png",
+  "jiohotstar": "https://image.tmdb.org/t/p/w154/ledoS6EgdjTNq8F1e6wubUQer18.png",
   "appletv": "https://image.tmdb.org/t/p/w154/9icYBfYFcwgCbky5VdGUIKJ4C5i.png",
   "sonyliv": "https://image.tmdb.org/t/p/w154/coM4QWbmIOa0xJ5cGR9BRmoV25B.png",
   "zee5": "https://image.tmdb.org/t/p/w154/uQvhdtB8skccsGHmvKi3y5bqBsX.png",
   "sunnxt": "https://image.tmdb.org/t/p/w154/1T9VcLknesOZZen9ZgLfcDdm5Ys.png",
+  "hoichoi": "https://image.tmdb.org/t/p/w154/8dgAD4EzQWMsyudVwWCFg19998L.png",
   "aha": "https://image.tmdb.org/t/p/w154/i8cMQ9Hw8oDcOO4rV6GYlO7VBDH.png",
   "lionsgate": "https://image.tmdb.org/t/p/w154/46U3TOB3PhVDjA7qaFOuYSaGMiq.png",
   "mubi": "https://image.tmdb.org/t/p/w154/k7iSlvgWzZuO4zU5PcBjhABMuia.png",
@@ -12,6 +14,7 @@
   "hbomax": "https://image.tmdb.org/t/p/w154/skypuy7SXuugIQeYg0IglmzoKaS.png",
   "hulu": "https://image.tmdb.org/t/p/w154/44uAnmSqvA4yBOdbPWN8YgQHjWm.png",
   "disney": "https://image.tmdb.org/t/p/w154/5eZ872CghnHFLB1j8grszbrx0dx.png",
+  "paramount": "https://image.tmdb.org/t/p/w154/uPWQPyF4nqwtfPNmGcFcenU57HG.png",
   "peacock": "https://image.tmdb.org/t/p/w154/a1UIdq5BrkcAxnxcUhFsNbXnxeu.png",
   "shudder": "https://image.tmdb.org/t/p/w154/58O6yqUFM6qoOiBNAddJs7xNKc.png"
 }

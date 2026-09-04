@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-04T18:12:51.252Z",
+  "generatedAt": "2026-09-04T18:18:02.570Z",
   "source": "tmdb",
   "weeks": [
     {
@@ -7,6 +7,31 @@
       "start": "2026-08-14",
       "end": "2026-08-20",
       "releases": [
+        {
+          "id": "t-95350",
+          "title": "Lanterns",
+          "kind": "series",
+          "platforms": [
+            "jiohotstar"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Drama",
+            "Mystery",
+            "Sci-Fi & Fantasy"
+          ],
+          "releaseDate": "2026-08-16",
+          "regions": [
+            "IN"
+          ],
+          "rating": 8.3,
+          "heat": 86,
+          "synopsis": "Two intergalactic cops, new recruit John Stewart and Lantern legend Hal Jordan, are drawn into a dark, Earth-based mystery as they investigate a murder in the American heartland.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/gpC7h43xPMEV3goYMQShfJbTtLq.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/mdbWfpbWhvxgG3k5MHpo90UgAUe.jpg"
+        },
         {
           "id": "t-303351",
           "title": "Blood Sacrifice",
@@ -108,6 +133,7 @@
           "title": "Whitmer Thomas: Terminal Crew of Dudes",
           "kind": "film",
           "platforms": [
+            "jiohotstar",
             "hbomax"
           ],
           "languages": [
@@ -119,6 +145,7 @@
           ],
           "releaseDate": "2026-08-14",
           "regions": [
+            "IN",
             "US"
           ],
           "heat": 33,
@@ -199,6 +226,31 @@
           "backdropUrl": "https://image.tmdb.org/t/p/w780/w2HSqxbdgkN6d6Rg5HvCUaMpG7x.jpg"
         },
         {
+          "id": "t-323557",
+          "title": "Lion",
+          "kind": "documentary",
+          "platforms": [
+            "jiohotstar",
+            "disney",
+            "hulu"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Documentary"
+          ],
+          "releaseDate": "2026-08-19",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 25,
+          "synopsis": "The extraordinary true story of lion cub Kio, on his journey to become a king.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/mvFQIZo2DG1pyiINL2bDa5QNR4O.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/xc5PQ22igs1F3OyJ1vXVTZW6793.jpg"
+        },
+        {
           "id": "t-331674",
           "title": "The Sex Slave",
           "kind": "documentary",
@@ -222,33 +274,11 @@
           "backdropUrl": "https://image.tmdb.org/t/p/w780/dqpULBcBjsTLbawXKQy2DKjoRwe.jpg"
         },
         {
-          "id": "t-323557",
-          "title": "Lion",
-          "kind": "documentary",
-          "platforms": [
-            "disney",
-            "hulu"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Documentary"
-          ],
-          "releaseDate": "2026-08-19",
-          "regions": [
-            "US"
-          ],
-          "heat": 25,
-          "synopsis": "The extraordinary true story of lion cub Kio, on his journey to become a king.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/mvFQIZo2DG1pyiINL2bDa5QNR4O.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/xc5PQ22igs1F3OyJ1vXVTZW6793.jpg"
-        },
-        {
           "id": "m-1736062",
           "title": "Disney Worldbuilders",
           "kind": "documentary",
           "platforms": [
+            "jiohotstar",
             "disney"
           ],
           "languages": [
@@ -259,6 +289,7 @@
           ],
           "releaseDate": "2026-08-16",
           "regions": [
+            "IN",
             "US"
           ],
           "heat": 24,
@@ -336,6 +367,28 @@
           "backdropUrl": "https://image.tmdb.org/t/p/w780/kqaqrGjVthqrK2kcjQEIeDYAAdH.jpg"
         },
         {
+          "id": "t-331722",
+          "title": "Bigg Boss : Agnipareeksha",
+          "kind": "reality",
+          "platforms": [
+            "jiohotstar"
+          ],
+          "languages": [
+            "ml"
+          ],
+          "genres": [
+            "Reality"
+          ],
+          "releaseDate": "2026-08-15",
+          "regions": [
+            "IN"
+          ],
+          "heat": 20,
+          "synopsis": "The journey to Bigg Boss Malayalam 8 begins in Agnipareeksha, where commoner contestants battle for a place in the Bigg Boss House.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/1GboWZREUaFkx11V4DtkLpQsiOs.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/a47LKDjGgDihcMDjEiekDIY3ToK.jpg"
+        },
+        {
           "id": "t-294722",
           "title": "The Dynasty: UConn Huskies",
           "kind": "documentary",
@@ -357,6 +410,51 @@
           "synopsis": "Go inside the most dominant program in college basketball history as Geno Auriemma pushes his players to the limit to win 12 titles. Rebecca Lobo, Diana Taurasi, Paige Bueckers, and more reveal what it takes to survive UConn and build a dynasty.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/5lZ0NLV93fIx8yIWT38h8rt5u2I.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/6dBzbLqznXgpe5z9ZIqqD0mxwac.jpg"
+        },
+        {
+          "id": "t-328818",
+          "title": "108 Base Hospital Uri",
+          "kind": "series",
+          "platforms": [
+            "jiohotstar"
+          ],
+          "languages": [
+            "hi"
+          ],
+          "genres": [
+            "Drama",
+            "War & Politics"
+          ],
+          "releaseDate": "2026-08-15",
+          "regions": [
+            "IN"
+          ],
+          "heat": 17,
+          "synopsis": "Resilient army doctors at 108 Base Hospital, Uri, navigate personal and professional battles whilst saving lives in a conflict-torn zone.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/9C7Ih4K9ptTZlyFbjl0l2pHk1G8.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/klGL1W8xcu1irWqb3TcBXnm8VyM.jpg"
+        },
+        {
+          "id": "t-331758",
+          "title": "Bigg Boss The Common Man",
+          "kind": "reality",
+          "platforms": [
+            "jiohotstar"
+          ],
+          "languages": [
+            "ta"
+          ],
+          "genres": [
+            "Reality"
+          ],
+          "releaseDate": "2026-08-16",
+          "regions": [
+            "IN"
+          ],
+          "heat": 15,
+          "synopsis": "From ordinary lives to extraordinary drama. Aspiring contestants fight to earn a spot in the Bigg Boss house.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/bQDWORa2JTBawIStjMLzOJIMcPN.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/hnzTQjhhEo67VHneHdHTQjTPzab.jpg"
         },
         {
           "id": "m-1738070",
@@ -643,6 +741,7 @@
           "title": "Yellow Mirror",
           "kind": "film",
           "platforms": [
+            "jiohotstar",
             "disney"
           ],
           "languages": [
@@ -655,6 +754,7 @@
           ],
           "releaseDate": "2026-08-26",
           "regions": [
+            "IN",
             "US"
           ],
           "rating": 8.1,
@@ -718,6 +818,7 @@
           "title": "LEGO Disney Princess: Magical Mayhem",
           "kind": "film",
           "platforms": [
+            "jiohotstar",
             "disney"
           ],
           "languages": [
@@ -731,6 +832,7 @@
           ],
           "releaseDate": "2026-08-21",
           "regions": [
+            "IN",
             "US"
           ],
           "heat": 37,
@@ -762,6 +864,28 @@
           "synopsis": "What happened to Mica Miller? This documentary series retraces her promising life, toxic marriage and the mysterious circumstances of her death.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/o8H6HmQNt2qx5bIfmvuI6VJn13A.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/gXX5VDz1jh0Adqo8a8QPHJthiEl.jpg"
+        },
+        {
+          "id": "t-330540",
+          "title": "Dalliance",
+          "kind": "series",
+          "platforms": [
+            "paramount"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Drama"
+          ],
+          "releaseDate": "2026-08-27",
+          "regions": [
+            "US"
+          ],
+          "heat": 32,
+          "synopsis": "Billy, a former cameraman, encounters Dani on a Sydney Harbour ferry as their different worlds intersect.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/oUwy6xIffGNp94bkiqowBDM9W1S.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/8Ye9jv4Ibo5xK6GgWihsec8M94A.jpg"
         },
         {
           "id": "t-326879",
@@ -837,6 +961,7 @@
           "title": "9/11: Reunited",
           "kind": "documentary",
           "platforms": [
+            "jiohotstar",
             "disney",
             "hulu"
           ],
@@ -848,6 +973,7 @@
           ],
           "releaseDate": "2026-08-21",
           "regions": [
+            "IN",
             "US"
           ],
           "heat": 25,
@@ -883,6 +1009,7 @@
           "title": "The Girls: A Khloé Kardashian Project",
           "kind": "reality",
           "platforms": [
+            "jiohotstar",
             "hulu"
           ],
           "languages": [
@@ -893,6 +1020,7 @@
           ],
           "releaseDate": "2026-08-21",
           "regions": [
+            "IN",
             "US"
           ],
           "heat": 17,
@@ -1152,6 +1280,7 @@
           "title": "LEGO Star Wars: The Mandalorian",
           "kind": "film",
           "platforms": [
+            "jiohotstar",
             "disney"
           ],
           "languages": [
@@ -1166,12 +1295,39 @@
           ],
           "releaseDate": "2026-09-02",
           "regions": [
+            "IN",
             "US"
           ],
           "heat": 47,
           "synopsis": "The Mandalorian and Grogu join their misfit allies for an epic party, celebrating their heroism. As friends regale the crowd with tales of their adventures, a pirate threat looms.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/x3HEvYXWOW6WHqsHmg2MUVy3SLm.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/upecGaCuQOIbSpdz85mrJ395UMg.jpg"
+        },
+        {
+          "id": "m-1506560",
+          "title": "Clash of the Thundermans",
+          "kind": "film",
+          "platforms": [
+            "paramount"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "TV Movie",
+            "Family",
+            "Science Fiction",
+            "Action",
+            "Comedy"
+          ],
+          "releaseDate": "2026-09-03",
+          "regions": [
+            "US"
+          ],
+          "heat": 47,
+          "synopsis": "When Chloe develops a destructive new superpower, the Hero League orders her to an elite boarding school for superheroes to learn control of her abilities. Faced with the prospect of sending Chloe away for years, the Thundermans split apart, with Phoebe, Barb and Billy taking her into hiding. Max, Hank, and Nora track their rogue family members, until the two factions face off against each other in a full-on battle for the Thundermans’ future.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/16oqRrWVzQm6qdGfBxvziZ2UiMT.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/6yT5O0g8ZXNOm9I5IXLZonZRBgx.jpg"
         },
         {
           "id": "t-290234",
@@ -1389,6 +1545,7 @@
           "title": "The Producer",
           "kind": "series",
           "platforms": [
+            "jiohotstar",
             "hbomax"
           ],
           "languages": [
@@ -1399,6 +1556,7 @@
           ],
           "releaseDate": "2026-08-28",
           "regions": [
+            "IN",
             "US"
           ],
           "heat": 19,
@@ -1411,6 +1569,7 @@
           "title": "Welcome to the Family: The Murder of Dan Markel",
           "kind": "documentary",
           "platforms": [
+            "jiohotstar",
             "hulu"
           ],
           "languages": [
@@ -1422,12 +1581,35 @@
           ],
           "releaseDate": "2026-09-01",
           "regions": [
+            "IN",
             "US"
           ],
           "heat": 19,
           "synopsis": "How far would you go for your family? The brutal murder of a prominent law professor in Tallahassee, Florida reveals the dark secrets of a wealthy family. A series of larger-than-life suspects leads to a mind-bending story of a murder-for-hire-plot, a messy custody battle, ex-lovers – and family dentistry. With exclusive access to those at the center of this extraordinary story, many of whom have never spoken before, this is the definitive telling of a case which took 11 years to solve.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/2Do6U54cg31Y9DWWmjT69O6lFow.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/lS5LRAuxTxkLih9VYI71PdW2jIN.jpg"
+        },
+        {
+          "id": "t-330912",
+          "title": "The Varnell Hill Show",
+          "kind": "series",
+          "platforms": [
+            "paramount"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Comedy"
+          ],
+          "releaseDate": "2026-09-01",
+          "regions": [
+            "US"
+          ],
+          "heat": 18,
+          "synopsis": "Follow Varnell Hill as he fights to stay relevant in a rapidly changing entertainment landscape. Between network executives eager to modernize the show, a chaotic writers' room, celebrity guests, family drama, and his own outsized ego, Varnell quickly discovers that keeping a television empire together may be harder than building one in the first place.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/nZbQHs1WCf2H8NJ8hzR0n5LoeT6.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/tE5EU20M9fHufcLXw2I8lM1hTMu.jpg"
         },
         {
           "id": "m-1750165",
@@ -1523,6 +1705,7 @@
           "title": "正义必胜",
           "kind": "documentary",
           "platforms": [
+            "jiohotstar",
             "lionsgate"
           ],
           "languages": [
@@ -2410,6 +2593,32 @@
       "backdropUrl": "https://image.tmdb.org/t/p/w780/uTWhbLc7Bj4qNSdW3ZvZKL8cOHv.jpg"
     },
     {
+      "id": "trend-t-95350",
+      "title": "Lanterns",
+      "kind": "series",
+      "platforms": [
+        "jiohotstar"
+      ],
+      "languages": [
+        "en"
+      ],
+      "genres": [
+        "Drama",
+        "Mystery",
+        "Sci-Fi & Fantasy"
+      ],
+      "releaseDate": "2026-08-16",
+      "regions": [
+        "IN",
+        "US"
+      ],
+      "rating": 8.3,
+      "heat": 86,
+      "synopsis": "Two intergalactic cops, new recruit John Stewart and Lantern legend Hal Jordan, are drawn into a dark, Earth-based mystery as they investigate a murder in the American heartland.",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/gpC7h43xPMEV3goYMQShfJbTtLq.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w780/mdbWfpbWhvxgG3k5MHpo90UgAUe.jpg"
+    },
+    {
       "id": "trend-m-1339713",
       "title": "Obsession",
       "kind": "film",
@@ -2595,8 +2804,7 @@
       "title": "Furious",
       "kind": "series",
       "platforms": [
-        "disney",
-        "hulu"
+        "jiohotstar"
       ],
       "languages": [
         "en"
@@ -2607,6 +2815,7 @@
       ],
       "releaseDate": "2026-07-27",
       "regions": [
+        "IN",
         "US"
       ],
       "rating": 7.2,
@@ -2620,8 +2829,7 @@
       "title": "Chad Powers",
       "kind": "series",
       "platforms": [
-        "disney",
-        "hulu"
+        "jiohotstar"
       ],
       "languages": [
         "en"
@@ -2631,6 +2839,7 @@
       ],
       "releaseDate": "2025-09-30",
       "regions": [
+        "IN",
         "US"
       ],
       "rating": 8,
@@ -2640,5 +2849,5 @@
       "backdropUrl": "https://image.tmdb.org/t/p/w780/wGmJg0wHBpifiHFsC6VgAOlQTge.jpg"
     }
   ],
-  "enrichedAt": "2026-09-04T18:12:52.372Z"
+  "enrichedAt": "2026-09-04T18:18:03.350Z"
 }
