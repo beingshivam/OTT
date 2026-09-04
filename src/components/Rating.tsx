@@ -28,7 +28,13 @@ const STRONG_VOTES = 50;
 export function Rating({ release, className = '' }: { release: Release; className?: string }) {
   if (release.rating == null) return null;
 
-  const strong = release.rating >= STRONG_SCORE && (release.votes ?? 0) >= STRONG_VOTES;
+  // A missing vote count means a hand-checked curated row, not a thinly-voted
+  // one — every discovered score carries its count by construction. Reading
+  // undefined as zero demoted exactly the wrong titles: Silo at 8.2 rendered in
+  // the same grey as a 5.5, because the vote gate meant for noisy crowd scores
+  // was being applied to a score that was never a crowd score.
+  const confident = release.votes == null || release.votes >= STRONG_VOTES;
+  const strong = release.rating >= STRONG_SCORE && confident;
 
   return (
     <span

@@ -45,6 +45,22 @@ const WEEKS_AHEAD = argNum('weeks-ahead', 4);
  */
 const THEATRICAL_PAGES = 1;
 
+/**
+ * How far back a cinema listing's own release date may sit before it counts as
+ * a revival rather than a release.
+ *
+ * Asking TMDB what is in cinemas this week returns repertory screenings too — a
+ * 1999 Princess Mononoke, a 2019 Avengers: Endgame. They really are showing,
+ * but this is a calendar of what is *new*, and old films carry a decade of
+ * accumulated votes, so they walked straight to the top of the highlighted
+ * scores and pushed the week's actual releases out of view.
+ *
+ * A year is deliberately generous: a film can premiere at a festival or in one
+ * state months before it opens elsewhere, and that is a genuine release for the
+ * audience seeing it. Only the clear revivals are dropped.
+ */
+const REPERTORY_DAYS = 365;
+
 requireToken();
 
 
@@ -179,6 +195,19 @@ async function discoverTheatrical({ region, from, to, page }) {
   });
 }
 
+/** True when a cinema listing is a revival rather than this week's release. */
+function isRevival(releaseDate, weekStartIso) {
+  if (!releaseDate) return false;
+  const age = Date.parse(weekStartIso) - Date.parse(releaseDate);
+  return Number.isFinite(age) && age > REPERTORY_DAYS * DAY;
+}
+
+function withinWeek(releaseDate, from, to) {
+  if (!releaseDate) return false;
+  const t = Date.parse(releaseDate);
+  return Number.isFinite(t) && t >= Date.parse(from) && t <= Date.parse(to);
+}
+
 async function providersFor(isMovie, id, region) {
   try {
     const data = await tmdb(`/${isMovie ? 'movie' : 'tv'}/${id}/watch/providers`);
@@ -272,6 +301,8 @@ async function buildWeek(weekId, platforms, index) {
         if (!data.results?.length) break;
 
         for (const item of data.results) {
+          if (isRevival(item.release_date, from)) continue;
+
           const key = `m-${item.id}`;
           const existing = byId.get(key);
           if (existing) {
@@ -288,7 +319,13 @@ async function buildWeek(weekId, platforms, index) {
             platforms: [theatricalId],
             languages: [item.original_language].filter(Boolean),
             genres,
-            releaseDate: item.release_date ?? from,
+            // TMDB returns the film's *primary* release date, which for a
+            // staggered rollout is an earlier country's. Left as-is it put the
+            // row outside its own week, and the poster view — which buckets by
+            // day within the week — dropped it on the floor entirely: 9% of
+            // rows were invisible there. Anything outside the window is pinned
+            // to the week's Friday instead.
+            releaseDate: withinWeek(item.release_date, from, to) ? item.release_date : from,
             regions: [region],
             rating: item.vote_count >= MIN_VOTES ? Number(item.vote_average?.toFixed(1)) : undefined,
         votes: item.vote_count || undefined,
