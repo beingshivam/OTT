@@ -24,6 +24,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { BRAND, HEADLINE } from './brand.mjs';
+import { ANALYTICS_TOKEN } from './config.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const HTML = resolve(ROOT, 'dist/index.html');
@@ -192,6 +193,19 @@ let out = html
   .replace(/<meta\s+property="og:title"[\s\S]*?\/>/, `<meta property="og:title" content="${esc(title)}" />`)
   .replace(/<meta\s+property="og:description"[\s\S]*?\/>/, `<meta property="og:description" content="${esc(description)}" />`);
 
+/**
+ * Cloudflare Web Analytics, when a token is configured.
+ *
+ * Injected at build time rather than added by the app at runtime so it keeps
+ * its `defer` and does not wait on React to mount — a beacon that only fires
+ * after hydration misses the visitors who bounce, which are exactly the ones
+ * worth counting. No token means no script at all: an empty beacon would
+ * silently report nothing while looking like it worked.
+ */
+const analytics = ANALYTICS_TOKEN
+  ? `    <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"${ANALYTICS_TOKEN}"}'></script>\n`
+  : '';
+
 const head = `    <link rel="canonical" href="${SITE_URL}/" />
     <meta property="og:url" content="${SITE_URL}/" />
     <meta property="og:site_name" content="${esc(BRAND)}" />
@@ -206,14 +220,28 @@ const head = `    <link rel="canonical" href="${SITE_URL}/" />
       .seo-fallback ul { margin: 0; padding-left: 18px; line-height: 1.7; }
     </style>
     <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
-`;
+${analytics}`;
 out = out.replace('</head>', `${head}  </head>`);
 out = out.replace('<div id="root"></div>', `<div id="root">${prerendered}</div>`);
 
 await writeFile(HTML, out);
 
-// A sitemap that lists the weeks actually carried, not just the root.
-const urls = [`${SITE_URL}/`, ...feed.weeks.filter((w) => w.releases.length).map((w) => `${SITE_URL}/?w=${w.id}`)];
+/**
+ * The sitemap lists what actually exists, which today is one page.
+ *
+ * It used to advertise a URL per week. Every one of them served this same file:
+ * the SPA fallback returns index.html for any path, only the current week is
+ * prerendered into it, and the canonical on it points back at the root. So a
+ * crawler was offered seven URLs, found one document behind them, and had six
+ * entries' worth of reason to trust the sitemap less.
+ *
+ * Advertising pages that do not exist is worse than advertising none. Listing
+ * only the root is honest; making the other weeks real pages — their own path,
+ * their own prerendered content, their own canonical — is the work that would
+ * earn those entries back, and it needs the app to route on the path rather
+ * than a query string first.
+ */
+const urls = [`${SITE_URL}/`];
 const sitemap =
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
   urls

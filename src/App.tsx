@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Board } from './components/Board';
 import { Controls } from './components/Controls';
 import { DetailSheet } from './components/DetailSheet';
+import { EmailSignup } from './components/EmailSignup';
 import { ReleaseCard } from './components/ReleaseCard';
 import { ShareWeek } from './components/ShareWeek';
 import { TrendingStrip, normalise } from './components/TrendingStrip';
@@ -498,6 +499,7 @@ export default function App() {
               <IconCalendar />
               Remind me every Friday
             </button>
+            <EmailSignup />
           </div>
           <div className="footer__stack">
             <span>Refreshes {refreshDaysLabel()}</span>
