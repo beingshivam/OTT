@@ -37,32 +37,70 @@ const SITE = (process.env.SITE_URL ?? 'https://newonott.in')
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 /**
- * The line, and its alternates.
+ * The lines.
  *
- * `hi` is the word that takes the gradient — the one the eye lands on. Keeping
- * it separate from the rest of the line means the emphasis is a decision rather
- * than a guess about where the ramp happens to fall.
+ * `head` is one entry per rendered row, so every break is a decision. Left to
+ * wrap on its own the first line came out "OTT ka / Google aa / gaya." — a
+ * phrase split across rows, which reads as a typesetting accident rather than
+ * a choice.
  *
- * 1 is the default and leans on a brand everyone knows to explain the category
- * in one beat. 2 says the same thing without naming anyone else's product,
- * which is the version to use if leaning on Google ever feels like the wrong
- * borrow. 3 leads with the question people actually ask out loud, which tests
- * differently — worth trying once the first has run.
+ * *Asterisks* mark the words that take the gradient. Naming them beats letting
+ * the ramp fall where it happens to land, and it keeps emphasis independent of
+ * where the row breaks are.
+ *
+ *   1  leans on a brand everyone knows to explain the category in one beat
+ *   2  says the same without naming another company's product
+ *   3  leads with the question people actually ask out loud
+ *   4  the "…hai na" cadence — Indian advertising's oldest reassurance, and it
+ *      works here because the product really is the thing you fall back on.
+ *      Its sub-line names the five apps the headline counts, so the claim is
+ *      specific instead of a round number nobody checks.
  */
 const LINES = {
-  1: { before: 'OTT ka', hi: 'Google', after: 'aa gaya.', sub: 'Har platform. Har nayi release. Ek hi page.' },
-  2: { before: 'Sab OTT.', hi: 'Ek page.', after: 'Bas.', sub: 'Har Friday, har nayi release — ek hi jagah.' },
-  3: { before: 'Aaj kya', hi: 'dekhein?', after: '', sub: 'Har platform ki nayi release, ek hi page pe.' },
+  1: {
+    head: ['OTT ka', '*Google*', 'aa gaya.'],
+    sub: 'Har platform. Har nayi release. Ek hi page.',
+  },
+  2: {
+    head: ['Sab OTT.', '*Ek page.*', 'Bas.'],
+    sub: 'Har Friday, har nayi release — ek hi jagah.',
+  },
+  3: {
+    head: ['Aaj kya', '*dekhein?*'],
+    sub: 'Har platform ki nayi release, ek hi page pe.',
+  },
+  4: {
+    head: ['Ab 5 app pe', 'scroll karna band.', '*newonott* hai na.'],
+    sub: 'Netflix, Prime, JioHotstar, Apple TV+, ZEE5 — sab ek hi page pe.',
+    body: `Netflix kholo — kuch nahi. Prime kholo — kuch nahi. JioHotstar, ZEE5, phir wapas Netflix. Bees minute nikal gaye, dekha kuch bhi nahi.
+
+Isliye sab ek page pe daal diya. Har platform ki nayi release, theatres ki bhi, sorted by what people are actually talking about.`,
+  },
 };
-const line = LINES[process.env.LINE ?? '1'];
+
+const which = process.env.LINE ?? '1';
+const line = LINES[which];
 if (!line) {
   console.error(`LINE must be one of: ${Object.keys(LINES).join(', ')}`);
   process.exit(1);
 }
 
-/** The headline is three short words, so it can run very large — and it should.
- *  A forwarded image is read at thumbnail size before it is opened, and the
- *  line has to survive that. */
+/** Named per line, so rendering a new one does not quietly destroy the last —
+ *  these are posted over weeks, not all at once. */
+const png = `hook-${which}.png`;
+const txt = `hook-${which}-caption.txt`;
+
+/** Escape first, then turn the *markers* into gradient spans — the other order
+ *  would let a stray asterisk in copy inject markup. */
+const emphasise = (row) => esc(row).replace(/\*([^*]+)\*/g, '<em>$1</em>');
+const headline = line.head.join(' ').replace(/\*/g, '');
+
+/** The headline runs as large as it will go, because a forwarded image is read
+ *  at thumbnail size before anyone opens it. HEAD_MAX is a starting point, not
+ *  a setting — see the fit pass after the render. */
+const HEAD_MAX = 132;
+const HEAD_MIN = 62;
+
 const html = `<!doctype html><meta charset="utf-8">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -89,8 +127,13 @@ const html = `<!doctype html><meta charset="utf-8">
 
   /* margin-top:auto pushes the block off the wordmark and lets the line sit
      optically centred, with the footer holding the bottom. */
-  h1 { position:relative; margin-top:auto; font-size:132px; line-height:.98;
+  h1 { position:relative; margin-top:auto; font-size:${HEAD_MAX}px; line-height:.98;
        font-weight:900; letter-spacing:-.055em; }
+  /* Each row is its own block and never wraps, so the fit pass can measure the
+     widest one and shrink the whole headline until it fits. Without nowrap a
+     too-long row would silently re-wrap and reintroduce the accidental breaks
+     the explicit rows exist to prevent. */
+  h1 span { display:block; white-space:nowrap; }
   /* Warm the whole way across. Clipped to a short word, a ramp that passes
      through blue desaturates mid-letter and reads as a broken render. */
   em { font-style:normal;
@@ -109,15 +152,7 @@ const html = `<!doctype html><meta charset="utf-8">
   <span class="mark"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
   <span class="brand">${esc(BRAND)}</span>
 </div>
-<!-- One part per line, every break explicit. Left to wrap on its own the
-     default line came out "OTT ka / Google aa / gaya.", which splits a phrase
-     across lines and reads as a typesetting accident. Breaking on the parts
-     also leaves the gradient word alone on its line, which is where the eye
-     should land anyway. -->
-<h1>${[line.before, `<em>${esc(line.hi)}</em>`, line.after]
-  .filter(Boolean)
-  .map((part) => (part.startsWith('<em>') ? part : esc(part)))
-  .join('<br>')}</h1>
+<h1>${line.head.map((row) => `<span>${emphasise(row)}</span>`).join('')}</h1>
 <p>${esc(line.sub)}</p>
 <div class="foot">
   <div class="url">${esc(SITE)}</div>
@@ -125,6 +160,7 @@ const html = `<!doctype html><meta charset="utf-8">
 </div>`;
 
 await mkdir(OUT, { recursive: true });
+let fitted = HEAD_MAX;
 const browser = await launchChromium('hook');
 try {
   const p = await browser.newPage({ viewport: { width: 1080, height: 1350 }, deviceScaleFactor: 1 });
@@ -132,23 +168,58 @@ try {
   // Webfonts can resolve after networkidle; without this the line renders in a
   // fallback face and the whole thing looks like a draft.
   await p.evaluate(() => document.fonts.ready);
-  await writeFile(resolve(OUT, 'hook.png'), await p.screenshot({ type: 'png' }));
+
+  /**
+   * Shrink the headline until the longest row fits.
+   *
+   * A fixed size only works while every line is about as short as the first
+   * one. "Ab 5 app pe / scroll karna band. / newonott hai na." is twice as
+   * wide, and at a hardcoded 132px its middle row ran off the canvas — where
+   * it would have been noticed after posting, not before. Measuring is the
+   * only version of this that stays correct for a line nobody has written yet.
+   *
+   * Done here rather than with CSS because there is no CSS for "as large as
+   * fits", and a viewport-unit guess is the same hardcoded number wearing a
+   * different hat.
+   */
+  fitted = await p.evaluate(
+    ([max, min]) => {
+      const h1 = document.querySelector('h1');
+      const rows = [...h1.querySelectorAll('span')];
+      const limit = h1.clientWidth;
+      let size = max;
+      // 2px steps: finer than the eye can tell at this scale, and it caps the
+      // loop at ~35 iterations.
+      while (size > min && rows.some((r) => r.scrollWidth > limit)) {
+        size -= 2;
+        h1.style.fontSize = `${size}px`;
+      }
+      return size;
+    },
+    [HEAD_MAX, HEAD_MIN],
+  );
+
+  await writeFile(resolve(OUT, png), await p.screenshot({ type: 'png' }));
 } finally {
   await browser.close();
 }
 
-const headline = [line.before, line.hi, line.after].filter(Boolean).join(' ');
-console.log(`  hook.png  1080x1350  "${headline}"`);
+console.log(`  ${png}  1080x1350  ${fitted}px  "${headline}"`);
+if (fitted === HEAD_MIN) {
+  console.warn(`  ⚠  headline hit the ${HEAD_MIN}px floor — it may still overflow. Shorten a row.`);
+}
 
 /**
  * The caption stays Hinglish too. Switching to English under a Hinglish image
  * reads as a translation of the joke, which kills it.
  */
+const DEFAULT_BODY = `Har hafte 100+ nayi releases aati hain — Netflix, Prime Video, JioHotstar, Apple TV+, SonyLIV, ZEE5 aur baaki sab pe. Dhoondhne mein jitna time jaata hai, utne mein aadhi movie khatam.
+
+Isliye sab kuch ek page pe daal diya. Theatres ki releases bhi. Sorted by what people are actually talking about.`;
+
 const caption = `${headline}
 
-Har hafte 100+ nayi releases aati hain — Netflix, Prime Video, JioHotstar, Apple TV+, SonyLIV, ZEE5 aur baaki sab pe. Dhoondhne mein jitna time jaata hai, utne mein aadhi movie khatam.
-
-Isliye sab kuch ek page pe daal diya. Theatres ki releases bhi. Sorted by what people are actually talking about.
+${line.body ?? DEFAULT_BODY}
 
 No app. No login. Har Friday update. Free.
 
@@ -157,6 +228,6 @@ No app. No login. Har Friday update. Free.
 #NewOnOTT #OTTIndia #OTTReleases #KyaDekhein #WhatToWatch #StreamingIndia
 #Netflix #PrimeVideo #JioHotstar #Bollywood #TamilCinema #TeluguCinema #MalayalamCinema
 `;
-await writeFile(resolve(OUT, 'hook-caption.txt'), caption);
+await writeFile(resolve(OUT, txt), caption);
 
-console.log(`\nWritten to social/ — hook.png, hook-caption.txt`);
+console.log(`\nWritten to social/ — ${png}, ${txt}`);
