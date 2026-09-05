@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Board } from './components/Board';
+import { BrowseLinks } from './components/BrowseLinks';
 import { Controls } from './components/Controls';
 import { DetailSheet } from './components/DetailSheet';
 import { EmailSignup } from './components/EmailSignup';
@@ -30,6 +31,7 @@ import { weeklyReminder } from './lib/reminder';
 import { nextRefreshLabel, refreshDaysLabel, relativeTime } from './lib/freshness';
 import { suggestions } from './lib/suggest';
 import { useKeyboard } from './lib/useKeyboard';
+import { routeFilters } from './lib/route';
 import { readFilters, writeFilters } from './lib/urlState';
 import {
   addDays,
@@ -54,13 +56,23 @@ export default function App() {
   const today = useMemo(() => new Date(), []);
   const currentWeek = useMemo(() => weekIdFor(today), [today]);
 
+  /**
+   * What the path already says: /netflix, /tamil, /w/<date>. Null on "/", which
+   * is every visit the site had before these pages existed — so the homepage
+   * takes exactly the code path it always did.
+   */
+  const route = useMemo(() => routeFilters(window.location.pathname), []);
+
   const [filters, setFilters] = useState<Filters>(() =>
-    readFilters({ weekId: weekIdFor(new Date()), region: 'IN' }),
+    readFilters({ weekId: weekIdFor(new Date()), region: 'IN' }, route),
   );
   // A week the reader actually asked for — via the arrows, or an inbound ?w —
   // is worth keeping in the URL. The landing auto-jump is not.
+  // A /w/<date> page is as explicit as ?w= — the reader asked for that week by
+  // clicking a search result for it. Without this, stepping to the next week
+  // from an archive page would not reach the URL at all.
   const [weekPinned, setWeekPinned] = useState(
-    () => new URLSearchParams(window.location.search).has('w'),
+    () => new URLSearchParams(window.location.search).has('w') || Boolean(route?.weekId),
   );
   // Same distinction for the region: an inbound ?r, or a deliberate switch, is
   // the reader's choice and belongs in every link they copy from here. The
@@ -110,7 +122,12 @@ export default function App() {
         // Never land someone on an empty page. If the live week hasn't been
         // pulled yet — early in the week, or a stale feed — open the closest
         // week that actually has releases. An explicit ?w= always wins.
-        const pinned = new URLSearchParams(window.location.search).get('w');
+        // An explicitly requested week always wins — from ?w=, and equally from
+        // a /w/<date> page, whose whole purpose is to show that one week. This
+        // check used to read the query string only, so an archive page would
+        // silently bounce the reader to the nearest stocked week and render
+        // something other than what its own title promised.
+        const pinned = new URLSearchParams(window.location.search).get('w') ?? route?.weekId;
         if (pinned) return;
         const stocked = loaded.weeks.filter((w) => w.releases.length > 0);
         if (!stocked.length) return;
@@ -128,15 +145,16 @@ export default function App() {
         if ((e as Error).name !== 'AbortError') setError((e as Error).message);
       });
     return () => controller.abort();
-  }, []);
+  }, [route]);
 
   useEffect(() => {
     writeFilters(
       filters,
       { weekId: currentWeek, region: prefs.region },
       { week: weekPinned, region: regionPinned },
+      route,
     );
-  }, [filters, currentWeek, prefs.region, weekPinned, regionPinned]);
+  }, [filters, currentWeek, prefs.region, weekPinned, regionPinned, route]);
 
   const update = useCallback((next: Partial<Filters>) => {
     setFilters((f) => ({ ...f, ...next }));
@@ -499,6 +517,10 @@ export default function App() {
             </span>
           </p>
         )}
+
+        {/* Above the footer proper: the crawlable, clickable route to every
+            other page on the site. See components/BrowseLinks.tsx. */}
+        <BrowseLinks feed={feed} region={filters.region} />
 
         <footer className="footer">
           <div className="footer__stack">

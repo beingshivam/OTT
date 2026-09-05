@@ -21,7 +21,7 @@
  */
 
 import { execSync } from 'node:child_process';
-import { readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { BRAND, HEADLINE, INSTAGRAM_URL } from './brand.mjs';
@@ -75,6 +75,16 @@ const languageName = new Map(
     ([, code, name]) => [code, name],
   ),
 );
+/** The full rows, not just names: the per-platform pages need to know which
+ *  regions a platform serves so an India page never links to a US-only one. */
+const PLATFORM_ROWS = [
+  ...registry.matchAll(/\{\s*id:\s*'([^']+)',\s*name:\s*'([^']+)'[\s\S]*?regions:\s*\[([^\]]*)\]/g),
+].map(([, id, name, regions]) => ({
+  id,
+  name,
+  regions: regions.split(',').map((x) => x.trim().replace(/'/g, '')).filter(Boolean),
+}));
+
 const KIND = { film: 'Film', series: 'Series', documentary: 'Documentary', reality: 'Reality', anime: 'Anime', special: 'Special' };
 const pname = (id) => platformName.get(id) ?? id;
 const lname = (code) => languageName.get(code) ?? code.toUpperCase();
@@ -119,109 +129,60 @@ const description =
   `${rows.length} releases across ${platforms.length} platforms including ` +
   `${topPlatforms.join(', ')}. Updated twice a week. No login.`;
 
-// --- content for crawlers that do not run JS -------------------------------
-const byPlatform = new Map();
-for (const r of rows) {
-  for (const id of r.platforms) {
-    if (!byPlatform.has(id)) byPlatform.set(id, []);
-    byPlatform.get(id).push(r);
+// --- what every page is built from ------------------------------------------
+
+/**
+ * Rows grouped into <section>s, which is the whole of the crawlable content.
+ *
+ * The homepage and the week pages group by platform ("what is on Netflix this
+ * week"); the platform and language pages group by week ("what has Netflix had
+ * lately"). Same rows, different question, which is the point — pages that
+ * merely reshuffle the same list are the thin programmatic content Google
+ * demotes, and each of these answers something the others do not.
+ */
+function sectionsBy(rows, key) {
+  const groups = new Map();
+  for (const r of rows) {
+    for (const g of key(r)) {
+      if (!groups.has(g)) groups.set(g, []);
+      groups.get(g).push(r);
+    }
   }
+  return groups;
 }
 
-const sections = [...byPlatform.entries()]
-  .sort((a, b) => b[1].length - a[1].length)
-  .map(([id, list]) => {
-    const items = list
-      .map(
-        (r) =>
-          `<li>${esc(r.title)} — ${esc(KIND[r.kind] ?? r.kind)}` +
-          `${r.languages?.length ? ` · ${esc(r.languages.map(lname).join(', '))}` : ''}` +
-          `${r.genres?.length ? ` · ${esc(r.genres.slice(0, 2).join(', '))}` : ''}</li>`,
-      )
-      .join('');
-    return `<section><h2>${esc(pname(id))}</h2><ul>${items}</ul></section>`;
-  })
-  .join('');
+const rowMarkup = (r) =>
+  `<li>${esc(r.title)} — ${esc(KIND[r.kind] ?? r.kind)}` +
+  `${r.languages?.length ? ` · ${esc(r.languages.map(lname).join(', '))}` : ''}` +
+  `${r.genres?.length ? ` · ${esc(r.genres.slice(0, 2).join(', '))}` : ''}</li>`;
+
+const sectionMarkup = (groups, heading) =>
+  [...groups.entries()]
+    .map(([g, list]) => `<section><h2>${esc(heading(g))}</h2><ul>${list.map(rowMarkup).join('')}</ul></section>`)
+    .join('');
 
 /**
- * React replaces this on mount, but on a slow connection it is on screen for a
- * moment first — so it gets enough styling to read as the page loading rather
- * than as a broken one. Deliberately visible, not hidden: text a crawler can see
- * and a visitor cannot is cloaking, and it is the honest version that ranks.
- */
-const prerendered =
-  `<main class="seo-fallback"><h1>New releases this week — ${esc(range)}</h1>` +
-  `<p>${esc(rows.length)} releases across ${esc(platforms.length)} platforms.</p>` +
-  sections +
-  `</main>`;
-
-// --- structured data --------------------------------------------------------
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@graph': [
-    {
-      '@type': 'WebSite',
-      name: BRAND,
-      url: `${SITE_URL}/`,
-      description: 'Every new release, every platform, one page.',
-      /**
-       * Tells search engines the site and the Instagram account are the same
-       * thing rather than two unrelated results that happen to share a name.
-       * It is the one piece of real SEO value in having a handle at all: on a
-       * new domain with no inbound links, an established profile is corroborating
-       * evidence that something is behind the site.
-       */
-      sameAs: [INSTAGRAM_URL],
-    },
-    {
-      '@type': 'ItemList',
-      name: `New releases ${range}`,
-      numberOfItems: rows.length,
-      itemListElement: rows.slice(0, 50).map((r, i) => ({
-        '@type': 'ListItem',
-        position: i + 1,
-        item: {
-          '@type': r.kind === 'series' ? 'TVSeries' : 'Movie',
-          name: r.title,
-          datePublished: r.releaseDate,
-          ...(r.genres?.length ? { genre: r.genres } : {}),
-          ...(r.posterUrl ? { image: r.posterUrl } : {}),
-          ...(r.synopsis ? { description: r.synopsis } : {}),
-        },
-      })),
-    },
-  ],
-};
-
-let out = html
-  .replace(/<title>[\s\S]*?<\/title>/, `<title>${esc(title)}</title>`)
-  .replace(/<meta\s+name="description"[\s\S]*?\/>/, `<meta name="description" content="${esc(description)}" />`)
-  .replace(/<meta\s+property="og:title"[\s\S]*?\/>/, `<meta property="og:title" content="${esc(title)}" />`)
-  .replace(/<meta\s+property="og:description"[\s\S]*?\/>/, `<meta property="og:description" content="${esc(description)}" />`);
-
-/**
- * Cloudflare Web Analytics, when a token is configured.
+ * The same links the app renders in its footer (components/BrowseLinks.tsx).
  *
- * Injected at build time rather than added by the app at runtime so it keeps
- * its `defer` and does not wait on React to mount — a beacon that only fires
- * after hydration misses the visitors who bounce, which are exactly the ones
- * worth counting. No token means no script at all: an empty beacon would
- * silently report nothing while looking like it worked.
+ * A page nothing links to is invisible to a crawler no matter what the sitemap
+ * claims, and these are the only route between them. Repeated here so they are
+ * present before React mounts — and repeated *identically*, because markup shown
+ * to a crawler that a person never sees is cloaking.
  */
-/**
- * Which commit this page was built from.
- *
- * The site deploys itself on every push, which makes "is the fix live yet?" a
- * question that comes up constantly and has no good answer from the outside —
- * you end up inferring it from whether some visual change appears, and a build
- * that silently didn't run looks identical to one that did. Two pushes six
- * minutes apart is all it takes to be looking at the older one.
- *
- * So the page says. Cloudflare and GitHub both put the commit in the build
- * environment; falling back to asking git covers a local build, and 'unknown'
- * covers a tarball with no git at all — this must never be the thing that
- * breaks a deploy.
- */
+function browseMarkup(pages) {
+  const group = (label, list) =>
+    `<section><h2>${esc(label)}</h2><ul>` +
+    list.map((pg) => `<li><a href="/${pg.path}">${esc(pg.linkText)}</a></li>`).join('') +
+    `</ul></section>`;
+  return (
+    `<nav>` +
+    group('By platform', pages.filter((p) => p.group === 'platform')) +
+    group('By language', pages.filter((p) => p.group === 'language')) +
+    group('By week', pages.filter((p) => p.group === 'week')) +
+    `</nav>`
+  );
+}
+
 const buildSha =
   process.env.WORKERS_CI_COMMIT_SHA ??
   process.env.CF_PAGES_COMMIT_SHA ??
@@ -240,50 +201,259 @@ const buildMeta =
   `    <meta name="build-commit" content="${esc(buildSha.slice(0, 12))}" />\n` +
   `    <meta name="build-time" content="${new Date().toISOString()}" />\n`;
 
+/**
+ * Cloudflare Web Analytics, when a token is configured. Injected at build time
+ * rather than by the app so it keeps its `defer` and does not wait on React —
+ * a beacon that only fires after hydration misses the visitors who bounce,
+ * which are exactly the ones worth counting.
+ */
 const analytics = ANALYTICS_TOKEN
   ? `    <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"${ANALYTICS_TOKEN}"}'></script>\n`
   : '';
 
-const head = `    <link rel="canonical" href="${SITE_URL}/" />
-    <meta property="og:url" content="${SITE_URL}/" />
-    <meta property="og:site_name" content="${esc(BRAND)}" />
-    <meta property="og:image" content="${SITE_URL}/og.png" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta name="twitter:image" content="${SITE_URL}/og.png" />
-    <style>
+const FALLBACK_CSS = `    <style>
       .seo-fallback { max-width: 1180px; margin: 0 auto; padding: 32px 20px; color: #8d94a4; }
       .seo-fallback h1 { color: #f2f4f9; font-size: 28px; margin: 0 0 4px; }
       .seo-fallback h2 { color: #b6bdcc; font-size: 15px; margin: 24px 0 6px; }
       .seo-fallback ul { margin: 0; padding-left: 18px; line-height: 1.7; }
+      .seo-fallback a { color: #b6bdcc; }
     </style>
-    <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
-${buildMeta}${analytics}`;
-out = out.replace('</head>', `${head}  </head>`);
-out = out.replace('<div id="root"></div>', `<div id="root">${prerendered}</div>`);
-
-await writeFile(HTML, out);
+`;
 
 /**
- * The sitemap lists what actually exists, which today is one page.
+ * Turn one page definition into a file.
  *
- * It used to advertise a URL per week. Every one of them served this same file:
- * the SPA fallback returns index.html for any path, only the current week is
- * prerendered into it, and the canonical on it points back at the root. So a
- * crawler was offered seven URLs, found one document behind them, and had six
- * entries' worth of reason to trust the sitemap less.
- *
- * Advertising pages that do not exist is worse than advertising none. Listing
- * only the root is honest; making the other weeks real pages — their own path,
- * their own prerendered content, their own canonical — is the work that would
- * earn those entries back, and it needs the app to route on the path rather
- * than a query string first.
+ * Every page is the same built bundle with a different head and a different
+ * prerendered body — no router, no server. Cloudflare serves /netflix from
+ * dist/netflix/index.html, and the app reads the path on mount (lib/route.ts)
+ * so what renders matches what the page promised.
  */
-const urls = [`${SITE_URL}/`];
+async function renderPage(page, pages) {
+  const canonical = `${SITE_URL}/${page.path}`;
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebSite',
+        name: BRAND,
+        url: `${SITE_URL}/`,
+        description: 'Every new release, every platform, one page.',
+        sameAs: [INSTAGRAM_URL],
+      },
+      // Breadcrumbs on the child pages only. A crumb trail on the homepage is
+      // a trail of one, which tells a crawler nothing it did not have.
+      ...(page.path
+        ? [
+            {
+              '@type': 'BreadcrumbList',
+              itemListElement: [
+                { '@type': 'ListItem', position: 1, name: BRAND, item: `${SITE_URL}/` },
+                { '@type': 'ListItem', position: 2, name: page.crumb, item: canonical },
+              ],
+            },
+          ]
+        : []),
+      {
+        '@type': 'ItemList',
+        name: page.h1,
+        numberOfItems: page.rows.length,
+        itemListElement: page.rows.slice(0, 50).map((r, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          item: {
+            '@type': r.kind === 'series' ? 'TVSeries' : 'Movie',
+            name: r.title,
+            datePublished: r.releaseDate,
+            ...(r.genres?.length ? { genre: r.genres } : {}),
+            ...(r.posterUrl ? { image: r.posterUrl } : {}),
+            ...(r.synopsis ? { description: r.synopsis } : {}),
+          },
+        })),
+      },
+    ],
+  };
+
+  const head =
+    `    <link rel="canonical" href="${canonical}" />\n` +
+    `    <meta property="og:url" content="${canonical}" />\n` +
+    `    <meta property="og:site_name" content="${esc(BRAND)}" />\n` +
+    `    <meta property="og:image" content="${SITE_URL}/og.png" />\n` +
+    `    <meta property="og:image:width" content="1200" />\n` +
+    `    <meta property="og:image:height" content="630" />\n` +
+    `    <meta name="twitter:image" content="${SITE_URL}/og.png" />\n` +
+    FALLBACK_CSS +
+    `    <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>\n` +
+    buildMeta +
+    analytics;
+
+  /**
+   * React replaces this on mount, but on a slow connection it is on screen for
+   * a moment first — so it gets enough styling to read as the page loading
+   * rather than a broken one. Deliberately visible, not hidden: text a crawler
+   * can see and a visitor cannot is cloaking, and the honest version is what
+   * ranks.
+   */
+  const prerendered =
+    `<main class="seo-fallback"><h1>${esc(page.h1)}</h1>` +
+    `<p>${esc(page.lede)}</p>` +
+    page.body +
+    browseMarkup(pages) +
+    `</main>`;
+
+  const out = html
+    .replace(/<title>[\s\S]*?<\/title>/, `<title>${esc(page.title)}</title>`)
+    .replace(/<meta\s+name="description"[\s\S]*?\/>/, `<meta name="description" content="${esc(page.description)}" />`)
+    .replace(/<meta\s+property="og:title"[\s\S]*?\/>/, `<meta property="og:title" content="${esc(page.title)}" />`)
+    .replace(/<meta\s+property="og:description"[\s\S]*?\/>/, `<meta property="og:description" content="${esc(page.description)}" />`)
+    .replace('</head>', `${head}  </head>`)
+    .replace('<div id="root"></div>', `<div id="root">${prerendered}</div>`);
+
+  const dir = page.path ? resolve(ROOT, 'dist', page.path) : resolve(ROOT, 'dist');
+  await mkdir(dir, { recursive: true });
+  await writeFile(resolve(dir, 'index.html'), out);
+}
+
+// --- the page set -----------------------------------------------------------
+
+const REGION = 'IN';
+
+/** Read from the app rather than repeated, so the links it renders and the
+ *  pages this writes cannot disagree. See lib/route.ts for why it exists. */
+const routeSrc = await readFile(resolve(ROOT, 'src/lib/route.ts'), 'utf8');
+const MIN_PAGE_ROWS = Number(
+  (routeSrc.match(/export const MIN_PAGE_ROWS\s*=\s*(\d+)/) ?? [])[1] ??
+    (() => {
+      throw new Error('src/lib/route.ts no longer exports MIN_PAGE_ROWS.');
+    })(),
+);
+const stockedWeeks = feed.weeks.filter((w) => w.releases.some((r) => r.regions.includes(REGION)));
+/** Stamped with their week on the way out: a release row carries no week id of
+ *  its own, and the platform and language pages group by week. */
+const everything = stockedWeeks.flatMap((w) =>
+  w.releases.filter((r) => r.regions.includes(REGION)).map((r) => ({ ...r, weekId: w.id })),
+);
+
+const weekRangeOf = (id) => formatRange(id);
+const platformsPresent = PLATFORM_ROWS.filter(
+  (p) =>
+    p.regions.includes(REGION) &&
+    everything.filter((r) => r.platforms.includes(p.id)).length >= MIN_PAGE_ROWS,
+);
+const languagesPresent = [...languageName].filter(
+  ([code]) => everything.filter((r) => (r.languages ?? []).includes(code)).length >= MIN_PAGE_ROWS,
+);
+
+const pages = [];
+
+/** The homepage: this week, grouped by platform. Unchanged in substance. */
+pages.push({
+  path: '',
+  group: 'root',
+  crumb: BRAND,
+  rows,
+  title,
+  description,
+  h1: `New releases this week — ${range}`,
+  lede: `${rows.length} releases across ${platforms.length} platforms.`,
+  body: sectionMarkup(sectionsBy(rows, (r) => r.platforms), pname),
+});
+
+for (const p of platformsPresent) {
+  const list = everything.filter((r) => r.platforms.includes(p.id));
+  const theatres = p.id === 'theatres';
+  pages.push({
+    path: p.id,
+    group: 'platform',
+    crumb: p.name,
+    linkText: theatres ? 'In cinemas' : `New on ${p.name}`,
+    rows: list,
+    title: theatres
+      ? `New movies in cinemas this week in India — ${BRAND}`
+      : `New on ${p.name} India — every new release, updated weekly`,
+    description: theatres
+      ? `Every film opening in Indian cinemas this week and the weeks around it. ${list.length} titles, updated every Friday. No login.`
+      : `Everything new on ${p.name} in India — ${list.length} films, series and shows across ${stockedWeeks.length} weeks, updated every Friday. No app, no login.`,
+    h1: theatres ? 'New in cinemas' : `New on ${p.name}`,
+    lede: `${list.length} releases across ${stockedWeeks.length} weeks, updated every Friday.`,
+    body: sectionMarkup(sectionsBy(list, (r) => [r.weekId]), weekRangeOf),
+  });
+}
+
+for (const [code, name] of languagesPresent) {
+  const list = everything.filter((r) => (r.languages ?? []).includes(code));
+  pages.push({
+    path: name.toLowerCase(),
+    group: 'language',
+    crumb: name,
+    linkText: `New ${name} releases`,
+    rows: list,
+    title: `New ${name} movies and series — every OTT platform, updated weekly`,
+    description: `Every new ${name} film, series and show across streaming platforms and cinemas — ${list.length} titles, updated every Friday. No app, no login.`,
+    h1: `New ${name} releases`,
+    lede: `${list.length} ${name} titles across every platform and cinemas, updated every Friday.`,
+    body: sectionMarkup(sectionsBy(list, (r) => [r.weekId]), weekRangeOf),
+  });
+}
+
+/**
+ * One page per week, newest first.
+ *
+ * These are the entries that compound. The homepage churns — every Friday its
+ * content is replaced and the previous week is gone — so nothing the site
+ * publishes accumulates. An archive page keeps it: a permanent URL for "what
+ * came out the week of X", one more of them every Friday, forever.
+ */
+for (const w of [...stockedWeeks].sort((a, b) => b.id.localeCompare(a.id))) {
+  const list = w.releases.filter((r) => r.regions.includes(REGION));
+  const wRange = formatRange(w.id);
+  pages.push({
+    path: `w/${w.id}`,
+    group: 'week',
+    crumb: wRange,
+    linkText: wRange,
+    rows: list,
+    title: `New OTT releases ${wRange} — every platform, plus cinemas`,
+    description: `Everything released ${wRange}: ${list.length} films, series and shows across ${new Set(list.flatMap((r) => r.platforms)).size} platforms and Indian cinemas.`,
+    h1: `New releases — ${wRange}`,
+    lede: `${list.length} releases across ${new Set(list.flatMap((r) => r.platforms)).size} platforms.`,
+    body: sectionMarkup(sectionsBy(list, (r) => r.platforms), pname),
+  });
+}
+
+/**
+ * Two pages may never claim the same path.
+ *
+ * Platform ids and language names are both flat slugs, which keeps the URLs
+ * clean and means a future platform called "Hindi" — or a language whose name
+ * matches a platform id — would silently overwrite one page with the other and
+ * leave a link pointing at the wrong content. Cheaper to fail the build.
+ */
+const seen = new Set();
+for (const pg of pages) {
+  if (seen.has(pg.path)) throw new Error(`Two pages both claim /${pg.path}`);
+  seen.add(pg.path);
+}
+
+for (const pg of pages) await renderPage(pg, pages);
+
+/**
+ * The sitemap now lists pages that genuinely exist.
+ *
+ * It used to advertise a URL per week when every one of them served the same
+ * document — a crawler was offered seven URLs, found one behind them, and had
+ * six entries' worth of reason to trust the file less. Each entry here has its
+ * own path, its own prerendered content and its own canonical.
+ */
+const lastmod = feed.generatedAt.slice(0, 10);
 const sitemap =
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
-  urls
-    .map((u) => `  <url><loc>${esc(u)}</loc><lastmod>${feed.generatedAt.slice(0, 10)}</lastmod><changefreq>weekly</changefreq></url>`)
+  pages
+    .map(
+      (pg) =>
+        `  <url><loc>${esc(`${SITE_URL}/${pg.path}`)}</loc><lastmod>${lastmod}</lastmod>` +
+        `<changefreq>weekly</changefreq><priority>${pg.path === '' ? '1.0' : pg.group === 'week' ? '0.5' : '0.8'}</priority></url>`,
+    )
     .join('\n') +
   `\n</urlset>\n`;
 await writeFile(resolve(ROOT, 'dist/sitemap.xml'), sitemap);
@@ -318,6 +488,10 @@ manifest.name = `${BRAND} — ${HEADLINE}`;
 manifest.short_name = BRAND;
 await writeFile(MANIFEST, `${JSON.stringify(manifest, null, 2)}\n`);
 
+const count = (g) => pages.filter((p) => p.group === g).length;
 console.log(
-  `SEO: build ${buildSha.slice(0, 8)}\n     titled "${title}"\n     prerendered ${rows.length} releases across ${byPlatform.size} platforms\n     sitemap with ${urls.length} urls, robots.txt, JSON-LD`,
+  `SEO: build ${buildSha.slice(0, 8)}\n` +
+    `     home titled "${title}" — ${rows.length} releases\n` +
+    `     ${pages.length} pages: 1 home, ${count('platform')} platform, ${count('language')} language, ${count('week')} week\n` +
+    `     sitemap, robots.txt, JSON-LD with breadcrumbs`,
 );

@@ -1,4 +1,5 @@
 import type { Filters, SortKey, TitleKind } from '../types';
+import type { Route } from './route';
 
 /**
  * Filters live in the URL so any view is shareable — "here's every Tamil film
@@ -13,20 +14,36 @@ function list(params: URLSearchParams, key: string): string[] {
   return raw ? raw.split(',').filter(Boolean) : [];
 }
 
-export function readFilters(defaults: Pick<Filters, 'weekId' | 'region'>): Filters {
+/**
+ * `route` is what the path already says — /netflix means the Netflix platform,
+ * /w/<date> means that week. It seeds the filters the page was built to show,
+ * and an explicit query parameter still wins over it, so a link like
+ * /netflix?p=netflix,prime keeps working and stays shareable.
+ */
+export function readFilters(
+  defaults: Pick<Filters, 'weekId' | 'region'>,
+  route: Route | null = null,
+): Filters {
   const p = new URLSearchParams(window.location.search);
   const sort = p.get('sort') as SortKey | null;
+  const platforms = list(p, 'p');
+  const languages = list(p, 'l');
   return {
-    weekId: p.get('w') ?? defaults.weekId,
+    weekId: p.get('w') ?? route?.weekId ?? defaults.weekId,
     region: p.get('r') ?? defaults.region,
-    platforms: list(p, 'p'),
+    platforms: platforms.length ? platforms : (route?.platforms ?? []),
     kinds: list(p, 't').filter((k): k is TitleKind => KIND_VALUES.includes(k as TitleKind)),
-    languages: list(p, 'l'),
+    languages: languages.length ? languages : (route?.languages ?? []),
     genres: list(p, 'g'),
     query: p.get('q') ?? '',
     sort: sort && SORT_VALUES.includes(sort) ? sort : 'trending',
   };
 }
+
+/** True when a filter is exactly what the path already says, and so does not
+ *  need repeating in the query string. */
+const sameList = (a: string[], b: string[] | undefined) =>
+  b !== undefined && a.length === b.length && a.every((x, i) => x === b[i]);
 
 /**
  * `pinned` separates what the reader chose from what was chosen for them.
@@ -47,13 +64,22 @@ export function writeFilters(
   f: Filters,
   defaults: Pick<Filters, 'weekId' | 'region'>,
   pinned: { week: boolean; region: boolean },
+  route: Route | null = null,
 ): void {
   const p = new URLSearchParams();
-  if (pinned.week && f.weekId !== defaults.weekId) p.set('w', f.weekId);
+  /**
+   * Anything the path already states is left out of the query.
+   *
+   * Without this, landing on /netflix immediately rewrote the address to
+   * /netflix?p=netflix — the same content reachable at two URLs, which is the
+   * duplicate-content problem the per-page canonicals exist to avoid, created
+   * by our own code a tick after the page loaded.
+   */
+  if (pinned.week && f.weekId !== defaults.weekId && f.weekId !== route?.weekId) p.set('w', f.weekId);
   if (pinned.region) p.set('r', f.region);
-  if (f.platforms.length) p.set('p', f.platforms.join(','));
+  if (f.platforms.length && !sameList(f.platforms, route?.platforms)) p.set('p', f.platforms.join(','));
   if (f.kinds.length) p.set('t', f.kinds.join(','));
-  if (f.languages.length) p.set('l', f.languages.join(','));
+  if (f.languages.length && !sameList(f.languages, route?.languages)) p.set('l', f.languages.join(','));
   if (f.genres.length) p.set('g', f.genres.join(','));
   if (f.query) p.set('q', f.query);
   if (f.sort !== 'trending') p.set('sort', f.sort);
