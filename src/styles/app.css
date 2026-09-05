@@ -1589,9 +1589,22 @@ a {
 
 /* ------------------------------------------------------------- sheet ---- */
 
+/*
+ * `inset: 0` is not the visible viewport on iOS.
+ *
+ * Safari resolves fixed positioning and vh against the *large* viewport — the
+ * height with the URL bar retracted — so with the bar showing, this box extends
+ * past what anyone can see. The sheet inside it is bottom-anchored on phones,
+ * which pushed its top up underneath the browser chrome and clipped the close
+ * button to a thin arc. dvh tracks the viewport that is actually visible right
+ * now, which is precisely this problem's fix; the plain-unit line above it stays
+ * as the fallback for browsers without dvh.
+ */
 .sheet-backdrop {
   position: fixed;
   inset: 0;
+  height: 100vh;
+  height: 100dvh;
   z-index: 60;
   background: rgba(3, 4, 6, 0.72);
   backdrop-filter: blur(6px);
@@ -1635,6 +1648,9 @@ a {
   overflow: hidden auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
+  /* A bottom-anchored sheet ends underneath the home indicator otherwise, so the
+     last line of cast sits behind the bar. */
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .sheet__hero {
@@ -1666,7 +1682,7 @@ a {
  */
 .sheet__close {
   position: absolute;
-  top: 12px;
+  top: max(12px, env(safe-area-inset-top, 0px));
   right: 12px;
   width: 36px;
   height: 36px;
@@ -1971,6 +1987,7 @@ a {
   }
   .sheet {
     max-height: 92vh;
+    max-height: 92dvh;
     width: 100%;
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     border-bottom: 0;
