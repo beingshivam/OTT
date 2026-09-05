@@ -5,13 +5,42 @@
   "name": "dropday",
   "compatibility_date": "2026-09-03",
 
-  // Assets-only: there is no Worker script, just the built static site.
-  // Nothing runs at request time, which is the whole point of the design —
-  // the release feed is a file, not an API call.
+  // The Worker exists for exactly one route, /api/subscribe. Everything else
+  // is still a static file served from ./dist — see worker/index.js.
+  "main": "./worker/index.js",
+
   "assets": {
     "directory": "./dist",
+    // Named so the Worker can hand requests back to the asset server.
+    "binding": "ASSETS",
     // Every view lives in the query string, so unknown paths serve the app
-    // rather than a 404.
-    "not_found_handling": "single-page-application"
+    // rather than a 404. env.ASSETS.fetch() applies this, so the fallback
+    // still works from inside the Worker.
+    "not_found_handling": "single-page-application",
+    /**
+     * Assets are normally matched before the Worker runs, and a path that
+     * matches no asset would hit the SPA fallback above — which would serve
+     * index.html for /api/subscribe and the endpoint would never exist. This
+     * flips the order so the Worker sees every request first; it forwards all
+     * but the one path straight to ASSETS.
+     */
+    "run_worker_first": true
   }
+
+  /**
+   * The subscriber list. Commented out until the database exists, because a
+   * binding naming a database_id that has not been created fails the deploy —
+   * and this config deploys the live site.
+   *
+   * Create it (dashboard → Storage & Databases → D1, or `wrangler d1 create`),
+   * paste the id below, uncomment, and run the schema in docs/email-setup.md.
+   * Until then /api/subscribe answers 503 and the sign-up form stays hidden.
+   */
+  // ,"d1_databases": [
+  //   {
+  //     "binding": "DB",
+  //     "database_name": "newonott-subscribers",
+  //     "database_id": "paste-the-id-here"
+  //   }
+  // ]
 }

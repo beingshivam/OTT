@@ -36,12 +36,23 @@ export const ANALYTICS_TOKEN = '';
 /**
  * Where the email sign-up posts.
  *
- * Any hosted form endpoint that accepts a JSON POST works — Buttondown,
- * ConvertKit, Formspree, a Google Form. Paste the full URL. There is
- * deliberately no backend of our own here: storing other people's email
- * addresses means owning deletion requests, breach duty and a database, and a
- * weekly newsletter does not justify any of that yet.
+ * Set this to '/api/subscribe' — our own Worker route, which writes one row to
+ * a Cloudflare D1 table. Relative on purpose: same origin means no CORS
+ * preflight and nothing to change if the domain moves.
  *
- * The field is posted as { email: "..." }.
+ * This was meant to be a hosted form service, and the plan did not survive
+ * their pricing pages — what is left of the free tiers is a hundred-subscriber
+ * ceiling, a monthly submission cap, or a trial. Owning the list means owning
+ * deletion requests and the duty not to leak it, which is a real cost; it buys
+ * a list that cannot be repriced out from under a product with no revenue.
+ * docs/email-setup.md has the setup and the obligations.
+ *
+ * A full URL still works if a hosted service is ever chosen instead — the form
+ * posts { email, email_address } so it fits whichever field name that service
+ * reads.
+ *
+ * Leave it empty until the D1 database is bound (step 3 of the doc). Empty
+ * hides both forms; set-but-unbound makes the endpoint answer 503, which the
+ * form surfaces as an error rather than a false thank-you.
  */
 export const EMAIL_ENDPOINT = '';
