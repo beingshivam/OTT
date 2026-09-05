@@ -19,7 +19,8 @@
     "digest": "node scripts/build-digest.mjs",
     "social": "node scripts/build-social.mjs",
     "launch": "node scripts/build-launch.mjs",
-    "hook": "node scripts/build-hook.mjs"
+    "hook": "node scripts/build-hook.mjs",
+    "memes": "node scripts/build-memes.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
