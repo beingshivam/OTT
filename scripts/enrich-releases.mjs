@@ -73,18 +73,53 @@ function pick(candidates, release, isMovie) {
   return null;
 }
 
+const REGION = (process.env.REGIONS ?? 'IN').split(',')[0].trim() || 'IN';
+
+/**
+ * A discovered row already carries its TMDB id — `m-1240889` is movie 1240889.
+ * Reading it back saves the search call entirely and removes any chance of the
+ * matcher picking the wrong film. Only curated rows, which were written by hand
+ * and have ids of their own, still need looking up.
+ */
+function tmdbRef(release) {
+  const m = /^([mt])-(\d+)$/.exec(release.id ?? '');
+  return m ? { isMovie: m[1] === 'm', id: Number(m[2]) } : null;
+}
+
+/** The best YouTube trailer TMDB has: official first, then any trailer, then a teaser. */
+function trailerFrom(videos) {
+  const yt = (videos?.results ?? []).filter((v) => v.site === 'YouTube' && v.key);
+  const pick =
+    yt.find((v) => v.type === 'Trailer' && v.official) ??
+    yt.find((v) => v.type === 'Trailer') ??
+    yt.find((v) => v.type === 'Teaser');
+  return pick ? `https://www.youtube.com/watch?v=${pick.key}` : undefined;
+}
+
+/** The age rating for our own region, which lives in a different place per kind. */
+function certificationFrom(detail, isMovie) {
+  if (isMovie) {
+    const row = detail.release_dates?.results?.find((r) => r.iso_3166_1 === REGION);
+    return row?.release_dates?.map((d) => d.certification).find(Boolean) || undefined;
+  }
+  const row = detail.content_ratings?.results?.find((r) => r.iso_3166_1 === REGION);
+  return row?.rating || undefined;
+}
+
 const feed = JSON.parse(await readFile(FEED, 'utf8'));
 let matched = 0;
 let skipped = 0;
 
 for (const week of feed.weeks) {
   for (const release of week.releases) {
-    if (release.posterUrl && !FORCE) continue;
-
     const isMovie = release.kind === 'film' || release.kind === 'documentary';
     const endpoint = isMovie ? '/search/movie' : '/search/tv';
 
+    let ref = tmdbRef(release);
     let hit = null;
+    if (ref) {
+      // Nothing to search for — the detail fetch below has everything it needs.
+    } else
     try {
       const { results = [] } = await tmdb(endpoint, {
         query: release.title,
@@ -108,41 +143,63 @@ for (const week of feed.weeks) {
       continue;
     }
 
-    if (!hit) {
-      skipped++;
-      if (VERBOSE) console.log(`  – ${release.title}: no confident match, left as-is`);
-      continue;
+    if (!ref) {
+      if (!hit) {
+        skipped++;
+        if (VERBOSE) console.log(`  – ${release.title}: no confident match, left as-is`);
+        continue;
+      }
+      const asMovie = hit.__flipped ? !isMovie : isMovie;
+      ref = { isMovie: asMovie, id: hit.id };
+      if (hit.poster_path) release.posterUrl = `${IMG}/w500${hit.poster_path}`;
+      if (hit.backdrop_path) release.backdropUrl = `${IMG}/w1280${hit.backdrop_path}`;
+      if (hit.overview) release.synopsis = hit.overview;
     }
 
-    const asMovie = hit.__flipped ? !isMovie : isMovie;
-    if (hit.poster_path) release.posterUrl = `${IMG}/w500${hit.poster_path}`;
-    if (hit.backdrop_path) release.backdropUrl = `${IMG}/w1280${hit.backdrop_path}`;
-    if (hit.overview) release.synopsis = hit.overview;
-    // Same bar as the discover pass, kept in step deliberately: a title should
-    // not gain or lose its score depending on which pass happened to find it.
-    if (hit.vote_count >= 5) {
-      release.rating = Number(hit.vote_average.toFixed(1));
-      release.votes = hit.vote_count;
-    }
-
-    // Runtime, genres and cast only exist on the detail endpoint.
+    /**
+     * Everything a viewer decides on lives behind this one call: the trailer,
+     * the cast, the runtime, the certificate. It used to be reached only by
+     * rows that arrived without a poster — and discover supplies posters for
+     * 96% of them, so it ran on almost nothing. Cast sat at 9%, runtime at 7%,
+     * trailers and certificates at zero, which left the detail sheet, the one
+     * screen where someone decides to watch, with a synopsis and little else.
+     *
+     * Now every row with a TMDB id gets it, every run. append_to_response
+     * bundles credits, videos and certificates into the same request, so the
+     * whole detail costs one call rather than four, and the score refreshes
+     * along with it instead of ageing from whenever the row was discovered.
+     */
     try {
-      const detail = await tmdb(`/${asMovie ? 'movie' : 'tv'}/${hit.id}`, {
-        append_to_response: 'credits',
+      const detail = await tmdb(`/${ref.isMovie ? 'movie' : 'tv'}/${ref.id}`, {
+        append_to_response: ref.isMovie
+          ? 'credits,videos,release_dates'
+          : 'credits,videos,content_ratings',
       });
-      const runtime = asMovie ? detail.runtime : detail.episode_run_time?.[0];
+      const runtime = ref.isMovie ? detail.runtime : detail.episode_run_time?.[0];
       if (runtime) release.runtimeMinutes = runtime;
       if (detail.genres?.length) release.genres = detail.genres.map((g) => g.name);
       const cast = detail.credits?.cast?.slice(0, 5).map((c) => c.name) ?? [];
       if (cast.length) release.cast = cast;
       const director = detail.credits?.crew?.find((c) => c.job === 'Director')?.name;
       if (director) release.director = director;
+
+      const trailer = trailerFrom(detail.videos);
+      if (trailer) release.trailerUrl = trailer;
+      const cert = certificationFrom(detail, ref.isMovie);
+      if (cert) release.certification = cert;
+
+      // Same bar as the discover pass, kept in step deliberately: a title should
+      // not gain or lose its score depending on which pass happened to find it.
+      if (detail.vote_count >= 5) {
+        release.rating = Number(detail.vote_average.toFixed(1));
+        release.votes = detail.vote_count;
+      }
     } catch {
       /* Artwork already landed; detail is a bonus, not a requirement. */
     }
 
     matched++;
-    console.log(`  ✓ ${release.title}${hit.poster_path ? '' : ' (matched, no poster on file)'}`);
+    if (VERBOSE) console.log(`  ✓ ${release.title}`);
   }
 }
 
