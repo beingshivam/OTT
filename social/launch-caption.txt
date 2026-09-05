@@ -1,6 +1,6 @@
-You have nine streaming apps and still no idea what's on this week.
+Twelve apps. Still no idea what's on this week.
 
-So we built the thing that should already exist: every new release — Netflix, Prime Video, JioHotstar, Apple TV+, ZEE5, SonyLIV, aha, hoichoi, Sun NXT — plus everything opening in cinemas, on one page.
+So we built the thing that should already exist: every new release — Netflix, Prime Video, JioHotstar, Apple TV+, SonyLIV, ZEE5, Sun NXT, hoichoi, aha, Lionsgate Play, MUBI, Crunchyroll — plus everything opening in cinemas, on one page.
 
 No app to install. No login. No algorithm deciding what you see. Just the week, sorted by what people are actually talking about, updated every Friday before the drops land.
 

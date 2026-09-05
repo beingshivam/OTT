@@ -178,9 +178,22 @@ try {
   await browser.close();
 }
 
-const caption = `You have nine streaming apps and still no idea what's on this week.
+/**
+ * The caption, built from the same list as the slide.
+ *
+ * The first draft hardcoded "nine streaming apps" while the image beside it
+ * said twelve — the same contradiction that was just fixed on the slide,
+ * surviving one file over because the number was typed in two places. Both now
+ * come from the registry.
+ *
+ * The opening line repeats the slide deliberately: only about 125 characters
+ * show before Instagram truncates to "…more", so the hook has to be the whole
+ * first sentence, and matching the image makes the post read as one thought
+ * rather than two.
+ */
+const caption = `${Count} apps. Still no idea what's on this week.
 
-So we built the thing that should already exist: every new release — Netflix, Prime Video, JioHotstar, Apple TV+, ZEE5, SonyLIV, aha, hoichoi, Sun NXT — plus everything opening in cinemas, on one page.
+So we built the thing that should already exist: every new release — ${apps.join(', ')} — plus everything opening in cinemas, on one page.
 
 No app to install. No login. No algorithm deciding what you see. Just the week, sorted by what people are actually talking about, updated every Friday before the drops land.
 
