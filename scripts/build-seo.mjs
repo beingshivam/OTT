@@ -280,6 +280,20 @@ const sitemap =
   `\n</urlset>\n`;
 await writeFile(resolve(ROOT, 'dist/sitemap.xml'), sitemap);
 
+/**
+ * The same build id at a URL, because meta tags are unreachable on a phone.
+ *
+ * Confirming which build is live otherwise means view-source, which iOS Safari
+ * does not offer — so the question "did my fix deploy?" got answered by
+ * squinting at whether some visual change appeared, which is exactly the guess
+ * this is meant to remove. Opening /build.txt answers it in a tab: a commit
+ * means this build is live, a 404 means it is not.
+ */
+await writeFile(
+  resolve(ROOT, 'dist/build.txt'),
+  `commit ${buildSha}\nbuilt  ${new Date().toISOString()}\n`,
+);
+
 await writeFile(
   resolve(ROOT, 'dist/robots.txt'),
   `User-agent: *\nAllow: /\n\nSitemap: ${SITE_URL}/sitemap.xml\n`,
