@@ -299,6 +299,8 @@ const FALLBACK_CSS = `    <style>
       .seo-fallback h2 { color: #b6bdcc; font-size: 15px; margin: 24px 0 6px; }
       .seo-fallback ul { margin: 0; padding-left: 18px; line-height: 1.7; }
       .seo-fallback a { color: #b6bdcc; text-decoration: none; }
+      .crumbs { font-size: 12px; color: #6a7080; margin-bottom: 10px; }
+      .crumbs a { color: #6a7080; }
       .browse { margin-top: 28px; padding-top: 20px; border-top: 1px solid #ffffff14; }
       .browse > div { display: flex; align-items: baseline; gap: 14px; margin-bottom: 12px; flex-wrap: wrap; }
       .browse h2 { flex: none; width: 78px; margin: 0; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; }
@@ -333,9 +335,23 @@ async function renderPage(page, pages) {
         ? [
             {
               '@type': 'BreadcrumbList',
+              /**
+               * The same trail the page renders. A title page goes through
+               * /theatres because that is the link it shows; structured data
+               * describing a route the reader cannot take is a claim the page
+               * does not keep.
+               */
               itemListElement: [
                 { '@type': 'ListItem', position: 1, name: BRAND, item: `${SITE_URL}/` },
-                { '@type': 'ListItem', position: 2, name: page.crumb, item: canonical },
+                ...(page.group === 'title'
+                  ? [{ '@type': 'ListItem', position: 2, name: 'In cinemas', item: `${SITE_URL}/theatres` }]
+                  : []),
+                {
+                  '@type': 'ListItem',
+                  position: page.group === 'title' ? 3 : 2,
+                  name: page.crumb,
+                  item: canonical,
+                },
               ],
             },
           ]
@@ -380,8 +396,17 @@ async function renderPage(page, pages) {
    * can see and a visitor cannot is cloaking, and the honest version is what
    * ranks.
    */
+  /** The crumb trail, rendered before React mounts and matching what the app
+   *  shows. Also the home link every sub-page was missing: the wordmark was a
+   *  <span>, so 80 of 81 pages had no way back at all. */
+  const crumbs = page.path
+    ? `<nav class="crumbs"><a href="/">${esc(BRAND)}</a> › ` +
+      (page.group === 'title' ? `<a href="/theatres">In cinemas</a> › ` : '') +
+      `<span>${esc(page.crumb)}</span></nav>`
+    : '';
+
   const prerendered =
-    `<main class="seo-fallback"><h1>${esc(page.h1)}</h1>` +
+    `<main class="seo-fallback">${crumbs}<h1>${esc(page.h1)}</h1>` +
     `<p>${esc(page.lede)}</p>` +
     (page.facts ?? '') +
     page.body +

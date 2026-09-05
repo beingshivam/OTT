@@ -183,6 +183,13 @@ a {
   letter-spacing: -0.03em;
   font-size: 17px;
   margin-right: auto;
+  /* It is an anchor now; keep it looking like a wordmark rather than a link,
+     but let it dim on hover so it reads as clickable. */
+  color: var(--text);
+  text-decoration: none;
+}
+.logo:hover {
+  color: var(--text-2);
 }
 .logo__mark {
   width: 24px;
@@ -2527,4 +2534,39 @@ a {
   .titlepage__intro h1 {
     font-size: 22px;
   }
+}
+
+/* ----------------------------------------------------- breadcrumbs ----
+   Small, quiet, and present on every page that is not the homepage. It
+   mirrors the BreadcrumbList in the page's JSON-LD: structured data
+   describing a trail nobody can see is a claim the page does not keep. */
+.crumbs {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-3);
+  min-width: 0;
+}
+.crumbs a {
+  color: var(--text-3);
+  text-decoration: none;
+}
+.crumbs a:hover {
+  color: var(--text-2);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+/* The last crumb is where you are; it should not read as somewhere to go. */
+.crumbs > span:last-child {
+  color: var(--text-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.titlepage .crumbs {
+  margin-bottom: 16px;
 }

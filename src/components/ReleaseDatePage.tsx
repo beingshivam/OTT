@@ -4,6 +4,7 @@ import { IconPlay, IconTicket, IconExternal } from './icons';
 import { platform as platformById, languageName } from '../data/platforms';
 import { formatWeekRange } from '../lib/week';
 import type { Release, ReleaseFeed } from '../types';
+import { BRAND } from '../data/brand';
 
 /**
  * "When is <film> coming to OTT?"
@@ -57,6 +58,14 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
 
   return (
     <article className="titlepage">
+      <nav className="crumbs" aria-label="Breadcrumb">
+        <a href="/">{BRAND}</a>
+        <span aria-hidden="true">›</span>
+        <a href="/theatres">In cinemas</a>
+        <span aria-hidden="true">›</span>
+        <span>{release.title}</span>
+      </nav>
+
       <div className="titlepage__head">
         <PosterArt
           className="titlepage__art"

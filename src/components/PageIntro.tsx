@@ -3,6 +3,7 @@ import type { Release, ReleaseFeed } from '../types';
 import type { Route } from '../lib/route';
 import { collectionBySlug, inCollection } from '../data/collections';
 import { platformLinkText } from './BrowseLinks';
+import { BRAND } from '../data/brand';
 
 /**
  * What a page says that the homepage does not.
@@ -149,6 +150,16 @@ export function PageIntro({ route, feed, region, currentWeek, onOpen }: Props) {
 
   return (
     <section className="pageintro">
+      {/* A visible trail, matching the BreadcrumbList the build emits for this
+          page. Schema describing a trail the reader cannot see is a claim
+          about the page that the page does not keep — and the second way
+          back, after the wordmark. */}
+      <nav className="crumbs" aria-label="Breadcrumb">
+        <a href="/">{BRAND}</a>
+        <span aria-hidden="true">›</span>
+        <span>{heading}</span>
+      </nav>
+
       {/* The one h1 on the page. The week bar's date steps down to a plain
           element here so a reader and a crawler are told the same thing about
           what this page is — two h1s saying different things is worse than

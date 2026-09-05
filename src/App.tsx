@@ -299,7 +299,13 @@ export default function App() {
           whole week at a glance. */}
       <div className="shell weekbar">
         <div className="weekbar__brand">
-          <span className="logo">
+          {/* A link, on every page including this one.
+              It was a <span>, which on the homepage cost nothing and on
+              /netflix or /ott-release-date/<slug> left no way back at all
+              except clearing a filter — a dead end on 80 of 81 pages. It is
+              also the strongest internal link a site has, and every sub-page
+              was withholding it from the page that most needs it. */}
+          <a className="logo" href="/" aria-label={`${BRAND} home`}>
             <span className="logo__mark">
               <IconPlay />
             </span>
@@ -309,7 +315,7 @@ export default function App() {
               {BRAND}
               <span className="logo__dot">.</span>
             </span>
-          </span>
+          </a>
           <div className="weekbar__region">
             <label className="region">
               <span aria-hidden="true">
