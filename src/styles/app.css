@@ -1779,6 +1779,23 @@ a {
   align-items: center;
 }
 
+/* The attribution line. Deliberately the quietest thing on the page — it is a
+   credit and a licence obligation, not something anyone came here to read. */
+.footer__credit {
+  max-width: 46ch;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--text-3);
+}
+.footer__credit a {
+  color: var(--text-2);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.footer__credit a:hover {
+  color: var(--text);
+}
+
 .footer__link {
   display: inline-flex;
   align-items: center;

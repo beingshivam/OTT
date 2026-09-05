@@ -156,14 +156,24 @@ export default function App() {
   const releases = week?.releases ?? [];
   const facets = useMemo(() => facetsFor(releases, filters.region), [releases, filters.region]);
   /**
-   * Prefer the live trending signal, which spans everything currently popular
-   * rather than only what happens to land this week. Fall back to ranking the
-   * week itself — and tell the strip which it got, so the label stays true.
+   * The week's own titles, ranked by how much attention they are getting.
+   *
+   * This used to lead with TMDB's global trending list, and on a page whose
+   * whole promise is "what's new this week" that put Reacher (2022), Ted Lasso
+   * (2020) and Bleach (2004) across the top of the board. Two of the eleven
+   * entries were actually from the week on screen. It answered a question
+   * nobody had come here to ask, in the most prominent slot on the page.
+   *
+   * Ranking the week instead surfaces the thing people mean when they ask what
+   * the big release is — Mirzapur opening in cinemas, not a four-year-old
+   * series peaking again. Global trending stays as the fallback for a week too
+   * thin to rank, and the label says which one it got so the claim stays true.
    */
   const trendingNow = useMemo(() => {
+    const scoped = releases.filter((r) => r.regions.includes(filters.region));
+    if (scoped.length >= 3) return { list: sortReleases(scoped, 'trending'), live: false };
     const live = (feed?.trending ?? []).filter((r) => r.regions.includes(filters.region));
-    if (live.length >= 3) return { list: live, live: true };
-    return { list: sortReleases(releases.filter((r) => r.regions.includes(filters.region)), 'trending'), live: false };
+    return { list: live, live: true };
   }, [feed, releases, filters.region]);
 
   /** Weeks the feed actually carries, for the empty state to offer. */
@@ -491,6 +501,17 @@ export default function App() {
           </div>
           <div className="footer__stack">
             <span>Refreshes {refreshDaysLabel()}</span>
+            {/* Says whose scores these are — they are TMDB's, not IMDb's, and
+                the two differ by a few tenths often enough that leaving a bare
+                star to be read as IMDb would be misleading. The wording is also
+                what TMDB's API terms ask for in return for the data. */}
+            <span className="footer__credit">
+              Ratings and release data from{' '}
+              <a href="https://www.themoviedb.org/" target="_blank" rel="noreferrer noopener">
+                TMDB
+              </a>
+              . This product uses the TMDB API but is not endorsed or certified by TMDB.
+            </span>
           </div>
         </footer>
       </main>
