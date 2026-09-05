@@ -19,6 +19,17 @@
  * personal data, so it needs no consent banner and does not undo the "no login,
  * nothing" promise the rest of the product makes. It is also free and already
  * on the platform this deploys to.
+ *
+ * LEAVE THIS EMPTY while the domain is proxied through Cloudflare.
+ *
+ * Cloudflare turns Web Analytics on by itself for a proxied zone and injects the
+ * beacon at the edge — which is what is already running on newonott.in. Setting
+ * a token here adds a *second* beacon on top of that one, and every visit gets
+ * counted twice. The measurements then look like growth and are an artefact.
+ *
+ * This exists for the case where the site is served from somewhere Cloudflare
+ * does not proxy, where nothing is injected and the beacon has to ship in the
+ * page itself.
  */
 export const ANALYTICS_TOKEN = '';
 
