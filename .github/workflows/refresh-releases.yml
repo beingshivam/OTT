@@ -110,9 +110,18 @@ jobs:
       # The week's email, assembled from the feed that was just rebuilt. A
       # newsletter dies of the Friday it did not get written, so the draft is
       # ready before anyone has to think about it.
+      #
+      # Once a week, not twice. The calendar is rebuilt on Monday as well
+      # because midweek titles keep appearing and the site should carry them —
+      # but a second email in the same week is a second interruption for one
+      # week's news, and unsubscribes are the price. So the draft is written
+      # only on the Thursday run, the one that lands ahead of Friday's drops.
+      # A manual run always writes one, for testing.
       - name: Draft the weekly email
         id: digest
-        if: steps.fetch.outcome == 'success'
+        if: >-
+          steps.fetch.outcome == 'success' &&
+          (github.event_name != 'schedule' || github.event.schedule == '30 19 * * 4')
         continue-on-error: true
         run: node scripts/build-digest.mjs
 
