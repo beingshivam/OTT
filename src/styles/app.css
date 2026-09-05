@@ -1650,23 +1650,51 @@ a {
   inset: 0;
   background: linear-gradient(180deg, rgba(18, 20, 28, 0.1) 30%, var(--surface-solid) 100%);
 }
+/*
+ * Has to read on anything, because it sits over artwork we do not control.
+ *
+ * It used to be a near-black disc (rgba(6,7,10,.7)) edged with --line, which is
+ * 9% white — invisible in practice. Over a bright backdrop that was survivable;
+ * over a dark one, or over the letterboxed ground beside a backdrop that does
+ * not fill the frame, it disappeared entirely and left a faint cross floating
+ * on black. "Not properly visible" was exactly right, and the scroll fix before
+ * this addressed a different bug.
+ *
+ * Now it carries its own contrast in both directions: a near-opaque dark disc
+ * so a pale image cannot wash it out, a genuinely visible light ring so a dark
+ * one cannot swallow it, and a drop shadow to separate it from busy artwork.
+ */
 .sheet__close {
   position: absolute;
   top: 12px;
   right: 12px;
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: rgba(6, 7, 10, 0.7);
+  background: rgba(8, 9, 12, 0.82);
   backdrop-filter: blur(10px);
-  border: 1px solid var(--line);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1.5px solid rgba(255, 255, 255, 0.62);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.55);
   color: #fff;
   z-index: 2;
 }
+/* The shared icon stroke is 1.8 on a 24 grid, tuned for 14px inline icons. At
+   this size that reads as a hairline, so the glyph gets its own weight. */
+.sheet__close svg {
+  width: 19px;
+  height: 19px;
+  stroke-width: 2.4;
+}
 .sheet__close:hover {
-  background: rgba(6, 7, 10, 0.92);
+  background: rgba(8, 9, 12, 0.95);
+  border-color: #fff;
+}
+.sheet__close:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
 }
 @media (pointer: coarse) {
   /* The one control someone reaches for in a hurry, and it was 34px against a
