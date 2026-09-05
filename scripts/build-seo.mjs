@@ -20,6 +20,7 @@
  *        SITE_URL=https://example.com npm run build   to pin the canonical host.
  */
 
+import { execSync } from 'node:child_process';
 import { readFile, writeFile } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -199,6 +200,38 @@ let out = html
  * worth counting. No token means no script at all: an empty beacon would
  * silently report nothing while looking like it worked.
  */
+/**
+ * Which commit this page was built from.
+ *
+ * The site deploys itself on every push, which makes "is the fix live yet?" a
+ * question that comes up constantly and has no good answer from the outside —
+ * you end up inferring it from whether some visual change appears, and a build
+ * that silently didn't run looks identical to one that did. Two pushes six
+ * minutes apart is all it takes to be looking at the older one.
+ *
+ * So the page says. Cloudflare and GitHub both put the commit in the build
+ * environment; falling back to asking git covers a local build, and 'unknown'
+ * covers a tarball with no git at all — this must never be the thing that
+ * breaks a deploy.
+ */
+const buildSha =
+  process.env.WORKERS_CI_COMMIT_SHA ??
+  process.env.CF_PAGES_COMMIT_SHA ??
+  process.env.GITHUB_SHA ??
+  (() => {
+    try {
+      return execSync('git rev-parse HEAD', { stdio: ['ignore', 'pipe', 'ignore'] })
+        .toString()
+        .trim();
+    } catch {
+      return 'unknown';
+    }
+  })();
+
+const buildMeta =
+  `    <meta name="build-commit" content="${esc(buildSha.slice(0, 12))}" />\n` +
+  `    <meta name="build-time" content="${new Date().toISOString()}" />\n`;
+
 const analytics = ANALYTICS_TOKEN
   ? `    <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"${ANALYTICS_TOKEN}"}'></script>\n`
   : '';
@@ -217,7 +250,7 @@ const head = `    <link rel="canonical" href="${SITE_URL}/" />
       .seo-fallback ul { margin: 0; padding-left: 18px; line-height: 1.7; }
     </style>
     <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
-${analytics}`;
+${buildMeta}${analytics}`;
 out = out.replace('</head>', `${head}  </head>`);
 out = out.replace('<div id="root"></div>', `<div id="root">${prerendered}</div>`);
 
@@ -264,5 +297,5 @@ manifest.short_name = BRAND;
 await writeFile(MANIFEST, `${JSON.stringify(manifest, null, 2)}\n`);
 
 console.log(
-  `SEO: titled "${title}"\n     prerendered ${rows.length} releases across ${byPlatform.size} platforms\n     sitemap with ${urls.length} urls, robots.txt, JSON-LD`,
+  `SEO: build ${buildSha.slice(0, 8)}\n     titled "${title}"\n     prerendered ${rows.length} releases across ${byPlatform.size} platforms\n     sitemap with ${urls.length} urls, robots.txt, JSON-LD`,
 );
