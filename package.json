@@ -15,7 +15,8 @@
     "logos": "node scripts/fetch-logos.mjs",
     "brand-marks": "node scripts/build-brand-marks.mjs",
     "providers": "node scripts/find-providers.mjs",
-    "og": "node scripts/build-og.mjs"
+    "og": "node scripts/build-og.mjs",
+    "digest": "node scripts/build-digest.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
