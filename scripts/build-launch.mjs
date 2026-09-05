@@ -24,17 +24,13 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { BRAND } from './brand.mjs';
+import { launchChromium } from './browser.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = resolve(ROOT, 'social');
 const SITE = (process.env.SITE_URL ?? 'https://newonott.in')
   .replace(/^https?:\/\//, '')
   .replace(/\/$/, '');
-
-const { chromium } = await import('playwright').catch(() => {
-  console.error('Needs Playwright:\n  npm i --no-save playwright && npx playwright install chromium\n');
-  process.exit(1);
-});
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
@@ -108,7 +104,21 @@ ${FONTS}
   }
   body::before { top:-700px; left:-320px; background:radial-gradient(circle, rgba(255,61,61,.34), transparent 62%); }
   body::after  { bottom:-760px; right:-340px; background:radial-gradient(circle, rgba(126,78,255,.26), transparent 64%); }
-  .grad { background:linear-gradient(100deg,#ff4d4d,#ffb03a 48%,#7e9bff);
+  /**
+   * Warm the whole way across, with no blue stop.
+   *
+   * The first version ran red → gold → blue, which is the site's full accent
+   * range and works across a wide element. Clipped to text it does not: over a
+   * short word the midpoint lands mid-letter and desaturates, so "one page"
+   * rendered with a beige "pa" and a grey "g" and read as a rendering fault
+   * rather than a colour choice. On the reveal slide it was worse — the URL's
+   * ".in" faded to pale grey, dimming the one string the entire carousel
+   * exists to deliver.
+   *
+   * Red to gold has no muddy midpoint at any length, and it is the same ramp
+   * as the play mark, so the wordmark and the words agree.
+   */
+  .grad { background:linear-gradient(100deg,#ff4d4d,#ff7a3d 42%,#ffb03a);
           -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
   .swipe { position:absolute; bottom:54px; right:76px; font-size:23px; font-weight:600; color:#6a7080; }
   ${extra}
@@ -123,8 +133,14 @@ const slide1 = SHELL(
   `<div class="wall">${wall.map((n) => `<span>${esc(n)}</span>`).join('')}</div>
 <h1><em class="grad">${Count}</em> apps.<br>Still no idea<br>what's on this week.</h1>
 <span class="swipe">Swipe →</span>`,
-  `.wall { position:relative; display:flex; flex-wrap:wrap; align-content:center;
-            gap:18px 18px; flex:1 1 auto; max-width:930px; }
+  /* The chips are the setup and the headline is the punchline, so they have to
+     read as one block. Centring the wall in the leftover space put roughly 300
+     empty pixels between them and the joke stopped landing — the chips looked
+     like decoration floating in the middle of the slide. Bottom-aligned, they
+     sit directly above the line they set up, and the empty space collects at
+     the top where the glow already lives. */
+  `.wall { position:relative; display:flex; flex-wrap:wrap; align-content:flex-end;
+            gap:18px 18px; flex:1 1 auto; max-width:930px; padding-bottom:64px; }
    .wall span { padding:16px 28px; border-radius:999px; border:1px solid rgba(255,255,255,.10);
                 background:rgba(255,255,255,.03); color:#5d636f;
                 font-size:37px; font-weight:600; letter-spacing:-.015em; }
@@ -188,7 +204,7 @@ const avatar = `<!doctype html><meta charset="utf-8">
 <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
 
 await mkdir(OUT, { recursive: true });
-const browser = await chromium.launch();
+const browser = await launchChromium('launch');
 try {
   const shots = [
     ['launch-1-problem', slide1, 1080, 1350],

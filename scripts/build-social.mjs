@@ -24,20 +24,12 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { BRAND } from './brand.mjs';
+import { launchChromium } from './browser.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = resolve(ROOT, 'social');
 const SITE = (process.env.SITE_URL ?? 'https://newonott.in').replace(/^https?:\/\//, '').replace(/\/$/, '');
 const REGION = (process.env.REGIONS ?? 'IN').split(',')[0].trim() || 'IN';
-
-const { chromium } = await import('playwright').catch(() => {
-  console.error(
-    'Needs Playwright, which is not a dependency on purpose — it pulls down a\n' +
-      'browser and this runs weekly at most:\n\n' +
-      '  npm i --no-save playwright && npx playwright install chromium && npm run social\n',
-  );
-  process.exit(1);
-});
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -138,8 +130,12 @@ function page({ w, h, items, title, head }) {
 
   h1 { position:relative; flex:none; margin-top:${Math.round(h * 0.038)}px;
        font-size:${head}px; line-height:1.02; font-weight:900; letter-spacing:-.045em; }
+  /* Warm the whole way, no blue stop. Clipped to a short word the red→gold→blue
+     ramp desaturates mid-letter: "week." came out with a grey "k" and a grey
+     full stop, which reads as a broken render rather than a colour choice. Same
+     ramp as the play mark, so wordmark and headline agree. */
   h1 em { font-style:normal;
-          background:linear-gradient(100deg,#ff4d4d,#ffb03a 48%,#7e9bff);
+          background:linear-gradient(100deg,#ff4d4d,#ff7a3d 42%,#ffb03a);
           -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
   .count { position:relative; margin-top:20px; font-size:27px; font-weight:500; color:#b6bdcc; }
 
@@ -196,7 +192,7 @@ ${rest > 0 ? `<div class="more">+ ${rest} more, including everything in cinemas<
 }
 
 await mkdir(OUT, { recursive: true });
-const browser = await chromium.launch();
+const browser = await launchChromium('social');
 try {
   for (const size of SIZES) {
     const p = await browser.newPage({ viewport: { width: size.w, height: size.h }, deviceScaleFactor: 1 });

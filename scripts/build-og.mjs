@@ -20,18 +20,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { BRAND, HEADLINE } from './brand.mjs';
-
-const { chromium } = await import('playwright').catch(() => {
-  console.error(
-    'This script needs Playwright, which is not a dependency on purpose — it\n' +
-      'pulls down a browser, and this runs about once a year. Install it just for\n' +
-      'this run:\n\n' +
-      '  npm i --no-save playwright\n' +
-      '  npx playwright install chromium\n' +
-      '  npm run og\n',
-  );
-  process.exit(1);
-});
+import { launchChromium } from './browser.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = resolve(ROOT, 'public/og.png');
@@ -96,7 +85,9 @@ const html = `<!doctype html><meta charset="utf-8">
   }
   h1 em {
     font-style: normal;
-    background: linear-gradient(100deg, #ff4d4d, #ffb03a 45%, #7e9bff);
+    /* No blue stop — clipped to text, the ramp through blue desaturates
+       mid-word and the tail of the phrase renders grey. */
+    background: linear-gradient(100deg, #ff4d4d, #ff7a3d 42%, #ffb03a);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   }
   p { position: relative; font-size: 26px; line-height: 1.45; color: #b6bdcc; max-width: 44ch; }
@@ -115,7 +106,7 @@ const html = `<!doctype html><meta charset="utf-8">
 <div class="chips">${chips.map((c) => `<span class="chip">${esc(c)}</span>`).join('')}</div>
 `;
 
-const browser = await chromium.launch();
+const browser = await launchChromium('og');
 try {
   const page = await browser.newPage({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 1 });
   await page.setContent(html, { waitUntil: 'networkidle' });
