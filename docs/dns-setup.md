@@ -26,6 +26,36 @@ To check independently: `dnschecker.org`, enter `newonott.in`, type **NS**.
 Cloudflare's names showing means it is propagating; the registrar's means step 2
 did not take.
 
+### Doing it on Hostinger
+
+The domain is registered with Hostinger, and Hostinger has two settings that
+look like the same thing and are not:
+
+| Setting | What it does |
+| ------- | ------------ |
+| **Domains → your domain → DNS / Nameservers → Change nameservers** | Hands the domain to Cloudflare. **This is the one.** |
+| **Domains → your domain → DNS Zone** (the records editor) | Edits records *Hostinger* serves. Irrelevant once nameservers move, and adding NS records here does nothing. |
+
+Under **Change nameservers**, pick **Use custom nameservers** and enter exactly
+the two Cloudflare assigned to this zone — the pair shown on the Cloudflare
+Overview page for `newonott.in`, e.g. `heidi.ns.cloudflare.com` and
+`wilson.ns.cloudflare.com`.
+
+Three things that produce "Invalid nameservers" on the Cloudflare side:
+
+1. **Leaving Hostinger's own nameservers in slots 3 and 4.** A mixed delegation
+   is not a partial one — it is a broken one. Only the two Cloudflare names may
+   be present; clear the rest.
+2. **Using a different Cloudflare pair.** Every zone is assigned its own pair.
+   Another zone's, or one copied from a guide, resolves as a real hostname but
+   does not serve your records.
+3. **Adding them as NS records in the DNS Zone editor** instead of changing the
+   nameservers. That edits a zone nobody is asking any more.
+
+Attaching a website or hosting plan in hPanel can also silently reset the
+nameservers back to Hostinger's. If the status flips back after being fine,
+that is what happened.
+
 ---
 
 ## 1. Pointing the domain at the Worker
