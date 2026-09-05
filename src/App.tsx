@@ -355,6 +355,11 @@ export default function App() {
       />
 
       <main className="shell" id="main">
+        {/* Above the board so it is actually seen, below the week header so the
+            reader has the thing they came for before being asked for anything.
+            One line, and dismissing it is permanent on that device. */}
+        <EmailSignup variant="banner" />
+
         {error && (
           <div className="empty">
             <span className="empty__icon">

@@ -1844,6 +1844,85 @@ a {
   align-items: center;
 }
 
+/* The top-of-page version. Wider, warmer, and carrying its own pitch, but still
+   one row tall — this sits where an onboarding card was removed for costing the
+   reader a decision on arrival, and must not repeat that. */
+.signup--banner {
+  margin-bottom: 20px;
+  padding: 10px 12px 10px 16px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line);
+  background: linear-gradient(100deg, rgba(255, 77, 77, 0.09), rgba(122, 162, 255, 0.07));
+  gap: 12px;
+}
+.signup__pitch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.45;
+  margin-right: auto;
+  font-size: 13px;
+  color: var(--text-2);
+}
+.signup__pitch strong {
+  color: var(--text);
+  font-weight: 620;
+}
+.signup__pitch svg {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  color: var(--brand);
+}
+.signup__dismiss {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--text-3);
+}
+.signup__dismiss:hover {
+  color: var(--text);
+  background: var(--surface-2);
+}
+.signup__dismiss svg {
+  width: 15px;
+  height: 15px;
+}
+.signup--banner.signup--done {
+  justify-content: center;
+  color: var(--text-2);
+}
+
+/* On a phone the pitch takes its own line and the field spans the width — a
+   cramped three-up row would make the ask feel like an obstacle. */
+@media (max-width: 620px) {
+  .signup--banner {
+    border-radius: var(--radius-lg);
+    padding: 12px 14px;
+    row-gap: 10px;
+  }
+  .signup__pitch {
+    flex: 1 0 100%;
+    margin-right: 0;
+    padding-right: 26px;
+  }
+  .signup--banner input {
+    flex: 1 1 auto;
+    max-width: none;
+  }
+  .signup__dismiss {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+  }
+  .signup--banner {
+    position: relative;
+  }
+}
+
 /* Footer sign-up. Deliberately a single line: the ask is small, so the form
    should look small — a boxed card here would read as an interruption. */
 .signup {
