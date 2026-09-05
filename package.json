@@ -21,7 +21,8 @@
     "launch": "node scripts/build-launch.mjs",
     "hook": "node scripts/build-hook.mjs",
     "memes": "node scripts/build-memes.mjs",
-    "story": "node scripts/build-story.mjs"
+    "story": "node scripts/build-story.mjs",
+    "test:worker": "node worker/index.test.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
