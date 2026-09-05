@@ -22,7 +22,12 @@ export function LogoProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const controller = new AbortController();
-    fetch(new URL('data/logos.json', document.baseURI).href, { signal: controller.signal })
+    // BASE_URL, not document.baseURI: the latter is the current page, so this
+    // asked for /netflix/data/logos.json on a platform page and 404'd on every
+    // page but the homepage — see the same fix in lib/feed.ts.
+    fetch(new URL(`${import.meta.env.BASE_URL}data/logos.json`, location.origin).href, {
+      signal: controller.signal,
+    })
       .then((r) => (r.ok ? r.json() : {}))
       .then((data: LogoMap) => setLogos(data ?? {}))
       // Logos are an enhancement; the monogram lockup is a complete fallback.
