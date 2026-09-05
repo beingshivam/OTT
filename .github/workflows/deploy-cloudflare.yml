@@ -1,0 +1,90 @@
+name: Deploy to Cloudflare
+
+# Cloudflare's dashboard integration builds on push, but from outside it there
+# is no way to see whether a build ran, what it built, or why it didn't — which
+# turned "is my fix live?" into guesswork twice in one evening. This does the
+# same deploy from CI, where the log is visible, the commit is named, and the
+# run can be started on demand rather than only by pushing.
+#
+# It coexists with the dashboard integration: both call the same Worker and the
+# last deploy wins. Turn the dashboard one off if the duplication is noisy.
+
+on:
+  push:
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-cloudflare
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    # Only the default branch publishes — resolved at run time rather than
+    # hardcoded, so this keeps working whatever that branch is renamed to.
+    if: >-
+      github.event_name != 'push' ||
+      github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # GITHUB_SHA is already in the environment, so the build stamps itself
+      # with the commit being deployed and /build.txt can be checked afterwards.
+      - name: Build
+        run: npm run build
+
+      - name: Check for Cloudflare credentials
+        id: creds
+        env:
+          TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          echo "CLOUDFLARE_API_TOKEN:  ${#TOKEN} characters"
+          echo "CLOUDFLARE_ACCOUNT_ID: ${#ACCOUNT} characters"
+          if [ -n "$TOKEN" ] && [ -n "$ACCOUNT" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::warning title=No Cloudflare credentials::This job built the site but cannot publish it. Add two repository secrets under Settings › Secrets and variables › Actions: CLOUDFLARE_API_TOKEN (Cloudflare dashboard › My Profile › API Tokens › Create Token › 'Edit Cloudflare Workers') and CLOUDFLARE_ACCOUNT_ID (shown in the Workers overview sidebar). Until then the dashboard integration remains the only thing deploying."
+          fi
+
+      - name: Publish
+        if: steps.creds.outputs.ready == 'true'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        # Pinned rather than @latest: a deploy tool that changes under you is a
+        # deploy that breaks on a day you changed nothing.
+        run: npx --yes wrangler@4 deploy
+
+      # Closes the loop the whole exercise was about. The deployed site serves
+      # the commit it was built from at /build.txt, so this asks the live URL
+      # what it is running and fails if that is not this commit — no more
+      # inferring a deploy from whether a visual change showed up.
+      - name: Verify what is actually live
+        if: steps.creds.outputs.ready == 'true'
+        env:
+          SITE: ${{ vars.DEPLOY_CHECK_URL || 'https://dropday.newreleases.workers.dev' }}
+        run: |
+          echo "Asking $SITE/build.txt which commit it is serving…"
+          for attempt in 1 2 3 4 5; do
+            live=$(curl -fsS --max-time 20 "$SITE/build.txt" | awk '/^commit/ { print $2 }' || true)
+            if [ "$live" = "$GITHUB_SHA" ]; then
+              echo "::notice title=Deploy confirmed::$SITE is serving ${GITHUB_SHA:0:8}."
+              exit 0
+            fi
+            echo "  attempt $attempt: live=${live:-<no build.txt>} want=${GITHUB_SHA:0:8} — waiting"
+            sleep $((attempt * 10))
+          done
+          echo "::error title=Deployed, but the site is not serving it::wrangler reported success, yet $SITE/build.txt still reports '${live:-nothing}' rather than ${GITHUB_SHA:0:8}. Either an edge cache is holding the old page or another deploy overwrote this one."
+          exit 1
