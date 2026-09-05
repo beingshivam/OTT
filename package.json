@@ -17,7 +17,8 @@
     "providers": "node scripts/find-providers.mjs",
     "og": "node scripts/build-og.mjs",
     "digest": "node scripts/build-digest.mjs",
-    "social": "node scripts/build-social.mjs"
+    "social": "node scripts/build-social.mjs",
+    "launch": "node scripts/build-launch.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
