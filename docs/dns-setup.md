@@ -167,8 +167,17 @@ split the reporting between them.
    TXT records have no proxy toggle; there is nothing to turn orange.
 3. Back in Search Console → **Verify**. Usually seconds, since Cloudflare
    publishes immediately.
-4. Left menu → **Sitemaps** → enter `sitemap.xml` (the path only, not the full
-   URL) → **Submit**.
+4. Left menu → **Sitemaps** → enter the **full URL**:
+
+   ```
+   https://newonott.in/sitemap.xml
+   ```
+
+   This is a Domain property, and a Domain property has no URL prefix filled in
+   for you — so a bare `sitemap.xml` has no host to attach to and is rejected
+   with "please enter a valid path to a sitemap in your site". It is only
+   URL-prefix properties that take the path on its own, which is what most
+   guides assume.
 5. **URL Inspection** → paste `https://newonott.in/` → **Request indexing**.
    That queues the homepage rather than waiting to be discovered.
 
