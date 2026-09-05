@@ -26,3 +26,7 @@ export const BRAND = read('BRAND');
 export const SLUG = read('SLUG');
 export const TAGLINE = read('TAGLINE');
 export const HEADLINE = read('HEADLINE');
+export const INSTAGRAM = read('INSTAGRAM');
+/** Built here rather than parsed: INSTAGRAM_URL is a template literal in the
+ *  .ts file, so the single-quote pattern above cannot read it. */
+export const INSTAGRAM_URL = `https://www.instagram.com/${INSTAGRAM}/`;

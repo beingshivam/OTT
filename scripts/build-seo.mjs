@@ -24,7 +24,7 @@ import { execSync } from 'node:child_process';
 import { readFile, writeFile } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { BRAND, HEADLINE } from './brand.mjs';
+import { BRAND, HEADLINE, INSTAGRAM_URL } from './brand.mjs';
 import { ANALYTICS_TOKEN } from './config.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -164,6 +164,14 @@ const jsonLd = {
       name: BRAND,
       url: `${SITE_URL}/`,
       description: 'Every new release, every platform, one page.',
+      /**
+       * Tells search engines the site and the Instagram account are the same
+       * thing rather than two unrelated results that happen to share a name.
+       * It is the one piece of real SEO value in having a handle at all: on a
+       * new domain with no inbound links, an established profile is corroborating
+       * evidence that something is behind the site.
+       */
+      sameAs: [INSTAGRAM_URL],
     },
     {
       '@type': 'ItemList',

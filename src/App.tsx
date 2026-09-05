@@ -10,10 +10,11 @@ import {
   IconCalendar,
   IconChevronLeft,
   IconChevronRight,
+  IconInstagram,
   IconPlay,
   IconSearch,
 } from './components/icons';
-import { BRAND, SLUG, TAGLINE } from './data/brand';
+import { BRAND, INSTAGRAM, INSTAGRAM_URL, SLUG, TAGLINE } from './data/brand';
 import { REGIONS } from './data/platforms';
 import { loadFeed, weekById } from './lib/feed';
 import {
@@ -508,6 +509,18 @@ export default function App() {
               <IconCalendar />
               Remind me every Friday
             </button>
+            {/* The other way to not have to remember this site exists. Sits
+                beside the calendar button because they answer the same
+                question — how do I see next week's list — and one of them
+                needs no app permission. */}
+            <a
+              className="footer__link"
+              href={INSTAGRAM_URL}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              <IconInstagram />@{INSTAGRAM}
+            </a>
             <EmailSignup />
           </div>
           <div className="footer__stack">

@@ -27,6 +27,22 @@ export const BRAND = 'New on OTT';
  */
 export const SLUG = 'newonott';
 
+/**
+ * The Instagram handle, and only the handle.
+ *
+ * The URL it came from was a QR share link carrying `igsi` and `utm_source=qr`
+ * — parameters that identify the share that produced it, not the account. Left
+ * in, every visitor to the site would have been attributed to a QR scan that
+ * never happened, and the tracking on Instagram's own side would be wrong for
+ * as long as the link sat in the footer.
+ *
+ * Stored as the handle rather than a URL so the link, the JSON-LD `sameAs` and
+ * anywhere a caption wants to print "@newon_ott" all build from one string and
+ * cannot drift apart.
+ */
+export const INSTAGRAM = 'newon_ott';
+export const INSTAGRAM_URL = `https://www.instagram.com/${INSTAGRAM}/`;
+
 export const TAGLINE = 'every new release, every platform, one page.';
 
 export const HEADLINE = 'everything new, everywhere, this week';

@@ -123,6 +123,20 @@ export const IconPlay = (p: P) => (
   </svg>
 );
 
+/**
+ * Instagram, drawn on the same stroke grid as everything else rather than
+ * pasted from their brand kit. A filled glyph in a row of 1.8px strokes reads
+ * as a foreign object, and the official mark comes with usage rules about
+ * colour and clear space that a footer link does not need to take on.
+ */
+export const IconInstagram = (p: P) => (
+  <svg {...base} {...p}>
+    <rect x="3" y="3" width="18" height="18" rx="5" />
+    <circle cx="12" cy="12" r="4" />
+    <path d="M17.2 6.8h.01" />
+  </svg>
+);
+
 export const KIND_ICON = {
   film: IconFilm,
   series: IconTv,
