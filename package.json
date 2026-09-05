@@ -20,7 +20,8 @@
     "social": "node scripts/build-social.mjs",
     "launch": "node scripts/build-launch.mjs",
     "hook": "node scripts/build-hook.mjs",
-    "memes": "node scripts/build-memes.mjs"
+    "memes": "node scripts/build-memes.mjs",
+    "story": "node scripts/build-story.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
