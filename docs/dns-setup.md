@@ -143,5 +143,42 @@ every subscriber it earns.
 - `newonott.in/build.txt` names the deployed commit
 - `newonott.in/robots.txt` still carries its `Sitemap:` line — Cloudflare's AI
   crawler settings can manage robots.txt and may replace it
-- Then, and only then, add the property in Google Search Console and submit
-  `https://newonott.in/sitemap.xml`
+
+---
+
+## 4. Google Search Console
+
+Pick **Domain** property, not URL prefix. It verifies over DNS, which we already
+control here, and it covers the apex, `www`, http and https in one — a URL-prefix
+property would treat `newonott.in` and `www.newonott.in` as separate sites and
+split the reporting between them.
+
+1. `search.google.com/search-console` → **Add property** → **Domain** →
+   `newonott.in` (no `https://`, no `www`).
+2. Google shows a TXT record. In Cloudflare → DNS → **Add record**:
+
+   | Field   | Value                                   |
+   | ------- | --------------------------------------- |
+   | Type    | `TXT`                                   |
+   | Name    | `@`                                     |
+   | Content | `google-site-verification=…` as given   |
+   | TTL     | Auto                                    |
+
+   TXT records have no proxy toggle; there is nothing to turn orange.
+3. Back in Search Console → **Verify**. Usually seconds, since Cloudflare
+   publishes immediately.
+4. Left menu → **Sitemaps** → enter `sitemap.xml` (the path only, not the full
+   URL) → **Submit**.
+5. **URL Inspection** → paste `https://newonott.in/` → **Request indexing**.
+   That queues the homepage rather than waiting to be discovered.
+
+### What to expect, so nothing looks broken
+
+- **"Couldn't fetch"** right after submitting is normal. Google often reports it
+  before it has actually read the file. Leave it a day.
+- **"Discovered – currently not indexed"** is also normal for a new domain with
+  no inbound links. It resolves on its own.
+- **One page** is the honest number. The whole site is a single URL, so the
+  sitemap has one entry and coverage will report one. Growing that means real
+  per-week and per-platform pages — the work described in the README, and the
+  thing that would actually justify the domain in search.
