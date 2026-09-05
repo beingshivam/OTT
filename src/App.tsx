@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Board } from './components/Board';
 import { BrowseLinks } from './components/BrowseLinks';
+import { PageIntro } from './components/PageIntro';
 import { Controls } from './components/Controls';
 import { DetailSheet } from './components/DetailSheet';
 import { EmailSignup } from './components/EmailSignup';
@@ -322,7 +323,11 @@ export default function App() {
           >
             <IconChevronLeft />
           </button>
-          <h1 className="weekbar__date">{formatWeekRange(filters.weekId)}</h1>
+          {route ? (
+            <p className="weekbar__date">{formatWeekRange(filters.weekId)}</p>
+          ) : (
+            <h1 className="weekbar__date">{formatWeekRange(filters.weekId)}</h1>
+          )}
           <button
             className="weeknav__btn"
             onClick={() => stepWeek(1)}
@@ -364,6 +369,18 @@ export default function App() {
           </span>
         </div>
       </div>
+
+      {/* Only on a page that promised something specific. On "/" this renders
+          nothing and the layout is exactly what it was. */}
+      {route && feed && (
+        <PageIntro
+          route={route}
+          feed={feed}
+          region={filters.region}
+          currentWeek={currentWeek}
+          onOpen={setSelected}
+        />
+      )}
 
       <Controls
         filters={filters}

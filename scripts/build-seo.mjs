@@ -303,6 +303,7 @@ async function renderPage(page, pages) {
   const prerendered =
     `<main class="seo-fallback"><h1>${esc(page.h1)}</h1>` +
     `<p>${esc(page.lede)}</p>` +
+    (page.facts ?? '') +
     page.body +
     browseMarkup(pages) +
     `</main>`;
@@ -319,6 +320,54 @@ async function renderPage(page, pages) {
   await mkdir(dir, { recursive: true });
   await writeFile(resolve(dir, 'index.html'), out);
 }
+
+/**
+ * The facts a page leads with, in the prerendered copy too.
+ *
+ * The component renders these for a reader (components/PageIntro.tsx); a
+ * crawler has to see them as well, or the twenty-four documents it compares
+ * differ only by which rows they list — which is the thin-page problem the
+ * pages were built to escape.
+ */
+const STRONG_VOTES = 50;
+
+function factsMarkup({ rows, thisWeek, cross }) {
+  const parts = [];
+
+  const biggest = [...(thisWeek.length ? thisWeek : rows)]
+    .sort((a, b) => (b.heat ?? 0) - (a.heat ?? 0))
+    .slice(0, 3);
+  if (biggest.length) {
+    parts.push(
+      `<p><strong>${thisWeek.length ? 'Biggest this week' : 'Biggest right now'}:</strong> ` +
+        biggest.map((r) => esc(r.title)).join(', ') +
+        `</p>`,
+    );
+  }
+
+  if (cross && cross.items.length) {
+    parts.push(
+      `<p><strong>${esc(cross.label)}:</strong> ` +
+        cross.items.map((i) => `${esc(i.text)} (${i.n})`).join(', ') +
+        `</p>`,
+    );
+  }
+
+  const best = [...rows]
+    .filter((r) => r.rating != null && (r.votes == null || r.votes >= STRONG_VOTES))
+    .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))[0];
+  if (best) {
+    parts.push(`<p><strong>Best rated:</strong> ${esc(best.title)} — ${best.rating.toFixed(1)}</p>`);
+  }
+
+  return parts.join('');
+}
+
+const tally = (rows, pick) => {
+  const counts = new Map();
+  for (const r of rows) for (const k of pick(r)) counts.set(k, (counts.get(k) ?? 0) + 1);
+  return [...counts.entries()].sort((a, b) => b[1] - a[1]);
+};
 
 // --- the page set -----------------------------------------------------------
 
@@ -382,6 +431,16 @@ for (const p of platformsPresent) {
       : `Everything new on ${p.name} in India — ${list.length} films, series and shows across ${stockedWeeks.length} weeks, updated every Friday. No app, no login.`,
     h1: theatres ? 'New in cinemas' : `New on ${p.name}`,
     lede: `${list.length} releases across ${stockedWeeks.length} weeks, updated every Friday.`,
+    facts: factsMarkup({
+      rows: list,
+      thisWeek: list.filter((r) => r.weekId === week.id),
+      cross: {
+        label: 'Mostly in',
+        items: tally(list, (r) => r.languages ?? [])
+          .slice(0, 4)
+          .map(([c, n]) => ({ text: lname(c), n })),
+      },
+    }),
     body: sectionMarkup(sectionsBy(list, (r) => [r.weekId]), weekRangeOf),
   });
 }
@@ -398,6 +457,16 @@ for (const [code, name] of languagesPresent) {
     description: `Every new ${name} film, series and show across streaming platforms and cinemas — ${list.length} titles, updated every Friday. No app, no login.`,
     h1: `New ${name} releases`,
     lede: `${list.length} ${name} titles across every platform and cinemas, updated every Friday.`,
+    facts: factsMarkup({
+      rows: list,
+      thisWeek: list.filter((r) => r.weekId === week.id),
+      cross: {
+        label: 'Mostly on',
+        items: tally(list, (r) => r.platforms)
+          .slice(0, 4)
+          .map(([id, n]) => ({ text: pname(id), n })),
+      },
+    }),
     body: sectionMarkup(sectionsBy(list, (r) => [r.weekId]), weekRangeOf),
   });
 }
@@ -423,6 +492,7 @@ for (const w of [...stockedWeeks].sort((a, b) => b.id.localeCompare(a.id))) {
     description: `Everything released ${wRange}: ${list.length} films, series and shows across ${new Set(list.flatMap((r) => r.platforms)).size} platforms and Indian cinemas.`,
     h1: `New releases — ${wRange}`,
     lede: `${list.length} releases across ${new Set(list.flatMap((r) => r.platforms)).size} platforms.`,
+    facts: factsMarkup({ rows: list, thisWeek: [], cross: null }),
     body: sectionMarkup(sectionsBy(list, (r) => r.platforms), pname),
   });
 }

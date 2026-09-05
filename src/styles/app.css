@@ -2301,3 +2301,93 @@ a {
     width: auto;
   }
 }
+
+/* ------------------------------------------------------- page intro ----
+   What a /netflix or /tamil page says that the homepage does not. Sits
+   above the controls because it is the answer someone arriving from a
+   search came for; the filters below are for what they do next. */
+.pageintro {
+  padding: 18px var(--page-x) 0;
+  max-width: var(--page-max, 1400px);
+  margin: 0 auto;
+}
+.pageintro__title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 750;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+.pageintro__stat {
+  margin: 5px 0 0;
+  font-size: 13px;
+  color: var(--text-3);
+}
+.pageintro__stat strong {
+  color: var(--text-2);
+  font-weight: 700;
+}
+.pageintro__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  margin-top: 12px;
+}
+.pageintro__fact {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+.pageintro__label {
+  flex: none;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.pageintro__vals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+/* Same pill as the browse links, so the page reads as one system. */
+.pageintro__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.18s var(--ease);
+}
+.pageintro__pill:hover {
+  border-color: var(--line-strong, #ffffff2e);
+  color: var(--text);
+}
+.pageintro__pill em {
+  font-style: normal;
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+@media (max-width: 720px) {
+  .pageintro__fact {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .pageintro__facts {
+    gap: 12px 18px;
+  }
+}
