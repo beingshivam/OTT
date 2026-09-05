@@ -2391,3 +2391,140 @@ a {
     gap: 12px 18px;
   }
 }
+
+/* ------------------------------------------------- release-date page ----
+   "When is <film> coming to OTT?" — the one route that replaces the board
+   rather than filtering it. Reads as an article, because that is what it
+   is, while staying inside the same palette and pill vocabulary. */
+.titlepage {
+  padding: 22px 0 8px;
+}
+.titlepage__head {
+  display: flex;
+  gap: 22px;
+  align-items: flex-start;
+}
+.titlepage__art {
+  flex: none;
+  width: 148px;
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.titlepage__intro {
+  min-width: 0;
+  flex: 1;
+}
+.titlepage__intro h1 {
+  margin: 0 0 12px;
+  font-size: 26px;
+  line-height: 1.2;
+  font-weight: 750;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+/* The answer, before any of the context. Someone who came for the date
+   should be able to leave after one line. */
+.answer {
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.answer strong {
+  color: var(--text);
+}
+.answer--yes {
+  border-color: color-mix(in srgb, var(--ok, #37d67a) 40%, transparent);
+}
+.answer a {
+  color: var(--text);
+}
+.titlepage__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 26px;
+  margin: 16px 0 0;
+}
+.titlepage__facts div {
+  min-width: 0;
+}
+.titlepage__facts dt {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.titlepage__facts dd {
+  margin: 3px 0 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+.titlepage__facts a {
+  color: var(--text-2);
+}
+.titlepage__ago {
+  color: var(--text-3);
+  font-weight: 500;
+}
+.titlepage__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+.titlepage__block {
+  margin-top: 26px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+.titlepage__block h2 {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.titlepage__block p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-2);
+  max-width: 70ch;
+}
+.titlepage__also {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  font-size: 13.5px;
+}
+.titlepage__also a {
+  color: var(--text-2);
+}
+.titlepage__more {
+  margin-top: 12px !important;
+  font-size: 12.5px !important;
+  color: var(--text-3) !important;
+}
+
+@media (max-width: 560px) {
+  .titlepage__head {
+    flex-direction: column;
+    gap: 16px;
+  }
+  .titlepage__art {
+    width: 118px;
+  }
+  .titlepage__intro h1 {
+    font-size: 22px;
+  }
+}

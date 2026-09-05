@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { IconClose, IconExternal, IconPlay, IconShare, IconCheck } from './icons';
+import { IconCalendar, IconClose, IconExternal, IconPlay, IconShare, IconCheck } from './icons';
 import { PosterArt } from './PosterArt';
 import { dropLabel } from './ReleaseCard';
 import { KIND_LABEL, languageName, platform } from '../data/platforms';
@@ -149,6 +149,16 @@ export function DetailSheet({ release, onClose }: Props) {
               <a className="btn btn--lg" href={release.trailerUrl} target="_blank" rel="noreferrer">
                 <IconExternal />
                 Trailer
+              </a>
+            )}
+            {/* The other half of the release-date pages: without a link a
+                person can click, those pages would be reachable only from a
+                search result, and prerendered links no visitor can follow are
+                the cloaking problem the whole set is built to avoid. */}
+            {release.slug && (
+              <a className="btn btn--lg" href={`/ott-release-date/${release.slug}`}>
+                <IconCalendar />
+                OTT release date
               </a>
             )}
             <button className="btn btn--lg" onClick={share}>

@@ -25,6 +25,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { BRAND, HEADLINE, INSTAGRAM_URL } from './brand.mjs';
+import { slugify } from './slug.mjs';
 import { ANALYTICS_TOKEN } from './config.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -229,7 +230,8 @@ function sectionsBy(rows, key) {
 }
 
 const rowMarkup = (r) =>
-  `<li>${esc(r.title)} — ${esc(KIND[r.kind] ?? r.kind)}` +
+  `<li>${r.slug ? `<a href="/ott-release-date/${r.slug}">${esc(r.title)}</a>` : esc(r.title)}` +
+  ` — ${esc(KIND[r.kind] ?? r.kind)}` +
   `${r.languages?.length ? ` · ${esc(r.languages.map(lname).join(', '))}` : ''}` +
   `${r.genres?.length ? ` · ${esc(r.genres.slice(0, 2).join(', '))}` : ''}</li>`;
 
@@ -474,6 +476,43 @@ const everything = stockedWeeks.flatMap((w) =>
   w.releases.filter((r) => r.regions.includes(REGION)).map((r) => ({ ...r, weekId: w.id })),
 );
 
+const TODAY = new Date().toISOString().slice(0, 10);
+const titlePages = everything
+  .filter(
+    (r) =>
+      r.platforms.includes('theatres') &&
+      r.releaseDate <= TODAY &&
+      r.synopsis &&
+      r.cast?.length,
+  )
+  // Newest first, so the sitemap leads with what people are searching now.
+  .sort((a, b) => b.releaseDate.localeCompare(a.releaseDate));
+
+const slugById = new Map();
+for (const r of titlePages) {
+  const slug = slugify(r.title);
+  if (slug) slugById.set(r.id, slug);
+}
+
+/**
+ * Stamped onto the feed's own rows, before any page markup is built.
+ *
+ * Every prerendered list — the homepage, each week, /theatres, each collection
+ * — links a title that has a page, and those links are the only route a
+ * crawler has to the 47 title pages. A sitemap entry for a page nothing links
+ * to is a page that does not get crawled.
+ */
+for (const w of feed.weeks) {
+  for (const r of w.releases) {
+    const slug = slugById.get(r.id);
+    if (slug) r.slug = slug;
+  }
+}
+for (const r of everything) {
+  const slug = slugById.get(r.id);
+  if (slug) r.slug = slug;
+}
+
 const weekRangeOf = (id) => formatRange(id);
 const platformsPresent = PLATFORM_ROWS.filter(
   (p) =>
@@ -625,6 +664,75 @@ for (const w of [...stockedWeeks].sort((a, b) => b.id.localeCompare(a.id))) {
 }
 
 /**
+ * A page per theatrical film: "when is <title> coming to OTT?"
+ *
+ * The highest-volume recurring pattern in Indian entertainment search, and the
+ * one this site can answer better than anyone: it already knows what opened in
+ * cinemas and it re-checks streaming providers twice a week, so the page flips
+ * from "not announced" to the answer within days of the actual drop.
+ *
+ * Published the week the film opens, not the week it streams. A page indexed
+ * and ageing before the demand arrives is the difference between ranking for
+ * the query and watching someone else rank for it.
+ *
+ * Three conditions, and all three are about not shipping thin pages:
+ *
+ *   already opened   a film that is not out yet has no "when does it stream"
+ *                    question worth a page, and the honest answer would be a
+ *                    shrug on an empty document
+ *   has a synopsis   without one there is nothing on the page but a date
+ *   has a cast       same, and together they are what makes 116 pages 116
+ *                    documents rather than one template repeated
+ *
+ * The slug is computed here and stamped into the shipped feed, so the app
+ * resolves the path by reading a field rather than re-deriving it — one
+ * implementation of the rule, and no way for the two to disagree.
+ */
+for (const r of titlePages) {
+  const slug = slugById.get(r.id);
+  if (!slug) continue;
+
+  const streaming = r.platforms.filter((p) => p !== 'theatres');
+  const answer = streaming.length
+    ? `Streaming now on ${streaming.map(pname).join(', ')}.`
+    : `Not announced yet — no streaming date has been confirmed. This page updates automatically; every platform is re-checked twice a week.`;
+
+  const langs = (r.languages ?? []).map(lname);
+  const alsoThatWeek = everything
+    .filter((x) => x.weekId === r.weekId && x.id !== r.id && x.platforms.includes('theatres'))
+    .slice(0, 6);
+
+  pages.push({
+    path: `ott-release-date/${slug}`,
+    group: 'title',
+    crumb: r.title,
+    rows: [r],
+    title: `${r.title} OTT release date — when is it coming to streaming?`,
+    description:
+      `${r.title}${langs.length ? ` (${langs.join(', ')})` : ''} released in cinemas on ${r.releaseDate}. ` +
+      `${streaming.length ? `Now streaming on ${streaming.map(pname).join(', ')}.` : 'Streaming date not announced yet.'} ` +
+      `Updated twice a week.`,
+    h1: `When is ${r.title} coming to OTT?`,
+    lede: answer,
+    facts:
+      `<p><strong>In cinemas:</strong> ${esc(r.releaseDate)}</p>` +
+      (langs.length ? `<p><strong>Language:</strong> ${esc(langs.join(', '))}</p>` : '') +
+      (r.genres?.length ? `<p><strong>Genre:</strong> ${esc(r.genres.join(', '))}</p>` : '') +
+      (r.certification ? `<p><strong>Certificate:</strong> ${esc(r.certification)}</p>` : '') +
+      (r.runtimeMinutes ? `<p><strong>Runtime:</strong> ${esc(r.runtimeMinutes)} min</p>` : '') +
+      (r.rating != null ? `<p><strong>Rating:</strong> ${esc(r.rating.toFixed(1))}</p>` : ''),
+    body:
+      `<section><h2>What it's about</h2><p>${esc(r.synopsis)}</p></section>` +
+      `<section><h2>Cast</h2><p>${esc(r.cast.join(' · '))}</p></section>` +
+      (alsoThatWeek.length
+        ? `<section><h2>Also in cinemas that week</h2><ul>` +
+          alsoThatWeek.map((x) => `<li>${esc(x.title)}</li>`).join('') +
+          `</ul></section>`
+        : ''),
+  });
+}
+
+/**
  * Two pages may never claim the same path.
  *
  * Platform ids and language names are both flat slugs, which keeps the URLs
@@ -662,6 +770,16 @@ const sitemap =
 await writeFile(resolve(ROOT, 'dist/sitemap.xml'), sitemap);
 
 /**
+ * Stamp each title page's slug onto its row in the shipped feed.
+ *
+ * The app resolves /ott-release-date/<slug> by looking for this field rather
+ * than slugifying titles itself. Two implementations of the slug rule would
+ * drift on the first title with a colon in it, and the failure would be
+ * silent: the page exists, the link points at it, and the app renders nothing.
+ */
+await writeFile(FEED, JSON.stringify(feed));
+
+/**
  * The same build id at a URL, because meta tags are unreachable on a phone.
  *
  * Confirming which build is live otherwise means view-source, which iOS Safari
@@ -695,6 +813,6 @@ const count = (g) => pages.filter((p) => p.group === g).length;
 console.log(
   `SEO: build ${buildSha.slice(0, 8)}\n` +
     `     home titled "${title}" — ${rows.length} releases\n` +
-    `     ${pages.length} pages: 1 home, ${count('collection')} collection, ${count('platform')} platform, ${count('language')} language, ${count('week')} week\n` +
+    `     ${pages.length} pages: 1 home, ${count('title')} title, ${count('collection')} collection, ${count('platform')} platform, ${count('language')} language, ${count('week')} week\n` +
     `     sitemap, robots.txt, JSON-LD with breadcrumbs`,
 );

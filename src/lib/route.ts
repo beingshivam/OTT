@@ -21,6 +21,8 @@ import type { Filters } from '../types';
  *   /tamil            a language, by its English name lowercased
  *   /south            a collection of languages (see data/collections.ts)
  *   /w/2026-09-04     one week, by the ISO date of its Friday
+ *   /ott-release-date/<slug>
+ *                     one theatrical film, answering when it reaches streaming
  *
  * Anything else — including "/" — returns null and the app behaves exactly as
  * it did before this file existed. That is deliberate: the homepage is live and
@@ -59,6 +61,9 @@ export type Route = Partial<Pick<Filters, 'platforms' | 'languages' | 'kinds' | 
   /** Set when the path was a collection, so the page can name itself after the
    *  group rather than after the first language in it. */
   collection?: string;
+  /** Set when the path names one title. Unlike every other route this is not a
+   *  filter over the board — the app renders a different page entirely. */
+  titleSlug?: string;
 };
 
 /** Language slugs, derived from the same table the app renders from, so a
@@ -72,6 +77,10 @@ const PLATFORM_IDS = new Set(PLATFORMS.map((p) => p.id));
 /** A Friday, as the build writes it. Anything else is not one of our pages. */
 const WEEK_PATH = /^\/w\/(\d{4}-\d{2}-\d{2})$/;
 
+/** One title's page. The slug is stamped onto the feed by the build
+ *  (scripts/slug.mjs), never derived here, so the two cannot disagree. */
+const TITLE_PATH = /^\/ott-release-date\/([a-z0-9-]+)$/;
+
 export function routeFilters(pathname: string): Route | null {
   // Trailing slashes are the same page — Cloudflare serves /netflix and
   // /netflix/ from the same file, so both must resolve here too.
@@ -80,6 +89,9 @@ export function routeFilters(pathname: string): Route | null {
 
   const week = WEEK_PATH.exec(path);
   if (week) return { weekId: week[1] };
+
+  const title = TITLE_PATH.exec(path);
+  if (title) return { titleSlug: title[1] };
 
   const slug = path.slice(1).toLowerCase();
   if (PLATFORM_IDS.has(slug)) return { platforms: [slug] };

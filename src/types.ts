@@ -29,6 +29,14 @@ export interface Release {
   genres: string[];
   /** ISO date (YYYY-MM-DD) the title becomes available. */
   releaseDate: string;
+  /**
+   * URL slug, stamped onto the feed by the build for titles that got their own
+   * page (scripts/build-seo.mjs, via scripts/slug.mjs). Absent on everything
+   * else — its presence is exactly the test for "does this title have a page".
+   * Never derived in the app: one implementation of the slug rule means the
+   * path the build wrote and the path the app resolves cannot drift.
+   */
+  slug?: string;
   /** Regions this release applies to (ISO-3166-1). Used by the region switcher. */
   regions: string[];
   drop?: DropInfo;

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Board } from './components/Board';
 import { BrowseLinks } from './components/BrowseLinks';
 import { PageIntro } from './components/PageIntro';
+import { ReleaseDatePage } from './components/ReleaseDatePage';
 import { Controls } from './components/Controls';
 import { DetailSheet } from './components/DetailSheet';
 import { EmailSignup } from './components/EmailSignup';
@@ -177,6 +178,25 @@ export default function App() {
     });
   }, []);
 
+  /**
+   * The title a /ott-release-date/<slug> page names, matched on the slug the
+   * build stamped into the feed rather than one derived here — see types.ts.
+   * Undefined while the feed is still loading, and for a slug that no longer
+   * exists, which the render below treats as "not found" rather than blank.
+   */
+  const titlePage = useMemo(() => {
+    if (!route?.titleSlug || !feed) return undefined;
+    for (const w of feed.weeks) {
+      const hit = w.releases.find((r) => r.slug === route.titleSlug);
+      if (hit) return hit;
+    }
+    return null;
+  }, [route, feed]);
+
+  /** A title page is the one route that does not render the board at all, so
+   *  the week bar, the filters and the grid all step aside for it. */
+  const isTitlePage = Boolean(route?.titleSlug);
+
   const week = weekById(feed, filters.weekId);
   const releases = week?.releases ?? [];
   const facets = useMemo(() => facetsFor(releases, filters.region), [releases, filters.region]);
@@ -314,6 +334,7 @@ export default function App() {
           </div>
         </div>
 
+        {!isTitlePage && (
         <div className="weekbar__week">
           <button
             className="weeknav__btn"
@@ -343,7 +364,9 @@ export default function App() {
             </button>
           )}
         </div>
+        )}
 
+        {!isTitlePage && (
         <div className="weekbar__right">
           <span className="weekbar__count">
             <strong>{facets.total}</strong> releases ·{' '}
@@ -368,11 +391,12 @@ export default function App() {
             </button>
           </span>
         </div>
+        )}
       </div>
 
       {/* Only on a page that promised something specific. On "/" this renders
           nothing and the layout is exactly what it was. */}
-      {route && feed && (
+      {route && feed && !isTitlePage && (
         <PageIntro
           route={route}
           feed={feed}
@@ -382,6 +406,7 @@ export default function App() {
         />
       )}
 
+      {!isTitlePage && (
       <Controls
         filters={filters}
         facets={facets}
@@ -389,6 +414,7 @@ export default function App() {
         onChange={update}
         onReset={resetFilters}
       />
+      )}
 
       <main className="shell" id="main">
         {/* Above the board so it is actually seen, below the week header so the
@@ -411,9 +437,31 @@ export default function App() {
           </div>
         )}
 
-        {!feed && !error && <LoadingBoard view={view} />}
+        {/* A title page replaces the board entirely. Null means the feed
+            loaded and no title carries that slug — a page that was generated
+            once and whose title has since fallen out of the eight-week window.
+            Saying so beats an empty screen. */}
+        {isTitlePage && feed && !error && titlePage && (
+          <ReleaseDatePage release={titlePage} feed={feed} region={filters.region} />
+        )}
+        {isTitlePage && feed && !error && titlePage === null && (
+          <div className="empty">
+            <span className="empty__icon">
+              <IconCalendar />
+            </span>
+            <h3>We don't have that title any more</h3>
+            <p>It has dropped out of the weeks we track. The board has everything current.</p>
+            <div className="empty__actions">
+              <a className="btn btn--lg" href="/">
+                Back to this week
+              </a>
+            </div>
+          </div>
+        )}
 
-        {feed && !error && facets.total === 0 && (
+        {!isTitlePage && !feed && !error && <LoadingBoard view={view} />}
+
+        {!isTitlePage && feed && !error && facets.total === 0 && (
           <div className="empty">
             <span className="empty__icon">
               <IconCalendar />
@@ -452,7 +500,7 @@ export default function App() {
           </div>
         )}
 
-        {feed && !error && facets.total > 0 && (
+        {!isTitlePage && feed && !error && facets.total > 0 && (
           <>
             {!userNarrowed && (
               <TrendingStrip
