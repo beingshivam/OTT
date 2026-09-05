@@ -53,13 +53,23 @@ export function EmailSignup({ variant = 'footer' }: { variant?: 'footer' | 'bann
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (state === 'sending' || !email.trim()) return;
+    const address = email.trim();
+    if (state === 'sending' || !address) return;
     setState('sending');
     try {
       const res = await fetch(EMAIL_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ email: email.trim() }),
+        /**
+         * Two names for one value, because providers disagree and a silently
+         * ignored field looks identical to a working form.
+         *
+         * Kit (ConvertKit) reads `email_address`; Buttondown, Formspree and most
+         * others read `email`. Sending both costs nothing — the one a given
+         * endpoint does not recognise is discarded — and it means the form works
+         * on whichever service gets chosen without a code change on launch day.
+         */
+        body: JSON.stringify({ email: address, email_address: address }),
       });
       if (!res.ok) throw new Error(String(res.status));
       setState('done');
