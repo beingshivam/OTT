@@ -84,7 +84,16 @@ const FRAMES = [
   {
     kicker: 'Bas itna hi',
     head: `*${SITE}*`,
-    sub: 'No app to install. No login. No ads. Free, aur free hi rahega.',
+    /**
+     * "No ads" is deliberately not in this list, and should not be added back.
+     *
+     * Ads are planned. A promise made to the earliest readers and broken later
+     * costs more than the line ever earned — and those are the readers who
+     * forgive it least. Everything claimed here stays true after ads exist:
+     * there is still no app, still no login, still a refresh every Friday, and
+     * it is still free to the person reading it.
+     */
+    sub: 'No app to install. No login. Har Friday update. Free, aur free hi rahega.',
     cta: true,
   },
 ];
