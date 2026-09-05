@@ -28,6 +28,17 @@ import type { Filters } from '../types';
  */
 
 /**
+ * The share of the whole feed above which a page stops being a distinct page.
+ *
+ * /movies would have been 143 of 183 rows and /drama 85 — documents so close
+ * to the homepage that they compete with it rather than add to it, and two
+ * near-identical pages is how you lose the better one. Expressed as a rule
+ * rather than a blocklist so a genre that swells one month is caught without
+ * anyone noticing it happened.
+ */
+export const MAX_PAGE_SHARE = 0.6;
+
+/**
  * How many titles a page needs before it is worth publishing.
  *
  * A per-platform page listing one film is thin programmatic content — the exact
@@ -44,7 +55,7 @@ import type { Filters } from '../types';
  */
 export const MIN_PAGE_ROWS = 5;
 
-export type Route = Partial<Pick<Filters, 'platforms' | 'languages' | 'weekId'>> & {
+export type Route = Partial<Pick<Filters, 'platforms' | 'languages' | 'kinds' | 'genres' | 'weekId'>> & {
   /** Set when the path was a collection, so the page can name itself after the
    *  group rather than after the first language in it. */
   collection?: string;
@@ -77,7 +88,14 @@ export function routeFilters(pathname: string): Route | null {
   // table, and the build refuses to publish two pages at the same path, so a
   // collection named after a language cannot silently shadow one.
   const collection = collectionBySlug(slug);
-  if (collection) return { languages: collection.languages, collection: slug };
+  if (collection) {
+    return {
+      ...(collection.languages ? { languages: collection.languages } : {}),
+      ...(collection.kinds ? { kinds: collection.kinds as Route['kinds'] } : {}),
+      ...(collection.genres ? { genres: collection.genres } : {}),
+      collection: slug,
+    };
+  }
 
   const language = LANGUAGE_BY_SLUG.get(slug);
   if (language) return { languages: [language] };

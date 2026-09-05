@@ -91,18 +91,76 @@ const PLATFORM_ROWS = [
  * job of adding a page.
  */
 const collectionSrc = await readFile(resolve(ROOT, 'src/data/collections.ts'), 'utf8');
-const COLLECTIONS = [
-  ...collectionSrc.matchAll(
-    /slug:\s*'([^']+)',[\s\S]*?label:\s*'([^']+)',[\s\S]*?languages:\s*\[([^\]]*)\][\s\S]*?title:\s*'([^']+)',[\s\S]*?description:\s*\n?\s*'([^']+)'/g,
-  ),
-].map(([, slug, label, langs, title, description]) => ({
-  slug,
-  label,
-  languages: langs.split(',').map((x) => x.trim().replace(/'/g, '')).filter(Boolean),
-  title,
-  description,
-}));
+
+/**
+ * Read one field out of a collection literal.
+ *
+ * String scanning rather than a composed RegExp: the first attempt built
+ * patterns with new RegExp and the escaping did not survive, which failed the
+ * build loudly — the right outcome, and avoidable. Fields are found at their
+ * own indentation so a word inside the comment above one cannot be mistaken
+ * for the field itself.
+ */
+const fieldAt = (block, name) => {
+  const i = block.indexOf(`\n    ${name}:`);
+  return i === -1 ? -1 : i + name.length + 6;
+};
+const strField = (block, name) => {
+  const i = fieldAt(block, name);
+  if (i === -1) return undefined;
+  const q = block.indexOf("'", i);
+  if (q === -1) return undefined;
+  let out = '';
+  for (let j = q + 1; j < block.length; j++) {
+    if (block[j] === '\\') { out += block[++j]; continue; }
+    if (block[j] === "'") break;
+    out += block[j];
+  }
+  return out;
+};
+const arrayField = (block, name) => {
+  const i = fieldAt(block, name);
+  if (i === -1) return undefined;
+  const open = block.indexOf('[', i);
+  const close = block.indexOf(']', open);
+  if (open === -1 || close === -1) return undefined;
+  return block.slice(open + 1, close).split(',').map((x) => x.trim().replace(/'/g, '')).filter(Boolean);
+};
+
+const COLLECTIONS = collectionSrc
+  .split(/\n  \{\n/)
+  .slice(1)
+  .map((block) => '\n' + block.split(/\n  \},/)[0])
+  .filter((block) => block.includes('slug:'))
+  .map((block) => ({
+    slug: strField(block, 'slug'),
+    label: strField(block, 'label'),
+    chip: strField(block, 'chip'),
+    title: strField(block, 'title'),
+    description: strField(block, 'description'),
+    languages: arrayField(block, 'languages'),
+    kinds: arrayField(block, 'kinds'),
+    genres: arrayField(block, 'genres'),
+  }));
+
 if (!COLLECTIONS.length) throw new Error('No collections parsed from src/data/collections.ts');
+for (const c of COLLECTIONS) {
+  if (!c.slug || !c.label || !c.chip || !c.title || !c.description) {
+    throw new Error(`Collection "${c.slug ?? '(unnamed)'}" is missing a field its page needs.`);
+  }
+  if (!c.languages && !c.kinds && !c.genres) {
+    throw new Error(`Collection "${c.slug}" selects nothing — it would list the entire feed.`);
+  }
+}
+
+/** Membership, mirroring inCollection() in src/data/collections.ts: every
+ *  dimension that is set must match, any value within one. */
+const inCollection = (c, r) => {
+  if (c.languages && !(r.languages ?? []).some((l) => c.languages.includes(l))) return false;
+  if (c.kinds && !c.kinds.includes(r.kind)) return false;
+  if (c.genres && !(r.genres ?? []).some((g) => c.genres.includes(g))) return false;
+  return true;
+};
 
 const KIND = { film: 'Film', series: 'Series', documentary: 'Documentary', reality: 'Reality', anime: 'Anime', special: 'Special' };
 const pname = (id) => platformName.get(id) ?? id;
@@ -397,6 +455,12 @@ const REGION = 'IN';
 /** Read from the app rather than repeated, so the links it renders and the
  *  pages this writes cannot disagree. See lib/route.ts for why it exists. */
 const routeSrc = await readFile(resolve(ROOT, 'src/lib/route.ts'), 'utf8');
+const MAX_PAGE_SHARE = Number(
+  (routeSrc.match(/export const MAX_PAGE_SHARE\s*=\s*([\d.]+)/) ?? [])[1] ??
+    (() => {
+      throw new Error('src/lib/route.ts no longer exports MAX_PAGE_SHARE.');
+    })(),
+);
 const MIN_PAGE_ROWS = Number(
   (routeSrc.match(/export const MIN_PAGE_ROWS\s*=\s*(\d+)/) ?? [])[1] ??
     (() => {
@@ -467,13 +531,32 @@ for (const p of platformsPresent) {
 }
 
 for (const c of COLLECTIONS) {
-  const list = everything.filter((r) => (r.languages ?? []).some((l) => c.languages.includes(l)));
-  if (list.length < MIN_PAGE_ROWS) continue;
+  const list = everything.filter((r) => inCollection(c, r));
+  /**
+   * Two guards, both read from the app so the chips and the pages agree:
+   * enough rows to be worth a page, and not so many that the page is really
+   * the homepage again — /movies would have been 143 of 183 rows.
+   */
+  if (list.length < MIN_PAGE_ROWS || list.length > everything.length * MAX_PAGE_SHARE) continue;
+
+  /** A language collection's interesting cut is which of its own languages
+   *  turned up; a genre or kind collection's is which platforms carry it. */
+  const languageCut = {
+    label: 'Languages',
+    items: tally(list, (r) => (r.languages ?? []).filter((l) => !c.languages || c.languages.includes(l)))
+      .slice(0, c.languages ? c.languages.length : 4)
+      .map(([code, n]) => ({ text: lname(code), n })),
+  };
+  const platformCut = {
+    label: 'Mostly on',
+    items: tally(list, (r) => r.platforms).slice(0, 4).map(([id, n]) => ({ text: pname(id), n })),
+  };
+
   pages.push({
     path: c.slug,
     group: 'collection',
     crumb: c.label,
-    linkText: c.label.replace(/ releases$/, ''),
+    linkText: c.chip,
     rows: list,
     title: c.title,
     description: c.description.replace('{n}', String(list.length)),
@@ -482,17 +565,8 @@ for (const c of COLLECTIONS) {
     facts: factsMarkup({
       rows: list,
       thisWeek: list.filter((r) => r.weekId === week.id),
-      cross: {
-        label: 'Languages',
-        items: tally(list, (r) => (r.languages ?? []).filter((l) => c.languages.includes(l)))
-          .map(([code, n]) => ({ text: lname(code), n })),
-      },
-      cross2: {
-        label: 'Mostly on',
-        items: tally(list, (r) => r.platforms)
-          .slice(0, 4)
-          .map(([id, n]) => ({ text: pname(id), n })),
-      },
+      cross: c.languages ? languageCut : platformCut,
+      cross2: c.languages ? platformCut : languageCut,
     }),
     body: sectionMarkup(sectionsBy(list, (r) => [r.weekId]), weekRangeOf),
   });

@@ -1,8 +1,8 @@
 import { PLATFORMS, LANGUAGES } from '../data/platforms';
 import type { ReleaseFeed } from '../types';
 import { formatWeekRange } from '../lib/week';
-import { MIN_PAGE_ROWS } from '../lib/route';
-import { COLLECTIONS } from '../data/collections';
+import { MIN_PAGE_ROWS, MAX_PAGE_SHARE } from '../lib/route';
+import { COLLECTIONS, inCollection } from '../data/collections';
 
 /**
  * The way in to every other page on the site.
@@ -55,9 +55,15 @@ export function BrowseLinks({ feed, region }: { feed: ReleaseFeed | null; region
   // Only what the build actually published — see MIN_PAGE_ROWS in lib/route.ts.
   const count = (match: (r: (typeof scoped)[number]) => boolean) => scoped.filter(match).length;
 
-  const collections = COLLECTIONS.filter(
-    (c) => count((r) => (r.languages ?? []).some((l) => c.languages.includes(l))) >= MIN_PAGE_ROWS,
-  );
+  /**
+   * The same two rules the build applies (lib/route.ts): enough rows to be
+   * worth a page, and not so many that the page is really the homepage again.
+   * Shared so a chip can never point at a page the build declined to write.
+   */
+  const collections = COLLECTIONS.filter((c) => {
+    const n = count((r) => inCollection(c, r));
+    return n >= MIN_PAGE_ROWS && n <= scoped.length * MAX_PAGE_SHARE;
+  });
 
   const platforms = PLATFORMS.filter(
     (p) => p.regions.includes(region) && count((r) => r.platforms.includes(p.id)) >= MIN_PAGE_ROWS,
@@ -80,7 +86,7 @@ export function BrowseLinks({ feed, region }: { feed: ReleaseFeed | null; region
           <div className="browse__chips">
             {collections.map((c) => (
               <a key={c.slug} className="browse__chip" href={`/${c.slug}`}>
-                {c.label.replace(/ releases$/, '')}
+                {c.chip}
               </a>
             ))}
           </div>

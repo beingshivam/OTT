@@ -32,9 +32,12 @@ export function readFilters(
     weekId: p.get('w') ?? route?.weekId ?? defaults.weekId,
     region: p.get('r') ?? defaults.region,
     platforms: platforms.length ? platforms : (route?.platforms ?? []),
-    kinds: list(p, 't').filter((k): k is TitleKind => KIND_VALUES.includes(k as TitleKind)),
+    kinds: (() => {
+      const fromUrl = list(p, 't').filter((k): k is TitleKind => KIND_VALUES.includes(k as TitleKind));
+      return fromUrl.length ? fromUrl : (route?.kinds ?? []);
+    })(),
     languages: languages.length ? languages : (route?.languages ?? []),
-    genres: list(p, 'g'),
+    genres: list(p, 'g').length ? list(p, 'g') : (route?.genres ?? []),
     query: p.get('q') ?? '',
     sort: sort && SORT_VALUES.includes(sort) ? sort : 'trending',
   };
@@ -78,9 +81,9 @@ export function writeFilters(
   if (pinned.week && f.weekId !== defaults.weekId && f.weekId !== route?.weekId) p.set('w', f.weekId);
   if (pinned.region) p.set('r', f.region);
   if (f.platforms.length && !sameList(f.platforms, route?.platforms)) p.set('p', f.platforms.join(','));
-  if (f.kinds.length) p.set('t', f.kinds.join(','));
+  if (f.kinds.length && !sameList(f.kinds, route?.kinds)) p.set('t', f.kinds.join(','));
   if (f.languages.length && !sameList(f.languages, route?.languages)) p.set('l', f.languages.join(','));
-  if (f.genres.length) p.set('g', f.genres.join(','));
+  if (f.genres.length && !sameList(f.genres, route?.genres)) p.set('g', f.genres.join(','));
   if (f.query) p.set('q', f.query);
   if (f.sort !== 'trending') p.set('sort', f.sort);
 

@@ -1,7 +1,7 @@
 import { PLATFORMS, LANGUAGES, platform as platformById, languageName } from '../data/platforms';
 import type { Release, ReleaseFeed } from '../types';
 import type { Route } from '../lib/route';
-import { collectionBySlug } from '../data/collections';
+import { collectionBySlug, inCollection } from '../data/collections';
 import { platformLinkText } from './BrowseLinks';
 
 /**
@@ -59,12 +59,16 @@ export function PageIntro({ route, feed, region, currentWeek, onOpen }: Props) {
    * Malayalam *and* Kannada, matched nothing, and rendered no intro at all
    * while the board below it showed seventy titles.
    */
+  const collection = route.collection ? collectionBySlug(route.collection) : undefined;
+
   const matches = (r: Release) =>
-    route.platforms
-      ? route.platforms.some((p) => r.platforms.includes(p))
-      : route.languages
-        ? route.languages.some((l) => (r.languages ?? []).includes(l))
-        : true;
+    collection
+      ? inCollection(collection, r)
+      : route.platforms
+        ? route.platforms.some((p) => r.platforms.includes(p))
+        : route.languages
+          ? route.languages.some((l) => (r.languages ?? []).includes(l))
+          : true;
 
   const weeks = route.weekId ? feed.weeks.filter((w) => w.id === route.weekId) : feed.weeks;
   const scope = weeks.flatMap((w) => w.releases.filter(inRegion).filter(matches));
@@ -86,8 +90,6 @@ export function PageIntro({ route, feed, region, currentWeek, onOpen }: Props) {
 
   const films = scope.filter((r) => r.kind === 'film').length;
   const series = scope.length - films;
-
-  const collection = route.collection ? collectionBySlug(route.collection) : undefined;
 
   const heading = collection
     ? collection.label
@@ -136,7 +138,9 @@ export function PageIntro({ route, feed, region, currentWeek, onOpen }: Props) {
   });
 
   const crosses = collection
-    ? [byLanguage(collection.languages.length, collection.languages), byPlatform]
+    ? collection.languages
+      ? [byLanguage(collection.languages.length, collection.languages), byPlatform]
+      : [byPlatform, byLanguage(4)]
     : route.languages
       ? [byPlatform]
       : route.platforms
