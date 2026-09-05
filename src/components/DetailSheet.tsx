@@ -75,9 +75,15 @@ export function DetailSheet({ release, onClose }: Props) {
       aria-labelledby="sheet-title"
     >
       <div className="sheet">
+        {/* Outside the scrolling region on purpose. It used to sit inside it,
+            absolutely positioned, so it scrolled away with the content — on a
+            phone, where the sheet is nearly full height and the overview runs
+            long, it was gone after the first flick and the only way out left
+            was the back gesture. */}
         <button ref={closeRef} className="sheet__close" onClick={onClose} aria-label="Close">
           <IconClose />
         </button>
+        <div className="sheet__scroll">
         <div className="sheet__hero">
           <PosterArt
             className="art"
@@ -201,6 +207,7 @@ export function DetailSheet({ release, onClose }: Props) {
             </div>
           )}
 
+        </div>
         </div>
       </div>
     </div>

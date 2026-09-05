@@ -1612,8 +1612,12 @@ a {
   position: relative;
   width: min(880px, 100%);
   max-height: min(86vh, 780px);
-  overflow: hidden auto;
-  overscroll-behavior: contain;
+  /* The sheet frames; an inner element scrolls. Making the frame itself the
+     scroll container meant the absolutely-positioned close button scrolled
+     with the content and left the screen. */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   border-radius: var(--radius-lg);
   border: 1px solid var(--line-strong);
   background: var(--surface-solid);
@@ -1625,6 +1629,12 @@ a {
     opacity: 0;
     transform: translateY(18px) scale(0.985);
   }
+}
+
+.sheet__scroll {
+  overflow: hidden auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .sheet__hero {
@@ -1657,6 +1667,17 @@ a {
 }
 .sheet__close:hover {
   background: rgba(6, 7, 10, 0.92);
+}
+@media (pointer: coarse) {
+  /* The one control someone reaches for in a hurry, and it was 34px against a
+     44px guideline — missed when the other touch targets were raised because
+     it lives in the sheet rather than the page. */
+  .sheet__close {
+    width: 44px;
+    height: 44px;
+    top: 10px;
+    right: 10px;
+  }
 }
 .sheet__body {
   padding: 0 clamp(20px, 4vw, 34px) clamp(24px, 4vw, 34px);
