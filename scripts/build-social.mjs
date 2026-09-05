@@ -94,7 +94,13 @@ const platformCount = new Set(rows.flatMap((r) => r.platforms)).size;
  * beats a complete list nobody can read.
  */
 const SIZES = [
+  // Instagram feed. 4:5 is the tallest crop the feed allows, so it takes the
+  // most screen on a scroll.
   { name: 'instagram-4x5', w: 1080, h: 1350, items: 8, title: 40, head: 92 },
+  // WhatsApp chat. A 9:16 gets aggressively cropped in the message thumbnail
+  // and the URL is what gets cut, so forwards get a square that cannot lose it.
+  { name: 'whatsapp-1x1', w: 1080, h: 1080, items: 6, title: 40, head: 84 },
+  // Stories, Reels covers, WhatsApp status.
   { name: 'story-9x16', w: 1080, h: 1920, items: 11, title: 42, head: 104 },
 ];
 
@@ -206,4 +212,47 @@ try {
   await browser.close();
 }
 
-console.log(`\nPosters for ${range}: ${rows.length} releases, ${platformCount} platforms → social/`);
+/**
+ * The words, generated with the pictures.
+ *
+ * Writing a fresh caption every week is the same chore that kills newsletters,
+ * and a recycled one reads as a recycled post. Both are built from the same
+ * week the posters show, so the titles named in the copy are the titles on the
+ * image.
+ */
+const named = rows.slice(0, 5).map((r) => `${r.title} (${pname(r.platforms[0])})`);
+const caption = [
+  `Out this week — ${range}`,
+  '',
+  ...rows.slice(0, 5).map((r) => `• ${r.title} — ${pname(r.platforms[0])}`),
+  '',
+  `+ ${rows.length - 5} more, including everything in cinemas.`,
+  `Every platform on one page. No app, no login, updated every Friday.`,
+  '',
+  `🔗 ${SITE} (link in bio)`,
+  '',
+  // Broad tags get you nothing at this follower count; specific ones are where
+  // a small account actually surfaces. Kept to a dozen for the same reason.
+  '#NewOnOTT #OTTReleases #WhatToWatch #OTTIndia #NewReleases',
+  '#Netflix #PrimeVideo #JioHotstar #Bollywood #TamilCinema #TeluguCinema #Malayalam',
+  '',
+].join('\n');
+
+// Short on purpose: long messages do not get forwarded.
+const whatsapp = [
+  `*Out this week* — ${range}`,
+  '',
+  ...rows.slice(0, 3).map((r) => `• ${r.title} — ${pname(r.platforms[0])}`),
+  '',
+  `+ ${rows.length - 3} more across ${platformCount} platforms, plus everything in cinemas.`,
+  `All on one page 👇`,
+  `https://${SITE}`,
+  '',
+].join('\n');
+
+await writeFile(resolve(OUT, 'caption.txt'), caption);
+await writeFile(resolve(OUT, 'whatsapp.txt'), whatsapp);
+
+console.log(`\nPosters for ${range}: ${rows.length} releases, ${platformCount} platforms`);
+console.log(`Leading with: ${named.slice(0, 3).join(', ')}`);
+console.log(`\nsocial/ — instagram-4x5.png, whatsapp-1x1.png, story-9x16.png, caption.txt, whatsapp.txt`);
