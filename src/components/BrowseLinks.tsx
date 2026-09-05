@@ -2,6 +2,7 @@ import { PLATFORMS, LANGUAGES } from '../data/platforms';
 import type { ReleaseFeed } from '../types';
 import { formatWeekRange } from '../lib/week';
 import { MIN_PAGE_ROWS } from '../lib/route';
+import { COLLECTIONS } from '../data/collections';
 
 /**
  * The way in to every other page on the site.
@@ -54,6 +55,10 @@ export function BrowseLinks({ feed, region }: { feed: ReleaseFeed | null; region
   // Only what the build actually published — see MIN_PAGE_ROWS in lib/route.ts.
   const count = (match: (r: (typeof scoped)[number]) => boolean) => scoped.filter(match).length;
 
+  const collections = COLLECTIONS.filter(
+    (c) => count((r) => (r.languages ?? []).some((l) => c.languages.includes(l))) >= MIN_PAGE_ROWS,
+  );
+
   const platforms = PLATFORMS.filter(
     (p) => p.regions.includes(region) && count((r) => r.platforms.includes(p.id)) >= MIN_PAGE_ROWS,
   );
@@ -69,6 +74,19 @@ export function BrowseLinks({ feed, region }: { feed: ReleaseFeed | null; region
 
   return (
     <nav className="browse" aria-label="Browse releases">
+      {collections.length > 0 && (
+        <div className="browse__row">
+          <h2>Collections</h2>
+          <div className="browse__chips">
+            {collections.map((c) => (
+              <a key={c.slug} className="browse__chip" href={`/${c.slug}`}>
+                {c.label.replace(/ releases$/, '')}
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="browse__row">
         <h2>Platforms</h2>
         <div className="browse__chips">

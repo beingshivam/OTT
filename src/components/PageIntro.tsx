@@ -1,6 +1,7 @@
 import { PLATFORMS, LANGUAGES, platform as platformById, languageName } from '../data/platforms';
 import type { Release, ReleaseFeed } from '../types';
 import type { Route } from '../lib/route';
+import { collectionBySlug } from '../data/collections';
 import { platformLinkText } from './BrowseLinks';
 
 /**
@@ -50,11 +51,19 @@ const tally = (rows: Release[], pick: (r: Release) => string[]) => {
 export function PageIntro({ route, feed, region, currentWeek, onOpen }: Props) {
   const inRegion = (r: Release) => r.regions.includes(region);
 
+  /**
+   * "Any of", matching what the board's own filter does (lib/filters.ts uses
+   * .some for both). This read .every, which is identical for a route naming
+   * one platform or one language and silently wrong the moment one names
+   * several: /south would have demanded a title be in Tamil *and* Telugu *and*
+   * Malayalam *and* Kannada, matched nothing, and rendered no intro at all
+   * while the board below it showed seventy titles.
+   */
   const matches = (r: Release) =>
     route.platforms
-      ? route.platforms.every((p) => r.platforms.includes(p))
+      ? route.platforms.some((p) => r.platforms.includes(p))
       : route.languages
-        ? route.languages.every((l) => (r.languages ?? []).includes(l))
+        ? route.languages.some((l) => (r.languages ?? []).includes(l))
         : true;
 
   const weeks = route.weekId ? feed.weeks.filter((w) => w.id === route.weekId) : feed.weeks;
@@ -78,14 +87,18 @@ export function PageIntro({ route, feed, region, currentWeek, onOpen }: Props) {
   const films = scope.filter((r) => r.kind === 'film').length;
   const series = scope.length - films;
 
-  const heading = route.platforms
-    ? (() => {
-        const p = platformById(route.platforms[0]);
-        return p.id === 'theatres' ? 'New in cinemas' : `New on ${p.name}`;
-      })()
-    : route.languages
-      ? `New ${languageName(route.languages[0])} releases`
-      : 'New releases';
+  const collection = route.collection ? collectionBySlug(route.collection) : undefined;
+
+  const heading = collection
+    ? collection.label
+    : route.platforms
+      ? (() => {
+          const p = platformById(route.platforms[0]);
+          return p.id === 'theatres' ? 'New in cinemas' : `New on ${p.name}`;
+        })()
+      : route.languages
+        ? `New ${languageName(route.languages[0])} releases`
+        : 'New releases';
 
   /**
    * The cross-cut: which platforms a language lands on, or which languages a
@@ -93,31 +106,42 @@ export function PageIntro({ route, feed, region, currentWeek, onOpen }: Props) {
    * else answers "where do Tamil releases actually go", and it is a different
    * answer every month.
    */
-  const cross = route.languages
-    ? {
-        label: 'Mostly on',
-        items: tally(scope, (r) => r.platforms)
-          .slice(0, 4)
-          .map(([id, n]) => ({
-            key: id,
-            text: platformLinkText(platformById(id).name),
-            href: PLATFORMS.some((p) => p.id === id) ? `/${id}` : undefined,
-            n,
-          })),
-      }
-    : route.platforms
-      ? {
-          label: 'Mostly in',
-          items: tally(scope, (r) => r.languages ?? [])
-            .slice(0, 4)
-            .map(([code, n]) => ({
-              key: code,
-              text: languageName(code),
-              href: LANGUAGES[code] ? `/${LANGUAGES[code].toLowerCase()}` : undefined,
-              n,
-            })),
-        }
-      : null;
+  const byPlatform = {
+    label: 'Mostly on',
+    items: tally(scope, (r) => r.platforms)
+      .slice(0, 4)
+      .map(([id, n]) => ({
+        key: id,
+        text: platformLinkText(platformById(id).name),
+        href: PLATFORMS.some((p) => p.id === id) ? `/${id}` : undefined,
+        n,
+      })),
+  };
+
+  /**
+   * Only the collection's own languages, and all of them — the whole point of
+   * the page is the split between them, and linking each to its own page is
+   * how someone who wanted Malayalam specifically gets there from here.
+   */
+  const byLanguage = (limit: number, only?: string[]) => ({
+    label: 'Languages',
+    items: tally(scope, (r) => (r.languages ?? []).filter((l) => !only || only.includes(l)))
+      .slice(0, limit)
+      .map(([code, n]) => ({
+        key: code,
+        text: languageName(code),
+        href: LANGUAGES[code] ? `/${LANGUAGES[code].toLowerCase()}` : undefined,
+        n,
+      })),
+  });
+
+  const crosses = collection
+    ? [byLanguage(collection.languages.length, collection.languages), byPlatform]
+    : route.languages
+      ? [byPlatform]
+      : route.platforms
+        ? [{ ...byLanguage(4), label: 'Mostly in' }]
+        : [];
 
   return (
     <section className="pageintro">
@@ -153,23 +177,25 @@ export function PageIntro({ route, feed, region, currentWeek, onOpen }: Props) {
           </div>
         )}
 
-        {cross && cross.items.length > 0 && (
-          <div className="pageintro__fact">
-            <span className="pageintro__label">{cross.label}</span>
-            <span className="pageintro__vals">
-              {cross.items.map((i) =>
-                i.href ? (
-                  <a key={i.key} className="pageintro__pill" href={i.href}>
-                    {i.text} <em>{i.n}</em>
-                  </a>
-                ) : (
-                  <span key={i.key} className="pageintro__pill">
-                    {i.text} <em>{i.n}</em>
-                  </span>
-                ),
-              )}
-            </span>
-          </div>
+        {crosses.map((cross) =>
+          cross.items.length === 0 ? null : (
+            <div className="pageintro__fact" key={cross.label}>
+              <span className="pageintro__label">{cross.label}</span>
+              <span className="pageintro__vals">
+                {cross.items.map((i) =>
+                  i.href ? (
+                    <a key={i.key} className="pageintro__pill" href={i.href}>
+                      {i.text} <em>{i.n}</em>
+                    </a>
+                  ) : (
+                    <span key={i.key} className="pageintro__pill">
+                      {i.text} <em>{i.n}</em>
+                    </span>
+                  ),
+                )}
+              </span>
+            </div>
+          ),
         )}
 
         {bestRated && (

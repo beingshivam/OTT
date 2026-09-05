@@ -1,4 +1,5 @@
 import { PLATFORMS, LANGUAGES } from '../data/platforms';
+import { collectionBySlug } from '../data/collections';
 import type { Filters } from '../types';
 
 /**
@@ -18,6 +19,7 @@ import type { Filters } from '../types';
  *
  *   /netflix          a platform, by its registry id
  *   /tamil            a language, by its English name lowercased
+ *   /south            a collection of languages (see data/collections.ts)
  *   /w/2026-09-04     one week, by the ISO date of its Friday
  *
  * Anything else — including "/" — returns null and the app behaves exactly as
@@ -42,7 +44,11 @@ import type { Filters } from '../types';
  */
 export const MIN_PAGE_ROWS = 5;
 
-export type Route = Partial<Pick<Filters, 'platforms' | 'languages' | 'weekId'>>;
+export type Route = Partial<Pick<Filters, 'platforms' | 'languages' | 'weekId'>> & {
+  /** Set when the path was a collection, so the page can name itself after the
+   *  group rather than after the first language in it. */
+  collection?: string;
+};
 
 /** Language slugs, derived from the same table the app renders from, so a
  *  renamed language cannot leave a stale URL behind. */
@@ -66,6 +72,12 @@ export function routeFilters(pathname: string): Route | null {
 
   const slug = path.slice(1).toLowerCase();
   if (PLATFORM_IDS.has(slug)) return { platforms: [slug] };
+
+  // Before single languages: a collection's slug is checked against its own
+  // table, and the build refuses to publish two pages at the same path, so a
+  // collection named after a language cannot silently shadow one.
+  const collection = collectionBySlug(slug);
+  if (collection) return { languages: collection.languages, collection: slug };
 
   const language = LANGUAGE_BY_SLUG.get(slug);
   if (language) return { languages: [language] };

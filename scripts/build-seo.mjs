@@ -85,6 +85,25 @@ const PLATFORM_ROWS = [
   regions: regions.split(',').map((x) => x.trim().replace(/'/g, '')).filter(Boolean),
 }));
 
+/**
+ * Language collections (src/data/collections.ts) — groups people search for as
+ * one thing. Parsed rather than duplicated so adding a row there is the whole
+ * job of adding a page.
+ */
+const collectionSrc = await readFile(resolve(ROOT, 'src/data/collections.ts'), 'utf8');
+const COLLECTIONS = [
+  ...collectionSrc.matchAll(
+    /slug:\s*'([^']+)',[\s\S]*?label:\s*'([^']+)',[\s\S]*?languages:\s*\[([^\]]*)\][\s\S]*?title:\s*'([^']+)',[\s\S]*?description:\s*\n?\s*'([^']+)'/g,
+  ),
+].map(([, slug, label, langs, title, description]) => ({
+  slug,
+  label,
+  languages: langs.split(',').map((x) => x.trim().replace(/'/g, '')).filter(Boolean),
+  title,
+  description,
+}));
+if (!COLLECTIONS.length) throw new Error('No collections parsed from src/data/collections.ts');
+
 const KIND = { film: 'Film', series: 'Series', documentary: 'Documentary', reality: 'Reality', anime: 'Anime', special: 'Special' };
 const pname = (id) => platformName.get(id) ?? id;
 const lname = (code) => languageName.get(code) ?? code.toUpperCase();
@@ -178,6 +197,7 @@ function browseMarkup(pages) {
     `</div></div>`;
   return (
     `<nav class="browse">` +
+    row('Collections', pages.filter((p) => p.group === 'collection')) +
     row('Platforms', pages.filter((p) => p.group === 'platform')) +
     row('Languages', pages.filter((p) => p.group === 'language')) +
     row('Weeks', pages.filter((p) => p.group === 'week')) +
@@ -331,7 +351,7 @@ async function renderPage(page, pages) {
  */
 const STRONG_VOTES = 50;
 
-function factsMarkup({ rows, thisWeek, cross }) {
+function factsMarkup({ rows, thisWeek, cross, cross2 }) {
   const parts = [];
 
   const biggest = [...(thisWeek.length ? thisWeek : rows)]
@@ -345,10 +365,11 @@ function factsMarkup({ rows, thisWeek, cross }) {
     );
   }
 
-  if (cross && cross.items.length) {
+  for (const c of [cross, cross2]) {
+    if (!c || !c.items.length) continue;
     parts.push(
-      `<p><strong>${esc(cross.label)}:</strong> ` +
-        cross.items.map((i) => `${esc(i.text)} (${i.n})`).join(', ') +
+      `<p><strong>${esc(c.label)}:</strong> ` +
+        c.items.map((i) => `${esc(i.text)} (${i.n})`).join(', ') +
         `</p>`,
     );
   }
@@ -439,6 +460,38 @@ for (const p of platformsPresent) {
         items: tally(list, (r) => r.languages ?? [])
           .slice(0, 4)
           .map(([c, n]) => ({ text: lname(c), n })),
+      },
+    }),
+    body: sectionMarkup(sectionsBy(list, (r) => [r.weekId]), weekRangeOf),
+  });
+}
+
+for (const c of COLLECTIONS) {
+  const list = everything.filter((r) => (r.languages ?? []).some((l) => c.languages.includes(l)));
+  if (list.length < MIN_PAGE_ROWS) continue;
+  pages.push({
+    path: c.slug,
+    group: 'collection',
+    crumb: c.label,
+    linkText: c.label.replace(/ releases$/, ''),
+    rows: list,
+    title: c.title,
+    description: c.description.replace('{n}', String(list.length)),
+    h1: c.label,
+    lede: `${list.length} titles across ${stockedWeeks.length} weeks, updated every Friday.`,
+    facts: factsMarkup({
+      rows: list,
+      thisWeek: list.filter((r) => r.weekId === week.id),
+      cross: {
+        label: 'Languages',
+        items: tally(list, (r) => (r.languages ?? []).filter((l) => c.languages.includes(l)))
+          .map(([code, n]) => ({ text: lname(code), n })),
+      },
+      cross2: {
+        label: 'Mostly on',
+        items: tally(list, (r) => r.platforms)
+          .slice(0, 4)
+          .map(([id, n]) => ({ text: pname(id), n })),
       },
     }),
     body: sectionMarkup(sectionsBy(list, (r) => [r.weekId]), weekRangeOf),
@@ -568,6 +621,6 @@ const count = (g) => pages.filter((p) => p.group === g).length;
 console.log(
   `SEO: build ${buildSha.slice(0, 8)}\n` +
     `     home titled "${title}" — ${rows.length} releases\n` +
-    `     ${pages.length} pages: 1 home, ${count('platform')} platform, ${count('language')} language, ${count('week')} week\n` +
+    `     ${pages.length} pages: 1 home, ${count('collection')} collection, ${count('platform')} platform, ${count('language')} language, ${count('week')} week\n` +
     `     sitemap, robots.txt, JSON-LD with breadcrumbs`,
 );
