@@ -52,14 +52,44 @@ const registry = await readFile(resolve(ROOT, 'src/data/platforms.ts'), 'utf8');
  * list.
  */
 const rowsRe = /\{\s*id:\s*'([^']+)',\s*name:\s*'([^']+)'[\s\S]*?regions:\s*\[([^\]]*)\]/g;
-const apps = [...registry.matchAll(rowsRe)]
+const allRows = [...registry.matchAll(rowsRe)];
+const nameById = new Map(allRows.map(([, id, name]) => [id, name]));
+
+/**
+ * The wall is a hook, not an inventory.
+ *
+ * Listing every platform the site covers put twelve chips on the slide under a
+ * headline reading "twelve apps" — accurate, and nobody believes it. Nobody
+ * pictures themselves juggling twelve subscriptions, so the reader does not
+ * recognise their own problem and the slide stops working.
+ *
+ * Six is the number people see themselves in. These are the six an Indian
+ * viewer most likely actually pays for, plus cinemas — which earns its place
+ * because it is the other thing you have to check separately, and no
+ * OTT-only competitor can show it.
+ *
+ * Ids rather than strings, resolved through the registry, so a rename in the
+ * app reaches the poster and a typo here fails loudly instead of printing a
+ * platform that does not exist.
+ */
+const FEATURED = ['netflix', 'prime', 'jiohotstar', 'appletv', 'sonyliv', 'zee5', 'theatres'];
+const wall = FEATURED.map((id) => {
+  const name = nameById.get(id);
+  if (!name) throw new Error(`Launch slide names '${id}', which is not in the platform registry.`);
+  return name;
+});
+
+/** The headline counts apps; cinemas is not one, and is the extra beat. */
+const appCount = FEATURED.filter((id) => id !== 'theatres').length;
+const WORDS = ['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve'];
+const countWord = WORDS[appCount] ?? String(appCount);
+const Count = countWord[0].toUpperCase() + countWord.slice(1);
+
+/** Everything the site actually carries, for the caption's reveal. */
+const covered = allRows
   .filter(([, , name, regions]) => regions.includes("'IN'") && !/theatre/i.test(name))
   .map(([, , name]) => name);
-
-/** Spelled out: "nine apps" reads; "9 apps" reads like a spec sheet. */
-const WORDS = ['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen'];
-const countWord = WORDS[apps.length] ?? String(apps.length);
-const Count = countWord[0].toUpperCase() + countWord.slice(1);
+const coveredWord = WORDS[covered.length] ?? String(covered.length);
 
 const FONTS = `<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">`;
@@ -90,7 +120,7 @@ ${body}`;
    of the frame is the feeling of the problem; the line underneath only has to
    name it. */
 const slide1 = SHELL(
-  `<div class="wall">${apps.map((n) => `<span>${esc(n)}</span>`).join('')}</div>
+  `<div class="wall">${wall.map((n) => `<span>${esc(n)}</span>`).join('')}</div>
 <h1><em class="grad">${Count}</em> apps.<br>Still no idea<br>what's on this week.</h1>
 <span class="swipe">Swipe →</span>`,
   `.wall { position:relative; display:flex; flex-wrap:wrap; align-content:center;
@@ -193,7 +223,7 @@ try {
  */
 const caption = `${Count} apps. Still no idea what's on this week.
 
-So we built the thing that should already exist: every new release — ${apps.join(', ')} — plus everything opening in cinemas, on one page.
+So we built the thing that should already exist: every new release across ${coveredWord} platforms — ${covered.join(', ')} — plus everything opening in cinemas, on one page.
 
 No app to install. No login. No algorithm deciding what you see. Just the week, sorted by what people are actually talking about, updated every Friday before the drops land.
 
