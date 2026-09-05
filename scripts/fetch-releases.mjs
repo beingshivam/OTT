@@ -408,6 +408,7 @@ async function buildTrending(index) {
 
 const platforms = await loadPlatforms();
 const index = providerIndex(platforms);
+const theatricalId = platforms.find((p) => p.theatrical)?.id;
 console.log(`Mapped ${index.size} TMDB providers across ${platforms.length} platforms.`);
 
 // Curated rows are hand-checked and cover regional titles TMDB's discover
@@ -437,6 +438,36 @@ for (const id of weekIds()) {
   }
   weeks.push(week);
 }
+
+/**
+ * A film opens once. TMDB records several theatrical dates for one — a limited
+ * run then a wide one, or a staggered rollout across states — and each of those
+ * dates matches a different week window, so fifteen titles were being announced
+ * as new releases two and three weeks running. Toxic: A Fairy Tale appeared on
+ * both 21 Aug and 4 Sep. A calendar that says the same film is new twice is not
+ * one anyone can trust.
+ *
+ * Weeks are already in chronological order, so the first sighting is the
+ * opening and the rest are the run continuing. Only cinema-only rows collapse:
+ * the same title showing in cinemas one week and landing on a streaming service
+ * a fortnight later is two real events, and both belong on the calendar.
+ */
+const openedIn = new Set();
+let repeats = 0;
+for (const week of weeks) {
+  week.releases = week.releases.filter((r) => {
+    const cinemaOnly = r.platforms.length === 1 && r.platforms[0] === theatricalId;
+    if (!cinemaOnly) return true;
+    const key = normTitle(r.title);
+    if (openedIn.has(key)) {
+      repeats++;
+      return false;
+    }
+    openedIn.add(key);
+    return true;
+  });
+}
+if (repeats) console.log(`Collapsed ${repeats} repeat cinema listing(s) to their opening week.`);
 
 process.stdout.write('Building trending … ');
 const trending = await buildTrending(index);
