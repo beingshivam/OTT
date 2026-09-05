@@ -23,5 +23,6 @@ const read = (name) => {
 };
 
 export const BRAND = read('BRAND');
+export const SLUG = read('SLUG');
 export const TAGLINE = read('TAGLINE');
 export const HEADLINE = read('HEADLINE');

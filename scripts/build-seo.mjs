@@ -31,23 +31,18 @@ const HTML = resolve(ROOT, 'dist/index.html');
 const FEED = resolve(ROOT, 'dist/data/releases.json');
 
 /**
- * A canonical pointing at a host that does not serve the site is worse than no
- * canonical at all, so this is derived rather than typed twice: the Worker name
- * comes from wrangler.jsonc — the same value that decides the real subdomain —
- * and cannot drift from it. Only the account subdomain lives here, because it is
- * account-level and not expressed anywhere in the repo.
+ * The canonical home of the site.
  *
- * On a custom domain, set SITE_URL in the Cloudflare build's environment
- * variables (Workers › Settings › Build) and that wins outright.
+ * This is now a domain we own, so it is stated rather than derived from the
+ * Worker's name and account subdomain. Those still resolve — the workers.dev
+ * URL keeps working — but every canonical, sitemap entry and OG tag should
+ * point at one address, and search engines should be told which one that is.
+ * Two hosts serving identical content with no canonical between them is how a
+ * site competes against itself.
+ *
+ * SITE_URL in the environment still wins, for previews and branch deploys.
  */
-const CF_ACCOUNT_SUBDOMAIN = 'newreleases';
-const workerName =
-  (await readFile(resolve(ROOT, 'wrangler.jsonc'), 'utf8')).match(/"name"\s*:\s*"([^"]+)"/)?.[1] ??
-  BRAND;
-
-const SITE_URL = (
-  process.env.SITE_URL ?? `https://${workerName}.${CF_ACCOUNT_SUBDOMAIN}.workers.dev`
-).replace(/\/$/, '');
+const SITE_URL = (process.env.SITE_URL ?? 'https://newonott.in').replace(/\/$/, '');
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const esc = (s) =>
@@ -112,9 +107,11 @@ const range = formatRange(week.id);
 const rows = week.releases.filter((r) => r.regions.includes('IN'));
 const platforms = [...new Set(rows.flatMap((r) => r.platforms))];
 
-// Lead with what people search for — "new releases this week", "OTT" — and keep
-// the brand at the end where a title tag usually carries it.
-const title = `New releases this week (${range}) — OTT & theatres | ${BRAND}`;
+// The brand is now the search term, so it leads instead of trailing: "New on
+// OTT this week" is the query people type, and repeating "OTT" to append the
+// brand — as the old "… — OTT & theatres | New on OTT" did — spends characters
+// Google truncates on a word already in the sentence.
+const title = `${BRAND} this week (${range}) — every platform, plus cinemas`;
 const topPlatforms = [...new Set(rows.flatMap((r) => r.platforms))].map(pname).slice(0, 5);
 const description =
   `Every new film, series and show released this week — ${range}. ` +

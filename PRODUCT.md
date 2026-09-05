@@ -1,4 +1,4 @@
-# dropday — product brief
+# New on OTT — product brief
 
 ## The problem
 

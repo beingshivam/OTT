@@ -8,7 +8,7 @@ import type { Release } from '../types';
 /**
  * Renders the current week as a shareable PNG.
  *
- * The thing dropday competes with is an image people forward on WhatsApp. Rather
+ * The thing this competes with is an image people forward on WhatsApp. Rather
  * than fight that behaviour, this feeds it: export exactly what's on screen —
  * filters and all — as a card sized for a chat thread, with the URL on it. Every
  * forward is then a link back, which makes sharing the growth loop rather than a

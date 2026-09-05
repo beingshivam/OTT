@@ -13,7 +13,7 @@ import {
   IconPlay,
   IconSearch,
 } from './components/icons';
-import { BRAND, TAGLINE } from './data/brand';
+import { BRAND, SLUG, TAGLINE } from './data/brand';
 import { REGIONS } from './data/platforms';
 import { loadFeed, weekById } from './lib/feed';
 import {
@@ -70,6 +70,10 @@ export default function App() {
 
   // Board is the default: the whole week at a glance, the way the printed
   // calendars do it. The poster grid stays available for browsing.
+  //
+  // The key still says dropday, and stays that way: it is an opaque storage key,
+  // not a label anyone sees, and renaming it would silently reset the layout
+  // choice of everyone who has already been here.
   const [view, setView] = useState<'board' | 'grid'>(() => {
     try {
       return localStorage.getItem('dropday.view') === 'grid' ? 'grid' : 'board';
@@ -142,7 +146,7 @@ export default function App() {
   }, []);
 
   const addWeeklyReminder = useCallback(() => {
-    download(weeklyReminder(window.location.origin), `${BRAND}-friday.ics`);
+    download(weeklyReminder(window.location.origin), `${SLUG}-friday.ics`);
   }, []);
 
   const updatePrefs = useCallback((next: Partial<Prefs>) => {

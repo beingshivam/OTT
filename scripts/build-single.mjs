@@ -15,14 +15,14 @@
 import { readFile, writeFile, readdir } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { BRAND, HEADLINE } from './brand.mjs';
+import { BRAND, HEADLINE, SLUG } from './brand.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = resolve(ROOT, 'dist');
 
 const args = process.argv.slice(2);
 const fragment = args.includes('--fragment');
-const outFile = resolve(ROOT, args.find((a) => !a.startsWith('--')) ?? `dist/${BRAND}.html`);
+const outFile = resolve(ROOT, args.find((a) => !a.startsWith('--')) ?? `dist/${SLUG}.html`);
 
 const FONTS =
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@1&display=swap';

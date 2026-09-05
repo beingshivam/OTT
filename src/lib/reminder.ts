@@ -1,7 +1,7 @@
 /**
  * A recurring Friday reminder, as a calendar file.
  *
- * dropday lives or dies on weekly return, which normally means push — and push
+ * This lives or dies on weekly return, which normally means push — and push
  * means a service worker plus a server holding subscriptions and VAPID keys.
  * That's a backend, and this site is deliberately a static file.
  *

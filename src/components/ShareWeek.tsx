@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { IconCheck, IconShare } from './icons';
-import { BRAND } from '../data/brand';
+import { SLUG } from '../data/brand';
 import { KIND_LABEL, languageName, platform } from '../data/platforms';
 import { download } from '../lib/download';
 import { renderShareCard } from '../lib/shareCard';
@@ -48,7 +48,7 @@ export function ShareWeek({ releases, filters }: Props) {
         filterNote: describe(filters),
         siteUrl: window.location.origin,
       });
-      const file = new File([blob], `${BRAND}-${filters.weekId}.png`, { type: 'image/png' });
+      const file = new File([blob], `${SLUG}-${filters.weekId}.png`, { type: 'image/png' });
       const text = `What's new ${formatWeekRange(filters.weekId)} — ${window.location.href}`;
 
       if (navigator.canShare?.({ files: [file] })) {

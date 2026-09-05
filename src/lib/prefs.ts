@@ -3,6 +3,9 @@
  * read. Kept on the device, so there is still nothing to sign in to.
  */
 
+// Named for an earlier brand, and deliberately left that way: it is an opaque
+// key rather than anything a visitor reads, and changing it would drop the
+// stored region of every returning reader for no gain.
 const KEY = 'dropday.prefs.v1';
 
 /** The site briefly shipped as firstday; anyone who set a region then keeps it. */
