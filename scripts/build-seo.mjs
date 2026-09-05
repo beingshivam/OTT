@@ -162,23 +162,25 @@ const sectionMarkup = (groups, heading) =>
     .join('');
 
 /**
- * The same links the app renders in its footer (components/BrowseLinks.tsx).
+ * The same links the app renders (components/BrowseLinks.tsx), with the same
+ * labels.
  *
  * A page nothing links to is invisible to a crawler no matter what the sitemap
- * claims, and these are the only route between them. Repeated here so they are
- * present before React mounts — and repeated *identically*, because markup shown
- * to a crawler that a person never sees is cloaking.
+ * claims, and these are the only route between them. Present before React
+ * mounts, and carrying *identical* text — markup shown to a crawler that a
+ * person never sees is cloaking, and an early version of this drifted: the
+ * prerender said "In cinemas" where the component said "New on In Theatres".
  */
 function browseMarkup(pages) {
-  const group = (label, list) =>
-    `<section><h2>${esc(label)}</h2><ul>` +
-    list.map((pg) => `<li><a href="/${pg.path}">${esc(pg.linkText)}</a></li>`).join('') +
-    `</ul></section>`;
+  const row = (label, list) =>
+    `<div><h2>${esc(label)}</h2><div>` +
+    list.map((pg) => `<a href="/${pg.path}">${esc(pg.linkText)}</a>`).join(' ') +
+    `</div></div>`;
   return (
-    `<nav>` +
-    group('By platform', pages.filter((p) => p.group === 'platform')) +
-    group('By language', pages.filter((p) => p.group === 'language')) +
-    group('By week', pages.filter((p) => p.group === 'week')) +
+    `<nav class="browse">` +
+    row('Platforms', pages.filter((p) => p.group === 'platform')) +
+    row('Languages', pages.filter((p) => p.group === 'language')) +
+    row('Weeks', pages.filter((p) => p.group === 'week')) +
     `</nav>`
   );
 }
@@ -216,7 +218,11 @@ const FALLBACK_CSS = `    <style>
       .seo-fallback h1 { color: #f2f4f9; font-size: 28px; margin: 0 0 4px; }
       .seo-fallback h2 { color: #b6bdcc; font-size: 15px; margin: 24px 0 6px; }
       .seo-fallback ul { margin: 0; padding-left: 18px; line-height: 1.7; }
-      .seo-fallback a { color: #b6bdcc; }
+      .seo-fallback a { color: #b6bdcc; text-decoration: none; }
+      .browse { margin-top: 28px; padding-top: 20px; border-top: 1px solid #ffffff14; }
+      .browse > div { display: flex; align-items: baseline; gap: 14px; margin-bottom: 12px; flex-wrap: wrap; }
+      .browse h2 { flex: none; width: 78px; margin: 0; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; }
+      .browse a { display: inline-block; padding: 4px 11px; margin: 0 2px 4px 0; border: 1px solid #ffffff14; border-radius: 999px; font-size: 12px; }
     </style>
 `;
 
@@ -366,7 +372,7 @@ for (const p of platformsPresent) {
     path: p.id,
     group: 'platform',
     crumb: p.name,
-    linkText: theatres ? 'In cinemas' : `New on ${p.name}`,
+    linkText: theatres ? 'In cinemas' : p.name,
     rows: list,
     title: theatres
       ? `New movies in cinemas this week in India — ${BRAND}`
@@ -386,7 +392,7 @@ for (const [code, name] of languagesPresent) {
     path: name.toLowerCase(),
     group: 'language',
     crumb: name,
-    linkText: `New ${name} releases`,
+    linkText: name,
     rows: list,
     title: `New ${name} movies and series — every OTT platform, updated weekly`,
     description: `Every new ${name} film, series and show across streaming platforms and cinemas — ${list.length} titles, updated every Friday. No app, no login.`,

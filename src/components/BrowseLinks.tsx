@@ -16,28 +16,42 @@ import { MIN_PAGE_ROWS } from '../lib/route';
  * rendered for search engines and hidden from people is cloaking, and the
  * honest version is also the more useful one.
  *
- * Built from the feed rather than a written list, so a platform with nothing
- * this season, or a language nothing was released in, never gets a link to an
- * empty page.
+ * Chips, not columns of text links. The first version was three stacked lists
+ * running about 380px on a desktop and 800px on a phone — a link farm bolted to
+ * the bottom of a board whose whole promise is that the week fits on one
+ * screen. The columns also ended at wildly different heights, because five
+ * platforms, ten languages and eight weeks do not line up. Wrapping chips are
+ * the pattern the filter row already uses, they take a third of the height, and
+ * they read as part of this product rather than a sitemap footer.
  */
+
+/**
+ * Chip labels: short, because the row label already supplies the context.
+ * "Netflix" under "Platforms" needs nothing more, and ten repetitions of the
+ * word "releases" is noise.
+ *
+ * Exported because the build prerenders this same markup
+ * (scripts/build-seo.mjs) and the two must not disagree. They did: the
+ * prerender said "In cinemas" while this component rendered "New on In
+ * Theatres" — broken English, and a crawler seeing different link text than a
+ * person is exactly the cloaking problem this component exists to avoid.
+ */
+export const platformLinkText = (name: string) => (name === 'In Theatres' ? 'In cinemas' : name);
+
 export function BrowseLinks({ feed, region }: { feed: ReleaseFeed | null; region: string }) {
   if (!feed) return null;
 
   /**
    * India only, because the pages behind these links are India pages — the
-   * build generates them from the IN rows (scripts/build-seo.mjs). Rendering
-   * them to a reader who has switched to US would offer links to pages that
-   * were never written, which land on the SPA fallback and show the whole
-   * week under a URL promising one platform.
+   * build generates them from the IN rows. Rendering them to a reader who has
+   * switched to US would offer links to pages that were never written.
    */
   if (region !== 'IN') return null;
 
   const scoped = feed.weeks.flatMap((w) => w.releases.filter((r) => r.regions.includes(region)));
   if (!scoped.length) return null;
 
-  // Only what the build actually published. Linking to a page it skipped would
-  // land on the SPA fallback and show the whole week under a URL promising one
-  // platform — see MIN_PAGE_ROWS in lib/route.ts.
+  // Only what the build actually published — see MIN_PAGE_ROWS in lib/route.ts.
   const count = (match: (r: (typeof scoped)[number]) => boolean) => scoped.filter(match).length;
 
   const platforms = PLATFORMS.filter(
@@ -55,37 +69,45 @@ export function BrowseLinks({ feed, region }: { feed: ReleaseFeed | null; region
 
   return (
     <nav className="browse" aria-label="Browse releases">
-      <div className="browse__group">
-        <h2>By platform</h2>
-        <ul>
+      <div className="browse__row">
+        <h2>Platforms</h2>
+        <div className="browse__chips">
           {platforms.map((p) => (
-            <li key={p.id}>
-              <a href={`/${p.id}`}>New on {p.name}</a>
-            </li>
+            // The same accent dot the filter chips carry, so a platform looks
+            // like itself everywhere on the page.
+            <a
+              key={p.id}
+              className="browse__chip"
+              href={`/${p.id}`}
+              style={{ ['--chip-accent' as string]: p.accent }}
+            >
+              <i className="chip__dot" />
+              {platformLinkText(p.name)}
+            </a>
           ))}
-        </ul>
+        </div>
       </div>
 
-      <div className="browse__group">
-        <h2>By language</h2>
-        <ul>
+      <div className="browse__row">
+        <h2>Languages</h2>
+        <div className="browse__chips">
           {languages.map(([code, name]) => (
-            <li key={code}>
-              <a href={`/${name.toLowerCase()}`}>New {name} releases</a>
-            </li>
+            <a key={code} className="browse__chip" href={`/${name.toLowerCase()}`}>
+              {name}
+            </a>
           ))}
-        </ul>
+        </div>
       </div>
 
-      <div className="browse__group">
-        <h2>By week</h2>
-        <ul>
+      <div className="browse__row">
+        <h2>Weeks</h2>
+        <div className="browse__chips">
           {weeks.map((w) => (
-            <li key={w.id}>
-              <a href={`/w/${w.id}`}>{formatWeekRange(w.id)}</a>
-            </li>
+            <a key={w.id} className="browse__chip" href={`/w/${w.id}`}>
+              {formatWeekRange(w.id)}
+            </a>
           ))}
-        </ul>
+        </div>
       </div>
     </nav>
   );

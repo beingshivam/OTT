@@ -2224,43 +2224,80 @@ a {
 }
 
 /* ---------------------------------------------------- browse links ----
-   Real links to the per-platform, per-language and per-week pages. They are
-   the only crawl path to those pages, and a person gets something a filter
-   dropdown cannot give them: an address they can bookmark or send. Quiet by
-   design — this is a footer utility, not a navigation bar competing with the
-   board above it. */
+   Real links to the per-platform, per-language and per-week pages: the only
+   crawl path to them, and the one thing a filter dropdown cannot give a
+   person — an address they can bookmark or send.
+
+   Built on the existing chip so it belongs to this page. The first version
+   was three columns of text links, ~380px tall on a desktop and ~800px on a
+   phone, under a board whose whole promise is that the week fits one screen.
+   A label and a wrapping row of chips says the same thing in a third of the
+   space, and the columns can no longer end at three different heights. */
 .browse {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 22px 32px;
-  margin-top: 40px;
-  padding-top: 26px;
+  margin-top: 32px;
+  padding-top: 22px;
   border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
-.browse__group h2 {
-  margin: 0 0 10px;
-  font-size: 11px;
+.browse__row {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+.browse__row h2 {
+  flex: none;
+  width: 78px;
+  margin: 0;
+  font-size: 10.5px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--text-3, #6a7080);
+  color: var(--text-3);
 }
-.browse__group ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
+.browse__chips {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 6px;
 }
-.browse__group a {
+/* Quieter than .chip — these sit below the fold under the week, and should
+   not compete with the filter row that does the actual work up top. */
+.browse__chip {
+  --chip-accent: var(--text-3);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 11px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line);
+  background: var(--surface);
   color: var(--text-2);
-  font-size: 12.5px;
-  font-weight: 500;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
   text-decoration: none;
+  transition: all 0.18s var(--ease);
 }
-.browse__group a:hover {
+.browse__chip:hover {
+  border-color: color-mix(in srgb, var(--chip-accent) 55%, transparent);
   color: var(--text);
-  text-decoration: underline;
-  text-underline-offset: 3px;
+}
+.browse__chip .chip__dot {
+  width: 6px;
+  height: 6px;
+}
+
+@media (max-width: 720px) {
+  /* The label stops holding a column and becomes a heading above its row —
+     a 78px gutter costs a third of the width a chip row needs on a phone. */
+  .browse__row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .browse__row h2 {
+    width: auto;
+  }
 }
