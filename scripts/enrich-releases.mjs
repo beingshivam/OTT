@@ -173,8 +173,24 @@ for (const week of feed.weeks) {
       const detail = await tmdb(`/${ref.isMovie ? 'movie' : 'tv'}/${ref.id}`, {
         append_to_response: ref.isMovie
           ? 'credits,videos,release_dates'
-          : 'credits,videos,content_ratings',
+          : 'credits,videos,content_ratings,external_ids',
       });
+
+      /**
+       * The IMDb id, so ratings can be looked up exactly.
+       *
+       * scripts/enrich-ratings.mjs asks OMDb for an IMDb score, and the only
+       * honest way to ask is by id. Matching on title and year would be a guess
+       * — and the failure mode is silent and awful: a Tamil film quietly
+       * wearing the rating of an unrelated American one with a similar name.
+       * A page that invents a date is worth less than no page, and the same is
+       * true of a score.
+       *
+       * Movies carry it on the detail response. TV does not, so external_ids is
+       * appended above — same request, no extra call.
+       */
+      const imdbId = ref.isMovie ? detail.imdb_id : detail.external_ids?.imdb_id;
+      if (imdbId) release.imdbId = imdbId;
       const runtime = ref.isMovie ? detail.runtime : detail.episode_run_time?.[0];
       if (runtime) release.runtimeMinutes = runtime;
       if (detail.genres?.length) release.genres = detail.genres.map((g) => g.name);

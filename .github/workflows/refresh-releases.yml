@@ -96,6 +96,26 @@ jobs:
           TMDB_TOKEN: ${{ secrets.TMDB_TOKEN || secrets.TMDB_API_KEY }}
         run: node scripts/enrich-releases.mjs
 
+      # IMDb scores, which TMDB cannot supply for a release calendar.
+      #
+      # A calendar contains nothing but brand-new titles, and a brand-new title
+      # has not been voted on: of 183 India rows, 39 carried a TMDB score and 13
+      # had enough votes to quote. IMDb has the votes.
+      #
+      # After enrichment, because that pass is what attaches the IMDb id this
+      # one looks up by — and before the archive, so the scores are merged into
+      # the permanent record along with everything else.
+      #
+      # No key configured means this prints why and exits clean, so the refresh
+      # is never blocked on a credential that is only ever an improvement.
+      - name: Attach IMDb scores
+        id: ratings
+        if: steps.fetch.outcome == 'success'
+        continue-on-error: true
+        env:
+          OMDB_API_KEY: ${{ secrets.OMDB_API_KEY }}
+        run: node scripts/enrich-ratings.mjs
+
       # Provider logos change rarely, but they cost two calls and keep the board
       # branded without shipping anyone's trademarked assets in the repo. Same
       # reasoning as above: nice to have, never worth losing the refresh over.
@@ -143,9 +163,9 @@ jobs:
         run: node scripts/build-digest.mjs
 
       - name: Note any partial pass
-        if: steps.enrich.outcome == 'failure' || steps.logos.outcome == 'failure' || steps.digest.outcome == 'failure' || steps.archive.outcome == 'failure'
+        if: steps.enrich.outcome == 'failure' || steps.ratings.outcome == 'failure' || steps.logos.outcome == 'failure' || steps.digest.outcome == 'failure' || steps.archive.outcome == 'failure'
         run: |
-          echo "::warning title=Refreshed, but not fully enriched::The calendar itself rebuilt and will be published. Enrichment: ${{ steps.enrich.outcome }}. Logos: ${{ steps.logos.outcome }}. Archive: ${{ steps.archive.outcome }}. Email draft: ${{ steps.digest.outcome }}. TMDB drops connections under load, and the next run picks up whatever was missed — no action needed unless it repeats."
+          echo "::warning title=Refreshed, but not fully enriched::The calendar itself rebuilt and will be published. Enrichment: ${{ steps.enrich.outcome }}. IMDb scores: ${{ steps.ratings.outcome }}. Logos: ${{ steps.logos.outcome }}. Archive: ${{ steps.archive.outcome }}. Email draft: ${{ steps.digest.outcome }}. TMDB drops connections under load, and the next run picks up whatever was missed — no action needed unless it repeats."
 
       # Pushing the data is what triggers the Cloudflare build, so this is the
       # step that actually publishes. Rebase first: a human push between the

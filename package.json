@@ -9,7 +9,7 @@
     "build": "tsc -b && vite build && node scripts/build-seo.mjs",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit --pretty",
-    "refresh": "node scripts/fetch-releases.mjs && node scripts/enrich-releases.mjs && node scripts/fetch-logos.mjs && node scripts/archive.mjs",
+    "refresh": "node scripts/fetch-releases.mjs && node scripts/enrich-releases.mjs && node scripts/enrich-ratings.mjs && node scripts/fetch-logos.mjs && node scripts/archive.mjs",
     "archive": "node scripts/archive.mjs",
     "build:single": "npm run build && node scripts/build-single.mjs",
     "enrich": "node scripts/enrich-releases.mjs",
@@ -26,7 +26,9 @@
     "feature": "node scripts/build-feature.mjs",
     "explain": "node scripts/build-explainer.mjs",
     "title": "node scripts/build-mirzapur.mjs",
-    "test:worker": "node worker/index.test.mjs"
+    "test:worker": "node worker/index.test.mjs",
+    "ratings": "node scripts/enrich-ratings.mjs",
+    "test:omdb": "node scripts/omdb.test.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

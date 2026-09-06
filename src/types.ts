@@ -57,6 +57,25 @@ export interface Release {
   votes?: number;
   /** 0–100 popularity used for the Trending sort. Higher is hotter. */
   heat?: number;
+  /**
+   * IMDb's id for this title, from TMDB during enrichment.
+   *
+   * Only here so the IMDb score can be looked up by id rather than by name —
+   * matching on a title and a year is a guess, and its failure mode is a
+   * regional film silently wearing an unrelated one's rating.
+   */
+  imdbId?: string;
+  /**
+   * IMDb's score and the votes behind it (scripts/enrich-ratings.mjs).
+   *
+   * Kept separate from `rating`/`votes`, which are TMDB's, rather than merged
+   * into them: they are different voting populations and usually land a few
+   * tenths apart, so a card showing one and a page ranking by the other would
+   * disagree in public. Always set together or not at all — a score with no
+   * vote count cannot be ranked on honestly.
+   */
+  imdbRating?: number;
+  imdbVotes?: number;
   synopsis?: string;
   cast?: string[];
   director?: string;
