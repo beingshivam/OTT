@@ -24,6 +24,7 @@
     "story": "node scripts/build-story.mjs",
     "feature": "node scripts/build-feature.mjs",
     "explain": "node scripts/build-explainer.mjs",
+    "title": "node scripts/build-mirzapur.mjs",
     "test:worker": "node worker/index.test.mjs"
   },
   "dependencies": {
