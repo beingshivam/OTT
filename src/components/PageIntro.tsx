@@ -72,18 +72,39 @@ export function PageIntro({ route, feed, region, currentWeek, onOpen }: Props) {
           : true;
 
   const weeks = route.weekId ? feed.weeks.filter((w) => w.id === route.weekId) : feed.weeks;
-  const scope = weeks.flatMap((w) => w.releases.filter(inRegion).filter(matches));
+  /** A span page is bounded by dates rather than by a facet, so its scope is a
+   *  date test on top of whatever else the route said. */
+  const inSpan = (r: Release) =>
+    !route.span || (r.releaseDate >= route.span.from && r.releaseDate <= route.span.to);
+  const scope = weeks.flatMap((w) => w.releases.filter(inRegion).filter(matches).filter(inSpan));
   if (!scope.length) return null;
 
   const thisWeek = (feed.weeks.find((w) => w.id === currentWeek)?.releases ?? [])
     .filter(inRegion)
-    .filter(matches);
+    .filter(matches)
+    .filter(inSpan);
 
-  // This week if there is one, otherwise the whole scope — a page should never
-  // show an empty "biggest" row just because a quiet week is on screen.
-  const biggest = [...(thisWeek.length ? thisWeek : scope)]
-    .sort((a, b) => (b.heat ?? 0) - (a.heat ?? 0))
-    .slice(0, 3);
+  /**
+   * This week if there is one, otherwise the whole scope — a page should never
+   * show an empty "biggest" row just because a quiet week is on screen.
+   *
+   * A span page is the exception and ranks its whole span: the page is about
+   * September, or about what is still to come, so narrowing "biggest" to the
+   * five days of it that fall in the current week answers a question the page
+   * never asked. On /upcoming that produced the visible bug — this row named
+   * the tail of the current week while the strip below it ranked all 64 rows,
+   * and both were labelled "Biggest this week".
+   */
+  const ranked = route.span ? scope : thisWeek.length ? thisWeek : scope;
+  const biggest = [...ranked].sort((a, b) => (b.heat ?? 0) - (a.heat ?? 0)).slice(0, 3);
+
+  const biggestLabel = route.span
+    ? route.span.kind === 'upcoming'
+      ? 'Biggest coming up'
+      : `Biggest in ${route.span.label}`
+    : thisWeek.length
+      ? 'Biggest this week'
+      : 'Biggest right now';
 
   const bestRated = [...scope]
     .filter((r) => r.rating != null && (r.votes == null || r.votes >= STRONG_VOTES))
@@ -92,7 +113,11 @@ export function PageIntro({ route, feed, region, currentWeek, onOpen }: Props) {
   const films = scope.filter((r) => r.kind === 'film').length;
   const series = scope.length - films;
 
-  const heading = collection
+  const heading = route.span
+    ? route.span.kind === 'upcoming'
+      ? 'Coming soon'
+      : `Releases in ${route.span.label}`
+    : collection
     ? collection.label
     : route.platforms
       ? (() => {
@@ -138,7 +163,11 @@ export function PageIntro({ route, feed, region, currentWeek, onOpen }: Props) {
       })),
   });
 
-  const crosses = collection
+  const crosses = route.span
+    ? /* A month names no facet of its own, so both splits are new information:
+         where the month's releases land, and what languages it is carrying. */
+      [byPlatform, byLanguage(5)]
+    : collection
     ? collection.languages
       ? [byLanguage(collection.languages.length, collection.languages), byPlatform]
       : [byPlatform, byLanguage(4)]
@@ -167,7 +196,13 @@ export function PageIntro({ route, feed, region, currentWeek, onOpen }: Props) {
       <h1 className="pageintro__title">{heading}</h1>
       <p className="pageintro__stat">
         <strong>{scope.length}</strong> {scope.length === 1 ? 'title' : 'titles'}
-        {!route.weekId && <> across {weeks.filter((w) => w.releases.some(matches)).length} weeks</>}
+        {!route.weekId && (
+          <>
+            {' '}
+            across{' '}
+            {weeks.filter((w) => w.releases.some((r) => matches(r) && inSpan(r))).length} weeks
+          </>
+        )}
         {films > 0 && series > 0 && (
           <>
             {' · '}
@@ -179,9 +214,7 @@ export function PageIntro({ route, feed, region, currentWeek, onOpen }: Props) {
       <div className="pageintro__facts">
         {biggest.length > 0 && (
           <div className="pageintro__fact">
-            <span className="pageintro__label">
-              {thisWeek.length ? 'Biggest this week' : 'Biggest right now'}
-            </span>
+            <span className="pageintro__label">{biggestLabel}</span>
             <span className="pageintro__vals">
               {biggest.map((r) => (
                 <button key={r.id} className="pageintro__pill" onClick={() => onOpen(r)}>

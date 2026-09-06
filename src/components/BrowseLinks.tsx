@@ -1,7 +1,7 @@
 import { PLATFORMS, LANGUAGES } from '../data/platforms';
 import type { ReleaseFeed } from '../types';
 import { formatWeekRange } from '../lib/week';
-import { MIN_PAGE_ROWS, MAX_PAGE_SHARE } from '../lib/route';
+import { MIN_PAGE_ROWS, MAX_PAGE_SHARE, MONTH_SLUGS } from '../lib/route';
 import { COLLECTIONS, inCollection } from '../data/collections';
 
 /**
@@ -78,6 +78,31 @@ export function BrowseLinks({ feed, region }: { feed: ReleaseFeed | null; region
     .slice()
     .sort((a, b) => b.id.localeCompare(a.id));
 
+  /**
+   * Calendar months the feed actually covers, oldest first so the row reads
+   * like a timeline. Same MIN_PAGE_ROWS bar as everything else here, so a month
+   * clipped at the edge of the eight-week window — one or two stray titles —
+   * does not get a chip pointing at a page the build declined to write.
+   */
+  const months = [...new Set(scoped.map((r) => r.releaseDate.slice(0, 7)))]
+    .sort()
+    .map((ym) => {
+      const [year, month] = ym.split('-');
+      return {
+        ym,
+        slug: `${MONTH_SLUGS[Number(month) - 1]}-${year}`,
+        label: new Date(`${ym}-01T00:00:00Z`).toLocaleDateString('en-IN', {
+          month: 'long',
+          year: 'numeric',
+          timeZone: 'UTC',
+        }),
+        n: count((r) => r.releaseDate.startsWith(ym)),
+      };
+    })
+    .filter((m) => m.n >= MIN_PAGE_ROWS);
+
+  const upcoming = count((r) => r.releaseDate > new Date().toISOString().slice(0, 10));
+
   return (
     <nav className="browse" aria-label="Browse releases">
       {collections.length > 0 && (
@@ -122,6 +147,24 @@ export function BrowseLinks({ feed, region }: { feed: ReleaseFeed | null; region
           ))}
         </div>
       </div>
+
+      {months.length > 0 && (
+        <div className="browse__row">
+          <h2>Months</h2>
+          <div className="browse__chips">
+            {upcoming >= MIN_PAGE_ROWS && (
+              <a className="browse__chip" href="/upcoming">
+                Coming soon
+              </a>
+            )}
+            {months.map((m) => (
+              <a key={m.ym} className="browse__chip" href={`/releases/${m.slug}`}>
+                {m.label}
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="browse__row">
         <h2>Weeks</h2>

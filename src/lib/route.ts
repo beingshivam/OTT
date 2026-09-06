@@ -21,6 +21,9 @@ import type { Filters } from '../types';
  *   /tamil            a language, by its English name lowercased
  *   /south            a collection of languages (see data/collections.ts)
  *   /w/2026-09-04     one week, by the ISO date of its Friday
+ *   /releases/september-2026
+ *                     one calendar month
+ *   /upcoming         everything not out yet
  *   /ott-release-date/<slug>
  *                     one theatrical film, answering when it reaches streaming
  *
@@ -57,6 +60,80 @@ export const MAX_PAGE_SHARE = 0.6;
  */
 export const MIN_PAGE_ROWS = 5;
 
+/**
+ * A stretch of dates, for the pages that are not about one week.
+ *
+ * Every other route narrows the board *within* a week: /netflix is the week
+ * filtered to one platform. A month is the opposite — it spans weeks, and the
+ * week stepper that sits above the board is meaningless on it. So a span
+ * carries its own dates and the app reads rows straight from the feed across
+ * every week, ignoring `weekId` entirely.
+ *
+ * Kept out of `Filters` on purpose. Filters are what a reader toggles and what
+ * gets written into the query string; a span is a property of the page itself,
+ * chosen by the path and not adjustable from the UI. Threading it through the
+ * filter machinery would have put a date range in the URL of every page that
+ * does not have one.
+ */
+export interface Span {
+  /** Inclusive ISO bounds. */
+  from: string;
+  to: string;
+  /** What the page calls itself: "September 2026", "Coming soon". */
+  label: string;
+  kind: 'month' | 'upcoming';
+}
+
+/** Full English month names, lowercased — the slug is the word people would
+ *  type. The build reads this array out of this file (scripts/build-seo.mjs)
+ *  rather than keeping its own, so a page and the route that resolves it are
+ *  spelled the same by construction. */
+export const MONTH_SLUGS = [
+  'january',
+  'february',
+  'march',
+  'april',
+  'may',
+  'june',
+  'july',
+  'august',
+  'september',
+  'october',
+  'november',
+  'december',
+];
+
+/** Title case for the heading, from the same array as the slug. */
+const monthLabel = (i: number, year: number) =>
+  `${MONTH_SLUGS[i][0].toUpperCase()}${MONTH_SLUGS[i].slice(1)} ${year}`;
+
+const pad = (n: number) => String(n).padStart(2, '0');
+
+/** Builds the span for a month, given its index and year. Exported so the
+ *  build can derive identical bounds without reimplementing month lengths. */
+export function monthSpan(monthIndex: number, year: number): Span {
+  // Day 0 of the next month is the last day of this one, which is also how
+  // February and leap years come out right without a table.
+  const last = new Date(Date.UTC(year, monthIndex + 1, 0)).getUTCDate();
+  return {
+    from: `${year}-${pad(monthIndex + 1)}-01`,
+    to: `${year}-${pad(monthIndex + 1)}-${pad(last)}`,
+    label: monthLabel(monthIndex, year),
+    kind: 'month',
+  };
+}
+
+/** Everything still to come, as of the moment it is asked.
+ *
+ *  Computed rather than baked in, so the page is right on a Tuesday three
+ *  weeks after the build that prerendered it — a title that has since opened
+ *  drops out on the client instead of sitting under a heading calling it
+ *  upcoming. */
+export function upcomingSpan(today = new Date()): Span {
+  const from = new Date(today.getTime() + 86_400_000).toISOString().slice(0, 10);
+  return { from, to: '9999-12-31', label: 'Coming soon', kind: 'upcoming' };
+}
+
 export type Route = Partial<Pick<Filters, 'platforms' | 'languages' | 'kinds' | 'genres' | 'weekId'>> & {
   /** Set when the path was a collection, so the page can name itself after the
    *  group rather than after the first language in it. */
@@ -64,6 +141,9 @@ export type Route = Partial<Pick<Filters, 'platforms' | 'languages' | 'kinds' | 
   /** Set when the path names one title. Unlike every other route this is not a
    *  filter over the board — the app renders a different page entirely. */
   titleSlug?: string;
+  /** Set when the path names a stretch of dates rather than a week. The board
+   *  reads across weeks and the week stepper steps aside. */
+  span?: Span;
 };
 
 /** Language slugs, derived from the same table the app renders from, so a
@@ -81,6 +161,9 @@ const WEEK_PATH = /^\/w\/(\d{4}-\d{2}-\d{2})$/;
  *  (scripts/slug.mjs), never derived here, so the two cannot disagree. */
 const TITLE_PATH = /^\/ott-release-date\/([a-z0-9-]+)$/;
 
+/** One calendar month, as "/releases/september-2026". */
+const MONTH_PATH = /^\/releases\/([a-z]+)-(\d{4})$/;
+
 export function routeFilters(pathname: string): Route | null {
   // Trailing slashes are the same page — Cloudflare serves /netflix and
   // /netflix/ from the same file, so both must resolve here too.
@@ -92,6 +175,18 @@ export function routeFilters(pathname: string): Route | null {
 
   const title = TITLE_PATH.exec(path);
   if (title) return { titleSlug: title[1] };
+
+  if (path === '/upcoming') return { span: upcomingSpan() };
+
+  const month = MONTH_PATH.exec(path);
+  if (month) {
+    const index = MONTH_SLUGS.indexOf(month[1]);
+    const year = Number(month[2]);
+    // An unrecognised month name or an implausible year falls through to null
+    // rather than resolving to a page the build never wrote.
+    if (index >= 0 && year >= 2000 && year <= 2100) return { span: monthSpan(index, year) };
+    return null;
+  }
 
   const slug = path.slice(1).toLowerCase();
   if (PLATFORM_IDS.has(slug)) return { platforms: [slug] };

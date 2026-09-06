@@ -129,6 +129,9 @@ export default function App() {
         // check used to read the query string only, so an archive page would
         // silently bounce the reader to the nearest stocked week and render
         // something other than what its own title promised.
+        // A span page reads across every week, so there is no week to land on
+        // and nudging one would only rewrite state nothing renders.
+        if (route?.span) return;
         const pinned = new URLSearchParams(window.location.search).get('w') ?? route?.weekId;
         if (pinned) return;
         const stocked = loaded.weeks.filter((w) => w.releases.length > 0);
@@ -197,8 +200,28 @@ export default function App() {
    *  the week bar, the filters and the grid all step aside for it. */
   const isTitlePage = Boolean(route?.titleSlug);
 
+  /**
+   * A month page or /upcoming: the board spans weeks, so the week the filters
+   * happen to be pointing at is irrelevant to what it shows.
+   */
+  const span = route?.span ?? null;
+
   const week = weekById(feed, filters.weekId);
-  const releases = week?.releases ?? [];
+  /**
+   * What the board is drawn from.
+   *
+   * Normally one week, which is the whole shape of this product. A span page
+   * reads every week in the feed and keeps the rows inside its dates instead —
+   * the one place the site looks past the week on screen, and the reason the
+   * stepper is hidden on those pages rather than left there stepping something
+   * nothing renders.
+   */
+  const releases = useMemo(() => {
+    if (!span) return week?.releases ?? [];
+    return (feed?.weeks ?? [])
+      .flatMap((w) => w.releases)
+      .filter((r) => r.releaseDate >= span.from && r.releaseDate <= span.to);
+  }, [span, week, feed]);
   const facets = useMemo(() => facetsFor(releases, filters.region), [releases, filters.region]);
   /**
    * The week's own titles, ranked by how much attention they are getting.
@@ -270,7 +293,9 @@ export default function App() {
   useKeyboard({
     onPrevWeek: () => stepWeek(-1),
     onNextWeek: () => stepWeek(1),
-    blocked: selected !== null,
+    // Same reason the stepper is hidden on a span page: the arrows would move a
+    // week nothing on screen is drawn from.
+    blocked: selected !== null || Boolean(span),
   });
 
   /** Trending is a browse aid; once the reader has narrowed the week it is noise. */
@@ -283,10 +308,15 @@ export default function App() {
       if (list) list.push(r);
       else map.set(r.releaseDate, [r]);
     }
-    return daysOfWeek(filters.weekId)
+    // A week has seven known days whether or not anything lands on them. A span
+    // has however many dates its rows actually fall on, which is the only list
+    // that makes sense across a month — enumerating 30 days to drop 20 empties
+    // would arrive at the same place the long way round.
+    const days = span ? [...map.keys()].sort() : daysOfWeek(filters.weekId);
+    return days
       .map((d) => [d, map.get(d) ?? []] as const)
       .filter(([, list]) => list.length > 0);
-  }, [visible, filters.weekId]);
+  }, [visible, filters.weekId, span]);
 
   return (
     <>
@@ -340,7 +370,10 @@ export default function App() {
           </div>
         </div>
 
-        {!isTitlePage && (
+        {/* A span page has no week to step through, and a stepper that changes
+            a number nothing on screen reads would be a control that does
+            nothing. The page's own name goes in PageIntro's h1 instead. */}
+        {!isTitlePage && !span && (
         <div className="weekbar__week">
           <button
             className="weeknav__btn"
@@ -387,7 +420,10 @@ export default function App() {
               Updated {relativeTime(feed.generatedAt)}
             </span>
           )}
-          <ShareWeek releases={visible} filters={filters} />
+          {/* The share card names the week it was made from, which is a true
+              label for every page but these two. Rather than teach it a second
+              vocabulary, a span page does without. */}
+          {!span && <ShareWeek releases={visible} filters={filters} />}
           <span className="viewtoggle" role="group" aria-label="Layout">
             <button data-on={view === 'board'} onClick={() => setView('board')}>
               Board
@@ -487,13 +523,16 @@ export default function App() {
             </span>
             <h3>Nothing scheduled here yet</h3>
             <p>
-              {formatWeekRange(filters.weekId)} hasn't been pulled into the calendar yet. The
-              refresh covers several weeks either side, so past and upcoming weeks fill in once it
-              runs.
+              {span
+                ? /* A span page cannot offer "try another week" — it has no week
+                     and the buttons below would be a non-sequitur. It reaches
+                     here only when a span outruns the feed's window. */
+                  `${span.label} isn't in the calendar yet. The refresh covers several weeks either side, so this fills in once it runs.`
+                : `${formatWeekRange(filters.weekId)} hasn't been pulled into the calendar yet. The refresh covers several weeks either side, so past and upcoming weeks fill in once it runs.`}
             </p>
             {/* A dead end otherwise: say which weeks do have data and go there in
                 one tap, rather than leaving the arrows to be guessed at. */}
-            {stockedWeeks.length > 0 && (
+            {!span && stockedWeeks.length > 0 && (
               <>
                 <p style={{ marginTop: -4 }}>
                   Right now the calendar covers{' '}
@@ -521,7 +560,11 @@ export default function App() {
 
         {!isTitlePage && feed && !error && facets.total > 0 && (
           <>
-            {!userNarrowed && (
+            {/* Not on a span page. PageIntro already ranks the same rows by the
+                same measure up top, so the strip would be a second copy of it
+                a few hundred pixels down — and its label says "this week",
+                which is not what a month page is ranking. */}
+            {!userNarrowed && !span && (
               <TrendingStrip
                 releases={trendingNow.list}
                 live={trendingNow.live}
@@ -562,7 +605,13 @@ export default function App() {
                 </div>
               </div>
             ) : view === 'board' ? (
-              <Board releases={visible} onOpen={setSelected} multiDay={byDay.length > 1} />
+              <Board
+                releases={visible}
+                onOpen={setSelected}
+                // A month spans five Fridays, so a weekday chip stops
+                // identifying anything and the date has to carry it.
+                dayLabel={byDay.length <= 1 ? 'none' : span ? 'date' : 'weekday'}
+              />
             ) : (
               byDay.map(([date, list]) => {
                 const d = formatDay(date);

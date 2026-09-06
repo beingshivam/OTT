@@ -37,11 +37,18 @@ const PANEL_MAX = 8;
 interface Props {
   releases: Release[];
   onOpen: (r: Release) => void;
-  /** Show a day chip per row when the week spans more than one release day. */
-  multiDay: boolean;
+  /**
+   * How each row labels its release day.
+   *
+   * 'none'    one day on screen, so a chip would repeat the same word.
+   * 'weekday' a single week — "FRI" is unambiguous inside seven days.
+   * 'date'    a month or the upcoming page, where the board spans weeks and
+   *           five different Fridays would all read "FRI".
+   */
+  dayLabel: 'none' | 'weekday' | 'date';
 }
 
-export function Board({ releases, onOpen, multiDay }: Props) {
+export function Board({ releases, onOpen, dayLabel }: Props) {
   // A theatrical Mirzapur and a single mid-season episode were rendering
   // identically. Give the week's top few a heavier line so the eye has somewhere
   // to land — emphasis, not a second hierarchy.
@@ -85,7 +92,7 @@ export function Board({ releases, onOpen, multiDay }: Props) {
               platformId={id}
               releases={list}
               onOpen={onOpen}
-              multiDay={multiDay}
+              dayLabel={dayLabel}
               major={major}
             />
           ))}
@@ -99,13 +106,13 @@ function PanelCard({
   platformId,
   releases,
   onOpen,
-  multiDay,
+  dayLabel,
   major,
 }: {
   platformId: string;
   releases: Release[];
   onOpen: (r: Release) => void;
-  multiDay: boolean;
+  dayLabel: 'none' | 'weekday' | 'date';
   major: Set<string>;
 }) {
   const [expanded, setExpanded] = useState(false);
@@ -133,7 +140,7 @@ function PanelCard({
             key={r.id + platformId}
             release={r}
             onOpen={onOpen}
-            multiDay={multiDay}
+            dayLabel={dayLabel}
             major={major.has(r.id)}
           />
         ))}
@@ -198,12 +205,12 @@ function useColumnCount(): number {
 function BoardRow({
   release,
   onOpen,
-  multiDay,
+  dayLabel,
   major,
 }: {
   release: Release;
   onOpen: (r: Release) => void;
-  multiDay: boolean;
+  dayLabel: 'none' | 'weekday' | 'date';
   major?: boolean;
 }) {
   const Kind = KIND_ICON[release.kind] ?? KIND_ICON.film;
@@ -229,7 +236,11 @@ function BoardRow({
             rather than shunting the row around. */}
         <span className="row__end">
           <Rating release={release} />
-          {multiDay && <span className="row__day">{day.weekday}</span>}
+          {dayLabel !== 'none' && (
+            <span className="row__day">
+              {dayLabel === 'date' ? `${day.day} ${day.month}` : day.weekday}
+            </span>
+          )}
         </span>
       </button>
     </li>

@@ -282,6 +282,7 @@ function browseMarkup(pages) {
     row('Collections', pages.filter((p) => p.group === 'collection')) +
     row('Platforms', pages.filter((p) => p.group === 'platform')) +
     row('Languages', pages.filter((p) => p.group === 'language')) +
+    row('Months', pages.filter((p) => p.group === 'month')) +
     row('Weeks', pages.filter((p) => p.group === 'week')) +
     `</nav>`
   );
@@ -519,6 +520,21 @@ const MIN_PAGE_ROWS = Number(
       throw new Error('src/lib/route.ts no longer exports MIN_PAGE_ROWS.');
     })(),
 );
+/**
+ * The month slugs, read out of the app's own route table rather than kept here.
+ *
+ * The path the build writes and the path the app resolves have to be spelled
+ * identically or a chip lands on the SPA fallback, and two hand-kept lists of
+ * twelve month names is exactly the kind of pair that drifts silently.
+ */
+const MONTH_SLUGS = (() => {
+  const block = routeSrc.match(/export const MONTH_SLUGS\s*=\s*\[([\s\S]*?)\]/);
+  if (!block) throw new Error('src/lib/route.ts no longer exports MONTH_SLUGS.');
+  const names = [...block[1].matchAll(/'([a-z]+)'/g)].map((m) => m[1]);
+  if (names.length !== 12) throw new Error(`MONTH_SLUGS has ${names.length} entries, expected 12.`);
+  return names;
+})();
+
 const stockedWeeks = feed.weeks.filter((w) => w.releases.some((r) => r.regions.includes(REGION)));
 /** Stamped with their week on the way out: a release row carries no week id of
  *  its own, and the platform and language pages group by week. */
@@ -694,6 +710,115 @@ for (const [code, name] of languagesPresent) {
     description: `Every new ${name} film, series and show across streaming platforms and cinemas — ${list.length} titles, updated every Friday. No app, no login.`,
     h1: `New ${name} releases`,
     lede: `${list.length} ${name} titles across every platform and cinemas, updated every Friday.`,
+    facts: factsMarkup({
+      rows: list,
+      thisWeek: list.filter((r) => r.weekId === week.id),
+      cross: {
+        label: 'Mostly on',
+        items: tally(list, (r) => r.platforms)
+          .slice(0, 4)
+          .map(([id, n]) => ({ text: pname(id), n })),
+      },
+    }),
+    body: sectionMarkup(sectionsBy(list, (r) => [r.weekId]), weekRangeOf),
+  });
+}
+
+/**
+ * Everything still to come.
+ *
+ * Overlaps the month pages by construction — it is their future half — and
+ * that is the point rather than an oversight: "what is releasing in October"
+ * and "what is coming next" are different questions from different people, and
+ * this one re-sorts by how soon rather than by when in the month. It is also
+ * the only page here whose contents change without a rebuild, since the app
+ * recomputes the cutoff on load.
+ */
+const upcomingRows = everything.filter((r) => r.releaseDate > TODAY);
+if (upcomingRows.length >= MIN_PAGE_ROWS) {
+  const cinema = upcomingRows.filter((r) => r.platforms.includes('theatres')).length;
+  const soonest = [...upcomingRows].sort((a, b) => a.releaseDate.localeCompare(b.releaseDate))[0];
+  pages.push({
+    path: 'upcoming',
+    group: 'month',
+    crumb: 'Coming soon',
+    linkText: 'Coming soon',
+    rows: upcomingRows,
+    title: 'Upcoming OTT and movie releases in India — what’s coming next',
+    description:
+      `${upcomingRows.length} films, series and shows still to come in India — ${cinema} opening in cinemas, ` +
+      `the rest landing on streaming. Next up: ${soonest.title} on ${formatDate(soonest.releaseDate)}.`,
+    h1: 'Coming soon',
+    lede: `${upcomingRows.length} releases still to come — next up is ${soonest.title} on ${formatDate(soonest.releaseDate)}.`,
+    facts: factsMarkup({
+      rows: upcomingRows,
+      thisWeek: [],
+      cross: {
+        label: 'Mostly on',
+        items: tally(upcomingRows, (r) => r.platforms)
+          .slice(0, 4)
+          .map(([id, n]) => ({ text: pname(id), n })),
+      },
+    }),
+    body: sectionMarkup(sectionsBy(upcomingRows, (r) => [r.weekId]), weekRangeOf),
+  });
+}
+
+/**
+ * One page per calendar month, plus everything not out yet.
+ *
+ * A month is how people ask this question outside the industry. Nobody types
+ * "releases for the week of 4 September" — they type "movies releasing in
+ * September" and "upcoming OTT releases", both of which are large, recurring
+ * and permanently seasonal. The week pages are the archive; these are the two
+ * shapes the demand actually arrives in.
+ *
+ * A month spans weeks, which is why it needed the span route rather than a
+ * filter: the board on these pages reads across the feed and the week stepper
+ * above it is hidden, because a control that steps a week nothing renders from
+ * is a control that does nothing.
+ *
+ * MIN_PAGE_ROWS applies, so a month clipped at the edge of the eight-week
+ * window does not get a page holding two stray titles. MAX_PAGE_SHARE does
+ * not: it exists to stop a page becoming a second copy of the homepage, and
+ * the homepage is one week — a month is a different question with a different
+ * answer even when it is most of the feed.
+ */
+const monthsPresent = [...new Set(everything.map((r) => r.releaseDate.slice(0, 7)))]
+  .sort()
+  .map((ym) => ({ ym, list: everything.filter((r) => r.releaseDate.startsWith(ym)) }))
+  .filter(({ list }) => list.length >= MIN_PAGE_ROWS);
+
+for (const { ym, list } of monthsPresent) {
+  const [year, month] = ym.split('-');
+  /**
+   * The full month name, matching what BrowseLinks renders.
+   *
+   * This said "Aug 2026" while the component said "August 2026" — the same
+   * prerender-versus-app drift that made the platform row say "In cinemas" to
+   * a crawler and "New on In Theatres" to a reader. A crawler being shown
+   * different link text than a person is the cloaking problem these chips
+   * exist to avoid, even when the difference is three letters.
+   */
+  const full = new Date(`${ym}-01T00:00:00Z`).toLocaleDateString('en-GB', {
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  });
+  const cinema = list.filter((r) => r.platforms.includes('theatres')).length;
+  pages.push({
+    path: `releases/${MONTH_SLUGS[Number(month) - 1]}-${year}`,
+    group: 'month',
+    crumb: full,
+    linkText: full,
+    rows: list,
+    title: `${full} OTT and movie releases in India — every platform, plus cinemas`,
+    description:
+      `Everything releasing in ${full}: ${list.length} films, series and shows across ` +
+      `${new Set(list.flatMap((r) => r.platforms)).size} streaming platforms and Indian cinemas. Updated every Friday.`,
+    h1: `Releases in ${full}`,
+    lede:
+      `${list.length} releases in ${full} — ${cinema} in cinemas, ${list.length - cinema} straight to streaming.`,
     facts: factsMarkup({
       rows: list,
       thisWeek: list.filter((r) => r.weekId === week.id),
@@ -896,10 +1021,19 @@ manifest.name = `${BRAND} — ${HEADLINE}`;
 manifest.short_name = BRAND;
 await writeFile(MANIFEST, `${JSON.stringify(manifest, null, 2)}\n`);
 
-const count = (g) => pages.filter((p) => p.group === g).length;
+/**
+ * Counted by walking the groups that exist rather than naming them.
+ *
+ * The hand-written version listed six groups and silently stopped adding up
+ * the moment a seventh was added — it reported 126 pages and then itemised
+ * 122, which is the kind of discrepancy nobody reads closely enough to catch.
+ */
+const byGroup = new Map();
+for (const p of pages) byGroup.set(p.group, (byGroup.get(p.group) ?? 0) + 1);
+const tallied = [...byGroup].map(([g, n]) => `${n} ${g}`).join(', ');
 console.log(
   `SEO: build ${buildSha.slice(0, 8)}\n` +
     `     home titled "${title}" — ${rows.length} releases\n` +
-    `     ${pages.length} pages: 1 home, ${count('title')} title, ${count('collection')} collection, ${count('platform')} platform, ${count('language')} language, ${count('week')} week\n` +
+    `     ${pages.length} pages: ${tallied}\n` +
     `     sitemap, robots.txt, JSON-LD with breadcrumbs`,
 );
