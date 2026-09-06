@@ -22,6 +22,7 @@
     "hook": "node scripts/build-hook.mjs",
     "memes": "node scripts/build-memes.mjs",
     "story": "node scripts/build-story.mjs",
+    "feature": "node scripts/build-feature.mjs",
     "test:worker": "node worker/index.test.mjs"
   },
   "dependencies": {
