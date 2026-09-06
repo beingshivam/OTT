@@ -1,4 +1,5 @@
 import type { Release } from '../types';
+import { scoreOf, scoreTitle } from '../lib/score';
 
 /**
  * The audience score, shown wherever a title is.
@@ -19,40 +20,27 @@ import type { Release } from '../types';
  * nothing keeps the slot empty rather than ragged, and because this sits in a
  * fixed-width right-hand column with the day chip, the numbers line up and the
  * gaps are invisible.
+ *
+ * Which source the number comes from, and whether it is trustworthy enough to
+ * colour, is decided in lib/score.ts — the same call the sort and the "best
+ * rated" pill make, so a card and the order it sits in cannot disagree.
  */
 
-/** Worth drawing the eye to: genuinely well-liked, on enough votes to mean it. */
-const STRONG_SCORE = 7.5;
-const STRONG_VOTES = 50;
-
 export function Rating({ release, className = '' }: { release: Release; className?: string }) {
-  if (release.rating == null) return null;
-
-  // A missing vote count means a hand-checked curated row, not a thinly-voted
-  // one — every discovered score carries its count by construction. Reading
-  // undefined as zero demoted exactly the wrong titles: Silo at 8.2 rendered in
-  // the same grey as a 5.5, because the vote gate meant for noisy crowd scores
-  // was being applied to a score that was never a crowd score.
-  const confident = release.votes == null || release.votes >= STRONG_VOTES;
-  const strong = release.rating >= STRONG_SCORE && confident;
+  const score = scoreOf(release);
+  if (!score) return null;
 
   return (
     <span
       className={`rating ${className}`.trim()}
-      data-strong={strong || undefined}
-      // Says where the number came from and what it rests on, so a 9.0 off six
-      // votes can be taken for what it is. TMDB, named honestly — it is not
-      // IMDb, which polls a different crowd and lands a few tenths elsewhere.
-      title={
-        release.votes
-          ? `${release.rating.toFixed(1)} on TMDB, from ${release.votes.toLocaleString()} vote${
-              release.votes === 1 ? '' : 's'
-            }`
-          : `${release.rating.toFixed(1)} on TMDB`
-      }
+      data-strong={score.strong || undefined}
+      // Names the source and what it rests on, so a 9.0 off six votes can be
+      // taken for what it is — and so a reader is never left assuming an IMDb
+      // number came from TMDB, or the reverse.
+      title={scoreTitle(score)}
     >
       <span aria-hidden="true">★</span>
-      {release.rating.toFixed(1)}
+      {score.value.toFixed(1)}
     </span>
   );
 }

@@ -3,6 +3,7 @@ import type { Release, ReleaseFeed } from '../types';
 import type { Route } from '../lib/route';
 import { collectionBySlug, inCollection } from '../data/collections';
 import { platformLinkText } from './BrowseLinks';
+import { scoreOf } from '../lib/score';
 import { BRAND } from '../data/brand';
 
 /**
@@ -38,10 +39,9 @@ interface Props {
   onOpen: (r: Release) => void;
 }
 
-/** A rating is only worth quoting when enough people voted on it — the same
- *  bar the star uses, so the page and the board never disagree about which
- *  titles count as well-reviewed. */
-const STRONG_VOTES = 50;
+/* Which score counts, and whether it is trustworthy, is lib/score.ts — the
+   same call the star and the ranked sort make, so this pill can never name a
+   title the board would order differently. */
 
 const tally = (rows: Release[], pick: (r: Release) => string[]) => {
   const counts = new Map<string, number>();
@@ -107,8 +107,9 @@ export function PageIntro({ route, feed, region, currentWeek, onOpen }: Props) {
       : 'Biggest right now';
 
   const bestRated = [...scope]
-    .filter((r) => r.rating != null && (r.votes == null || r.votes >= STRONG_VOTES))
-    .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))[0];
+    .map((r) => ({ row: r, score: scoreOf(r) }))
+    .filter((x) => x.score?.confident)
+    .sort((a, b) => (b.score?.value ?? 0) - (a.score?.value ?? 0))[0];
 
   const films = scope.filter((r) => r.kind === 'film').length;
   const series = scope.length - films;
@@ -250,8 +251,8 @@ export function PageIntro({ route, feed, region, currentWeek, onOpen }: Props) {
           <div className="pageintro__fact">
             <span className="pageintro__label">Best rated</span>
             <span className="pageintro__vals">
-              <button className="pageintro__pill" onClick={() => onOpen(bestRated)}>
-                {bestRated.title} <em>★ {bestRated.rating?.toFixed(1)}</em>
+              <button className="pageintro__pill" onClick={() => onOpen(bestRated.row)}>
+                {bestRated.row.title} <em>★ {bestRated.score?.value.toFixed(1)}</em>
               </button>
             </span>
           </div>

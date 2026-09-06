@@ -1,4 +1,5 @@
 import type { Filters, Release, SortKey, TitleKind } from '../types';
+import { scoreOf } from './score';
 
 export const EMPTY_FILTERS: Omit<Filters, 'weekId' | 'region'> = {
   platforms: [],
@@ -36,9 +37,14 @@ export function sortReleases(releases: Release[], sort: SortKey): Release[] {
       return out.sort(
         (a, b) => a.releaseDate.localeCompare(b.releaseDate) || (b.heat ?? 0) - (a.heat ?? 0),
       );
-    case 'rating':
-      // Unrated titles sink rather than pretending to be zero-star.
-      return out.sort((a, b) => (b.rating ?? -1) - (a.rating ?? -1) || (b.heat ?? 0) - (a.heat ?? 0));
+    case 'rating': {
+      // Through lib/score.ts, so the order matches the number each card shows —
+      // sorting by TMDB while the cards displayed IMDb would put an 8.1 above
+      // an 8.6 in plain sight. Unrated titles sink rather than pretending to be
+      // zero-star.
+      const value = (r: Release) => scoreOf(r)?.value ?? -1;
+      return out.sort((a, b) => value(b) - value(a) || (b.heat ?? 0) - (a.heat ?? 0));
+    }
     case 'az':
       return out.sort((a, b) => a.title.localeCompare(b.title));
     case 'trending':

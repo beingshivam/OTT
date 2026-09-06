@@ -4,6 +4,7 @@ import { PosterArt } from './PosterArt';
 import { dropLabel } from './ReleaseCard';
 import { KIND_LABEL, languageName, platform } from '../data/platforms';
 import { formatDay } from '../lib/week';
+import { scoreOf, scoreTitle } from '../lib/score';
 import type { Release } from '../types';
 
 interface Props {
@@ -18,6 +19,9 @@ export function DetailSheet({ release, onClose }: Props) {
   const day = formatDay(release.releaseDate);
   const drop = release.drop;
   const dropText = dropLabel(release);
+  /* Same call the card behind this sheet makes, so opening a title never shows
+     a different number than the row you tapped. */
+  const score = scoreOf(release);
 
   useEffect(() => {
     // Remember what opened the sheet so focus can go back there on close.
@@ -110,14 +114,9 @@ export function DetailSheet({ release, onClose }: Props) {
             {drop?.fullSeason && <span className="pill">Full season</span>}
             {drop?.finale && <span className="pill">Finale</span>}
             {release.certification && <span className="pill">{release.certification}</span>}
-            {release.rating != null && (
-              <span
-                className="pill"
-                title={`${release.rating.toFixed(1)} on TMDB${
-                  release.votes ? `, from ${release.votes.toLocaleString()} votes` : ''
-                }`}
-              >
-                ★ {release.rating.toFixed(1)}
+            {score && (
+              <span className="pill" title={scoreTitle(score)}>
+                ★ {score.value.toFixed(1)}
               </span>
             )}
           </div>
