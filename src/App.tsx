@@ -193,6 +193,30 @@ export default function App() {
       const hit = w.releases.find((r) => r.slug === route.titleSlug);
       if (hit) return hit;
     }
+    /**
+     * Not in the window any more — so read the row the build put in the page.
+     *
+     * Title pages outlive the eight-week feed on purpose (scripts/archive.mjs):
+     * a page that deletes itself three weeks after a film opens never gets to
+     * be the page that ranks. But the feed the app loads is still a window, so
+     * without this the app would look up the slug, miss, and render "we don't
+     * have that title any more" underneath prerendered markup carrying the
+     * whole film — the crawler seeing the page and the visitor seeing an
+     * apology.
+     *
+     * Parsed rather than fetched: it is already here, so there is no request
+     * and no flash of the wrong state.
+     */
+    const embedded = document.getElementById('title-data')?.textContent;
+    if (embedded) {
+      try {
+        const row = JSON.parse(embedded) as Release;
+        if (row.slug === route.titleSlug) return row;
+      } catch {
+        /* A malformed blob is a build bug, not something to take the page down
+           over — fall through to the not-found state below. */
+      }
+    }
     return null;
   }, [route, feed]);
 

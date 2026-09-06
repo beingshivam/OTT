@@ -409,6 +409,23 @@ async function renderPage(page, pages) {
     `    <meta name="twitter:image" content="${SITE_URL}/og.png" />\n` +
     FALLBACK_CSS +
     `    <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>\n` +
+    /**
+     * The title's own row, carried in the page.
+     *
+     * A title page outlives the eight-week feed the app loads, so once its week
+     * rolls off, the app looks the slug up, finds nothing and renders "we don't
+     * have that title any more" — under prerendered markup that has the whole
+     * film on it. A crawler would see the page and a visitor would see the
+     * apology.
+     *
+     * Embedding beats fetching an archive file: no second request, no waterfall
+     * before the page can render, and it stays one small object per page however
+     * large the archive grows. `<` is escaped so a synopsis containing "</script>"
+     * cannot close this tag early.
+     */
+    (page.embed
+      ? `    <script type="application/json" id="title-data">${JSON.stringify(page.embed).replace(/</g, '\\u003c')}</script>\n`
+      : '') +
     buildMeta +
     analytics;
 
@@ -543,6 +560,40 @@ const everything = stockedWeeks.flatMap((w) =>
 );
 
 const TODAY = new Date().toISOString().slice(0, 10);
+
+/**
+ * Every title the feed has ever carried, not just the ones in it today.
+ *
+ * The feed is a rolling eight-week window, so generating title pages from it
+ * meant every page had a three-week fuse: the film's week fell off the back,
+ * the page stopped being written, and the URL died. A page that deletes itself
+ * never gets to be the page that ranks — and search rewards a URL that has been
+ * answering the same question for a year.
+ *
+ * scripts/archive.mjs keeps the permanent record and this reads it. Missing
+ * file means it has never run, which is not a reason to fail a build: the
+ * window still covers the current weeks, so the site is correct, just not yet
+ * accumulating.
+ *
+ * Deliberately only the title pages. Every other page here — platform,
+ * language, collection, week, month — is also rendered by the app from the
+ * live feed, and widening those to the archive would have the prerendered
+ * /netflix list three hundred titles while the app showed thirty-seven. A
+ * title page has no such problem: it is one title, and the build embeds that
+ * title's own data into the page.
+ */
+const archived = await readFile(resolve(ROOT, 'data/archive.json'), 'utf8')
+  .then((s) => JSON.parse(s).titles)
+  .catch(() => []);
+
+const liveIds = new Set(everything.map((r) => r.id));
+/** Live rows win: they came from this refresh and the archive may be a run
+ *  behind on a platform that has just picked a film up. */
+const titleCandidates = [
+  ...everything,
+  ...archived.filter((r) => !liveIds.has(r.id) && (r.regions ?? []).includes(REGION)),
+];
+
 /**
  * Every theatrical film with enough on it to fill a page — before it opens as
  * well as after.
@@ -570,7 +621,7 @@ const TODAY = new Date().toISOString().slice(0, 10);
  * date, and those two fields are what make 88 pages 88 documents rather than
  * one template repeated.
  */
-const titlePages = everything
+const titlePages = titleCandidates
   .filter((r) => r.platforms.includes('theatres') && r.synopsis && r.cast?.length)
   // Newest first, so the sitemap leads with what people are searching now.
   .sort((a, b) => b.releaseDate.localeCompare(a.releaseDate));
@@ -901,7 +952,9 @@ for (const r of titlePages) {
       : `Not announced yet — no streaming date has been confirmed. This page updates automatically; every platform is re-checked twice a week.`;
 
   const langs = (r.languages ?? []).map(lname);
-  const alsoThatWeek = everything
+  // From the archive too, so a page whose week has rolled out of the window
+  // keeps its context instead of quietly losing a section as it ages.
+  const alsoThatWeek = titleCandidates
     .filter((x) => x.weekId === r.weekId && x.id !== r.id && x.platforms.includes('theatres'))
     .slice(0, 6);
 
@@ -910,6 +963,9 @@ for (const r of titlePages) {
     group: 'title',
     crumb: r.title,
     rows: [r],
+    /** Carried into the page so it still renders once this title has aged out
+     *  of the feed the app loads. See the head assembly in renderPage. */
+    embed: { ...r, slug },
     /**
      * The title tag tracks the state, because the query does. Before a film
      * opens people search its release date; after it opens they search where

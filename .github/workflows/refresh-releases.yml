@@ -107,6 +107,23 @@ jobs:
           TMDB_TOKEN: ${{ secrets.TMDB_TOKEN || secrets.TMDB_API_KEY }}
         run: node scripts/fetch-logos.mjs
 
+      # The permanent record, updated from the feed that was just rebuilt.
+      #
+      # The feed is a rolling eight-week window, so without this every title
+      # page the build writes has a three-week fuse — the film's week falls off
+      # the back and the URL dies. Pages that delete themselves never rank.
+      #
+      # Runs whenever the fetch succeeded, enriched or not: the merge only
+      # writes fields it actually has, so a run that lost enrichment records the
+      # new titles without stripping the synopses already stored for the old
+      # ones. And like enrichment, it must never cost us a refresh that already
+      # worked — the calendar is the product, the archive is what compounds.
+      - name: Update the archive
+        id: archive
+        if: steps.fetch.outcome == 'success'
+        continue-on-error: true
+        run: node scripts/archive.mjs
+
       # The week's email, assembled from the feed that was just rebuilt. A
       # newsletter dies of the Friday it did not get written, so the draft is
       # ready before anyone has to think about it.
@@ -126,9 +143,9 @@ jobs:
         run: node scripts/build-digest.mjs
 
       - name: Note any partial pass
-        if: steps.enrich.outcome == 'failure' || steps.logos.outcome == 'failure' || steps.digest.outcome == 'failure'
+        if: steps.enrich.outcome == 'failure' || steps.logos.outcome == 'failure' || steps.digest.outcome == 'failure' || steps.archive.outcome == 'failure'
         run: |
-          echo "::warning title=Refreshed, but not fully enriched::The calendar itself rebuilt and will be published. Enrichment: ${{ steps.enrich.outcome }}. Logos: ${{ steps.logos.outcome }}. Email draft: ${{ steps.digest.outcome }}. TMDB drops connections under load, and the next run picks up whatever was missed — no action needed unless it repeats."
+          echo "::warning title=Refreshed, but not fully enriched::The calendar itself rebuilt and will be published. Enrichment: ${{ steps.enrich.outcome }}. Logos: ${{ steps.logos.outcome }}. Archive: ${{ steps.archive.outcome }}. Email draft: ${{ steps.digest.outcome }}. TMDB drops connections under load, and the next run picks up whatever was missed — no action needed unless it repeats."
 
       # Pushing the data is what triggers the Cloudflare build, so this is the
       # step that actually publishes. Rebase first: a human push between the
@@ -137,13 +154,13 @@ jobs:
       - name: Commit the updated calendar
         if: steps.fetch.outcome == 'success'
         run: |
-          if git diff --quiet -- public/data/releases.json public/data/logos.json email; then
+          if git diff --quiet -- public/data/releases.json public/data/logos.json data/archive.json email; then
             echo "::notice::Calendar already up to date — nothing to commit."
             exit 0
           fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public/data/releases.json public/data/logos.json email
+          git add public/data/releases.json public/data/logos.json data/archive.json email
           git commit -m "chore(data): refresh release calendar"
 
           for attempt in 1 2 3; do
