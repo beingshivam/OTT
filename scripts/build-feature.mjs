@@ -50,6 +50,51 @@ const SHOT = process.env.SHOT;
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 /**
+ * This week's facts, read from the built feed.
+ *
+ * The weekly post is the only one here that cannot have written copy: it goes
+ * out every Friday and its numbers and titles change every Friday with it.
+ * Deriving them means running the script is the whole job — no editing a line
+ * that quietly describes last week.
+ */
+const feed = JSON.parse(await readFile(resolve(DIST, 'data/releases.json'), 'utf8'));
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const DAY = 86_400_000;
+
+const stocked = feed.weeks.filter((w) => w.releases.some((r) => r.regions.includes('IN')));
+const now = new Date();
+const base = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+const currentId = new Date(base.getTime() - ((base.getUTCDay() + 2) % 7) * DAY).toISOString().slice(0, 10);
+/** Today's week if it has rows, else the nearest that does — the same rule the
+ *  site itself uses to decide what to open on, so the post and the page agree. */
+const week =
+  stocked.find((w) => w.id === currentId) ??
+  stocked.reduce((best, w) =>
+    Math.abs(Date.parse(w.id) - Date.parse(currentId)) < Math.abs(Date.parse(best.id) - Date.parse(currentId))
+      ? w
+      : best,
+  );
+
+const weekRows = week.releases
+  .filter((r) => r.regions.includes('IN'))
+  .sort((a, b) => (b.heat ?? 0) - (a.heat ?? 0));
+const a = new Date(`${week.id}T00:00:00Z`);
+const b = new Date(a.getTime() + 6 * DAY);
+const weekRange =
+  a.getUTCMonth() === b.getUTCMonth()
+    ? `${a.getUTCDate()}–${b.getUTCDate()} ${MONTHS[b.getUTCMonth()]}`
+    : `${a.getUTCDate()} ${MONTHS[a.getUTCMonth()]} – ${b.getUTCDate()} ${MONTHS[b.getUTCMonth()]}`;
+
+const registry = await readFile(resolve(ROOT, 'src/data/platforms.ts'), 'utf8');
+const pnames = new Map(
+  [...registry.matchAll(/\{\s*id:\s*'([^']+)',\s*name:\s*'([^']+)'/g)].map(([, id, name]) => [id, name]),
+);
+const pname = (id) => pnames.get(id) ?? id;
+const weekPlatforms = new Set(weekRows.flatMap((r) => r.platforms)).size;
+const weekTop = weekRows.slice(0, 6).map((r) => `• ${r.title} — ${r.platforms.map(pname).join(' · ')}`);
+const weekRest = weekRows.length - 6;
+
+/**
  * The five posts.
  *
  * `url` is a real path on the real site, including its query string — the
@@ -62,6 +107,27 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
  * feed, and it is worth re-checking when the feed moves.
  */
 const POSTS = [
+  {
+    slug: 'week',
+    /** The homepage, which is the week. Everything on this post is derived
+     *  above, so re-running it on a Friday produces that Friday's post. */
+    url: '/',
+    badge: weekRange,
+    head: ['Is hafte kya', '*naya* hai?'],
+    sub: `${weekRows.length} releases, ${weekPlatforms} platforms — Netflix se theatres tak, sab ek page pe.`,
+    caption: `Is hafte kya naya hai — ${weekRange}
+
+${weekTop.join('\n')}${weekRest > 0 ? `\n\n+ ${weekRest} aur, theatres ki releases ke saath.` : ''}
+
+${weekRows.length} releases, ${weekPlatforms} platforms, ek page. Koi app nahi, koi login nahi. Har Friday subah update — drops land hone se pehle.
+
+🔗 newonott.in — link in bio
+
+Is hafte kya dekh rahe ho? 👇
+
+#NewOnOTT #OTTIndia #OTTReleases #KyaDekhein #WhatToWatch #NewReleases
+#Netflix #PrimeVideo #JioHotstar #Bollywood #TamilCinema #TeluguCinema #MalayalamCinema`,
+  },
   {
     slug: 'mirzapur',
     url: '/ott-release-date/mirzapur-the-movie',
