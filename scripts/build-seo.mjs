@@ -25,6 +25,11 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { BRAND, HEADLINE, INSTAGRAM_URL } from './brand.mjs';
+
+/** Kept beside the app's own wording in App.tsx — one sentence, two places,
+ *  and they have to agree. */
+const TAGLINE_LONG =
+  "Everything releasing this week — tap any title to see where it's streaming and open it there. Nothing plays on this page.";
 import { slugify } from './slug.mjs';
 import { ANALYTICS_TOKEN } from './config.mjs';
 
@@ -202,10 +207,20 @@ const platforms = [...new Set(rows.flatMap((r) => r.platforms))];
 // Google truncates on a word already in the sentence.
 const title = `${BRAND} this week (${range}) — every platform, plus cinemas`;
 const topPlatforms = [...new Set(rows.flatMap((r) => r.platforms))].map(pname).slice(0, 5);
+/**
+ * Says where to watch, not just what is out.
+ *
+ * This described "N releases across M platforms" and stopped there, which
+ * reads as a place that carries the releases. A reader wrote in unsure
+ * whether she could watch things here — and this line is what shows in a
+ * Google result, so it is where the misunderstanding starts for anyone who
+ * arrives from search.
+ */
 const description =
   `Every new film, series and show released this week — ${range}. ` +
   `${rows.length} releases across ${platforms.length} platforms including ` +
-  `${topPlatforms.join(', ')}. Updated twice a week. No login.`;
+  `${topPlatforms.join(', ')}. See which platform each one is on and open it there. ` +
+  `Updated twice a week. No login.`;
 
 // --- what every page is built from ------------------------------------------
 
@@ -408,6 +423,9 @@ async function renderPage(page, pages) {
   const prerendered =
     `<main class="seo-fallback">${crumbs}<h1>${esc(page.h1)}</h1>` +
     `<p>${esc(page.lede)}</p>` +
+    /* The same sentence the app shows under the week bar, so the
+       pre-hydration paint and a crawler both get it. */
+    (page.path ? '' : `<p>${esc(TAGLINE_LONG)}</p>`) +
     (page.facts ?? '') +
     page.body +
     browseMarkup(pages) +

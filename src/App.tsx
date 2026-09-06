@@ -400,6 +400,19 @@ export default function App() {
         )}
       </div>
 
+      {/* The sentence the homepage never had.
+          Someone arriving from Instagram had nothing on screen telling them
+          what this is — the header is a wordmark, the board is a list of
+          titles, and a reader wrote in genuinely unsure whether she could
+          watch things here. One quiet line, on the page a first visit lands
+          on. The route pages have PageIntro doing this job already. */}
+      {!route && (
+        <p className="shell explainer">
+          Everything releasing this week — tap any title to see where it's streaming and open it
+          there. Nothing plays on this page.
+        </p>
+      )}
+
       {/* Only on a page that promised something specific. On "/" this renders
           nothing and the layout is exactly what it was. */}
       {route && feed && !isTitlePage && (
@@ -597,6 +610,11 @@ export default function App() {
           <div className="footer__stack">
             <span>
               {BRAND} — {TAGLINE}
+            </span>
+            {/* Said plainly, because a tagline can still be read the hopeful
+                way. This is the sentence that answers the question directly. */}
+            <span className="footer__note">
+              We don't stream anything. Every title links out to the platform showing it.
             </span>
             <button className="footer__link" onClick={addWeeklyReminder}>
               <IconCalendar />

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { IconCalendar, IconClose, IconExternal, IconPlay, IconShare, IconCheck } from './icons';
+import { IconCalendar, IconClose, IconExternal, IconShare, IconCheck } from './icons';
 import { PosterArt } from './PosterArt';
 import { dropLabel } from './ReleaseCard';
 import { KIND_LABEL, languageName, platform } from '../data/platforms';
@@ -140,8 +140,14 @@ export function DetailSheet({ release, onClose }: Props) {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  <IconPlay />
-                  {target.theatrical ? 'Book tickets' : `Open ${target.short}`}
+                  {/* An outward arrow, not a play triangle. The play icon said
+                      "playback starts here" while the label said the opposite,
+                      and the icon is what gets read first — a reader wrote in
+                      unsure whether this site streams anything. Naming the
+                      destination and pointing away from the page is the whole
+                      clarification. */}
+                  <IconExternal />
+                  {target.theatrical ? 'Book tickets' : `Watch on ${target.short}`}
                 </a>
               );
             })}

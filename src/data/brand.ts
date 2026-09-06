@@ -43,6 +43,20 @@ export const SLUG = 'newonott';
 export const INSTAGRAM = 'newon_ott';
 export const INSTAGRAM_URL = `https://www.instagram.com/${INSTAGRAM}/`;
 
-export const TAGLINE = 'every new release, every platform, one page.';
+/**
+ * What the product does, in one line — and it has to say *where to watch it*.
+ *
+ * This read "every new release, every platform, one page." A reader in her
+ * forties wrote in genuinely unsure whether this was a place to watch things,
+ * and she was reading it correctly: "every platform, one page" is a fair
+ * description of a service that pools every platform's catalogue into one
+ * player. That is the wrong product, and the line was inviting the mistake.
+ *
+ * Nothing streams here. The job is telling you what is new and which platform
+ * has it, so the line now says that. A tagline that oversells is not a
+ * marketing win — it costs a visit from someone who arrives expecting to
+ * press play.
+ */
+export const TAGLINE = 'every new release, and where to watch it.';
 
-export const HEADLINE = 'everything new, everywhere, this week';
+export const HEADLINE = "what's new this week, and where to watch it";

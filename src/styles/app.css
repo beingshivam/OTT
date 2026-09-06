@@ -2570,3 +2570,21 @@ a {
 .titlepage .crumbs {
   margin-bottom: 16px;
 }
+
+/* ------------------------------------------------------- explainer ----
+   One line under the week bar on the homepage, saying what this is. A
+   first-time visitor from Instagram otherwise has nothing on screen
+   telling them — the header is a wordmark and the board is a list of
+   titles, which is exactly how a reader came to ask whether she could
+   watch things here. Quiet enough not to cost the week its space. */
+.explainer {
+  margin: 0 auto;
+  padding: 0 var(--page-x) 2px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text-3);
+  max-width: 74ch;
+}
+.footer__note {
+  color: var(--text-3);
+}
