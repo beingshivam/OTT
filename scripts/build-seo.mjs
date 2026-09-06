@@ -952,6 +952,47 @@ for (const r of titlePages) {
       : `Not announced yet — no streaming date has been confirmed. This page updates automatically; every platform is re-checked twice a week.`;
 
   const langs = (r.languages ?? []).map(lname);
+
+  /**
+   * How a person would name this thing out loud: "Telugu movie", "Hindi series".
+   *
+   * The title tags carried neither word. A page about a Telugu film never said
+   * "Telugu" anywhere in its tag, which drops the term people most often pair
+   * with a title they half-remember — and the established sites in this space
+   * put it first ("Thakavi Tamil Movie Streaming Online Watch on Amazon").
+   * Ugly, and it matches the query.
+   *
+   * The kind word is dropped when the title already contains it, so
+   * "Mirzapur: The Movie" does not become "Mirzapur: The Movie Hindi movie".
+   */
+  const KIND_WORD = {
+    film: 'movie',
+    series: 'series',
+    documentary: 'documentary',
+    reality: 'show',
+    anime: 'anime',
+    special: 'special',
+  };
+  const kindWord = KIND_WORD[r.kind] ?? 'title';
+  const descriptor = [
+    langs[0],
+    r.title.toLowerCase().includes(kindWord) ? '' : kindWord,
+  ]
+    .filter(Boolean)
+    .join(' ');
+
+  /**
+   * The descriptor rides in brackets after the title rather than inline.
+   *
+   * Inline, it had to be a noun phrase for the sentence around it to work, and
+   * it is not always one: "Mirzapur: The Movie" already contains "movie", so
+   * the kind word is dropped, the descriptor collapses to "Hindi", and the tag
+   * read "where to watch the Hindi online". Bracketed, both "(Telugu movie)"
+   * and "(Hindi)" are grammatical, and no template downstream has to care which
+   * it got.
+   */
+  const qualified = descriptor ? `${r.title} (${descriptor})` : r.title;
+  const on = streaming.length ? streaming.map(pname).join(', ') : '';
   // From the archive too, so a page whose week has rolled out of the window
   // keeps its context instead of quietly losing a section as it ages.
   const alsoThatWeek = titleCandidates
@@ -967,20 +1008,42 @@ for (const r of titlePages) {
      *  of the feed the app loads. See the head assembly in renderPage. */
     embed: { ...r, slug },
     /**
-     * The title tag tracks the state, because the query does. Before a film
-     * opens people search its release date; after it opens they search where
-     * to stream it. One tag serving both would match neither well.
+     * Three states, and the tag tracks them because the query does.
+     *
+     * Before a film opens people search its release date. After it opens they
+     * search when it will stream. Once it is streaming they search where to
+     * watch it — the highest-intent of the three and the one worth being
+     * literal about, so that tag leads with the word "Watch" and names the
+     * platform.
+     *
+     * The important terms go first: a tag is truncated for display at roughly
+     * sixty characters, and the half that survives should be the half carrying
+     * the title, the language and the intent.
      */
-    title: upcoming
-      ? `${r.title} release date — in cinemas ${opensOn}, and when it reaches OTT`
-      : `${r.title} OTT release date — when is it coming to streaming?`,
-    description: upcoming
-      ? `${r.title}${langs.length ? ` (${langs.join(', ')})` : ''} opens in Indian cinemas on ${opensOn}. ` +
-        `Cast, runtime, certificate and trailer — plus the OTT date, tracked twice a week from the day it lands.`
-      : `${r.title}${langs.length ? ` (${langs.join(', ')})` : ''} released in cinemas on ${r.releaseDate}. ` +
-        `${streaming.length ? `Now streaming on ${streaming.map(pname).join(', ')}.` : 'Streaming date not announced yet.'} ` +
-        `Updated twice a week.`,
-    h1: upcoming ? `When does ${r.title} release?` : `When is ${r.title} coming to OTT?`,
+    title: streaming.length
+      ? `Watch ${qualified} online — streaming on ${on}`
+      : upcoming
+        ? `${qualified} release date — in cinemas ${opensOn}`
+        : `${qualified} OTT release date — where to watch online`,
+    description: streaming.length
+      ? `${r.title}${langs.length ? ` (${langs.join(', ')})` : ''} is streaming now on ${on} in India. ` +
+        `Cast, runtime, certificate and trailer, plus every other new release this week.`
+      : upcoming
+        ? `${r.title}${langs.length ? ` (${langs.join(', ')})` : ''} opens in Indian cinemas on ${opensOn}. ` +
+          `Cast, runtime, certificate and trailer — plus the OTT date, tracked twice a week from the day it lands.`
+        : `${r.title}${langs.length ? ` (${langs.join(', ')})` : ''} released in cinemas on ${opensOn}. ` +
+          `No OTT platform has dated it yet — we re-check every platform twice a week and this page says so the day that changes.`,
+    /**
+     * The heading asked "When is X coming to OTT?" even when the answer block
+     * directly beneath it said "Streaming now on Netflix" — the page
+     * contradicting itself in its own h1, on the one state where the reader
+     * has already found what they came for.
+     */
+    h1: streaming.length
+      ? `Where to watch ${r.title}`
+      : upcoming
+        ? `When does ${r.title} release?`
+        : `When is ${r.title} coming to OTT?`,
     lede: answer,
     facts:
       `<p><strong>${upcoming ? 'In cinemas from' : 'In cinemas'}:</strong> ${esc(opensOn)}</p>` +

@@ -90,10 +90,15 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
           imageUrl={release.posterUrl}
         />
         <div className="titlepage__intro">
+          {/* Once it is streaming the question is answered, so asking it again
+              in the heading reads as though the page has not noticed — and
+              "where to watch" is what someone at this stage actually typed. */}
           <h1>
-            {upcoming
-              ? `When does ${release.title} release?`
-              : `When is ${release.title} coming to OTT?`}
+            {streaming.length
+              ? `Where to watch ${release.title}`
+              : upcoming
+                ? `When does ${release.title} release?`
+                : `When is ${release.title} coming to OTT?`}
           </h1>
 
           {/* The answer, first and unqualified. Everything below is context for
