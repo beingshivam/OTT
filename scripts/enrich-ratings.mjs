@@ -51,6 +51,23 @@ if (!KEY) {
 
 let calls = 0;
 
+/**
+ * A wall-clock budget, because the worst case is measured in hours.
+ *
+ * Each lookup allows three attempts and a fifteen-second timeout, so a few
+ * hundred rows against an OMDb that is unreachable rather than merely slow is
+ * about four hours of a runner doing nothing useful — and every step behind
+ * this one, including the commit that publishes the calendar, waits on it.
+ *
+ * A step timeout in the workflow would stop it, but by killing the process,
+ * and the feed is written once at the end: a kill loses every score fetched.
+ * Stopping ourselves means the partial pass is kept and the next run continues
+ * from it, which against a daily quota is the difference between eventually
+ * finishing and never starting.
+ */
+const BUDGET_MS = Number(process.env.OMDB_BUDGET_MS ?? 8 * 60_000);
+const startedAt = Date.now();
+
 const feed = JSON.parse(await readFile(FEED, 'utf8'));
 const rows = feed.weeks.flatMap((w) => w.releases);
 const targets = rows.filter((r) => r.imdbId);
@@ -67,6 +84,12 @@ let missing = 0;
 let stopped = null;
 
 for (const release of targets) {
+  if (Date.now() - startedAt > BUDGET_MS) {
+    stopped = `ran out of its ${Math.round(BUDGET_MS / 60_000)}-minute budget with ${
+      targets.length - scored - missing
+    } row(s) unchecked. The next run picks up from here.`;
+    break;
+  }
   try {
     calls++;
     const score = scoreFrom(await fetchTitle(release.imdbId, KEY));
