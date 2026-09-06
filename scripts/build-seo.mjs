@@ -64,6 +64,13 @@ function formatRange(weekId) {
   return `${left}–${b.getUTCDate()} ${MONTHS[b.getUTCMonth()]} ${b.getUTCFullYear()}`;
 }
 
+/** One date, spelled out. Title tags and descriptions are read by people, and
+ *  "2026-09-18" in a search result reads like a database row. */
+function formatDate(iso) {
+  const d = new Date(`${iso}T00:00:00Z`);
+  return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+}
+
 const html = await readFile(HTML, 'utf8');
 const feed = JSON.parse(await readFile(FEED, 'utf8'));
 
@@ -520,14 +527,35 @@ const everything = stockedWeeks.flatMap((w) =>
 );
 
 const TODAY = new Date().toISOString().slice(0, 10);
+/**
+ * Every theatrical film with enough on it to fill a page — before it opens as
+ * well as after.
+ *
+ * This used to require `releaseDate <= TODAY`, on the reasoning that a film
+ * which is not out yet has no "when does it stream" question worth answering.
+ * That reasoning was sound about the OTT question and wrong about the page:
+ * the pre-release window is where the search volume actually is. People look
+ * up a film's release date, cast and runtime in the weeks *before* it opens,
+ * far more than after, and the gate was withholding a page from 41 titles
+ * that already had a synopsis and a cast sitting in the feed.
+ *
+ * It also argued against the note directly above it. A page indexed and
+ * ageing before demand arrives is the difference between ranking and watching
+ * someone else rank — which is an argument for publishing earlier, not for
+ * waiting until the film opens.
+ *
+ * So the page now has three states and says something true in each: what the
+ * release date is before it opens, that streaming is unannounced after it
+ * opens, and which platform has it once one does. The URL never changes, so a
+ * page earns its age through all three.
+ *
+ * The other two conditions still hold, and both are about not shipping thin
+ * pages: without a synopsis and a cast there is nothing on the document but a
+ * date, and those two fields are what make 88 pages 88 documents rather than
+ * one template repeated.
+ */
 const titlePages = everything
-  .filter(
-    (r) =>
-      r.platforms.includes('theatres') &&
-      r.releaseDate <= TODAY &&
-      r.synopsis &&
-      r.cast?.length,
-  )
+  .filter((r) => r.platforms.includes('theatres') && r.synopsis && r.cast?.length)
   // Newest first, so the sitemap leads with what people are searching now.
   .sort((a, b) => b.releaseDate.localeCompare(a.releaseDate));
 
@@ -736,9 +764,16 @@ for (const r of titlePages) {
   if (!slug) continue;
 
   const streaming = r.platforms.filter((p) => p !== 'theatres');
+  /** Three states, one URL. The page is written for whichever is true today
+   *  and rewrites itself on the next build as the film moves through them. */
+  const upcoming = r.releaseDate > TODAY;
+  const opensOn = formatDate(r.releaseDate);
+
   const answer = streaming.length
     ? `Streaming now on ${streaming.map(pname).join(', ')}.`
-    : `Not announced yet — no streaming date has been confirmed. This page updates automatically; every platform is re-checked twice a week.`;
+    : upcoming
+      ? `In cinemas from ${opensOn}. No streaming date yet — a film is normally picked up by a platform after its theatrical run, and this page updates automatically when one announces.`
+      : `Not announced yet — no streaming date has been confirmed. This page updates automatically; every platform is re-checked twice a week.`;
 
   const langs = (r.languages ?? []).map(lname);
   const alsoThatWeek = everything
@@ -750,15 +785,24 @@ for (const r of titlePages) {
     group: 'title',
     crumb: r.title,
     rows: [r],
-    title: `${r.title} OTT release date — when is it coming to streaming?`,
-    description:
-      `${r.title}${langs.length ? ` (${langs.join(', ')})` : ''} released in cinemas on ${r.releaseDate}. ` +
-      `${streaming.length ? `Now streaming on ${streaming.map(pname).join(', ')}.` : 'Streaming date not announced yet.'} ` +
-      `Updated twice a week.`,
-    h1: `When is ${r.title} coming to OTT?`,
+    /**
+     * The title tag tracks the state, because the query does. Before a film
+     * opens people search its release date; after it opens they search where
+     * to stream it. One tag serving both would match neither well.
+     */
+    title: upcoming
+      ? `${r.title} release date — in cinemas ${opensOn}, and when it reaches OTT`
+      : `${r.title} OTT release date — when is it coming to streaming?`,
+    description: upcoming
+      ? `${r.title}${langs.length ? ` (${langs.join(', ')})` : ''} opens in Indian cinemas on ${opensOn}. ` +
+        `Cast, runtime, certificate and trailer — plus the OTT date, tracked twice a week from the day it lands.`
+      : `${r.title}${langs.length ? ` (${langs.join(', ')})` : ''} released in cinemas on ${r.releaseDate}. ` +
+        `${streaming.length ? `Now streaming on ${streaming.map(pname).join(', ')}.` : 'Streaming date not announced yet.'} ` +
+        `Updated twice a week.`,
+    h1: upcoming ? `When does ${r.title} release?` : `When is ${r.title} coming to OTT?`,
     lede: answer,
     facts:
-      `<p><strong>In cinemas:</strong> ${esc(r.releaseDate)}</p>` +
+      `<p><strong>${upcoming ? 'In cinemas from' : 'In cinemas'}:</strong> ${esc(opensOn)}</p>` +
       (langs.length ? `<p><strong>Language:</strong> ${esc(langs.join(', '))}</p>` : '') +
       (r.genres?.length ? `<p><strong>Genre:</strong> ${esc(r.genres.join(', '))}</p>` : '') +
       (r.certification ? `<p><strong>Certificate:</strong> ${esc(r.certification)}</p>` : '') +
@@ -768,7 +812,7 @@ for (const r of titlePages) {
       `<section><h2>What it's about</h2><p>${esc(r.synopsis)}</p></section>` +
       `<section><h2>Cast</h2><p>${esc(r.cast.join(' · '))}</p></section>` +
       (alsoThatWeek.length
-        ? `<section><h2>Also in cinemas that week</h2><ul>` +
+        ? `<section><h2>${upcoming ? 'Also opening that week' : 'Also in cinemas that week'}</h2><ul>` +
           alsoThatWeek.map((x) => `<li>${esc(x.title)}</li>`).join('') +
           `</ul></section>`
         : ''),

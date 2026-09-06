@@ -15,10 +15,21 @@ import { BRAND } from '../data/brand';
  * so the moment a theatrical title gains one, this page has the answer while
  * everyone else is still guessing.
  *
- * The page is published the week the film opens, not the week it streams. That
- * ordering is the whole point — a page indexed and ageing before the search
- * demand arrives is the difference between ranking for it and watching someone
- * else rank for it.
+ * The page is published the week the film is *announced*, not the week it
+ * opens and not the week it streams. That ordering is the whole point — a page
+ * indexed and ageing before the search demand arrives is the difference between
+ * ranking for it and watching someone else rank for it.
+ *
+ * So it has three states and one URL, and says something true in each:
+ *
+ *   before it opens   the release date, which is what people search in the
+ *                     weeks running up to a film and the busiest of the three
+ *   after it opens    streaming unannounced, and honestly so
+ *   once it streams   the platform that has it
+ *
+ * The URL does not change between them, which is the reason the states exist
+ * on one page rather than three: the document earns its age across the whole
+ * lifecycle instead of starting from nothing each time the question changes.
  *
  * What it will not do is guess. There is a strong temptation to print "films
  * usually arrive on OTT in about eight weeks", and with four cinema-to-OTT
@@ -47,6 +58,11 @@ const fmtDate = (iso: string) =>
 export function ReleaseDatePage({ release, feed, region }: Props) {
   const streaming = release.platforms.filter((p) => p !== 'theatres');
   const daysOut = Math.floor((Date.now() - Date.parse(`${release.releaseDate}T00:00:00Z`)) / DAY);
+  /** Negative days out means the film has not opened. Derived from the same
+   *  number rather than a second date comparison, so the heading and the
+   *  "in N days" line beside it can never disagree. */
+  const upcoming = daysOut < 0;
+  const daysToGo = -daysOut;
 
   const week = feed.weeks.find((w) => w.releases.some((r) => r.id === release.id));
   const alsoThatWeek = (week?.releases ?? [])
@@ -74,7 +90,11 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
           imageUrl={release.posterUrl}
         />
         <div className="titlepage__intro">
-          <h1>When is {release.title} coming to OTT?</h1>
+          <h1>
+            {upcoming
+              ? `When does ${release.title} release?`
+              : `When is ${release.title} coming to OTT?`}
+          </h1>
 
           {/* The answer, first and unqualified. Everything below is context for
               a reader who wants it; someone who came for the date should be
@@ -91,6 +111,18 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
                 ))}
                 .
               </>
+            ) : upcoming ? (
+              /* Before a film opens, "not announced" is a true answer to the
+                 wrong question — nobody has arrived here yet asking about
+                 streaming. Lead with the date they came for, then say plainly
+                 that the OTT date does not exist rather than implying one is
+                 being withheld. */
+              <>
+                <strong>In cinemas from {fmtDate(release.releaseDate)}</strong>
+                {daysToGo > 0 && ` — ${daysToGo === 1 ? 'tomorrow' : `${daysToGo} days away`}`}.{' '}
+                No streaming date yet: a film is normally picked up by a platform after its
+                theatrical run. This page updates automatically the day one announces.
+              </>
             ) : (
               <>
                 <strong>Not announced yet.</strong> {release.title} has not been dated for any
@@ -102,13 +134,19 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
 
           <dl className="titlepage__facts">
             <div>
-              <dt>In cinemas</dt>
+              <dt>{upcoming ? 'In cinemas from' : 'In cinemas'}</dt>
               <dd>
                 {fmtDate(release.releaseDate)}
                 {daysOut > 0 && (
                   <span className="titlepage__ago">
                     {' · '}
                     {daysOut === 1 ? 'yesterday' : `${daysOut} days ago`}
+                  </span>
+                )}
+                {daysToGo > 0 && (
+                  <span className="titlepage__ago">
+                    {' · '}
+                    {daysToGo === 1 ? 'tomorrow' : `in ${daysToGo} days`}
                   </span>
                 )}
               </dd>
@@ -164,7 +202,11 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
             {!streaming.length && (
               <a className="btn btn--lg" href={bookUrl} target="_blank" rel="noreferrer">
                 <IconTicket />
-                Book tickets
+                {/* Advance booking usually opens days before a film does, but
+                    not always, and this cannot tell which. "Book tickets" on a
+                    film with no seats yet promises something the next screen
+                    does not deliver; "Check booking" is true either way. */}
+                {upcoming ? 'Check booking' : 'Book tickets'}
                 <IconExternal />
               </a>
             )}
@@ -188,7 +230,7 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
 
       {alsoThatWeek.length > 0 && week && (
         <section className="titlepage__block">
-          <h2>Also in cinemas that week</h2>
+          <h2>{upcoming ? 'Also opening that week' : 'Also in cinemas that week'}</h2>
           <ul className="titlepage__also">
             {alsoThatWeek.map((r) => (
               <li key={r.id}>
