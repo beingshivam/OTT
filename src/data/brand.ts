@@ -30,17 +30,19 @@ export const SLUG = 'newonott';
 /**
  * The Instagram handle, and only the handle.
  *
- * The URL it came from was a QR share link carrying `igsi` and `utm_source=qr`
+ * The URL it came from was a QR share link carrying `stkn` and `utm_source=qr`
  * — parameters that identify the share that produced it, not the account. Left
  * in, every visitor to the site would have been attributed to a QR scan that
  * never happened, and the tracking on Instagram's own side would be wrong for
- * as long as the link sat in the footer.
+ * as long as the link sat in the page. The same was true of the `igsi` on the
+ * previous handle's link; a share URL is never the account's address.
  *
  * Stored as the handle rather than a URL so the link, the JSON-LD `sameAs` and
- * anywhere a caption wants to print "@newon_ott" all build from one string and
- * cannot drift apart.
+ * anywhere a caption wants to print "@newonott.in" all build from one string
+ * and cannot drift apart — which is what made renaming from @newon_ott a
+ * one-line change rather than a hunt.
  */
-export const INSTAGRAM = 'newon_ott';
+export const INSTAGRAM = 'newonott.in';
 export const INSTAGRAM_URL = `https://www.instagram.com/${INSTAGRAM}/`;
 
 /**

@@ -777,6 +777,38 @@ a {
   align-items: center;
 }
 
+/* Borrows the region pill's shape so the two controls beside the wordmark read
+   as a pair rather than as one button and one stray icon. Square, because it
+   holds a glyph and not a word — a pill sized for text around a 16px mark
+   leaves the icon floating in it. */
+.iglink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text-2);
+  transition:
+    background 0.2s var(--ease),
+    border-color 0.2s var(--ease),
+    color 0.2s var(--ease);
+}
+.iglink svg {
+  width: 16px;
+  height: 16px;
+}
+/* Instagram's own colour on hover — enough to confirm what it is on the way to
+   clicking it, without a permanently coloured mark competing with the board. */
+.iglink:hover {
+  background: var(--surface-2);
+  border-color: var(--line-strong);
+  color: #e1306c;
+}
+
 .weekbar__date {
   margin: 0 2px;
   font-size: clamp(19px, 2.5vw, 27px);

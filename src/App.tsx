@@ -370,6 +370,24 @@ export default function App() {
               <span className="logo__dot">.</span>
             </span>
           </a>
+          {/* Up here rather than in the footer.
+              Buried at the bottom it was reachable only by someone who had
+              already scrolled the whole board — which is precisely the reader
+              who did not need convincing. Most traffic arrives from Instagram
+              in the first place, so the account is the one thing a first-time
+              visitor is most likely to want and least likely to hunt for.
+              Icon-only, because the header's job is the week and a handle
+              spelled out beside the wordmark reads as a second brand. */}
+          <a
+            className="iglink"
+            href={INSTAGRAM_URL}
+            target="_blank"
+            rel="noreferrer noopener"
+            title={`@${INSTAGRAM} on Instagram`}
+            aria-label={`@${INSTAGRAM} on Instagram`}
+          >
+            <IconInstagram />
+          </a>
           <div className="weekbar__region">
             <label className="region">
               <span aria-hidden="true">
@@ -693,18 +711,6 @@ export default function App() {
               <IconCalendar />
               Remind me every Friday
             </button>
-            {/* The other way to not have to remember this site exists. Sits
-                beside the calendar button because they answer the same
-                question — how do I see next week's list — and one of them
-                needs no app permission. */}
-            <a
-              className="footer__link"
-              href={INSTAGRAM_URL}
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              <IconInstagram />@{INSTAGRAM}
-            </a>
             <EmailSignup />
           </div>
           <div className="footer__stack">
