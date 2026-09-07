@@ -4,12 +4,10 @@ import { PlatformLogo } from './PlatformLogo';
 import { IconChevronLeft, IconChevronRight } from './icons';
 import { platform } from '../data/platforms';
 import { scoreOf } from '../lib/score';
-import { WINDOW_DAYS } from '../lib/justLanded';
 import type { Release } from '../types';
 
 /**
- * The first thing a visitor sees, and the only place on the site that leads
- * with artwork.
+ * A row of posters, and the only place on the site that leads with artwork.
  *
  * The board deliberately does not: it is a schedule, and a schedule is read
  * fastest as text. But a schedule answers "what came out", and most people
@@ -26,15 +24,29 @@ import type { Release } from '../types';
  * Nothing auto-advances. A carousel that moves on its own takes the reader's
  * place away mid-sentence, is unusable with a screen reader, and reliably
  * measures worse than one that waits. This waits.
+ *
+ * One component, three rows, because each lens is asking a different question
+ * and the same row on all three would be wrong twice over: "just landed" on a
+ * page of films that are not out yet is a false statement, and on the back
+ * catalogue it is the homepage again. So the selection and the wording belong
+ * to the caller and only the behaviour lives here.
  */
 
 interface Props {
+  /** What the row is. Short — it competes with the board for attention. */
+  title: string;
+  /** The qualification the heading cannot carry. Hidden on narrow screens. */
+  subtitle: string;
   releases: Release[];
   onOpen: (r: Release) => void;
-  today: Date;
+  /** The line under each poster. Given the row rather than fixed inside it,
+   *  because "3 days ago" is the right answer on one lens and "In 5 days" or a
+   *  year is the right answer on another — and a rail that decides this for its
+   *  caller ends up printing "2 weeks ago" over a film that is not out yet. */
+  caption: (r: Release) => string;
 }
 
-export function JustLanded({ releases, onOpen, today }: Props) {
+export function PosterRail({ title, subtitle, releases, onOpen, caption }: Props) {
   const track = useRef<HTMLUListElement>(null);
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
@@ -82,9 +94,9 @@ export function JustLanded({ releases, onOpen, today }: Props) {
     <section className="landed" aria-labelledby="landed-heading">
       <div className="landed__head">
         <h2 className="landed__title" id="landed-heading">
-          Just landed
+          {title}
         </h2>
-        <p className="landed__sub">Out in the last {WINDOW_DAYS} days — streaming and in cinemas</p>
+        <p className="landed__sub">{subtitle}</p>
         {/* Hidden from assistive tech: these duplicate the arrow keys and the
             track's own scrolling, and announcing "previous/next" twice on a
             list that is already navigable is noise. */}
@@ -118,7 +130,7 @@ export function JustLanded({ releases, onOpen, today }: Props) {
               <button
                 className="landed__card"
                 onClick={() => onOpen(r)}
-                aria-label={`${r.title} — ${p.name}, ${landedLabel(r.releaseDate, today)}`}
+                aria-label={`${r.title} — ${p.name}, ${caption(r)}`}
               >
                 <span className="landed__art">
                   <PosterArt
@@ -142,7 +154,7 @@ export function JustLanded({ releases, onOpen, today }: Props) {
                   )}
                 </span>
                 <span className="landed__name">{r.title}</span>
-                <span className="landed__meta">{landedLabel(r.releaseDate, today)}</span>
+                <span className="landed__meta">{caption(r)}</span>
               </button>
             </li>
           );
@@ -153,21 +165,33 @@ export function JustLanded({ releases, onOpen, today }: Props) {
 }
 
 /**
- * How long ago, in the words a person uses.
+ * How near a date is, in the words a person uses, in either direction.
  *
  * A date under a poster ("2026-09-04") is a database row. "Today" and
- * "Yesterday" are what makes the row feel live, and past that the number of
- * days is what a reader is actually judging — not which Tuesday it was.
+ * "Tomorrow" are what make a row feel live, and past that the number of days is
+ * what a reader is judging — not which Tuesday it was.
+ *
+ * Both directions in one function on purpose: the past-only version printed
+ * "2 weeks ago" for everything it did not recognise, which was correct for the
+ * one row that existed and would have been a confident lie the moment a second
+ * row showed films that had not come out yet.
  */
-export function landedLabel(iso: string, today: Date): string {
+export function relativeDay(iso: string, today: Date): string {
   const days = Math.round(
-    (Date.parse(`${todayISO(today)}T00:00:00Z`) - Date.parse(`${iso}T00:00:00Z`)) / 86_400_000,
+    (Date.parse(`${iso}T00:00:00Z`) - Date.parse(`${todayISO(today)}T00:00:00Z`)) / 86_400_000,
   );
-  if (days <= 0) return 'Today';
-  if (days === 1) return 'Yesterday';
-  if (days < 7) return `${days} days ago`;
-  if (days < 14) return 'Last week';
-  return '2 weeks ago';
+  if (days === 0) return 'Today';
+  if (days === 1) return 'Tomorrow';
+  if (days === -1) return 'Yesterday';
+  if (days < 0) {
+    const ago = -days;
+    if (ago < 7) return `${ago} days ago`;
+    if (ago < 14) return 'Last week';
+    return `${Math.round(ago / 7)} weeks ago`;
+  }
+  if (days < 7) return `In ${days} days`;
+  if (days < 14) return 'Next week';
+  return `In ${Math.round(days / 7)} weeks`;
 }
 
 function todayISO(d: Date): string {

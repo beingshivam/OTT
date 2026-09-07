@@ -89,3 +89,69 @@ export function justLanded(
 
   return { releases, from, to };
 }
+
+/** The other direction. Shorter, because anticipation has a shorter reach than
+ *  memory: a reader plans this weekend, not the one after next. */
+export const SOON_DAYS = 21;
+
+/**
+ * What is about to arrive.
+ *
+ * The mirror of the row above, and it has to be a different selection rather
+ * than the same one relabelled — "just landed" over a film that is not out for
+ * a fortnight is simply false, and a row that lies about the one thing it
+ * claims is worse than no row.
+ *
+ * Ordering flips with it. Landing is ranked newest-first because the freshest
+ * arrival is the most interesting; landing *soon* is ranked nearest-first,
+ * because the thing coming on Friday matters more than the thing coming in
+ * three weeks. Same rule underneath: days sort against each other directly,
+ * languages interleave only within a day.
+ */
+export function landingSoon(all: Release[], region: string, today: Date = new Date()): JustLanded {
+  const from = toISODate(new Date(today.getTime() + 86_400_000));
+  const to = toISODate(new Date(today.getTime() + SOON_DAYS * 86_400_000));
+
+  const upcoming = all.filter(
+    (r) =>
+      r.regions?.includes(region) &&
+      r.releaseDate >= from &&
+      r.releaseDate <= to &&
+      Boolean(r.posterUrl),
+  );
+
+  const byDay = new Map<string, Release[]>();
+  for (const r of upcoming) {
+    if (!byDay.has(r.releaseDate)) byDay.set(r.releaseDate, []);
+    byDay.get(r.releaseDate)!.push(r);
+  }
+
+  const releases = [...byDay.keys()]
+    .sort((a, b) => a.localeCompare(b))
+    .flatMap((day) =>
+      interleaveByLanguage(byDay.get(day)!, (a, b) => (b.heat ?? 0) - (a.heat ?? 0)),
+    )
+    .slice(0, MAX_ITEMS);
+
+  return { releases, from, to };
+}
+
+/**
+ * The catalogue's own row.
+ *
+ * /streaming is not a calendar — its rows have no meaningful recent date, and a
+ * "just landed" row there would either be empty or be the homepage again. What
+ * that page has instead is `popRank`, a position within a title's own language,
+ * which is the only popularity number on this site that compares fairly.
+ *
+ * So this is the one row of the three that is not chronological at all, and it
+ * still cannot be a plain sort: `popRank` is comparable within a language and
+ * meaningless across them, so the interleave is doing the whole job here rather
+ * than breaking ties.
+ */
+export function popularNow(catalogue: Release[], region: string): Release[] {
+  const scoped = catalogue.filter(
+    (r) => r.popRank != null && Boolean(r.posterUrl) && (!r.regions || r.regions.includes(region)),
+  );
+  return interleaveByLanguage(scoped, (a, b) => a.popRank! - b.popRank!).slice(0, MAX_ITEMS);
+}

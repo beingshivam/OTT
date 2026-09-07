@@ -9,7 +9,7 @@ import { EmailSignup } from './components/EmailSignup';
 import { ReleaseCard } from './components/ReleaseCard';
 import { ShareWeek } from './components/ShareWeek';
 import { TrendingStrip, normalise } from './components/TrendingStrip';
-import { JustLanded } from './components/JustLanded';
+import { PosterRail, relativeDay } from './components/PosterRail';
 import {
   IconCalendar,
   IconChevronLeft,
@@ -22,7 +22,7 @@ import { BRAND, INSTAGRAM, INSTAGRAM_URL, SLUG, TAGLINE } from './data/brand';
 import { REGIONS } from './data/platforms';
 import { loadFeed, weekById } from './lib/feed';
 import { loadCatalogue } from './lib/catalogue';
-import { justLanded, MIN_ITEMS } from './lib/justLanded';
+import { justLanded, landingSoon, popularNow, MIN_ITEMS, SOON_DAYS, WINDOW_DAYS } from './lib/rails';
 import {
   applyFilters,
   facetsFor,
@@ -336,6 +336,24 @@ export default function App() {
     [feed, filters.region, today],
   );
 
+  /** The same fortnight, pointed the other way, for the Coming soon lens. */
+  const soon = useMemo(
+    () => landingSoon(feed?.weeks.flatMap((w) => w.releases) ?? [], filters.region, today).releases,
+    [feed, filters.region, today],
+  );
+
+  /**
+   * And the catalogue's own row, which is not a date at all.
+   *
+   * Reads `catalogue` rather than the feed: that lens renders a different
+   * dataset entirely, and ranking the week's releases on a page about the back
+   * catalogue would be a row that contradicts the board beneath it.
+   */
+  const popular = useMemo(
+    () => (catalogue ? popularNow(catalogue, filters.region) : []),
+    [catalogue, filters.region],
+  );
+
   /** Weeks the feed actually carries, for the empty state to offer. */
   const stockedWeeks = useMemo(
     () =>
@@ -392,6 +410,45 @@ export default function App() {
 
   /** Trending is a browse aid; once the reader has narrowed the week it is noise. */
   const userNarrowed = activeFilterCount(filters) > 0;
+
+  /**
+   * One row per lens, each ranking what its own page is about.
+   *
+   * Asked whether the rail should be on the other two lenses as well: yes, and
+   * not the same one. "Just landed" over films that are not out yet is a false
+   * statement, and on the back catalogue it is the homepage a second time. So
+   * the component is shared and the selection, the wording and the caption
+   * belong to the lens.
+   *
+   * Suppressed once a reader narrows the page. The rows below then answer a
+   * question they asked, and an unfiltered row of posters above them would be
+   * answering a different one.
+   */
+  const lensRail =
+    userNarrowed ? null
+    : span?.kind === 'upcoming' && soon.length >= MIN_ITEMS ? (
+        <PosterRail
+          title="Landing soon"
+          subtitle={`Arriving in the next ${SOON_DAYS} days — streaming and in cinemas`}
+          releases={soon}
+          onOpen={setSelected}
+          caption={(r) => relativeDay(r.releaseDate, today)}
+        />
+      )
+    : route?.catalogue && popular.length >= MIN_ITEMS ? (
+        <PosterRail
+          title="Popular now"
+          subtitle="Most watched in each language, right now"
+          releases={popular}
+          onOpen={setSelected}
+          /* Not a date. Every row here is back catalogue, so "3 weeks ago"
+             would be true of almost none of them and useless for the rest; the
+             year is what a reader places the film by. */
+          caption={(r) => r.releaseDate.slice(0, 4)}
+        />
+      )
+    : null;
+
 
   const byDay = useMemo(() => {
     const map = new Map<string, Release[]>();
@@ -624,6 +681,7 @@ export default function App() {
           region={filters.region}
           currentWeek={currentWeek}
           onOpen={setSelected}
+          rail={lensRail}
         />
       )}
 
@@ -752,7 +810,13 @@ export default function App() {
                 which is not what a month page is ranking. */}
             {!userNarrowed && !span && !route?.catalogue && (
               landed.length >= MIN_ITEMS ? (
-                <JustLanded releases={landed} onOpen={setSelected} today={today} />
+                <PosterRail
+                  title="Just landed"
+                  subtitle={`Out in the last ${WINDOW_DAYS} days — streaming and in cinemas`}
+                  releases={landed}
+                  onOpen={setSelected}
+                  caption={(r) => relativeDay(r.releaseDate, today)}
+                />
               ) : (
                 /* Not enough recent artwork to make a row of posters — a thin
                    rail reads as a bug rather than a selection. The text strip

@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { PLATFORMS, LANGUAGES, platform as platformById, languageName } from '../data/platforms';
 import { interleaveByLanguage } from '../lib/rank';
 import type { Release, ReleaseFeed } from '../types';
@@ -46,6 +47,15 @@ interface Props {
   region: string;
   currentWeek: string;
   onOpen: (r: Release) => void;
+  /**
+   * The lens's poster row, rendered here rather than by the caller.
+   *
+   * It belongs directly under the sentence that says what the page is and above
+   * the pills that say how to narrow it: the pills are navigation and the row
+   * is the content, and on a phone the version with that order reversed put
+   * four bands of chips between a reader and the first thing worth looking at.
+   */
+  rail?: ReactNode;
 }
 
 /* Which score counts, and whether it is trustworthy, is lib/score.ts — the
@@ -58,7 +68,7 @@ const tally = (rows: Release[], pick: (r: Release) => string[]) => {
   return [...counts.entries()].sort((a, b) => b[1] - a[1]);
 };
 
-export function PageIntro({ route, rows, feed, region, currentWeek, onOpen }: Props) {
+export function PageIntro({ route, rows, feed, region, currentWeek, onOpen, rail }: Props) {
   const inRegion = (r: Release) => r.regions.includes(region);
 
   /**
@@ -120,16 +130,12 @@ export function PageIntro({ route, rows, feed, region, currentWeek, onOpen }: Pr
   const byScore = (a: Release, b: Release) => (scoreOf(b)?.value ?? 0) - (scoreOf(a)?.value ?? 0);
 
   /**
-   * Two rows on the catalogue, because they answer two different questions and
-   * a reader browsing "now streaming" asks both: what is everyone watching, and
-   * what is actually good. Everywhere else there is one, about the week.
+   * The catalogue used to carry two pill rows here — what everyone is watching,
+   * and what is actually good. The first is now a row of posters above this
+   * intro, ranked by the same measure over the same rows, so keeping the pills
+   * would be the same three titles twice within 200px. Only "best rated"
+   * remains, which the rail does not cover.
    */
-  const popular = route.catalogue
-    ? interleaveByLanguage(
-        scope.filter((r) => r.popRank != null),
-        (a, b) => a.popRank! - b.popRank!,
-      ).slice(0, 3)
-    : [];
 
   const biggest = route.catalogue
     ? interleaveByLanguage(
@@ -291,24 +297,9 @@ export function PageIntro({ route, rows, feed, region, currentWeek, onOpen }: Pr
         )}
       </p>
 
-      <div className="pageintro__facts">
-        {popular.length > 0 && (
-          <div className="pageintro__fact">
-            {/* "Popular now", not "trending this week". The rank behind it is a
-                snapshot from the last refresh, not a week-over-week movement —
-                calling it a weekly trend would be describing a measurement the
-                data does not contain. */}
-            <span className="pageintro__label">Popular now</span>
-            <span className="pageintro__vals">
-              {popular.map((r) => (
-                <button key={r.id} className="pageintro__pill" onClick={() => onOpen(r)}>
-                  {r.title}
-                </button>
-              ))}
-            </span>
-          </div>
-        )}
+      {rail}
 
+      <div className="pageintro__facts">
         {biggest.length > 0 && (
           <div className="pageintro__fact">
             <span className="pageintro__label">{biggestLabel}</span>

@@ -31,7 +31,7 @@
     "test:omdb": "node scripts/omdb.test.mjs",
     "catalogue": "node scripts/fetch-catalogue.mjs",
     "eval": "node scripts/eval.mjs",
-    "test:rail": "node --test src/lib/justLanded.test.mjs",
+    "test:rail": "node --test src/lib/rails.test.mjs",
     "e2e": "node scripts/e2e.mjs"
   },
   "dependencies": {

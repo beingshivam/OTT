@@ -1087,6 +1087,11 @@ a {
 .landed {
   margin-bottom: 20px;
 }
+/* Inside a page intro the row follows a sentence rather than a band of chips,
+   and without this the heading sits directly on the line above it. */
+.pageintro .landed {
+  margin-top: 16px;
+}
 
 .landed__head {
   display: flex;

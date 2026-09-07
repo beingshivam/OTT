@@ -24,10 +24,12 @@ import { execFileSync } from 'node:child_process';
 const dir = mkdtempSync(join(tmpdir(), 'rail-'));
 execFileSync(
   'npx',
-  ['--yes', 'esbuild', 'src/lib/justLanded.ts', '--bundle', '--format=esm', `--outfile=${join(dir, 'justLanded.mjs')}`],
+  ['--yes', 'esbuild', 'src/lib/rails.ts', '--bundle', '--format=esm', `--outfile=${join(dir, 'rails.mjs')}`],
   { stdio: 'pipe' },
 );
-const { justLanded, WINDOW_DAYS, MAX_ITEMS } = await import(join(dir, 'justLanded.mjs'));
+const { justLanded, landingSoon, popularNow, WINDOW_DAYS, SOON_DAYS, MAX_ITEMS } = await import(
+  join(dir, 'rails.mjs'),
+);
 
 const TODAY = new Date('2026-09-07T12:00:00');
 const iso = (daysAgo) =>
@@ -160,4 +162,85 @@ test('the shipped feed produces a usable row', () => {
     JSON.stringify(releases.map((r) => `${r.releaseDate} ${r.languages?.[0]} ${r.title}`), null, 2),
   );
   console.log(`      ${releases.length} in the row, ${from} to ${to}`);
+});
+
+// --- landing soon ------------------------------------------------------------
+
+test('landing soon takes only what has not come out yet', () => {
+  const { releases } = landingSoon(
+    [row({ releaseDate: iso(1) }), row({ releaseDate: iso(0) }), row({ releaseDate: iso(-2) })],
+    'IN',
+    TODAY,
+  );
+  assert.equal(releases.length, 1, 'today and yesterday have already landed');
+  assert.equal(releases[0].releaseDate, iso(-2));
+});
+
+test('landing soon is nearest-first — the opposite order to just landed', () => {
+  const { releases } = landingSoon(
+    [
+      row({ releaseDate: iso(-18), heat: 999, title: 'Big, three weeks out' }),
+      row({ releaseDate: iso(-2), heat: 1, title: 'This Friday' }),
+    ],
+    'IN',
+    TODAY,
+  );
+  assert.equal(releases[0].title, 'This Friday', 'the nearest release leads a row about what is coming');
+});
+
+test('landing soon stops at its own horizon', () => {
+  const { releases } = landingSoon(
+    [row({ releaseDate: iso(-SOON_DAYS) }), row({ releaseDate: iso(-SOON_DAYS - 1) })],
+    'IN',
+    TODAY,
+  );
+  assert.equal(releases.length, 1);
+});
+
+test('the two rows never contain the same title', () => {
+  const rows = [];
+  for (let d = -SOON_DAYS; d <= WINDOW_DAYS; d++) rows.push(row({ releaseDate: iso(d) }));
+  const landedIds = new Set(justLanded(rows, 'IN', TODAY).releases.map((r) => r.id));
+  const soonIds = landingSoon(rows, 'IN', TODAY).releases.map((r) => r.id);
+  const overlap = soonIds.filter((id) => landedIds.has(id));
+  assert.deepEqual(overlap, [], 'a title cannot have both just landed and be landing soon');
+});
+
+// --- popular now -------------------------------------------------------------
+
+test('popular now needs a rank, and ignores rows without one', () => {
+  const out = popularNow([row({ popRank: 1 }), row({}), row({ popRank: 4 })], 'IN');
+  assert.equal(out.length, 2);
+});
+
+test('popular now interleaves languages rather than sorting rank globally', () => {
+  const out = popularNow(
+    [
+      row({ popRank: 1, languages: ['en'], title: 'English 1' }),
+      row({ popRank: 2, languages: ['en'], title: 'English 2' }),
+      row({ popRank: 3, languages: ['en'], title: 'English 3' }),
+      row({ popRank: 1, languages: ['ml'], title: 'Malayalam 1' }),
+    ],
+    'IN',
+  );
+  assert.equal(
+    out[1].title,
+    'Malayalam 1',
+    'ranks are positions within a language and do not compare across them',
+  );
+});
+
+test('popular now carries a poster, because it renders as one', () => {
+  const out = popularNow([row({ popRank: 1, posterUrl: undefined }), row({ popRank: 2 })], 'IN');
+  assert.equal(out.length, 1);
+});
+
+/** The catalogue file, checked the same way as the feed. */
+test('the shipped catalogue produces a usable row', () => {
+  const cat = JSON.parse(readFileSync('public/data/catalogue.json', 'utf8'));
+  const out = popularNow(cat.titles, 'IN');
+  assert.ok(out.length >= 6, `only ${out.length} ranked titles with posters`);
+  const langs = new Set(out.map((r) => r.languages?.[0]));
+  assert.ok(langs.size >= 3, `the row is only ${[...langs].join(', ')} — the interleave is not working`);
+  console.log(`      ${out.length} in the row, ${langs.size} languages: ${[...langs].join(', ')}`);
 });

@@ -352,6 +352,61 @@ console.log('\nFallback');
   await ctx.close();
 }
 
+// --- one row per lens, each true to its own page ------------------------------
+
+console.log('\nA rail on every lens');
+
+/**
+ * The three rows must not be the same row. "Just landed" over films that are
+ * not out yet is a false statement and the catalogue's row is the homepage
+ * again — so this asserts the heading, and that the captions are pointing the
+ * direction the heading claims.
+ */
+for (const [path, heading, expect] of [
+  ['/', 'Just landed', 'past'],
+  ['/upcoming', 'Landing soon', 'future'],
+  ['/streaming', 'Popular now', 'year'],
+]) {
+  for (const width of [390, 1440]) {
+    const { ctx, page, errors } = await newPage(browser, { width, height: 900 });
+    await page.goto(`${BASE}${path}`, { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('.landed__cell', { timeout: 15_000 }).catch(() => {});
+    await page.waitForTimeout(900);
+
+    const m = await page.evaluate(() => ({
+      heading: document.querySelector('.landed__title')?.textContent?.trim() ?? null,
+      captions: [...document.querySelectorAll('.landed__meta')].slice(0, 6).map((e) => e.textContent.trim()),
+      cards: document.querySelectorAll('.landed__cell').length,
+      overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      // The pill row the catalogue rail replaced must not still be there too.
+      duplicatePills: [...document.querySelectorAll('.pageintro__label')].some(
+        (e) => e.textContent.trim() === 'Popular now',
+      ),
+    }));
+
+    is(m.heading === heading, `${path} @${width}: the row is "${heading}"`, `it says "${m.heading}"`);
+    is(m.cards >= 6, `${path} @${width}: the row is full enough to be a row`, `${m.cards} cards`);
+    is(m.overflow === 0, `${path} @${width}: nothing escapes the viewport`, `overflow ${m.overflow}px`);
+
+    const past = /ago|Today|Yesterday|Last week/;
+    const future = /^(Tomorrow|In \d+ days|Next week|In \d+ weeks)$/;
+    const year = /^(19|20)\d\d$/;
+    const rule = expect === 'past' ? past : expect === 'future' ? future : year;
+    const wrong = m.captions.filter((c) => !rule.test(c));
+    is(
+      m.captions.length > 0 && wrong.length === 0,
+      `${path} @${width}: every caption points ${expect}`,
+      `"${wrong.join('", "')}" under a heading that says ${heading}`,
+    );
+
+    if (path === '/streaming') {
+      is(!m.duplicatePills, `${path} @${width}: the old pill row is gone`, 'the same titles render twice');
+    }
+    is(errors.length === 0, `${path} @${width}: no console errors`, errors[0]);
+    await ctx.close();
+  }
+}
+
 // --- other pages still work -------------------------------------------------
 
 console.log('\nOther routes');
