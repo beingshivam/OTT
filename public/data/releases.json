@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-07T13:48:39.604Z",
+  "generatedAt": "2026-09-07T14:15:52.429Z",
   "source": "tmdb",
   "weeks": [
     {
@@ -4076,14 +4076,15 @@
           ],
           "genres": [
             "Horror",
-            "Comedy"
+            "Comedy",
+            "Fantasy"
           ],
           "releaseDate": "2026-08-28",
           "regions": [
             "US"
           ],
-          "rating": 8.4,
-          "votes": 37,
+          "rating": 8.3,
+          "votes": 38,
           "heat": 47,
           "synopsis": "A magical, singing orange unicorn holds his cast hostage in a surreal TV-show dimension, as he becomes more and more demented.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/6Lh4ZlsAISFQFVfLZ90sE9ycVnN.jpg",
@@ -5283,8 +5284,8 @@
           "trailerUrl": "https://www.youtube.com/watch?v=Mf8Yiy3FL24",
           "certification": "U/A 13+",
           "imdbId": "tt27548557",
-          "rating": 2.6,
-          "votes": 5,
+          "rating": 3.3,
+          "votes": 6,
           "imdbRating": 8.6,
           "imdbVotes": 32329
         },
@@ -5753,7 +5754,7 @@
           "posterUrl": "https://image.tmdb.org/t/p/w500/bi7Aeaozl51cd5K6vAn8tI1lOW0.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w1280/3gN540zmAiJW1v6mFoNiciamxc2.jpg",
           "synopsis": "A computer scientist is invited by a tech billionaire to join his private facility on a Caribbean island to investigate extraterrestrial matter on Earth. When they make contact beyond our world, chaos erupts as we’re left to wonder: do they come in peace?",
-          "rating": 6.6,
+          "rating": 6.5,
           "runtimeMinutes": 87,
           "cast": [
             "Isabelle Fuhrman",
@@ -5764,7 +5765,7 @@
           ],
           "director": "Jonathan Sobol",
           "trailerUrl": "https://www.youtube.com/watch?v=rJY9BC89igE",
-          "votes": 44,
+          "votes": 45,
           "imdbId": "tt21109170"
         },
         {
@@ -6944,8 +6945,8 @@
           "regions": [
             "US"
           ],
-          "rating": 9.4,
-          "votes": 5,
+          "rating": 9,
+          "votes": 6,
           "heat": 39,
           "synopsis": "A former soldier and his unlikely partner become the targets of a ruthless cartel while racing to complete a critical medical delivery and save the life of a little girl.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/yBKMAIj7clP42UkFejhGDBBoTpb.jpg",
@@ -11296,6 +11297,6 @@
       "backdropUrl": "https://image.tmdb.org/t/p/w780/iBc82qaA05ntzSnrVndw8scv4Bn.jpg"
     }
   ],
-  "enrichedAt": "2026-09-07T13:49:17.328Z",
-  "ratedAt": "2026-09-07T13:49:31.118Z"
+  "enrichedAt": "2026-09-07T14:16:20.447Z",
+  "ratedAt": "2026-09-07T14:16:36.979Z"
 }
