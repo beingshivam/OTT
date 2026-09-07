@@ -2347,7 +2347,10 @@ a {
    search came for; the filters below are for what they do next. */
 .pageintro {
   padding: 18px var(--page-x) 0;
-  max-width: var(--page-max, 1400px);
+  /* The same token as .shell. This read var(--page-max, 1400px) and --page-max
+     is defined nowhere, so it silently took the 1400px fallback against the
+     shell's 1440 and sat 20px inside the board it heads. */
+  max-width: var(--max-w);
   margin: 0 auto;
 }
 .pageintro__title {
@@ -2609,9 +2612,13 @@ a {
    telling them — the header is a wordmark and the board is a list of
    titles, which is exactly how a reader came to ask whether she could
    watch things here. Quiet enough not to cost the week its space. */
+/* Follows the lenses it sits under, and the grid everything else uses.
+   It was centred in the viewport, which put it under a left-aligned page; then
+   flush left, which put it in the gutter. A shell wrapper carries the page
+   gutter and this keeps the line length readable inside it. */
 .explainer {
-  margin: 0 auto;
-  padding: 0 var(--page-x) 2px;
+  margin: 0;
+  padding: 0 0 2px;
   font-size: 12.5px;
   line-height: 1.5;
   color: var(--text-3);
@@ -2628,10 +2635,18 @@ a {
    links: a single track, the active one lifted out of it. Sits directly under
    the header because it answers the first question a reader has — what am I
    looking at — before any filter is worth touching. */
+/* Left-aligned to the same edge as everything else.
+   Centred, it was the only element on the page not starting where the search
+   box, the filter chips, the board and the browse links all start — at 1920
+   that put the primary navigation adrift in the middle with nothing to align
+   to. The wrapper carries the page gutter; the pill row sits at its edge. */
+.lenses-row {
+  margin-top: 4px;
+}
 .lenses {
   display: flex;
   gap: 4px;
-  margin: 4px auto 0;
+  margin: 0;
   padding: 4px;
   border-radius: var(--radius-pill);
   border: 1px solid var(--line);
@@ -2682,6 +2697,9 @@ a {
   .lenses {
     width: 100%;
     justify-content: stretch;
+  }
+  .lenses-row {
+    padding-inline: var(--page-x);
   }
   .lens {
     flex: 1 1 0;

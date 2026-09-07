@@ -519,7 +519,8 @@ export default function App() {
           (zero Indian-language titles in the top thirty by popularity), so a
           tab with that label would be a lie about what the site knows. */}
       {!isTitlePage && (
-        <nav className="lenses shell" aria-label="What to show">
+        <div className="shell lenses-row">
+        <nav className="lenses" aria-label="What to show">
           <a className="lens" href="/" aria-current={!route ? 'page' : undefined}>
             This week
           </a>
@@ -538,6 +539,7 @@ export default function App() {
             Coming soon
           </a>
         </nav>
+        </div>
       )}
 
       {/* The sentence the homepage never had.
@@ -547,10 +549,12 @@ export default function App() {
           watch things here. One quiet line, on the page a first visit lands
           on. The route pages have PageIntro doing this job already. */}
       {!route && (
-        <p className="shell explainer">
+        <div className="shell">
+        <p className="explainer">
           Everything releasing this week — tap any title to see where it's streaming and open it
           there. Nothing plays on this page.
         </p>
+        </div>
       )}
 
       {/* Only on a page that promised something specific. On "/" this renders
