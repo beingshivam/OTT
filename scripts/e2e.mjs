@@ -18,7 +18,7 @@
 
 import { chromium } from 'playwright';
 import { createServer } from 'node:http';
-import { readFile, mkdir } from 'node:fs/promises';
+import { readFile, mkdir, stat } from 'node:fs/promises';
 import { extname, join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -371,7 +371,7 @@ for (const width of [390, 1440]) {
       rail: top('.landed'),
       heading: top('.controls'),
       board: top('.board'),
-      share: top('.shareout'),
+      share: top('.weekbar .share'),
       // The bands this change removed. Their absence is the change.
       oldWeekBand: !!document.querySelector('.weekbar__week'),
       oldMetaBand: !!document.querySelector('.weekbar__right'),
@@ -401,7 +401,20 @@ for (const width of [390, 1440]) {
     `${label}: lenses, then the row, then the board's heading, then the board`,
     `lenses ${m.lenses}, rail ${m.rail}, heading ${m.heading}, board ${m.board}`,
   );
-  is(m.share > m.board, `${label}: Share sits below the board`, `share ${m.share}, board ${m.board}`);
+  /**
+   * Share is in the header, above everything.
+   *
+   * It spent one commit at the foot of the board on the reasoning that nobody
+   * shares a week they have not read — true of a reader, and beside the point:
+   * the picture it makes is how the site travels, and a growth loop that needs
+   * scrolling to find does not run. The owner called it, and this check now
+   * holds the placement they chose rather than the one it replaced.
+   */
+  is(
+    m.share !== null && m.share < m.rail,
+    `${label}: Share is in the header, above the fold`,
+    `share ${m.share}, rail ${m.rail}`,
+  );
   is(errors.length === 0, `${label}: no console errors`, errors[0]);
   await ctx.close();
 }
@@ -461,6 +474,75 @@ console.log('\nBoard controls');
   is(panel.region, 'the region picker is in the filters panel', 'it is nowhere');
   is(panel.sort, 'the sort control is in the filters panel', 'it is nowhere');
   is(errors.length === 0, 'no console errors', errors[0]);
+  await ctx.close();
+}
+
+// --- sharing the week as a picture -------------------------------------------
+
+console.log('\nShare');
+for (const width of [390, 1440]) {
+  const ctx = await browser.newContext({
+    viewport: { width, height: 900 },
+    deviceScaleFactor: 1,
+    acceptDownloads: true,
+  });
+  await ctx.addInitScript(() => { try { localStorage.setItem('dropday.seen', '1'); } catch {} });
+  const page = await ctx.newPage();
+  const errors = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  // Artwork is unreachable here, which is the path worth testing anyway: the
+  // card has to render when a poster does not arrive.
+  await page.route('**image.tmdb.org/**', (r) => r.abort());
+  await page.route('**fonts.g**', (r) => r.abort());
+  await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('.share .iconbtn');
+
+  const inHeader = await page.evaluate(() => !!document.querySelector('.weekbar .share'));
+  is(inHeader, `${width}px: the share button is in the header`, 'it is somewhere else');
+
+  await page.locator('.share .iconbtn').click();
+  await page.waitForTimeout(300);
+  const items = await page.locator('.share__item').count();
+  is(items === 2, `${width}px: it offers both a board and a poster image`, `${items} options`);
+
+  for (const [i, kind] of [[0, 'board'], [1, 'posters']]) {
+    if (!(await page.locator('.share__menu').isVisible())) {
+      await page.locator('.share .iconbtn').click();
+      await page.waitForTimeout(250);
+    }
+    const [dl] = await Promise.all([
+      page.waitForEvent('download', { timeout: 40_000 }),
+      page.locator('.share__item').nth(i).click(),
+    ]);
+    const file = join(SHOTS, `share-${width}-${kind}.png`);
+    await dl.saveAs(file);
+    const { size } = await stat(file);
+    const head = (await readFile(file)).subarray(0, 8);
+    is(
+      head[0] === 0x89 && head[1] === 0x50 && size > 20_000,
+      `${width}px: the ${kind} image renders as a real PNG`,
+      `${size} bytes, magic ${head.subarray(0, 4).toString('hex')}`,
+    );
+    is(
+      /\.png$/.test(dl.suggestedFilename()) && dl.suggestedFilename().includes('2026-'),
+      `${width}px: the ${kind} file is named for its week`,
+      dl.suggestedFilename(),
+    );
+    await page.waitForTimeout(400);
+  }
+
+  // Escape closes the menu — it is a popover, and popovers that trap you are a
+  // bug people report as "the site froze".
+  await page.locator('.share .iconbtn').click();
+  await page.waitForTimeout(200);
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(200);
+  is(
+    !(await page.locator('.share__menu').isVisible()),
+    `${width}px: Escape closes the share menu`,
+    'it stayed open',
+  );
+  is(errors.length === 0, `${width}px: no console errors`, errors[0]);
   await ctx.close();
 }
 

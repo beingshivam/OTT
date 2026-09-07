@@ -1177,11 +1177,126 @@ a {
   max-width: none;
 }
 
-/* Share, at the end of what it shares. */
-.shareout {
+/* ------------------------------------------------------------- share ---- */
+
+.share {
+  position: relative;
+  flex: none;
+}
+
+/* The same round target the search toggle uses, so the header's actions read as
+   one set rather than three separately-designed buttons. */
+.iconbtn {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text-2);
+  transition: background 0.18s var(--ease), color 0.18s var(--ease);
+}
+.iconbtn:hover:not(:disabled) {
+  background: var(--surface-2);
+  color: var(--text);
+}
+.iconbtn:disabled {
+  opacity: 0.4;
+}
+.iconbtn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.share__menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 60;
+  width: min(290px, calc(100vw - 32px));
+  padding: 10px;
+  border-radius: 16px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface-solid);
+  box-shadow: var(--shadow-pop);
+  animation: sharein 0.16s var(--ease);
+}
+@keyframes sharein {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .share__menu {
+    animation: none;
+  }
+}
+
+.share__note {
+  margin: 2px 4px 8px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-3);
+}
+
+.share__item {
   display: flex;
-  justify-content: center;
-  margin: 8px 0 4px;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 9px 10px;
+  border-radius: 11px;
+  text-align: left;
+  color: var(--text);
+  background: none;
+  border: 0;
+}
+.share__item:hover:not(:disabled) {
+  background: var(--surface-2);
+}
+.share__item:disabled {
+  opacity: 0.55;
+}
+.share__item svg {
+  width: 17px;
+  height: 17px;
+  flex: none;
+  color: var(--text-3);
+}
+.share__item strong {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 640;
+}
+.share__item small {
+  display: block;
+  font-size: 11.5px;
+  color: var(--text-3);
+  margin-top: 1px;
+}
+
+.share__spin {
+  margin-left: auto;
+  width: 13px;
+  height: 13px;
+  flex: none;
+  border-radius: 50%;
+  border: 2px solid var(--line-strong);
+  border-top-color: var(--text-2);
+  animation: sharespin 0.7s linear infinite;
+}
+@keyframes sharespin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.share__error {
+  margin: 8px 4px 2px;
+  font-size: 12px;
+  color: #ff9f9f;
 }
 
 /* ---------------------------------------------------------- just landed ---- */

@@ -520,6 +520,23 @@ export default function App() {
             specific title, and that reader had to scroll past five rows of
             navigation to find the field. This is where every app puts it.
           */}
+          {/*
+            Share, in the header, on the owner's call — and the reasoning that
+            put it at the foot of the board was too narrow. That argument was
+            about a reader, who has no use for it until they have read the week.
+            But the picture this makes is how the site travels: it goes out on
+            WhatsApp and Instagram carrying the address, and a growth loop that
+            needs scrolling to find is a growth loop that does not run. It does
+            not fit on the board's heading row, which has nothing to spare at
+            360px, and it does not belong back in a band of its own.
+
+            Only where the card can name what it holds: it says "4–10 Sep" and
+            means it, which is true of a week and not of a month or of seventy
+            years of back catalogue.
+          */}
+          {feed && !isTitlePage && !span && !route?.catalogue && (
+            <ShareWeek releases={visible} filters={filters} />
+          )}
           <SearchBox value={filters.query} onChange={(query) => update({ query })} />
         </div>
 
@@ -851,20 +868,6 @@ export default function App() {
               awaiting artwork and synopses.
             </span>
           </p>
-        )}
-
-        {/*
-          Share, at the end of the thing being shared.
-          It spent its life in the top bar, where it took a line on a phone and
-          asked to be acted on before the reader had seen anything worth
-          sharing. Nobody shares a week they have not read. The card it renders
-          names the week it was made from, which is a true label for a week and
-          not for a month or the back catalogue — so those lenses do without.
-        */}
-        {feed && !isTitlePage && !span && !route?.catalogue && visible.length > 0 && (
-          <div className="shareout">
-            <ShareWeek releases={visible} filters={filters} />
-          </div>
         )}
 
         {/* Above the footer proper: the crawlable, clickable route to every
