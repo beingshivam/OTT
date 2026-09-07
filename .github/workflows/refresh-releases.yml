@@ -38,6 +38,8 @@ concurrency:
 
 permissions:
   contents: write
+  # For the report below, which is how a person finds out this ran.
+  issues: write
 
 jobs:
   refresh:
@@ -197,11 +199,17 @@ jobs:
       # week's news, and unsubscribes are the price. So the draft is written
       # only on the Thursday run, the one that lands ahead of Friday's drops.
       # A manual run always writes one, for testing.
+      # Matched against the cron that opens the week. This named the old
+      # Thursday schedule, which stopped existing when the cadence changed —
+      # so on every scheduled run the condition was false and the digest
+      # silently stopped being drafted. Nothing failed; a weekly email just
+      # quietly wasn't there. A workflow that refers to its own schedule by
+      # string is a second copy of the schedule, and it drifted within a day.
       - name: Draft the weekly email
         id: digest
         if: >-
           steps.fetch.outcome == 'success' &&
-          (github.event_name != 'schedule' || github.event.schedule == '30 19 * * 4')
+          (github.event_name != 'schedule' || github.event.schedule == '30 2 * * 5')
         continue-on-error: true
         run: node scripts/build-digest.mjs
 
@@ -246,8 +254,8 @@ jobs:
       # on disk has gone stale, because a failed scheduled workflow is the one
       # thing GitHub actually emails you about.
       #
-      # The window allows a full missed week: two runs land per week, so this
-      # only trips after roughly three consecutive failures, never on one bad
+      # The window allows a full missed week: three runs land per week, so this
+      # only trips after four or five consecutive failures, never on one bad
       # night.
       - name: Guard against a stale calendar
         if: always()
@@ -279,3 +287,75 @@ jobs:
             }
             console.log(`Calendar is ${age} days old — within the ${max}-day limit.`);
           '
+
+      # ---------------------------------------------------------------- report
+      #
+      # How a person finds out this ran, without adding a credential to the repo.
+      #
+      # GitHub already emails you when a scheduled workflow *fails*, which is the
+      # half that actually matters and the reason the guard above turns a silent
+      # stall into a failure. What it never sends is the other half: word that
+      # the thing worked. So the job writes to one long-running issue and
+      # @mentions the owner, because a mention is the one notification GitHub
+      # sends reliably whatever a person's watch settings say — and it needs no
+      # SMTP server, no app password and no third-party action holding a secret.
+      #
+      # Weekly rather than per-run, on purpose. Three "it worked" emails a week
+      # is how a person learns to delete them unread, and an alert nobody reads
+      # is worse than none: it is the same silence with more noise. Monday's run
+      # reports; Friday's and Saturday's stay quiet unless something breaks.
+      - name: Report the run
+        if: always() && (failure() || github.event_name == 'workflow_dispatch' || github.event.schedule == '30 13 * * 1')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          OUTCOME: ${{ job.status }}
+        run: |
+          set -euo pipefail
+          api() { curl -sS -H "Authorization: Bearer $GH_TOKEN" \
+                          -H "Accept: application/vnd.github+json" "$@"; }
+
+          # The numbers a reader of the email would actually want: is it fresh,
+          # and how much is in it.
+          summary=$(node -e '
+            const fs = require("fs");
+            const read = (p) => { try { return JSON.parse(fs.readFileSync(p, "utf8")); } catch { return null; } };
+            const feed = read("public/data/releases.json");
+            const cat  = read("public/data/catalogue.json");
+            const arch = read("data/archive.json");
+            const rows = feed ? feed.weeks.flatMap((w) => w.releases).length : 0;
+            const age  = feed ? ((Date.now() - Date.parse(feed.generatedAt)) / 3600000).toFixed(1) : "?";
+            console.log([
+              `- **${rows}** releases across ${feed ? feed.weeks.length : 0} weeks, rebuilt ${age}h ago`,
+              `- **${cat ? cat.titles.length : 0}** titles in the back catalogue`,
+              `- **${arch ? arch.titles.length : 0}** titles in the permanent archive`,
+            ].join("\n"));
+          ')
+
+          if [ "$OUTCOME" = "success" ]; then
+            head="✅ Refresh completed — $(date -u '+%a %d %b %Y, %H:%M UTC')"
+          else
+            head="⚠️ **Refresh FAILED** — $(date -u '+%a %d %b %Y, %H:%M UTC')"
+          fi
+
+          body=$(printf '%s\n\n%s\n\n[Full log](%s)\n\n@%s' "$head" "$summary" "$RUN_URL" "$OWNER")
+
+          # One issue, reused. Found by title so the workflow needs nothing
+          # stored anywhere; created on the first run that reports.
+          number=$(api "https://api.github.com/repos/$REPO/issues?state=open&per_page=100" \
+            | jq -r '[.[] | select(.title == "Refresh log")][0].number // empty')
+
+          if [ -z "$number" ]; then
+            number=$(api -X POST "https://api.github.com/repos/$REPO/issues" \
+              -d "$(jq -n --arg b "$body" '{
+                    title: "Refresh log",
+                    body: ("Every refresh reports here. Close this issue to stop the notifications.\n\n---\n\n" + $b)
+                  }')" | jq -r '.number')
+            echo "Opened the refresh log as issue #$number."
+          else
+            api -X POST "https://api.github.com/repos/$REPO/issues/$number/comments" \
+              -d "$(jq -n --arg b "$body" '{ body: $b }')" > /dev/null
+            echo "Reported to issue #$number."
+          fi
