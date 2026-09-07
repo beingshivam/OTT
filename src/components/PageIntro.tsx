@@ -104,19 +104,62 @@ export function PageIntro({ route, rows, feed, region, currentWeek, onOpen }: Pr
    * and both were labelled "Biggest this week".
    */
   const ranked = route.catalogue || route.span ? scope : thisWeek.length ? thisWeek : scope;
+
   /**
-   * Heat everywhere except the catalogue, whose rows carry none — sorting those
-   * by it would have listed three titles in whatever order they happened to
-   * arrive, under a label reading "Best rated". There, the score is the point,
-   * so the score is the sort.
+   * One per language before a second of any, then interleaved by that position.
+   *
+   * Ranking the catalogue by raw score put Avatar, Breaking Bad and Swapped in
+   * the "best rated" row — three English titles, on a page whose whole design
+   * rests on never comparing a Malayalam score to an English one. TMDB's votes
+   * are densest where its audience is, so a straight sort is a sort by how
+   * American a title is. Taking each language's best first, then each
+   * language's second, gives an honest row and a more useful one.
    */
-  const biggest = [...ranked]
-    .sort(
-      route.catalogue
-        ? (a, b) => (scoreOf(b)?.value ?? 0) - (scoreOf(a)?.value ?? 0)
-        : (a, b) => (b.heat ?? 0) - (a.heat ?? 0),
-    )
-    .slice(0, 3);
+  const interleaveByLanguage = (rows: Release[], better: (a: Release, b: Release) => number) => {
+    const byLang = new Map<string, Release[]>();
+    for (const r of rows) {
+      const code = r.languages?.[0];
+      if (!code) continue;
+      if (!byLang.has(code)) byLang.set(code, []);
+      byLang.get(code)!.push(r);
+    }
+    const queues = [...byLang.values()].map((list) => [...list].sort(better));
+    // Biggest language first, so a one-title language cannot lead the row.
+    queues.sort((a, b) => b.length - a.length);
+    const out: Release[] = [];
+    for (let depth = 0; out.length < rows.length; depth++) {
+      let took = false;
+      for (const q of queues) {
+        if (q[depth]) {
+          out.push(q[depth]);
+          took = true;
+        }
+      }
+      if (!took) break;
+    }
+    return out;
+  };
+
+  const byScore = (a: Release, b: Release) => (scoreOf(b)?.value ?? 0) - (scoreOf(a)?.value ?? 0);
+
+  /**
+   * Two rows on the catalogue, because they answer two different questions and
+   * a reader browsing "now streaming" asks both: what is everyone watching, and
+   * what is actually good. Everywhere else there is one, about the week.
+   */
+  const popular = route.catalogue
+    ? interleaveByLanguage(
+        scope.filter((r) => r.popRank != null),
+        (a, b) => a.popRank! - b.popRank!,
+      ).slice(0, 3)
+    : [];
+
+  const biggest = route.catalogue
+    ? interleaveByLanguage(
+        scope.filter((r) => scoreOf(r)?.confident),
+        byScore,
+      ).slice(0, 3)
+    : [...ranked].sort((a, b) => (b.heat ?? 0) - (a.heat ?? 0)).slice(0, 3);
 
   const biggestLabel = route.catalogue
     ? 'Best rated'
@@ -129,9 +172,9 @@ export function PageIntro({ route, rows, feed, region, currentWeek, onOpen }: Pr
       : 'Biggest right now';
 
   /**
-   * Its own row everywhere except the catalogue, where the lead row is already
-   * ranked by score — so the page printed "BEST RATED" twice, a few pills
-   * apart, with Breaking Bad in both.
+   * Its own row everywhere except the catalogue, which already has one — the
+   * page printed "BEST RATED" twice, a few pills apart, with Breaking Bad in
+   * both.
    */
   const bestRated = route.catalogue
     ? undefined
@@ -265,6 +308,23 @@ export function PageIntro({ route, rows, feed, region, currentWeek, onOpen }: Pr
       </p>
 
       <div className="pageintro__facts">
+        {popular.length > 0 && (
+          <div className="pageintro__fact">
+            {/* "Popular now", not "trending this week". The rank behind it is a
+                snapshot from the last refresh, not a week-over-week movement —
+                calling it a weekly trend would be describing a measurement the
+                data does not contain. */}
+            <span className="pageintro__label">Popular now</span>
+            <span className="pageintro__vals">
+              {popular.map((r) => (
+                <button key={r.id} className="pageintro__pill" onClick={() => onOpen(r)}>
+                  {r.title}
+                </button>
+              ))}
+            </span>
+          </div>
+        )}
+
         {biggest.length > 0 && (
           <div className="pageintro__fact">
             <span className="pageintro__label">{biggestLabel}</span>
