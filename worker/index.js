@@ -40,6 +40,53 @@ const json = (status, body) =>
     headers: { 'content-type': 'application/json', 'cache-control': 'no-store' },
   });
 
+/**
+ * TMDB artwork, re-served from our own origin.
+ *
+ * The share card draws posters onto a canvas, and a canvas that has drawn a
+ * cross-origin image cannot be read back unless the server said it could.
+ * image.tmdb.org does not: proved by simulating both policies against a real
+ * Chromium — with the header the poster draws in every cache state, without it
+ * the load fails every time, and no client-side trick changes that. The picture
+ * came out as coloured gradients on the live site, which is the fallback doing
+ * its job and not the design anybody wanted.
+ *
+ * So the bytes come through here instead, which makes them same-origin and the
+ * question moot. Only the share card uses this — the posters on the page are
+ * plain <img> tags that never touch a canvas and have no reason to pay for a
+ * hop.
+ *
+ * Narrow on purpose. An open proxy is somebody else's bandwidth bill and a way
+ * into networks that trust this origin, so the path has to look exactly like a
+ * TMDB image path and nothing else is forwarded: no query string, no client
+ * headers, no cookies, no methods but GET and HEAD.
+ */
+const TMDB_IMAGE = /^\/img\/(w\d{2,4}|original)\/([A-Za-z0-9_-]{8,64}\.(?:jpg|png|webp|svg))$/;
+
+async function proxyPoster(request, url) {
+  if (request.method !== 'GET' && request.method !== 'HEAD') {
+    return json(405, { error: 'method_not_allowed' });
+  }
+  const match = url.pathname.match(TMDB_IMAGE);
+  if (!match) return json(404, { error: 'not_an_image_path' });
+
+  const [, size, file] = match;
+  const upstream = await fetch(`https://image.tmdb.org/t/p/${size}/${file}`, {
+    method: request.method,
+    // Cloudflare caches this at the edge, so a popular poster is fetched from
+    // TMDB once rather than once per person who shares the week.
+    cf: { cacheEverything: true, cacheTtl: 86_400 },
+  });
+
+  if (!upstream.ok) return json(upstream.status === 404 ? 404 : 502, { error: 'upstream' });
+
+  const headers = new Headers();
+  headers.set('content-type', upstream.headers.get('content-type') ?? 'image/jpeg');
+  // TMDB paths are content-addressed: the same path is always the same image.
+  headers.set('cache-control', 'public, max-age=31536000, immutable');
+  return new Response(upstream.body, { status: 200, headers });
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -51,6 +98,7 @@ export default {
      * comparison before handing off. env.ASSETS.fetch applies the SPA
      * fallback from wrangler.jsonc, so unknown paths still serve the board.
      */
+    if (url.pathname.startsWith('/img/')) return proxyPoster(request, url);
     if (url.pathname !== '/api/subscribe') return env.ASSETS.fetch(request);
 
     if (request.method !== 'POST') {

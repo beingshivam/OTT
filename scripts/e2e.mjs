@@ -494,6 +494,18 @@ for (const width of [390, 1440]) {
   // card has to render when a poster does not arrive.
   await page.route('**image.tmdb.org/**', (r) => r.abort());
   await page.route('**fonts.g**', (r) => r.abort());
+  /**
+   * The poster grid must ask *our* origin for artwork, not TMDB's.
+   * image.tmdb.org sends no Access-Control-Allow-Origin, so a canvas that draws
+   * from it cannot be read back — which is why the first live poster card came
+   * out as coloured gradients. The Worker re-serves those bytes from /img/, and
+   * this counts the requests that prove the card is using it.
+   */
+  const proxied = [];
+  await page.route('**/img/**', (r) => {
+    proxied.push(new URL(r.request().url()).pathname);
+    return r.fulfill({ status: 200, contentType: 'image/png', body: PIXEL });
+  });
   await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('.share .iconbtn');
 
@@ -529,6 +541,16 @@ for (const width of [390, 1440]) {
       dl.suggestedFilename(),
     );
     await page.waitForTimeout(400);
+
+    if (kind === 'posters') {
+      is(
+        proxied.length > 0 && proxied.every((p) => /^\/img\/(w\d+|original)\//.test(p)),
+        `${width}px: the poster card asks our own origin for artwork`,
+        proxied.length === 0
+          ? 'it went straight to TMDB, whose images a canvas cannot read back'
+          : `unexpected paths: ${proxied.slice(0, 3).join(', ')}`,
+      );
+    }
   }
 
   // Escape closes the menu — it is a popover, and popovers that trap you are a

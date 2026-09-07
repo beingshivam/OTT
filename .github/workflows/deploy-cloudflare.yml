@@ -176,6 +176,22 @@ jobs:
             *) echo "::error title=The loading check is unreachable::$SITE/diag/ did not return the check page. The banner shown to a reader whose assets were blocked links there, so it has to resolve." ; exit 1 ;;
           esac
 
+          # 5. Does the poster proxy answer? The share card's artwork goes
+          #    through the Worker because image.tmdb.org sends no CORS header,
+          #    and a canvas cannot read back what it drew from there. If this
+          #    route stops working the cards do not break — they quietly render
+          #    coloured gradients instead of posters, which is exactly the kind
+          #    of failure nobody reports.
+          poster=$(printf '%s' "$html" | grep -o 'image\.tmdb\.org/t/p/[^"]*' | head -1 | sed 's|image\.tmdb\.org/t/p||')
+          if [ -n "$poster" ]; then
+            ptype=$(curl -fsS --max-time 20 -o /dev/null -w '%{content_type}' "$SITE/img$poster" || true)
+            echo "  /img$poster -> ${ptype:-<unreachable>}"
+            case "$ptype" in
+              image/*) ;;
+              *) echo "::warning title=The poster proxy is not serving images::$SITE/img$poster returned '${ptype:-nothing}'. Poster share cards will fall back to generated art instead of real artwork." ;;
+            esac
+          fi
+
           if [ "$live" != "$GITHUB_SHA" ]; then
             echo "::error title=Live site is not this commit::$SITE/build.txt reports '${live:-nothing}' rather than ${GITHUB_SHA:0:8}. The bundle loads, so the site works — it is just serving an older deploy."
             exit 1

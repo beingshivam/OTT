@@ -164,5 +164,122 @@ await test('responses are never cached', async () => {
   assert.equal(res.headers.get('cache-control'), 'no-store');
 });
 
+
+/* ------------------------------------------------------------ poster proxy ---- */
+
+/**
+ * The image proxy exists so the share card's canvas can be read back, and the
+ * only thing that makes it safe is being unable to fetch anything but a TMDB
+ * image path. Most of what follows is that refusal.
+ */
+
+/** Stands in for image.tmdb.org, recording what was asked of it. */
+function fakeUpstream({ status = 200 } = {}) {
+  const calls = [];
+  const original = globalThis.fetch;
+  globalThis.fetch = async (url, init) => {
+    calls.push({ url: String(url), method: init?.method });
+    return new Response(status === 200 ? new Uint8Array([1, 2, 3]) : null, {
+      status,
+      headers: { 'content-type': 'image/jpeg' },
+    });
+  };
+  return { calls, restore: () => { globalThis.fetch = original; } };
+}
+
+const img = (path, init) => worker.fetch(new Request(`${ORIGIN}${path}`, init), {});
+
+await test('serves a TMDB poster from our own origin', async () => {
+  const up = fakeUpstream();
+  try {
+    const res = await img('/img/w342/abcdefgh12345678.jpg');
+    assert.equal(res.status, 200);
+    assert.equal(res.headers.get('content-type'), 'image/jpeg');
+    assert.match(res.headers.get('cache-control'), /immutable/);
+    assert.equal(up.calls[0].url, 'https://image.tmdb.org/t/p/w342/abcdefgh12345678.jpg');
+  } finally {
+    up.restore();
+  }
+});
+
+/**
+ * The property that matters is that none of these reach TMDB — not which of the
+ * two ways they are stopped.
+ *
+ * Traversal attempts are normalised away by the URL parser before the worker
+ * sees them: "/img/../../etc/passwd" arrives as "/etc/passwd", never matches the
+ * /img/ prefix, and is handed to the asset server like any other unknown path.
+ * The first version of this test asserted a 404 from the proxy and failed on
+ * exactly those cases, which was the test being wrong about where the defence
+ * sits rather than the defence being missing. So assert the invariant instead:
+ * whatever route it takes, nothing is fetched upstream.
+ */
+await test('never becomes an open proxy', async () => {
+  const up = fakeUpstream();
+  const env = { ASSETS: { ...fakeAssets, fetched: [] } };
+  try {
+    for (const path of [
+      '/img/../../etc/passwd',
+      '/img/w342/../../secret.jpg',
+      '/img/w342/evil.jpg/../../x',
+      '/img/http://example.com/x.jpg',
+      '/img/w342/x.svg%00.jpg',
+      '/img/notasize/abcdefgh12345678.jpg',
+      '/img/w342/short.jpg',
+      '/img/w342/abcdefgh12345678.exe',
+      '/img/w342/abcdefgh12345678',
+      '/img/w342/a'.padEnd(200, 'b') + '.jpg',
+    ]) {
+      const res = await worker.fetch(new Request(`${ORIGIN}${path}`), env);
+      assert.ok(res.status !== 200 || !res.headers.get('content-type')?.startsWith('image/'),
+        `${path} came back as an image`);
+    }
+    assert.equal(up.calls.length, 0, `fetched upstream: ${up.calls.map((c) => c.url).join(', ')}`);
+  } finally {
+    up.restore();
+  }
+});
+
+await test('refuses anything but a read', async () => {
+  const up = fakeUpstream();
+  try {
+    const res = await img('/img/w342/abcdefgh12345678.jpg', { method: 'POST' });
+    assert.equal(res.status, 405);
+    assert.equal(up.calls.length, 0);
+  } finally {
+    up.restore();
+  }
+});
+
+await test('passes a missing poster through as missing', async () => {
+  const up = fakeUpstream({ status: 404 });
+  try {
+    assert.equal((await img('/img/w342/abcdefgh12345678.jpg')).status, 404);
+  } finally {
+    up.restore();
+  }
+});
+
+await test('reports an upstream failure as a gateway error, not as an image', async () => {
+  const up = fakeUpstream({ status: 500 });
+  try {
+    assert.equal((await img('/img/w342/abcdefgh12345678.jpg')).status, 502);
+  } finally {
+    up.restore();
+  }
+});
+
+await test('the query string is not forwarded', async () => {
+  const up = fakeUpstream();
+  try {
+    await img('/img/w342/abcdefgh12345678.jpg?api_key=leak');
+    assert.ok(!up.calls[0].url.includes('api_key'), up.calls[0].url);
+  } finally {
+    up.restore();
+  }
+});
+
+
+
 console.log(results.join('\n'));
 console.log(process.exitCode ? '\nsome checks failed' : `\n${results.length} checks passed`);

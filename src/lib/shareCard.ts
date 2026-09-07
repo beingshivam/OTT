@@ -354,6 +354,20 @@ const GRID_MAX = GRID_COLS * 4;
  * *load* instead, which is a failure this can see and answer with the generated
  * art the app already falls back to on screen. Either way a card comes out.
  */
+/**
+ * TMDB artwork, asked for from our own origin.
+ *
+ * image.tmdb.org does not send Access-Control-Allow-Origin, so a canvas that
+ * has drawn one of its images cannot be read back — which is why the first
+ * poster cards came out as coloured gradients. The Worker re-serves the same
+ * bytes from this origin (see worker/index.js), where the question does not
+ * arise. Anything that is not a TMDB URL is left exactly as it is.
+ */
+function sameOrigin(url: string): string {
+  const m = url.match(/^https?:\/\/image\.tmdb\.org\/t\/p\/([^/]+)\/(.+)$/);
+  return m ? `/img/${m[1]}/${m[2]}` : url;
+}
+
 function loadPoster(url: string): Promise<HTMLImageElement | null> {
   return new Promise((resolve) => {
     const img = new Image();
@@ -368,7 +382,7 @@ function loadPoster(url: string): Promise<HTMLImageElement | null> {
       clearTimeout(timer);
       resolve(null);
     };
-    img.src = url;
+    img.src = sameOrigin(url);
   });
 }
 
