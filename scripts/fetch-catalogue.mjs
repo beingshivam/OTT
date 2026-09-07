@@ -178,17 +178,48 @@ async function discoverPopular(isMovie, language, minVotes, page) {
   });
 }
 
+/**
+ * Where it plays, and on what terms.
+ *
+ * This used to merge flatrate, free and ad-supported into one list, which made
+ * a platform that only carries a title behind ads indistinguishable from one
+ * carrying it on subscription. The discover query above asks for flatrate
+ * specifically, so the two halves of this pipeline were making different
+ * claims about the same row — and the merged version is the more flattering
+ * one, which is how a small dishonesty usually gets in.
+ *
+ * It matters here more than it would elsewhere: JioHotstar runs a large free
+ * tier in India and came out as the most-carried platform in the catalogue,
+ * ahead of both Prime and Netflix. That is a plausible reading of a merged list
+ * and a suspicious one for a catalogue of well-rated titles.
+ *
+ * All three tiers are still kept, because all three mean "you can watch this
+ * tonight without paying extra" and dropping the free ones would lose real
+ * answers. What changes is that each platform now records which it is, so the
+ * page can say so rather than implying subscription for all of them.
+ */
 async function providersFor(isMovie, id) {
   try {
     const data = await tmdb(`/${isMovie ? 'movie' : 'tv'}/${id}/watch/providers`);
     const scoped = data.results?.[REGION];
-    if (!scoped) return [];
-    const ids = [...(scoped.flatrate ?? []), ...(scoped.free ?? []), ...(scoped.ads ?? [])].map(
-      (p) => p.provider_id,
-    );
-    return [...new Set(ids.map((n) => platformByProvider.get(n)).filter(Boolean))];
+    if (!scoped) return { platforms: [], tiers: {} };
+
+    const tiers = {};
+    // Best terms win where a platform appears under more than one heading:
+    // included beats free-with-ads beats ads.
+    for (const [tier, list] of [
+      ['ads', scoped.ads],
+      ['free', scoped.free],
+      ['flatrate', scoped.flatrate],
+    ]) {
+      for (const p of list ?? []) {
+        const id = platformByProvider.get(p.provider_id);
+        if (id) tiers[id] = tier;
+      }
+    }
+    return { platforms: Object.keys(tiers), tiers };
   } catch {
-    return [];
+    return { platforms: [], tiers: {} };
   }
 }
 
@@ -324,12 +355,12 @@ for (const row of byId.values()) {
     stopped = stopped ?? `ran out of its ${Math.round(BUDGET_MS / 60_000)}-minute budget`;
     break;
   }
-  const platforms = await providersFor(row.kind === 'film', Number(row.id.slice(2)));
+  const { platforms, tiers } = await providersFor(row.kind === 'film', Number(row.id.slice(2)));
   if (!platforms.length) {
     noProvider++;
     continue;
   }
-  rows.push({ ...row, platforms });
+  rows.push({ ...row, platforms, tiers });
 }
 
 // --- genre names ------------------------------------------------------------
@@ -380,6 +411,12 @@ for (const l of perLanguage) {
   if (!top.length) continue;
   console.log(`    ${l.name}: ` + top.map((r) => `${r.title} (${r.year})`).join(' · '));
 }
-if (noProvider) console.log(`\n  ${noProvider} dropped — no India provider on the detail call`);
+/** How much of the catalogue is actually subscription-included, which is what
+ *  the discover query asked for and what the page implies. */
+const tierCount = {};
+for (const r of rows) for (const t of Object.values(r.tiers ?? {})) tierCount[t] = (tierCount[t] ?? 0) + 1;
+console.log('\n  platform listings by tier: ' +
+  Object.entries(tierCount).map(([t, n]) => `${t} ${n}`).join(' · '));
+if (noProvider) console.log(`  ${noProvider} dropped — no India provider on the detail call`);
 if (stopped) console.log(`\n  Stopped early: ${stopped}. Kept what was gathered.`);
 console.log(`  ${callCount()} API calls.\n`);
