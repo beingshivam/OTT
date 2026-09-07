@@ -1,4 +1,5 @@
 import { PLATFORMS, LANGUAGES, platform as platformById, languageName } from '../data/platforms';
+import { interleaveByLanguage } from '../lib/rank';
 import type { Release, ReleaseFeed } from '../types';
 import type { Route } from '../lib/route';
 import { collectionBySlug, inCollection } from '../data/collections';
@@ -115,30 +116,6 @@ export function PageIntro({ route, rows, feed, region, currentWeek, onOpen }: Pr
    * American a title is. Taking each language's best first, then each
    * language's second, gives an honest row and a more useful one.
    */
-  const interleaveByLanguage = (rows: Release[], better: (a: Release, b: Release) => number) => {
-    const byLang = new Map<string, Release[]>();
-    for (const r of rows) {
-      const code = r.languages?.[0];
-      if (!code) continue;
-      if (!byLang.has(code)) byLang.set(code, []);
-      byLang.get(code)!.push(r);
-    }
-    const queues = [...byLang.values()].map((list) => [...list].sort(better));
-    // Biggest language first, so a one-title language cannot lead the row.
-    queues.sort((a, b) => b.length - a.length);
-    const out: Release[] = [];
-    for (let depth = 0; out.length < rows.length; depth++) {
-      let took = false;
-      for (const q of queues) {
-        if (q[depth]) {
-          out.push(q[depth]);
-          took = true;
-        }
-      }
-      if (!took) break;
-    }
-    return out;
-  };
 
   const byScore = (a: Release, b: Release) => (scoreOf(b)?.value ?? 0) - (scoreOf(a)?.value ?? 0);
 

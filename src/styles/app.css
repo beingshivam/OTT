@@ -1069,6 +1069,237 @@ a {
   margin-top: 1px;
 }
 
+/* ---------------------------------------------------------- just landed ---- */
+
+/**
+ * The poster rail.
+ *
+ * Sized with clamp() against the viewport rather than at breakpoints, because
+ * the brief is "best at any screen size" and breakpoints are the opposite of
+ * that: they are correct at the widths someone thought to test and arbitrary
+ * between them. A 414px phone and a 360px one get proportionally the same row.
+ *
+ * The card width is deliberately not a whole fraction of the track. Cards that
+ * divide the viewport exactly end flush with its edge, and a row that ends
+ * flush looks finished — readers do not scroll it. The partial card at the
+ * right edge is the only thing that says there is more.
+ */
+.landed {
+  margin-bottom: 20px;
+}
+
+.landed__head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.landed__title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  flex: none;
+}
+
+/* Hidden on a phone rather than truncated. At 390px it rendered as "Out in the
+   last 14 days — streaming an…", which tells a reader less than nothing: the
+   heading already says what the row is, and each card carries its own age
+   underneath. It returns as soon as there is room to finish the sentence. */
+.landed__sub {
+  display: none;
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-3);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (min-width: 600px) {
+  .landed__sub {
+    display: block;
+  }
+}
+
+.landed__arrows {
+  margin-left: auto;
+  display: none;
+  gap: 6px;
+  flex: none;
+}
+
+.landed__arrow {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text-2);
+  transition: background 0.18s var(--ease), color 0.18s var(--ease), opacity 0.18s var(--ease);
+}
+.landed__arrow:hover:not(:disabled) {
+  background: var(--surface-2);
+  color: var(--text);
+}
+.landed__arrow:disabled {
+  opacity: 0.3;
+}
+
+.landed__track {
+  display: flex;
+  gap: 12px;
+  list-style: none;
+  margin: 0;
+  padding: 0 0 4px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  /* Full-bleed: the row runs to both edges of the screen so the partial card is
+     cut by the viewport rather than by the page gutter, which is what makes it
+     read as "more over there" instead of "clipped". */
+  margin-inline: calc(var(--page-x) * -1);
+  padding-inline: var(--page-x);
+  scroll-padding-inline: var(--page-x);
+  overscroll-behavior-x: contain;
+  /* Masked rather than covered by a gradient overlay: an overlay would sit on
+     top of the cards and swallow taps near the edge, which on a phone is most
+     of the row. */
+  --fade: 34px;
+  transition: mask-image 0.2s var(--ease);
+}
+.landed__track[data-more] {
+  mask-image: linear-gradient(to right, #000 calc(100% - var(--fade)), transparent 100%);
+}
+.landed__track[data-back] {
+  mask-image: linear-gradient(to right, transparent 0, #000 var(--fade));
+}
+.landed__track[data-back][data-more] {
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 var(--fade),
+    #000 calc(100% - var(--fade)),
+    transparent 100%
+  );
+}
+.landed__track::-webkit-scrollbar {
+  display: none;
+}
+
+.landed__cell {
+  flex: 0 0 clamp(124px, 30vw, 172px);
+  scroll-snap-align: start;
+}
+
+.landed__card {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.landed__art {
+  position: relative;
+  display: block;
+  /* Reserved before the image arrives, so a poster landing late cannot push the
+     board down the page — the rail sits above everything else on the screen and
+     any shift here moves all of it. */
+  aspect-ratio: 2 / 3;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+}
+
+.landed__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.35s var(--ease);
+}
+.landed__card:hover .landed__img {
+  transform: scale(1.04);
+}
+
+.landed__badge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  display: grid;
+  place-items: center;
+  padding: 3px;
+  border-radius: 8px;
+  background: color-mix(in srgb, #05060a 62%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.landed__score {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  padding: 2px 6px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-2);
+  background: color-mix(in srgb, #05060a 72%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.landed__score[data-strong] {
+  color: #ffc65c;
+}
+
+/* Two lines, always — reserved whether the title needs them or not. Titles run
+   from "Silo" to "Mahaprabhu Jagannath", and letting each card size to its own
+   text left the ages under them sitting at three different heights, which reads
+   as a row of cards that were placed rather than laid out. */
+.landed__name {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-top: 7px;
+  font-size: 12.5px;
+  font-weight: 620;
+  line-height: 1.3;
+  min-height: calc(2 * 1.3em);
+  color: var(--text);
+}
+
+.landed__meta {
+  display: block;
+  margin-top: 2px;
+  font-size: 11.5px;
+  color: var(--text-3);
+}
+
+/* Arrows are a pointer affordance. A touch device scrolls the row directly, and
+   a 30px target beside a poster is a mis-tap waiting to happen. */
+@media (hover: hover) and (min-width: 900px) {
+  .landed__arrows {
+    display: flex;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landed__img,
+  .landed__card:hover .landed__img {
+    transition: none;
+    transform: none;
+  }
+}
+
 /* ------------------------------------------------------------- strip ---- */
 
 .strip {
@@ -1204,75 +1435,13 @@ a {
   color: var(--text-3);
 }
 
-.rail {
-  display: flex;
-  gap: 14px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-  margin-inline: calc(var(--page-x) * -1);
-  padding-inline: var(--page-x);
-  padding-bottom: 6px;
-}
-.rail::-webkit-scrollbar {
-  display: none;
-}
-
-.spot {
-  position: relative;
-  flex: none;
-  width: clamp(260px, 68vw, 340px);
-  aspect-ratio: 16 / 10;
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  border: 1px solid var(--line);
-  scroll-snap-align: start;
-  text-align: left;
-  transition: transform 0.3s var(--ease), border-color 0.3s var(--ease);
-  box-shadow: var(--shadow-card);
-}
-.spot:hover {
-  transform: translateY(-4px);
-  border-color: var(--line-strong);
-}
-.spot__art {
-  position: absolute;
-  inset: 0;
-}
-.spot__scrim {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.05) 20%, rgba(0, 0, 0, 0.86) 100%);
-}
-.spot__body {
-  position: absolute;
-  inset: auto 0 0 0;
-  padding: 16px 18px;
-  display: grid;
-  gap: 7px;
-}
-.spot__rank {
-  position: absolute;
-  top: 12px;
-  left: 14px;
-  font-size: 12px;
-  font-weight: 750;
-  letter-spacing: 0.1em;
-  color: rgba(255, 255, 255, 0.72);
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
-}
-.spot__title {
-  font-size: 19px;
-  font-weight: 680;
-  letter-spacing: -0.025em;
-  line-height: 1.15;
-}
-.spot__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  align-items: center;
-}
+/* The .landed and .spot rules that stood here were removed. They styled a
+   horizontal spotlight row from an earlier design that no component has
+   rendered for a long time — and because they were still in the sheet, a new
+   section that reasonably called itself "rail" inherited display:flex from
+   them and collapsed to 32px. Dead CSS is not free; it is a trap with a
+   plausible name. Verified unused across src/ and the SEO builder before
+   deleting. */
 
 /* -------------------------------------------------------------- cards ---- */
 
@@ -2076,6 +2245,15 @@ a {
   .weekbar__right {
     flex-wrap: nowrap;
     gap: 8px;
+  }
+  /* Except on the narrowest phones still in use, where the four items on this
+     line genuinely do not fit and holding them to one row pushed the whole page
+     into a 15px horizontal scroll. A second 30px band on a 320px screen is a
+     mild cost; a page that slides sideways under the thumb is not. */
+  @media (max-width: 380px) {
+    .weekbar__right {
+      flex-wrap: wrap;
+    }
   }
   .weekbar__right .btn span.btn__text {
     display: none;

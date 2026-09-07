@@ -9,6 +9,7 @@ import { EmailSignup } from './components/EmailSignup';
 import { ReleaseCard } from './components/ReleaseCard';
 import { ShareWeek } from './components/ShareWeek';
 import { TrendingStrip, normalise } from './components/TrendingStrip';
+import { JustLanded } from './components/JustLanded';
 import {
   IconCalendar,
   IconChevronLeft,
@@ -21,6 +22,7 @@ import { BRAND, INSTAGRAM, INSTAGRAM_URL, SLUG, TAGLINE } from './data/brand';
 import { REGIONS } from './data/platforms';
 import { loadFeed, weekById } from './lib/feed';
 import { loadCatalogue } from './lib/catalogue';
+import { justLanded, MIN_ITEMS } from './lib/justLanded';
 import {
   applyFilters,
   facetsFor,
@@ -319,6 +321,20 @@ export default function App() {
     const live = (feed?.trending ?? []).filter((r) => r.regions.includes(filters.region));
     return { list: live, live: true };
   }, [feed, releases, filters.region]);
+
+  /**
+   * What landed in the last fortnight, across weeks.
+   *
+   * Reads the whole feed rather than `releases`, which is the one week on
+   * screen. That is the point of the row: a film that arrived nine days ago is
+   * still new to almost everyone and is currently reachable only by noticing
+   * the week arrows and stepping back, which is a lot to ask of someone whose
+   * question is what to watch tonight.
+   */
+  const landed = useMemo(
+    () => justLanded(feed?.weeks.flatMap((w) => w.releases) ?? [], filters.region, today).releases,
+    [feed, filters.region, today],
+  );
 
   /** Weeks the feed actually carries, for the empty state to offer. */
   const stockedWeeks = useMemo(
@@ -735,12 +751,20 @@ export default function App() {
                 a few hundred pixels down — and its label says "this week",
                 which is not what a month page is ranking. */}
             {!userNarrowed && !span && !route?.catalogue && (
-              <TrendingStrip
-                releases={trendingNow.list}
-                live={trendingNow.live}
-                thisWeekIds={thisWeekTitles}
-                onOpen={setSelected}
-              />
+              landed.length >= MIN_ITEMS ? (
+                <JustLanded releases={landed} onOpen={setSelected} today={today} />
+              ) : (
+                /* Not enough recent artwork to make a row of posters — a thin
+                   rail reads as a bug rather than a selection. The text strip
+                   was always the honest shape for a short list, so it stays as
+                   the fallback rather than being deleted. */
+                <TrendingStrip
+                  releases={trendingNow.list}
+                  live={trendingNow.live}
+                  thisWeekIds={thisWeekTitles}
+                  onOpen={setSelected}
+                />
+              )
             )}
 
             {visible.length === 0 ? (

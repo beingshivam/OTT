@@ -30,7 +30,9 @@
     "ratings": "node scripts/enrich-ratings.mjs",
     "test:omdb": "node scripts/omdb.test.mjs",
     "catalogue": "node scripts/fetch-catalogue.mjs",
-    "eval": "node scripts/eval.mjs"
+    "eval": "node scripts/eval.mjs",
+    "test:rail": "node --test src/lib/justLanded.test.mjs",
+    "e2e": "node scripts/e2e.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
