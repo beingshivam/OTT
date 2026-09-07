@@ -28,7 +28,8 @@
     "title": "node scripts/build-mirzapur.mjs",
     "test:worker": "node worker/index.test.mjs",
     "ratings": "node scripts/enrich-ratings.mjs",
-    "test:omdb": "node scripts/omdb.test.mjs"
+    "test:omdb": "node scripts/omdb.test.mjs",
+    "catalogue": "node scripts/fetch-catalogue.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

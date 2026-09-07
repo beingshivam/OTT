@@ -150,6 +150,29 @@ jobs:
         continue-on-error: true
         run: node scripts/archive.mjs
 
+      # The back catalogue: what is good and streaming now, whatever its age.
+      #
+      # A reader asked for this — a release calendar can only ever answer "what
+      # is new", and half the time the question is "what is worth watching".
+      # It is a separate dataset with a separate shape, deliberately not merged
+      # into the calendar, whose whole promise is that everything on it is new.
+      #
+      # Weekly rather than twice weekly, on the same run as the email: a back
+      # catalogue barely moves, and this is the most expensive step here by an
+      # order of magnitude — roughly a thousand calls, since TMDB can filter by
+      # provider but will not say which one matched, so every title costs one
+      # more call to find out where it actually streams.
+      - name: Fetch the back catalogue
+        id: catalogue
+        if: >-
+          steps.fetch.outcome == 'success' &&
+          (github.event_name != 'schedule' || github.event.schedule == '30 19 * * 4')
+        continue-on-error: true
+        timeout-minutes: 15
+        env:
+          TMDB_TOKEN: ${{ secrets.TMDB_TOKEN || secrets.TMDB_API_KEY }}
+        run: node scripts/fetch-catalogue.mjs --verbose
+
       # The week's email, assembled from the feed that was just rebuilt. A
       # newsletter dies of the Friday it did not get written, so the draft is
       # ready before anyone has to think about it.
@@ -169,9 +192,9 @@ jobs:
         run: node scripts/build-digest.mjs
 
       - name: Note any partial pass
-        if: steps.enrich.outcome == 'failure' || steps.ratings.outcome == 'failure' || steps.logos.outcome == 'failure' || steps.digest.outcome == 'failure' || steps.archive.outcome == 'failure'
+        if: steps.enrich.outcome == 'failure' || steps.ratings.outcome == 'failure' || steps.logos.outcome == 'failure' || steps.catalogue.outcome == 'failure' || steps.digest.outcome == 'failure' || steps.archive.outcome == 'failure'
         run: |
-          echo "::warning title=Refreshed, but not fully enriched::The calendar itself rebuilt and will be published. Enrichment: ${{ steps.enrich.outcome }}. IMDb scores: ${{ steps.ratings.outcome }}. Logos: ${{ steps.logos.outcome }}. Archive: ${{ steps.archive.outcome }}. Email draft: ${{ steps.digest.outcome }}. TMDB drops connections under load, and the next run picks up whatever was missed — no action needed unless it repeats."
+          echo "::warning title=Refreshed, but not fully enriched::The calendar itself rebuilt and will be published. Enrichment: ${{ steps.enrich.outcome }}. IMDb scores: ${{ steps.ratings.outcome }}. Logos: ${{ steps.logos.outcome }}. Archive: ${{ steps.archive.outcome }}. Catalogue: ${{ steps.catalogue.outcome }}. Email draft: ${{ steps.digest.outcome }}. TMDB drops connections under load, and the next run picks up whatever was missed — no action needed unless it repeats."
 
       # Pushing the data is what triggers the Cloudflare build, so this is the
       # step that actually publishes. Rebase first: a human push between the
@@ -180,13 +203,13 @@ jobs:
       - name: Commit the updated calendar
         if: steps.fetch.outcome == 'success'
         run: |
-          if git diff --quiet -- public/data/releases.json public/data/logos.json data/archive.json email; then
+          if git diff --quiet -- public/data/releases.json public/data/logos.json data/archive.json data/catalogue.json email; then
             echo "::notice::Calendar already up to date — nothing to commit."
             exit 0
           fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public/data/releases.json public/data/logos.json data/archive.json email
+          git add public/data/releases.json public/data/logos.json data/archive.json data/catalogue.json email
           git commit -m "chore(data): refresh release calendar"
 
           for attempt in 1 2 3; do
