@@ -340,8 +340,46 @@ async function buildWeek(weekId, platforms, index) {
     }
   }
 
-  const releases = [...byId.values()].sort((a, b) => (b.heat ?? 0) - (a.heat ?? 0));
+  const releases = [...byId.values()]
+    .map(unreleasedCannotBeStreaming)
+    .sort((a, b) => (b.heat ?? 0) - (a.heat ?? 0));
   return { id: weekId, start: from, end: to, releases };
+}
+
+/**
+ * A film that opens in cinemas next month is not already on Prime.
+ *
+ * Reported from the site: "Drishyam: The Conclusion" showed for 2 October with
+ * both a cinema listing and Prime Video. The title, the date and the language
+ * were all right — the Prime badge was not, and it was the kind of wrong that
+ * costs a reader a subscription they did not need.
+ *
+ * The cause is the same property of TMDB this whole calendar is built around:
+ * providers are assigned *after* a title is available, which is why theatrical
+ * dates have to be fetched separately for upcoming weeks to exist at all. Run
+ * that backwards and a provider sitting on a future theatrical row cannot be a
+ * fact about that film — there is nothing yet for anyone to stream. In this
+ * case it is almost certainly the franchise's earlier entries, which really are
+ * on Prime: the Malayalam Drishyam 3 has been streaming there since May, and
+ * the site has that right, in the catalogue, where it belongs.
+ *
+ * Deliberately narrow. A future release with no cinema listing keeps its
+ * platform, because a streaming-only title announced for a date is a real
+ * thing the calendar should carry. Only the contradiction is removed: in
+ * cinemas, not yet out, and somehow also streaming.
+ */
+const TODAY = new Date().toISOString().slice(0, 10);
+
+function unreleasedCannotBeStreaming(row) {
+  if (row.releaseDate <= TODAY) return row;
+  if (!row.platforms.includes('theatres')) return row;
+  const streaming = row.platforms.filter((p) => p !== 'theatres');
+  if (!streaming.length) return row;
+  console.log(
+    `  ${row.title} (${row.releaseDate}) opens in cinemas — dropping ${streaming.join(', ')}, ` +
+      'which TMDB cannot yet know.',
+  );
+  return { ...row, platforms: ['theatres'] };
 }
 
 /**

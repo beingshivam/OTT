@@ -55,6 +55,13 @@ export interface Platform {
  *
  * When a platform goes quiet, its ids have probably gone stale:
  *   npm run providers -- <name>
+ *
+ * MUBI was dropped from the India list. It carried three titles in total and
+ * every one of them was MUBI-only, which meant a whole column, a whole chip and
+ * — because its releases are recent and foreign — the lead card in the poster
+ * row went to a service almost nobody in this audience subscribes to. A
+ * platform earns its place by being somewhere a reader can actually watch the
+ * thing. It stays available for other regions if that ever changes.
  */
 export const PLATFORMS: Platform[] = [
   { id: 'theatres',    name: 'In Theatres',  short: 'Theatres',  mark: '▶',  accent: '#FFC94A', accent2: '#FF8A3D', tmdb: [],           regions: ['IN', 'US'], theatrical: true, homeUrl: 'https://in.bookmyshow.com/', searchUrl: 'https://in.bookmyshow.com/explore/movies?q={q}' },
@@ -68,7 +75,6 @@ export const PLATFORMS: Platform[] = [
   { id: 'hoichoi',     name: 'hoichoi',      short: 'hoichoi',   mark: 'ho',   accent: '#F5333F', accent2: '#FF7A45', tmdb: [315],        regions: ['IN'],       homeUrl: 'https://www.hoichoi.tv/', searchUrl: 'https://www.hoichoi.tv/search?q={q}' },
   { id: 'aha',         name: 'aha',          short: 'aha',       mark: 'aha',  accent: '#FF4E3A', accent2: '#FFA23A', tmdb: [532],        regions: ['IN'],       homeUrl: 'https://www.aha.video/', searchUrl: 'https://www.aha.video/search?query={q}' },
   { id: 'lionsgate',   name: 'Lionsgate Play', short: 'Lionsgate', mark: 'LG', accent: '#C8A24A', accent2: '#F0D488', tmdb: [1898],     regions: ['IN'],       homeUrl: 'https://www.lionsgateplay.com/', searchUrl: 'https://www.lionsgateplay.com/search?q={q}' },
-  { id: 'mubi',        name: 'MUBI',         short: 'MUBI',      mark: 'M',    accent: '#0A5AFF', accent2: '#5B9BFF', tmdb: [11],         regions: ['IN', 'US'], homeUrl: 'https://mubi.com/', searchUrl: 'https://mubi.com/en/search/films?query={q}' },
   { id: 'crunchyroll', name: 'Crunchyroll',  short: 'Crunchyroll', mark: 'CR', accent: '#F47521', accent2: '#FFA95C', tmdb: [283],      regions: ['IN', 'US'], homeUrl: 'https://www.crunchyroll.com/', searchUrl: 'https://www.crunchyroll.com/search?q={q}' },
   { id: 'hbomax',      name: 'HBO Max',      short: 'HBO Max',   mark: 'MAX',  accent: '#8A4BFF', accent2: '#2E6BFF', tmdb: [1899, 384],  regions: ['US'],       homeUrl: 'https://www.max.com/', searchUrl: 'https://www.max.com/search?q={q}' },
   { id: 'hulu',        name: 'Hulu',         short: 'Hulu',      mark: 'hu',   accent: '#1CE783', accent2: '#7CFFC0', tmdb: [15],         regions: ['US'],       homeUrl: 'https://www.hulu.com/', searchUrl: 'https://www.hulu.com/search?q={q}' },

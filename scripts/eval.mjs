@@ -270,6 +270,36 @@ else {
   }
 }
 
+// --- what the calendar claims about the future ------------------------------
+
+const S7 = 'Unreleased titles';
+{
+  /**
+   * Nothing can be streaming before it exists.
+   *
+   * Reported from the live site: a film opening in cinemas on 2 October also
+   * carried a Prime badge. TMDB assigns providers *after* a title is available,
+   * so a provider on a future theatrical row is never a fact about that film —
+   * usually it is the franchise's earlier entries, which really are streaming.
+   * The cost of getting this wrong is somebody paying for a subscription to
+   * watch something that is not there.
+   */
+  const today = new Date().toISOString().slice(0, 10);
+  const contradictions = feedRows.filter(
+    (r) =>
+      r.releaseDate > today &&
+      r.platforms?.includes('theatres') &&
+      r.platforms.some((p) => p !== 'theatres'),
+  );
+  if (!feedRows.length) skip(S7, 'nothing unreleased is also streaming', 'no feed');
+  else
+    contradictions.length
+      ? fail(S7, 'nothing unreleased is also streaming', `${contradictions.length} in cinemas and streaming at once`,
+          contradictions.slice(0, 5).map((r) => `${r.title} — opens ${r.releaseDate}, listed on ${r.platforms.join(', ')}`))
+      : pass(S7, 'nothing unreleased is also streaming',
+          `${feedRows.filter((r) => r.releaseDate > today).length} future rows checked`);
+}
+
 // --- the schedule the site advertises ---------------------------------------
 
 const S6 = 'Refresh schedule';
