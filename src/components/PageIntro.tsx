@@ -221,6 +221,12 @@ export function PageIntro({ route, rows, feed, region, currentWeek, onOpen }: Pr
     route.catalogue ? `/streaming?${param}=${value}` : undefined;
 
   const byPlatform = {
+    /* Named so the mobile stylesheet can drop this one row. It repeats the
+       platform chips that sit directly beneath the intro — same services, same
+       counts, same filtering — and on a phone that duplicate pushed the first
+       title to 80% of the fold. The language split below is not repeated
+       anywhere, so it stays. */
+    kind: 'platform' as const,
     label: 'Mostly on',
     items: tally(scope, (r) => r.platforms)
       .slice(0, 4)
@@ -242,6 +248,7 @@ export function PageIntro({ route, rows, feed, region, currentWeek, onOpen }: Pr
    * how someone who wanted Malayalam specifically gets there from here.
    */
   const byLanguage = (limit: number, only?: string[]) => ({
+    kind: 'language' as const,
     label: 'Languages',
     items: tally(scope, (r) => (r.languages ?? []).filter((l) => !only || only.includes(l)))
       .slice(0, limit)
@@ -340,7 +347,7 @@ export function PageIntro({ route, rows, feed, region, currentWeek, onOpen }: Pr
 
         {crosses.map((cross) =>
           cross.items.length === 0 ? null : (
-            <div className="pageintro__fact" key={cross.label}>
+            <div className="pageintro__fact" data-kind={cross.kind} key={cross.label}>
               <span className="pageintro__label">{cross.label}</span>
               <span className="pageintro__vals">
                 {cross.items.map((i) =>

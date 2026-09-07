@@ -115,6 +115,34 @@ export default function App() {
     }
   }, [view]);
 
+  /**
+   * The one-line explainer, shown to a first visit and then retired.
+   *
+   * It exists because a reader arrived from Instagram and could not tell
+   * whether films played on this page — so it earns its place the first time
+   * and only the first time. On a 390px phone the header stack already spends
+   * 63% of the fold before the first film; a sentence a returning reader has
+   * read and does not need is the cheapest 40px on the page to give back.
+   *
+   * Read once into state rather than checked on every render: flipping it
+   * mid-session would move the board under the reader's thumb.
+   */
+  const [showExplainer] = useState(() => {
+    try {
+      return localStorage.getItem('dropday.seen') !== '1';
+    } catch {
+      // Storage blocked: show it. A sentence twice beats never.
+      return true;
+    }
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem('dropday.seen', '1');
+    } catch {
+      /* As above. */
+    }
+  }, []);
+
   // Restore device preferences before the first paint of real content so the
   // region never visibly flips underneath the user.
   useEffect(() => {
@@ -478,8 +506,17 @@ export default function App() {
         {!isTitlePage && (
         <div className="weekbar__right">
           <span className="weekbar__count">
-            <strong>{facets.total}</strong> releases ·{' '}
-            <strong>{facets.platforms.length}</strong> platforms
+            <strong>{facets.total}</strong> releases
+            {/* Dropped on a phone, where this row has to hold the count, the
+                freshness, Share and the view toggle on one line — and where the
+                chips immediately below name every platform and carry its own
+                count for each. Saying "10 platforms" directly above ten
+                labelled platform chips spends the scarcest space on the page
+                repeating what the next row shows. */}
+            <span className="weekbar__count-plat">
+              {' · '}
+              <strong>{facets.platforms.length}</strong> platforms
+            </span>
           </span>
           {feed && (
             <span
@@ -487,7 +524,12 @@ export default function App() {
               title={`Next refresh ${nextRefreshLabel()}`}
             >
               <i />
-              Updated {relativeTime(feed.generatedAt)}
+              {/* The word goes on a phone, where this row must hold four things
+                  on one line. A live green dot followed by "3h ago" still reads
+                  as freshness; the full sentence stays in the title and on every
+                  wider screen. */}
+              <span className="weekbar__fresh-word">Updated </span>
+              {relativeTime(feed.generatedAt)}
             </span>
           )}
           {/* The share card names the week it was made from, which is a true
@@ -548,11 +590,10 @@ export default function App() {
           titles, and a reader wrote in genuinely unsure whether she could
           watch things here. One quiet line, on the page a first visit lands
           on. The route pages have PageIntro doing this job already. */}
-      {!route && (
+      {!route && showExplainer && (
         <div className="shell">
         <p className="explainer">
-          Everything releasing this week — tap any title to see where it's streaming and open it
-          there. Nothing plays on this page.
+          Everything releasing this week — tap a title to see where to watch it.
         </p>
         </div>
       )}

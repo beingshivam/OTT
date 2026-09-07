@@ -75,7 +75,13 @@ export function ShareWeek({ releases, filters }: Props) {
       aria-label="Share this week as an image"
     >
       {state === 'done' ? <IconCheck /> : <IconShare />}
-      {state === 'working' ? 'Rendering…' : state === 'error' ? 'Try again' : 'Share'}
+      {/* The word drops away on a phone, where this button sat on a line of its
+          own and pushed the first film below the fold. Sharing the week is
+          something you do after reading it; the icon and the aria-label carry
+          it until then. */}
+      <span className="btn__text">
+        {state === 'working' ? 'Rendering…' : state === 'error' ? 'Try again' : 'Share'}
+      </span>
     </button>
   );
 }
