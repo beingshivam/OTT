@@ -41,6 +41,7 @@ jobs:
       # GITHUB_SHA is already in the environment, so the build stamps itself
       # with the commit being deployed and /build.txt can be checked afterwards.
       - name: Build
+        id: build
         run: npm run build
 
       - name: Check for Cloudflare credentials
@@ -67,24 +68,54 @@ jobs:
         # deploy that breaks on a day you changed nothing.
         run: npx --yes wrangler@4 deploy
 
-      # Closes the loop the whole exercise was about. The deployed site serves
-      # the commit it was built from at /build.txt, so this asks the live URL
-      # what it is running and fails if that is not this commit — no more
-      # inferring a deploy from whether a visual change showed up.
+      # Closes the loop the whole exercise was about — and it is not gated on
+      # the Cloudflare credentials, because it does not need them. It is an HTTP
+      # GET against the live site, and the thing most worth catching is exactly
+      # the case where *this* job published nothing: the dashboard's own Workers
+      # Build is what deploys, and until now nothing checked what it produced.
+      # Fifty-two runs reported success while this step sat skipped.
       - name: Verify what is actually live
-        if: steps.creds.outputs.ready == 'true'
+        if: always() && steps.build.outcome == 'success'
         env:
-          SITE: ${{ vars.DEPLOY_CHECK_URL || 'https://dropday.newreleases.workers.dev' }}
+          SITE: ${{ vars.DEPLOY_CHECK_URL || 'https://newonott.in' }}
         run: |
-          echo "Asking $SITE/build.txt which commit it is serving…"
-          for attempt in 1 2 3 4 5; do
+          echo "Asking $SITE what it is serving…"
+
+          # 1. Is it serving this commit? Workers Builds may land after this job
+          #    starts, so give it a few minutes before calling it a failure.
+          live=""
+          for attempt in 1 2 3 4 5 6; do
             live=$(curl -fsS --max-time 20 "$SITE/build.txt" | awk '/^commit/ { print $2 }' || true)
-            if [ "$live" = "$GITHUB_SHA" ]; then
-              echo "::notice title=Deploy confirmed::$SITE is serving ${GITHUB_SHA:0:8}."
-              exit 0
-            fi
+            [ "$live" = "$GITHUB_SHA" ] && break
             echo "  attempt $attempt: live=${live:-<no build.txt>} want=${GITHUB_SHA:0:8} — waiting"
-            sleep $((attempt * 10))
+            sleep $((attempt * 15))
           done
-          echo "::error title=Deployed, but the site is not serving it::wrangler reported success, yet $SITE/build.txt still reports '${live:-nothing}' rather than ${GITHUB_SHA:0:8}. Either an edge cache is holding the old page or another deploy overwrote this one."
-          exit 1
+
+          # 2. Does the app actually boot? Every page ships prerendered markup
+          #    that React replaces on mount, so a broken bundle does not 404 —
+          #    it renders the fallback, which looks like a plain unstyled list of
+          #    titles and is easy to mistake for a styling bug. With the SPA
+          #    fallback on, a missing asset is served index.html instead, and the
+          #    browser refuses to run HTML as a module. So: fetch the bundle the
+          #    page references and check it came back as JavaScript.
+          html=$(curl -fsS --max-time 20 "$SITE/" || true)
+          asset=$(printf '%s' "$html" | grep -o '/assets/index-[A-Za-z0-9_-]*\.js' | head -1)
+          if [ -z "$asset" ]; then
+            echo "::error title=No script tag::$SITE/ does not reference an app bundle at all."
+            exit 1
+          fi
+          ctype=$(curl -fsS --max-time 20 -o /dev/null -w '%{content_type}' "$SITE$asset" || true)
+          echo "  bundle $asset -> ${ctype:-<unreachable>}"
+          case "$ctype" in
+            *javascript*|*ecmascript*) ;;
+            *)
+              echo "::error title=The app cannot boot::$SITE$asset came back as '${ctype:-nothing}' rather than JavaScript. The SPA fallback serves index.html for assets that are missing, so the browser refuses to execute it and the page renders its prerendered fallback — a plain unstyled list of titles. The deploy is missing its assets."
+              exit 1
+              ;;
+          esac
+
+          if [ "$live" != "$GITHUB_SHA" ]; then
+            echo "::error title=Live site is not this commit::$SITE/build.txt reports '${live:-nothing}' rather than ${GITHUB_SHA:0:8}. The bundle loads, so the site works — it is just serving an older deploy."
+            exit 1
+          fi
+          echo "::notice title=Deploy confirmed::$SITE is serving ${GITHUB_SHA:0:8} and its bundle loads as $ctype."
