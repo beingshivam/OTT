@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-07T04:48:54.720Z",
+  "generatedAt": "2026-09-07T08:49:55.536Z",
   "source": "tmdb",
   "weeks": [
     {
@@ -27,7 +27,7 @@
             "IN"
           ],
           "rating": 8.3,
-          "votes": 270,
+          "votes": 277,
           "heat": 84,
           "synopsis": "Two intergalactic cops, new recruit John Stewart and Lantern legend Hal Jordan, are drawn into a dark, Earth-based mystery as they investigate a murder in the American heartland.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/gpC7h43xPMEV3goYMQShfJbTtLq.jpg",
@@ -424,7 +424,9 @@
             "Jeramy Ritchie"
           ],
           "director": "Clay Tatum",
-          "trailerUrl": "https://www.youtube.com/watch?v=8dYHRyOtVBs"
+          "trailerUrl": "https://www.youtube.com/watch?v=8dYHRyOtVBs",
+          "imdbRating": 5.8,
+          "imdbVotes": 49
         },
         {
           "id": "m-1036081",
@@ -1777,7 +1779,7 @@
             "US"
           ],
           "rating": 8.8,
-          "votes": 548,
+          "votes": 558,
           "heat": 84,
           "synopsis": "Two Mexican officers must survive the final hours of their shift after crossing a ruthless cartel boss.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/alpf5v4UqSFawPmG9RX03Or4BDk.jpg",
@@ -1893,7 +1895,7 @@
             "US"
           ],
           "rating": 6.8,
-          "votes": 479,
+          "votes": 488,
           "heat": 77,
           "synopsis": "When his young son vanishes, a widower enlists help from his estranged father, a retired detective who put away the serial killer now linked to the case.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/6UqflU8Qqkz7Dq4swJPqs0ZJjY4.jpg",
@@ -1931,7 +1933,7 @@
             "US"
           ],
           "rating": 6.5,
-          "votes": 110,
+          "votes": 114,
           "heat": 64,
           "synopsis": "Gemma, a young mother raising her daughter in the house she grew up in, discovers she can travel into The Further, where she possesses an ability to bring what lives there back to the real world.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/4tTrW9dXCByS5wt2pXVWb58zNjz.jpg",
@@ -2008,8 +2010,8 @@
             "IN",
             "US"
           ],
-          "rating": 7.6,
-          "votes": 7,
+          "rating": 7.7,
+          "votes": 8,
           "heat": 59,
           "synopsis": "New to Beijing, Shang Zhitao crosses paths with Luan Nian, a true creative genius. Bold and open-hearted, she grows stronger step by step and gradually breaks through the defenses around Luan's guarded heart. Drawn to each other, they find themselves caught in an intense, on-again, off-again relationship in the urban jungle. To love is to summon all your courage and leave no regrets, to heal each other, and to grow together. But when love and her career pull her in different directions, she puts her career first. When she has come into her own and he has learned to soften his sharp edges, they finally stand as equals, ready to write a new ending together...",
           "posterUrl": "https://image.tmdb.org/t/p/w500/yiAzR6wGqjyAotZ4DvFvFeo8QS0.jpg",
@@ -2388,8 +2390,8 @@
             "IN",
             "US"
           ],
-          "rating": 7.9,
-          "votes": 27,
+          "rating": 7.7,
+          "votes": 29,
           "heat": 34,
           "synopsis": "What happened to Mica Miller? This documentary series retraces her promising life, toxic marriage and the mysterious circumstances of her death.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/o8H6HmQNt2qx5bIfmvuI6VJn13A.jpg",
@@ -2458,7 +2460,7 @@
             "US"
           ],
           "rating": 6.8,
-          "votes": 25,
+          "votes": 26,
           "heat": 31,
           "synopsis": "Four lifelong friends realize that somewhere between careers, relationships, families, and everyday responsibilities, they’ve forgotten how to take care of themselves and each other. Burned out and overdue for a break, the women escape to a luxury spa retreat for an unforgettable weekend dedicated to fun, laughter, and a lot of really bad decisions.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/i3I19SbOyz6AIl0cSYdyVJRucMr.jpg",
@@ -2540,7 +2542,9 @@
             "Abdool Lee"
           ],
           "director": "Raja Karuppasamy",
-          "certification": "UA"
+          "certification": "UA",
+          "imdbRating": 8.9,
+          "imdbVotes": 1175
         },
         {
           "id": "m-1422011",
@@ -3012,8 +3016,8 @@
           ],
           "director": "Andrius Blaževičius",
           "trailerUrl": "https://www.youtube.com/watch?v=36eO2GEf0Qs",
-          "imdbRating": 7,
-          "imdbVotes": 121
+          "imdbRating": 6.8,
+          "imdbVotes": 222
         },
         {
           "id": "m-1756360",
@@ -3260,7 +3264,9 @@
             "Malavika Avinash",
             "Balaji Thiyagarajan"
           ],
-          "director": "Ramachandrran Kannan"
+          "director": "Ramachandrran Kannan",
+          "imdbRating": 6.6,
+          "imdbVotes": 6203
         },
         {
           "id": "m-1756456",
@@ -3534,7 +3540,7 @@
             "US"
           ],
           "rating": 7.6,
-          "votes": 184,
+          "votes": 193,
           "heat": 95,
           "synopsis": "After Acme products fail him one too many times in his dogged pursuit of the Roadrunner, Wile E. Coyote decides to hire a billboard lawyer to sue the Acme Corporation.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/orkLtdgMGiO9rTVMqJ1kKwrnup1.jpg",
@@ -3690,7 +3696,7 @@
             "US"
           ],
           "rating": 6.7,
-          "votes": 214,
+          "votes": 216,
           "heat": 68,
           "synopsis": "After the world's population has been ravaged by a pandemic, a man lives a lonesome existence in a Colorado airplane hangar with his dog and a dour gunman he has befriended. When a mysterious transmission comes through on the radio while he’s flying his old Cessna, it sparks a hunt for the provenance of the sound.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/5O616X9vmRzQdB68PHzBewPittd.jpg",
@@ -3767,8 +3773,8 @@
             "IN",
             "US"
           ],
-          "rating": 6.3,
-          "votes": 64,
+          "rating": 6.4,
+          "votes": 68,
           "heat": 65,
           "synopsis": "After discovering she has a family and a shipping empire, a woman with amnesia returns to a wealthy and seemingly perfect past to uncover why she left.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/5FC5vUHFz0fbJOd0bhyzJpCSLrc.jpg",
@@ -3962,8 +3968,8 @@
             "IN",
             "US"
           ],
-          "rating": 7.2,
-          "votes": 18,
+          "rating": 7.1,
+          "votes": 19,
           "heat": 49,
           "synopsis": "The Mandalorian and Grogu join their misfit allies for an epic party, celebrating their heroism. As friends regale the crowd with tales of their adventures, a pirate threat looms.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/x3HEvYXWOW6WHqsHmg2MUVy3SLm.jpg",
@@ -4076,8 +4082,8 @@
           "regions": [
             "US"
           ],
-          "rating": 8.3,
-          "votes": 35,
+          "rating": 8.4,
+          "votes": 37,
           "heat": 47,
           "synopsis": "A magical, singing orange unicorn holds his cast hostage in a surreal TV-show dimension, as he becomes more and more demented.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/6Lh4ZlsAISFQFVfLZ90sE9ycVnN.jpg",
@@ -4258,8 +4264,8 @@
             "IN",
             "US"
           ],
-          "rating": 7,
-          "votes": 6,
+          "rating": 6.9,
+          "votes": 7,
           "heat": 33,
           "synopsis": "A quarter-century after September 11th, the attacks' ripple effects persist across generations. Orphaned children, War on Terror journalists, young Afghans, and U.S. Marines shaped by the 2021 withdrawal share their stories.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/fSPbxVI1q5sCS4fegzoFByzE749.jpg",
@@ -4816,7 +4822,9 @@
             "Prabhu",
             "Radhika Sarathkumar"
           ],
-          "director": "Vishnu Edavan"
+          "director": "Vishnu Edavan",
+          "imdbRating": 9.2,
+          "imdbVotes": 2968
         },
         {
           "id": "m-1417935",
@@ -4851,7 +4859,9 @@
             "Isabel Sicat"
           ],
           "director": "Rafael Manuel",
-          "trailerUrl": "https://www.youtube.com/watch?v=Mq-7rJqNJ4I"
+          "trailerUrl": "https://www.youtube.com/watch?v=Mq-7rJqNJ4I",
+          "imdbRating": 6.5,
+          "imdbVotes": 196
         },
         {
           "id": "m-1684016",
@@ -4916,7 +4926,9 @@
             "Narendra Ravi"
           ],
           "director": "Venu Gopal Reddy",
-          "trailerUrl": "https://www.youtube.com/watch?v=SuHxIe7g-i4"
+          "trailerUrl": "https://www.youtube.com/watch?v=SuHxIe7g-i4",
+          "imdbRating": 6.7,
+          "imdbVotes": 18
         },
         {
           "id": "m-1475440",
@@ -5144,7 +5156,9 @@
           ],
           "director": "Samik Roy Choudhury",
           "trailerUrl": "https://www.youtube.com/watch?v=rh7APdRlv4I",
-          "certification": "U/A 16+"
+          "certification": "U/A 16+",
+          "imdbRating": 9.6,
+          "imdbVotes": 430
         },
         {
           "id": "t-333575",
@@ -5301,7 +5315,7 @@
             "finale": true
           },
           "posterUrl": "https://image.tmdb.org/t/p/w500/gMYZZvnkVNTqSVnVCphWbPXwWwb.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w1280/uTWhbLc7Bj4qNSdW3ZvZKL8cOHv.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w1280/4XccmjsOmQZw8S2iW1wvlvmb5v1.jpg",
           "synopsis": "In a ruined and toxic future, thousands live in a giant silo deep underground. After its sheriff breaks a cardinal rule and residents die mysteriously, engineer Juliette starts to uncover shocking secrets and the truth about the silo.",
           "rating": 8.2,
           "cast": [
@@ -5313,7 +5327,7 @@
           ],
           "trailerUrl": "https://www.youtube.com/watch?v=8ZYhuvIv1pA",
           "certification": "A",
-          "votes": 2592,
+          "votes": 2595,
           "imdbId": "tt14688458",
           "imdbRating": 8.1,
           "imdbVotes": 218324
@@ -5465,8 +5479,8 @@
           ],
           "heat": 76,
           "sample": true,
-          "posterUrl": "https://image.tmdb.org/t/p/w500/7tlkTHxcTSlrPYURo0VuglaLPXv.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w1280/lsouhNVm05pazPBDhpqs0KXNbmz.jpg",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/hVXjX1jLZ1ljFSNGXpjJfbTUOa7.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w1280/4gyx49ibwQslyrwuUS1c58PJEEd.jpg",
           "synopsis": "When a U.S. Navy pilot on a top-secret mission during the Cold War gets trapped behind enemy lines, his only chance at survival is to form an alliance with an eccentric ex-KGB agent.",
           "runtimeMinutes": 110,
           "cast": [
@@ -5557,7 +5571,7 @@
           ],
           "director": "David Mackenzie",
           "trailerUrl": "https://www.youtube.com/watch?v=1aNywiElPSY",
-          "votes": 360,
+          "votes": 363,
           "imdbId": "tt31189814",
           "imdbRating": 6.4,
           "imdbVotes": 1075
@@ -5631,7 +5645,9 @@
           "synopsis": "Jeevan and Yojna are a couple drowning in debt who hatch an insurance scheme after crossing paths with Bheema, a stranger who bears a striking resemblance to Jeevan - but things spiral out of control when he turns out to be tangled up in a diamond smuggling racket.",
           "runtimeMinutes": 120,
           "certification": "U/A 16+",
-          "imdbId": "tt19132352"
+          "imdbId": "tt19132352",
+          "imdbRating": 7.9,
+          "imdbVotes": 22
         },
         {
           "id": "nf-gdn",
@@ -5690,7 +5706,8 @@
           ],
           "heat": 64,
           "sample": true,
-          "synopsis": "Lord Jagannath, a form of Hindu God Vishnu venerated across Odisha and widely worshipped throughout India, is the presiding deity of the 12th-century Puri temple and the subject of the annual Rath Yatra chariot festival, one of the country’s largest religious gatherings."
+          "synopsis": "Lord Jagannath, a form of Hindu God Vishnu venerated across Odisha and widely worshipped throughout India, is the presiding deity of the 12th-century Puri temple and the subject of the annual Rath Yatra chariot festival, one of the country’s largest religious gatherings.",
+          "runtimeMinutes": 104
         },
         {
           "id": "sn-dc-bloody-valentine",
@@ -6154,8 +6171,8 @@
           "regions": [
             "US"
           ],
-          "rating": 6.5,
-          "votes": 12,
+          "rating": 6.3,
+          "votes": 15,
           "heat": 38,
           "synopsis": "When a rogue squad of genetically engineered super soldiers break loose in the desert, a badass Army sniper must unleash hell to protect her young daughter.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/cOGtvhc6Ij9KvzM6jZsfQyg0B0O.jpg",
@@ -6719,7 +6736,9 @@
             "Teja Velpucharla",
             "Shekar Chandra"
           ],
-          "director": "Nishanth Doti"
+          "director": "Nishanth Doti",
+          "imdbRating": 9.3,
+          "imdbVotes": 13
         },
         {
           "id": "m-1744783",
@@ -6994,8 +7013,8 @@
           "regions": [
             "US"
           ],
-          "rating": 6.2,
-          "votes": 7,
+          "rating": 6.7,
+          "votes": 8,
           "heat": 38,
           "synopsis": "The Owens sisters must confront the dark curse that threatens to unravel their family once and for all.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/7jCV8dkRFK3DGJ4dTqlvrMTFPwZ.jpg",
@@ -7470,7 +7489,9 @@
             "Ellie Shaddix"
           ],
           "director": "Padraig Reynolds",
-          "trailerUrl": "https://www.youtube.com/watch?v=mvSxjFkBdK4"
+          "trailerUrl": "https://www.youtube.com/watch?v=mvSxjFkBdK4",
+          "imdbRating": 8.4,
+          "imdbVotes": 138
         },
         {
           "id": "m-1049064",
@@ -10999,7 +11020,7 @@
         "US"
       ],
       "rating": 8.1,
-      "votes": 3232,
+      "votes": 3233,
       "heat": 96,
       "synopsis": "Jack Reacher, a veteran military police investigator, has just recently entered civilian life. Reacher is a drifter, carrying no phone and the barest of essentials as he travels the country and explores the nation he once served.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/f1VCQIG2iCyOookdgOzwtUpwWC0.jpg",
@@ -11025,7 +11046,7 @@
         "US"
       ],
       "rating": 8.2,
-      "votes": 2595,
+      "votes": 2596,
       "heat": 90,
       "synopsis": "In a ruined and toxic future, thousands live in a giant silo deep underground. After its sheriff breaks a cardinal rule and residents die mysteriously, engineer Juliette starts to uncover shocking secrets and the truth about the silo.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/gMYZZvnkVNTqSVnVCphWbPXwWwb.jpg",
@@ -11078,7 +11099,7 @@
         "US"
       ],
       "rating": 6.7,
-      "votes": 292,
+      "votes": 299,
       "heat": 85,
       "synopsis": "Maia Marten, a brilliant London lawyer, has her life shattered by a single call on her morning run: her son has been taken. To get him back, she must keep running, obey every ruthless command, and trust no one-each second a test of how far a mother will go to save her child.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/uxCaBoYXsDC4A0SqTm3SISj0OwK.jpg",
@@ -11103,7 +11124,7 @@
         "US"
       ],
       "rating": 8.2,
-      "votes": 5343,
+      "votes": 5346,
       "heat": 85,
       "synopsis": "After breaking the mysterious \"One Wish Willow\" to win his crush's heart, a hopeless romantic finds himself getting exactly what he asked for but soon discovers that some desires come at a dark, sinister price.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/bRwnj8WEKBCvmfeUNOukJPwB43K.jpg",
@@ -11129,7 +11150,7 @@
         "IN"
       ],
       "rating": 8.3,
-      "votes": 276,
+      "votes": 277,
       "heat": 84,
       "synopsis": "Two intergalactic cops, new recruit John Stewart and Lantern legend Hal Jordan, are drawn into a dark, Earth-based mystery as they investigate a murder in the American heartland.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/gpC7h43xPMEV3goYMQShfJbTtLq.jpg",
@@ -11183,10 +11204,10 @@
         "US"
       ],
       "rating": 8,
-      "votes": 234,
+      "votes": 246,
       "heat": 84,
       "synopsis": "When a U.S. Navy pilot on a top-secret mission during the Cold War gets trapped behind enemy lines, his only chance at survival is to form an alliance with an eccentric ex-KGB agent.",
-      "posterUrl": "https://image.tmdb.org/t/p/w500/7tlkTHxcTSlrPYURo0VuglaLPXv.jpg",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/hVXjX1jLZ1ljFSNGXpjJfbTUOa7.jpg",
       "backdropUrl": "https://image.tmdb.org/t/p/w780/4gyx49ibwQslyrwuUS1c58PJEEd.jpg"
     },
     {
@@ -11214,7 +11235,7 @@
         "US"
       ],
       "rating": 8.4,
-      "votes": 2261,
+      "votes": 2262,
       "heat": 80,
       "synopsis": "For as long as he can remember, Ichigo Kurosaki has been able to see ghosts. But when he meets Rukia, a Soul Reaper who battles evil spirits known as Hollows, he finds his life is changed forever. Now, with a newfound wealth of spiritual energy, Ichigo discovers his true calling: to protect the living and the dead from evil.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/2EewmxXe72ogD0EaWM8gqa0ccIw.jpg",
@@ -11241,7 +11262,7 @@
         "US"
       ],
       "rating": 6.8,
-      "votes": 486,
+      "votes": 488,
       "heat": 77,
       "synopsis": "When his young son vanishes, a widower enlists help from his estranged father, a retired detective who put away the serial killer now linked to the case.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/6UqflU8Qqkz7Dq4swJPqs0ZJjY4.jpg",
@@ -11267,43 +11288,13 @@
         "IN"
       ],
       "rating": 7.1,
-      "votes": 3152,
+      "votes": 3154,
       "heat": 73,
       "synopsis": "A strange doorway appears in the basement of a furniture showroom.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/rhGx6E3qRNMgj3i5su2oukNHwIQ.jpg",
       "backdropUrl": "https://image.tmdb.org/t/p/w780/dqmMWNWfLnExDRpMtIMqI97GQFR.jpg"
-    },
-    {
-      "id": "trend-t-37854",
-      "title": "One Piece",
-      "kind": "anime",
-      "platforms": [
-        "crunchyroll",
-        "sonyliv",
-        "netflix",
-        "hulu"
-      ],
-      "languages": [
-        "ja"
-      ],
-      "genres": [
-        "Action & Adventure",
-        "Comedy",
-        "Animation"
-      ],
-      "releaseDate": "1999-10-20",
-      "regions": [
-        "IN",
-        "US"
-      ],
-      "rating": 8.7,
-      "votes": 5525,
-      "heat": 70,
-      "synopsis": "Years ago, the fearsome Pirate King, Gol D. Roger was executed leaving a huge pile of treasure and the famous \"One Piece\" behind. Whoever claims the \"One Piece\" will be named the new King of the Pirates.\n\nMonkey D. Luffy, a boy who consumed a \"Devil Fruit,\" decides to follow in the footsteps of his idol, the pirate Shanks, and find the One Piece. It helps, of course, that his body has the properties of rubber and that he's surrounded by a bevy of skilled fighters and thieves to help him along the way.\n\nLuffy will do anything to get the One Piece and become King of the Pirates!",
-      "posterUrl": "https://image.tmdb.org/t/p/w500/dB4EDhre2dsC2kxYDavyKWqLQwi.jpg",
-      "backdropUrl": "https://image.tmdb.org/t/p/w780/2rmK7mnchw9Xr3XdiTFSxTTLXqv.jpg"
     }
   ],
-  "enrichedAt": "2026-09-07T04:49:49.871Z",
-  "ratedAt": "2026-09-07T04:50:10.999Z"
+  "enrichedAt": "2026-09-07T08:50:42.081Z",
+  "ratedAt": "2026-09-07T08:50:59.865Z"
 }
