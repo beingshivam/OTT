@@ -405,11 +405,6 @@ a {
   border-bottom: 1px solid var(--line);
   margin-bottom: 28px;
 }
-.controls__row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
 
 .search {
   position: relative;
@@ -1069,6 +1064,126 @@ a {
   margin-top: 1px;
 }
 
+/* ------------------------------------------------- board heading ---- */
+
+/**
+ * The row that used to be four bands.
+ *
+ * It carries what the board is (the week, or the lens), how much of it there
+ * is, how fresh it is, how to step it, how to render it and how to narrow it —
+ * all of which describe the board and none of which belonged at the top of the
+ * page. Sticky, because every one of those stays useful while the board is
+ * being scrolled.
+ */
+.controls__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.controls__heading {
+  margin: 0;
+  font-size: 14.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.controls__count {
+  font-weight: 500;
+  color: var(--text-3);
+}
+
+.controls__fresh {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  font-size: 11.5px;
+  color: var(--text-3);
+}
+.controls__fresh i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #3ddc97;
+  flex: none;
+}
+
+/* The stepper, the layout toggle and Filters sit together at the far end, away
+   from the label they act on — one group of verbs, one label. */
+.controls__row .weeknav {
+  display: inline-flex;
+  gap: 4px;
+  flex: none;
+  margin-left: auto;
+}
+.controls__row .btn,
+.controls__row .viewtoggle {
+  flex: none;
+}
+.controls__row .weeknav + .viewtoggle,
+.controls__row .weeknav + .btn {
+  margin-left: 0;
+}
+.controls__row > .viewtoggle:not(.weeknav + *),
+.controls__row > .btn:not(.weeknav + *):not(.viewtoggle + *) {
+  margin-left: auto;
+}
+.viewtoggle button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.viewtoggle svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ------------------------------------------------- header search ---- */
+
+.searchbox {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+.searchbox[data-open] {
+  flex: 1 1 220px;
+  max-width: 340px;
+}
+.searchbox__toggle {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text-2);
+}
+.searchbox__toggle:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+.searchbox__toggle svg {
+  width: 16px;
+  height: 16px;
+}
+.searchbox .search {
+  flex: 1 1 auto;
+  max-width: none;
+}
+
+/* Share, at the end of what it shares. */
+.shareout {
+  display: flex;
+  justify-content: center;
+  margin: 8px 0 4px;
+}
+
 /* ---------------------------------------------------------- just landed ---- */
 
 /**
@@ -1087,9 +1202,9 @@ a {
 .landed {
   margin-bottom: 20px;
 }
-/* Inside a page intro the row follows a sentence rather than a band of chips,
-   and without this the heading sits directly on the line above it. */
-.pageintro .landed {
+/* The row always follows something that has just spoken — a lens control, or
+   the sentence naming the page — so it needs a beat before it starts. */
+.landed {
   margin-top: 16px;
 }
 
@@ -2311,6 +2426,34 @@ a {
   .controls {
     padding-block: 8px;
     margin-bottom: 16px;
+  }
+  /**
+   * The heading row, trimmed to what only it can say.
+   *
+   * At 390px it holds a freshness dot, the week, a count, two stepper arrows, a
+   * two-way layout toggle and Filters — 28px more than the line has. Rather
+   * than let any of them wrap into a second band (which is the thing this whole
+   * change exists to remove), each control drops the part the page says
+   * elsewhere: the count is on every board column already, "ago" is legible
+   * from a live green dot, and rows-versus-grid is the most established icon
+   * pair in software.
+   */
+  .controls__count,
+  .controls__fresh-label,
+  .controls__row .viewtoggle .btn__text,
+  .controls__row .btn .btn__text {
+    display: none;
+  }
+  .controls__row {
+    gap: 6px;
+  }
+  .controls__heading {
+    font-size: 13.5px;
+    min-width: 0;
+  }
+  .controls__row .weeknav__btn {
+    width: 28px;
+    height: 28px;
   }
   .chips {
     padding-block: 8px 2px;

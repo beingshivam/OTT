@@ -1,7 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
-import { IconChevronDown, IconClose, IconSearch, IconSliders } from './icons';
+import { useState } from 'react';
+import {
+  IconChevronDown,
+  IconChevronLeft,
+  IconChevronRight,
+  IconGrid,
+  IconRows,
+  IconSliders,
+} from './icons';
 import { PlatformLogo } from './PlatformLogo';
-import { KIND_LABEL, languageName, platform } from '../data/platforms';
+import { KIND_LABEL, REGIONS, languageName, platform } from '../data/platforms';
 import { activeFilterCount, toggle } from '../lib/filters';
 import type { Filters, SortKey, TitleKind } from '../types';
 
@@ -13,12 +20,53 @@ interface Facets {
   total: number;
 }
 
+/**
+ * The board's own heading, and the controls that act on it.
+ *
+ * These used to live in the page header: the week in one band, the count and
+ * freshness in another, the view toggle beside them, filters and sort in a
+ * third. Six bands stood between a phone and the first film, and every one of
+ * them described the board while sitting nowhere near it.
+ *
+ * Position is what makes a control legible. A view toggle at the top of the
+ * page reads as a mode switch for everything on it — which stopped being true
+ * the moment a poster rail appeared above the board. Sitting on the board's own
+ * heading, it says what it actually does: this is how *this list* renders.
+ * Same for the week, which labels the board rather than the page, and for the
+ * filters, which narrow the board and nothing else.
+ */
 interface Props {
   filters: Filters;
   facets: Facets;
   resultCount: number;
   onChange: (next: Partial<Filters>) => void;
   onReset: () => void;
+  /** What the board below is showing: "4–10 Sep 2026", or "649 titles" on a
+   *  lens whose intro has already named it a line above. */
+  heading: string;
+  /** False where `heading` is already the count, so it is not printed twice. */
+  showCount?: boolean;
+  /** Absent on a lens with no weeks to step through — a month, the catalogue.
+   *  `today` is present only when the reader has stepped away from the current
+   *  week: two arrows will get them back eventually, and a way back in one tap
+   *  is the difference between a stepper you explore and one you avoid. */
+  step?: {
+    back: () => void;
+    forward: () => void;
+    canBack: boolean;
+    canForward: boolean;
+    today?: () => void;
+  };
+  /** How fresh the data is, phrased by the caller. */
+  freshness?: { label: string; title: string };
+  view: 'board' | 'grid';
+  onView: (v: 'board' | 'grid') => void;
+  /** Which country's calendar this is. Down here rather than in the header
+   *  because it is guessed correctly for almost everyone, changed roughly once
+   *  per device, and was spending permanent header width to say "India" to
+   *  people who live in India. */
+  region: string;
+  onRegion: (code: string) => void;
 }
 
 // Results are always grouped by release day — that calendar spine is the product.
@@ -57,76 +105,89 @@ function Chip({
   );
 }
 
-export function Controls({ filters, facets, resultCount, onChange, onReset }: Props) {
+export function Controls({
+  filters,
+  facets,
+  resultCount,
+  onChange,
+  onReset,
+  heading,
+  showCount = true,
+  step,
+  freshness,
+  view,
+  onView,
+  region,
+  onRegion,
+}: Props) {
   const [open, setOpen] = useState(false);
-  const searchRef = useRef<HTMLInputElement>(null);
   const active = activeFilterCount(filters);
-
-  // "/" to search, Escape to bail — the shortcuts power users try first.
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      const el = document.activeElement;
-      const typing = el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement;
-      if (e.key === '/' && !typing) {
-        e.preventDefault();
-        searchRef.current?.focus();
-      }
-      if (e.key === 'Escape' && typing) searchRef.current?.blur();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, []);
 
   return (
     <div className="controls">
       <div className="shell">
         <div className="controls__row">
-          <div className="search">
-            <IconSearch />
-            <input
-              ref={searchRef}
-              type="search"
-              placeholder="Search titles, cast, genres"
-              value={filters.query}
-              onChange={(e) => onChange({ query: e.target.value })}
-              aria-label="Search this week's releases"
-            />
-            {filters.query ? (
-              <button
-                className="search__clear"
-                onClick={() => onChange({ query: '' })}
-                aria-label="Clear search"
-              >
-                <IconClose />
-              </button>
-            ) : (
-              <kbd>/</kbd>
-            )}
-          </div>
+          {freshness && (
+            <span className="controls__fresh" title={freshness.title}>
+              <i />
+              <span className="controls__fresh-label">{freshness.label}</span>
+            </span>
+          )}
+          <h2 className="controls__heading">
+            {heading}
+            {showCount && <span className="controls__count"> · {facets.total} titles</span>}
+          </h2>
 
-          <button className="btn" data-active={open} onClick={() => setOpen((v) => !v)}>
+          {step && (
+            <span className="weeknav" role="group" aria-label="Change week">
+              <button className="weeknav__btn" onClick={step.back} disabled={!step.canBack} aria-label="Previous week">
+                <IconChevronLeft />
+              </button>
+              <button className="weeknav__btn" onClick={step.forward} disabled={!step.canForward} aria-label="Next week">
+                <IconChevronRight />
+              </button>
+              {step.today && (
+                <button className="weeknav__today" onClick={step.today}>
+                  This week
+                </button>
+              )}
+            </span>
+          )}
+
+          {/*
+            Icons on a phone, words on a desktop — the same trade the Share
+            button makes. Rows and a grid are the two most legible icons in
+            software, and at 390px the words cost more than they explain.
+            aria-pressed rather than a visual state alone, because this is a
+            two-way toggle and a screen reader has no colour to read.
+          */}
+          <span className="viewtoggle" role="group" aria-label="Layout">
+            <button data-on={view === 'board'} aria-pressed={view === 'board'} onClick={() => onView('board')}>
+              <IconRows />
+              <span className="btn__text">Board</span>
+            </button>
+            <button data-on={view === 'grid'} aria-pressed={view === 'grid'} onClick={() => onView('grid')}>
+              <IconGrid />
+              <span className="btn__text">Posters</span>
+            </button>
+          </span>
+
+          <button className="btn" data-active={open} onClick={() => setOpen((v) => !v)} aria-expanded={open}>
             <IconSliders />
             <span className="btn__text">Filters</span>
             {active > 0 && <span className="btn__count">{active}</span>}
           </button>
-
-          <div className="sort">
-            <select
-              value={filters.sort}
-              onChange={(e) => onChange({ sort: e.target.value as SortKey })}
-              aria-label="Sort releases"
-            >
-              {SORTS.map((s) => (
-                <option key={s.value} value={s.value}>
-                  {s.label}
-                </option>
-              ))}
-            </select>
-            <IconChevronDown />
-          </div>
         </div>
 
-        {/* Platform is the filter people reach for first, so it never hides in a panel. */}
+        {/*
+          Platform chips, in the poster view only.
+          
+          In board view every platform is already a labelled column carrying its
+          own count, so a row of platform chips directly above it spent 44px
+          restating the next section. The grid has no columns and no other
+          platform wayfinding, which is exactly where they earn their place.
+        */}
+        {view === 'grid' && (
         <div className="chips" role="group" aria-label="Filter by platform">
           {facets.platforms.map(([id, n]) => {
             const p = platform(id);
@@ -147,6 +208,7 @@ export function Controls({ filters, facets, resultCount, onChange, onReset }: Pr
             );
           })}
         </div>
+        )}
 
         {open && (
           <div className="panel">
@@ -196,6 +258,43 @@ export function Controls({ filters, facets, resultCount, onChange, onReset }: Pr
                 </div>
               </div>
             )}
+
+            <div className="panel__group">
+              <span className="panel__label">Region</span>
+              <label className="region">
+                <span aria-hidden="true">{REGIONS.find((r) => r.code === region)?.flag ?? '🌐'}</span>
+                <span className="sr-only">Region</span>
+                <select value={region} onChange={(e) => onRegion(e.target.value)}>
+                  {REGIONS.map((r) => (
+                    <option key={r.code} value={r.code}>
+                      {r.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            {/* Moved in from the row beside search. It is a narrowing control
+                like the rest, it was the only one wearing a different shape,
+                and "Trending" sitting in a dropdown beside "Filters" read as a
+                second filter rather than an ordering. */}
+            <div className="panel__group">
+              <span className="panel__label">Order</span>
+              <div className="sort">
+                <select
+                  value={filters.sort}
+                  onChange={(e) => onChange({ sort: e.target.value as SortKey })}
+                  aria-label="Sort releases"
+                >
+                  {SORTS.map((s) => (
+                    <option key={s.value} value={s.value}>
+                      {s.label}
+                    </option>
+                  ))}
+                </select>
+                <IconChevronDown />
+              </div>
+            </div>
 
             <div className="panel__footer">
               <button className="btn" onClick={onReset} disabled={active === 0}>

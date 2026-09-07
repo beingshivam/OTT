@@ -137,6 +137,31 @@ export const IconInstagram = (p: P) => (
   </svg>
 );
 
+/**
+ * The two layouts, as the shapes they are.
+ *
+ * Rows and a grid are about the most legible pair of icons in software — every
+ * mail client, file browser and photo app uses them for exactly this choice —
+ * which is what lets the words drop away on a phone without the control
+ * becoming a guess.
+ */
+export const IconRows = (p: P) => (
+  <svg {...base} {...p}>
+    <rect x="3" y="4" width="18" height="4" rx="1.5" />
+    <rect x="3" y="10" width="18" height="4" rx="1.5" />
+    <rect x="3" y="16" width="18" height="4" rx="1.5" />
+  </svg>
+);
+
+export const IconGrid = (p: P) => (
+  <svg {...base} {...p}>
+    <rect x="3" y="3" width="7.5" height="7.5" rx="1.5" />
+    <rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5" />
+    <rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5" />
+    <rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5" />
+  </svg>
+);
+
 export const KIND_ICON = {
   film: IconFilm,
   series: IconTv,

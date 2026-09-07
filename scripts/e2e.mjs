@@ -352,6 +352,118 @@ console.log('\nFallback');
   await ctx.close();
 }
 
+// --- the page reads in the right order ---------------------------------------
+
+console.log('\nStructure');
+for (const width of [390, 1440]) {
+  const { ctx, page, errors } = await newPage(browser, { width, height: 900 });
+  await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('.controls__row');
+  await page.waitForTimeout(700);
+
+  const m = await page.evaluate(() => {
+    const top = (sel) => {
+      const el = document.querySelector(sel);
+      return el ? Math.round(el.getBoundingClientRect().top + window.scrollY) : null;
+    };
+    return {
+      lenses: top('.lenses-row'),
+      rail: top('.landed'),
+      heading: top('.controls'),
+      board: top('.board'),
+      share: top('.shareout'),
+      // The bands this change removed. Their absence is the change.
+      oldWeekBand: !!document.querySelector('.weekbar__week'),
+      oldMetaBand: !!document.querySelector('.weekbar__right'),
+      headingText: document.querySelector('.controls__heading')?.textContent?.trim() ?? '',
+      hasSearch: !!document.querySelector('.searchbox'),
+      searchInHeader: !!document.querySelector('.weekbar .searchbox'),
+      stepper: document.querySelectorAll('.controls__row .weeknav__btn').length,
+      toggle: document.querySelectorAll('.controls__row .viewtoggle button').length,
+    };
+  });
+
+  const label = `${width}px`;
+  is(!m.oldWeekBand && !m.oldMetaBand, `${label}: the two header bands are gone`, 'a removed band is still rendering');
+  is(m.searchInHeader, `${label}: search is in the header`, 'it is not');
+  is(m.stepper === 2, `${label}: the week stepper is on the board heading`, `${m.stepper} arrows found`);
+  is(m.toggle === 2, `${label}: the layout toggle is on the board heading`, `${m.toggle} buttons found`);
+  is(/Sep|week/i.test(m.headingText), `${label}: the heading names the week`, `it says "${m.headingText}"`);
+
+  /**
+   * Content before controls. The first attempt at this rendered the board's
+   * heading above the poster row, because the row was still inside <main> and
+   * the heading is not — which read as a control bar for a rail it did not
+   * control.
+   */
+  is(
+    m.lenses < m.rail && m.rail < m.heading && m.heading < m.board,
+    `${label}: lenses, then the row, then the board's heading, then the board`,
+    `lenses ${m.lenses}, rail ${m.rail}, heading ${m.heading}, board ${m.board}`,
+  );
+  is(m.share > m.board, `${label}: Share sits below the board`, `share ${m.share}, board ${m.board}`);
+  is(errors.length === 0, `${label}: no console errors`, errors[0]);
+  await ctx.close();
+}
+
+// --- the controls on that heading actually work ------------------------------
+
+console.log('\nBoard controls');
+{
+  const { ctx, page, errors } = await newPage(browser, { width: 1440, height: 900 });
+  await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('.controls__row');
+
+  // The layout toggle changes the layout, and chips follow the view that needs them.
+  const chipsInBoard = await page.evaluate(() => !!document.querySelector('.chips'));
+  is(!chipsInBoard, 'no platform chips in board view', 'the chips duplicate the board columns');
+
+  await page.locator('.controls__row .viewtoggle button').nth(1).click();
+  await page.waitForTimeout(500);
+  const grid = await page.evaluate(() => ({
+    grid: !!document.querySelector('.grid'),
+    chips: !!document.querySelector('.chips'),
+    pressed: document.querySelectorAll('.controls__row .viewtoggle button[aria-pressed="true"]').length,
+  }));
+  is(grid.grid, 'the toggle switches to posters', 'the grid did not render');
+  is(grid.chips, 'chips appear in poster view, where nothing else names the platforms', 'no chips');
+  is(grid.pressed === 1, 'exactly one layout is announced as pressed', `${grid.pressed} pressed`);
+
+  await page.locator('.controls__row .viewtoggle button').nth(0).click();
+  await page.waitForTimeout(400);
+  is(await page.evaluate(() => !!document.querySelector('.board')), 'and back to the board', 'it did not return');
+
+  // The week stepper still steps, from its new home.
+  const before = await page.evaluate(() => document.querySelector('.controls__heading').textContent);
+  await page.locator('.controls__row .weeknav__btn').first().click();
+  await page.waitForTimeout(600);
+  const after = await page.evaluate(() => ({
+    heading: document.querySelector('.controls__heading').textContent,
+    today: !!document.querySelector('.weeknav__today'),
+  }));
+  is(after.heading !== before, 'the stepper changes the week', `still "${before}"`);
+  is(after.today, 'a way back to this week appears once you leave it', 'no shortcut back');
+  await page.locator('.weeknav__today').click();
+  await page.waitForTimeout(600);
+  is(
+    (await page.evaluate(() => document.querySelector('.controls__heading').textContent)) === before,
+    'and it returns',
+    'the shortcut did not go back',
+  );
+
+  // Region and sort moved into the panel; they have to be reachable there.
+  await page.locator('.controls__row .btn').first().click();
+  await page.waitForTimeout(400);
+  const panel = await page.evaluate(() => ({
+    region: !!document.querySelector('.panel .region select'),
+    sort: !!document.querySelector('.panel .sort select'),
+  }));
+  is(panel.region, 'the region picker is in the filters panel', 'it is nowhere');
+  is(panel.sort, 'the sort control is in the filters panel', 'it is nowhere');
+  is(errors.length === 0, 'no console errors', errors[0]);
+  await ctx.close();
+}
+
 // --- one row per lens, each true to its own page ------------------------------
 
 console.log('\nA rail on every lens');

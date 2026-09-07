@@ -8,18 +8,16 @@ import { DetailSheet } from './components/DetailSheet';
 import { EmailSignup } from './components/EmailSignup';
 import { ReleaseCard } from './components/ReleaseCard';
 import { ShareWeek } from './components/ShareWeek';
+import { SearchBox } from './components/SearchBox';
 import { TrendingStrip, normalise } from './components/TrendingStrip';
 import { PosterRail, relativeDay } from './components/PosterRail';
 import {
   IconCalendar,
-  IconChevronLeft,
-  IconChevronRight,
   IconInstagram,
   IconPlay,
   IconSearch,
 } from './components/icons';
 import { BRAND, INSTAGRAM, INSTAGRAM_URL, SLUG, TAGLINE } from './data/brand';
-import { REGIONS } from './data/platforms';
 import { loadFeed, weekById } from './lib/feed';
 import { loadCatalogue } from './lib/catalogue';
 import { justLanded, landingSoon, popularNow, MIN_ITEMS, SOON_DAYS, WINDOW_DAYS } from './lib/rails';
@@ -44,7 +42,6 @@ import {
   formatDay,
   formatWeekRange,
   isToday,
-  relativeWeekLabel,
   weekIdFor,
 } from './lib/week';
 import type { Filters, Release, ReleaseFeed } from './types';
@@ -517,108 +514,15 @@ export default function App() {
           >
             <IconInstagram />
           </a>
-          <div className="weekbar__region">
-            <label className="region">
-              <span aria-hidden="true">
-                {REGIONS.find((r) => r.code === filters.region)?.flag ?? '🌐'}
-              </span>
-              <span className="sr-only">Region</span>
-              <select
-                value={filters.region}
-                onChange={(e) => {
-                  setRegionPinned(true);
-                  update({ region: e.target.value, platforms: [] });
-                  updatePrefs({ region: e.target.value });
-                }}
-              >
-                {REGIONS.map((r) => (
-                  <option key={r.code} value={r.code}>
-                    {r.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
+          {/*
+            Search, promoted from the fifth band down into the header.
+            The site's highest-intent traffic arrives asking where to watch one
+            specific title, and that reader had to scroll past five rows of
+            navigation to find the field. This is where every app puts it.
+          */}
+          <SearchBox value={filters.query} onChange={(query) => update({ query })} />
         </div>
 
-        {/* A span page has no week to step through, and a stepper that changes
-            a number nothing on screen reads would be a control that does
-            nothing. The page's own name goes in PageIntro's h1 instead. */}
-        {!isTitlePage && !span && !route?.catalogue && (
-        <div className="weekbar__week">
-          <button
-            className="weeknav__btn"
-            onClick={() => stepWeek(-1)}
-            disabled={weekOffset <= -WEEK_RANGE}
-            aria-label="Previous week"
-          >
-            <IconChevronLeft />
-          </button>
-          {route ? (
-            <p className="weekbar__date">{formatWeekRange(filters.weekId)}</p>
-          ) : (
-            <h1 className="weekbar__date">{formatWeekRange(filters.weekId)}</h1>
-          )}
-          <button
-            className="weeknav__btn"
-            onClick={() => stepWeek(1)}
-            disabled={weekOffset >= WEEK_RANGE}
-            aria-label="Next week"
-          >
-            <IconChevronRight />
-          </button>
-          <span className="weekbar__rel">{relativeWeekLabel(filters.weekId, today)}</span>
-          {weekOffset !== 0 && (
-            <button className="weeknav__today" onClick={goToCurrentWeek}>
-              This week
-            </button>
-          )}
-        </div>
-        )}
-
-        {!isTitlePage && (
-        <div className="weekbar__right">
-          <span className="weekbar__count">
-            <strong>{facets.total}</strong> releases
-            {/* Dropped on a phone, where this row has to hold the count, the
-                freshness, Share and the view toggle on one line — and where the
-                chips immediately below name every platform and carry its own
-                count for each. Saying "10 platforms" directly above ten
-                labelled platform chips spends the scarcest space on the page
-                repeating what the next row shows. */}
-            <span className="weekbar__count-plat">
-              {' · '}
-              <strong>{facets.platforms.length}</strong> platforms
-            </span>
-          </span>
-          {feed && (
-            <span
-              className="weekbar__fresh"
-              title={`Next refresh ${nextRefreshLabel()}`}
-            >
-              <i />
-              {/* The word goes on a phone, where this row must hold four things
-                  on one line. A live green dot followed by "3h ago" still reads
-                  as freshness; the full sentence stays in the title and on every
-                  wider screen. */}
-              <span className="weekbar__fresh-word">Updated </span>
-              {relativeTime(feed.generatedAt)}
-            </span>
-          )}
-          {/* The share card names the week it was made from, which is a true
-              label for every page but these two. Rather than teach it a second
-              vocabulary, a span page does without. */}
-          {!span && !route?.catalogue && <ShareWeek releases={visible} filters={filters} />}
-          <span className="viewtoggle" role="group" aria-label="Layout">
-            <button data-on={view === 'board'} onClick={() => setView('board')}>
-              Board
-            </button>
-            <button data-on={view === 'grid'} onClick={() => setView('grid')}>
-              Posters
-            </button>
-          </span>
-        </div>
-        )}
       </div>
 
       {/* What am I looking at — three lenses on the same board.
@@ -685,6 +589,38 @@ export default function App() {
         />
       )}
 
+      {/*
+        The homepage's row, above the board's heading rather than below it.
+        On a lens page PageIntro holds the row in its slot and it lands in the
+        same place; the homepage has no intro, so it renders here. Either way
+        the order is the same: what the page is, then the row worth looking at,
+        then the controls that act on the board underneath.
+      */}
+      {!isTitlePage && feed && !error && facets.total > 0 && !userNarrowed && !span && !route?.catalogue && (
+        <div className="shell">
+          {landed.length >= MIN_ITEMS ? (
+            <PosterRail
+              title="Just landed"
+              subtitle={`Out in the last ${WINDOW_DAYS} days — streaming and in cinemas`}
+              releases={landed}
+              onOpen={setSelected}
+              caption={(r) => relativeDay(r.releaseDate, today)}
+            />
+          ) : (
+            /* Not enough recent artwork to make a row of posters — a thin rail
+               reads as a bug rather than a selection. The text strip was always
+               the honest shape for a short list, so it stays as the fallback
+               rather than being deleted. */
+            <TrendingStrip
+              releases={trendingNow.list}
+              live={trendingNow.live}
+              thisWeekIds={thisWeekTitles}
+              onOpen={setSelected}
+            />
+          )}
+        </div>
+      )}
+
       {!isTitlePage && (
       <Controls
         filters={filters}
@@ -692,6 +628,37 @@ export default function App() {
         resultCount={visible.length}
         onChange={update}
         onReset={resetFilters}
+        /* The board names itself now — but only where nothing else has.
+           A week page has no other title, so the range is the heading. A lens
+           page opens with an h1 saying "Coming soon" a hundred pixels above,
+           and repeating it here would be the page telling you twice; the size
+           of what you are looking at is the fact that line does not carry. */
+        heading={span || route?.catalogue ? `${facets.total} titles` : formatWeekRange(filters.weekId)}
+        showCount={!span && !route?.catalogue}
+        step={
+          span || route?.catalogue
+            ? undefined
+            : {
+                back: () => stepWeek(-1),
+                forward: () => stepWeek(1),
+                canBack: weekOffset > -WEEK_RANGE,
+                canForward: weekOffset < WEEK_RANGE,
+                today: weekOffset !== 0 ? goToCurrentWeek : undefined,
+              }
+        }
+        freshness={
+          feed
+            ? { label: relativeTime(feed.generatedAt), title: `Next refresh ${nextRefreshLabel()}` }
+            : undefined
+        }
+        view={view}
+        onView={setView}
+        region={filters.region}
+        onRegion={(code) => {
+          setRegionPinned(true);
+          update({ region: code, platforms: [] });
+          updatePrefs({ region: code });
+        }}
       />
       )}
 
@@ -804,33 +771,6 @@ export default function App() {
 
         {!isTitlePage && feed && !error && facets.total > 0 && (
           <>
-            {/* Not on a span page. PageIntro already ranks the same rows by the
-                same measure up top, so the strip would be a second copy of it
-                a few hundred pixels down — and its label says "this week",
-                which is not what a month page is ranking. */}
-            {!userNarrowed && !span && !route?.catalogue && (
-              landed.length >= MIN_ITEMS ? (
-                <PosterRail
-                  title="Just landed"
-                  subtitle={`Out in the last ${WINDOW_DAYS} days — streaming and in cinemas`}
-                  releases={landed}
-                  onOpen={setSelected}
-                  caption={(r) => relativeDay(r.releaseDate, today)}
-                />
-              ) : (
-                /* Not enough recent artwork to make a row of posters — a thin
-                   rail reads as a bug rather than a selection. The text strip
-                   was always the honest shape for a short list, so it stays as
-                   the fallback rather than being deleted. */
-                <TrendingStrip
-                  releases={trendingNow.list}
-                  live={trendingNow.live}
-                  thisWeekIds={thisWeekTitles}
-                  onOpen={setSelected}
-                />
-              )
-            )}
-
             {visible.length === 0 ? (
               <div className="empty">
                 <span className="empty__icon">
@@ -911,6 +851,20 @@ export default function App() {
               awaiting artwork and synopses.
             </span>
           </p>
+        )}
+
+        {/*
+          Share, at the end of the thing being shared.
+          It spent its life in the top bar, where it took a line on a phone and
+          asked to be acted on before the reader had seen anything worth
+          sharing. Nobody shares a week they have not read. The card it renders
+          names the week it was made from, which is a true label for a week and
+          not for a month or the back catalogue — so those lenses do without.
+        */}
+        {feed && !isTitlePage && !span && !route?.catalogue && visible.length > 0 && (
+          <div className="shareout">
+            <ShareWeek releases={visible} filters={filters} />
+          </div>
         )}
 
         {/* Above the footer proper: the crawlable, clickable route to every
