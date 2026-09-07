@@ -232,11 +232,64 @@
                         'deploy or something answered on its behalf.'
                       : '')
                 );
+
+                /**
+                 * Read the page that answered instead.
+                 *
+                 * A blocked request does not arrive empty: whatever refused it
+                 * usually says so, names the policy, and prints a reference
+                 * number for whoever administers it. That text is the only part
+                 * of this whole exercise that identifies *what* is doing the
+                 * blocking, and it was sitting unread in a response this page
+                 * had already fetched.
+                 */
+                if (!good && r.body && /text\/html/i.test(r.ctype)) {
+                  var text = r.body
+                    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+                    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+                    .replace(/<[^>]+>/g, ' ')
+                    .replace(/&nbsp;/g, ' ')
+                    .replace(/\s+/g, ' ')
+                    .replace(/^\s+/, '');
+                  add('info', 'What answered instead', text.slice(0, 500) || '(no readable text)');
+                  sizeProbe(url);
+                }
                 if (--left === 0) crossOriginProbe(broken);
               });
             })(list[i]);
           }
           if (!list.length) crossOriginProbe(0);
+        }
+
+        /**
+         * Is it the file, or the first 32KB of it?
+         *
+         * The report that produced this check had the stylesheet arriving
+         * intact at 38KB and a small script at the same origin loading fine,
+         * while the 214KB app bundle came back as a 403 page. That rules out
+         * "JavaScript is blocked" and points at something scanning the file
+         * itself. Asking for a byte range separates the two: if a slice of the
+         * same URL comes back and the whole thing does not, the file is being
+         * inspected rather than the address being refused.
+         */
+        function sizeProbe(url) {
+          if (!window.fetch) return;
+          window
+            .fetch(url, { headers: { Range: 'bytes=0-32767' }, cache: 'reload' })
+            .then(function (res) {
+              add(
+                res.status === 206 || res.status === 200 ? 'info' : 'info',
+                'First 32KB of the same file',
+                'status ' + res.status +
+                  (res.status === 206
+                    ? ' — a slice of this exact file is allowed through, so the address is not what is refused. ' +
+                      'Something is scanning the whole file and stopping it on size or content.'
+                    : ' — refused as well, so it is the file or its address, not its size.')
+              );
+            })
+            .catch(function (e) {
+              add('info', 'First 32KB of the same file', 'request failed — ' + e.message);
+            });
         }
 
         /**
@@ -253,9 +306,14 @@
           var url = '/diag-probe.js?t=' + Date.now();
           var plainOk = null;
           var corsOk = null;
+          var reported = false;
 
           function done() {
             if (plainOk === null || corsOk === null) return;
+            // Both a load event and the timeout can complete the pair, and the
+            // first report printed itself twice.
+            if (reported) return;
+            reported = true;
             if (plainOk && !corsOk) {
               add('bad', 'Scripts load only without the crossorigin attribute',
                 'This is the failure. A filter on this network is answering asset requests from ' +
