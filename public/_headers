@@ -1,3 +1,23 @@
+# Cache rules, in the order Cloudflare applies them: a later matching rule
+# replaces the header a earlier one set, so the broad default goes first and the
+# exceptions follow. Deploy prints the headers it actually got back, because
+# this ordering is the sort of thing that is easy to assume and worth checking.
+
+# Every page. This rule used to read "/index.html", which matched nothing a
+# browser ever asks for — a visitor requests "/", "/streaming", "/hindi", and
+# none of those is the literal path index.html. So no HTML page on the site
+# carried a revalidation directive from us at all.
+#
+# That matters more here than on most sites because the filenames below are
+# content-hashed and the deploy replaces the whole set: a stale copy of a page,
+# held anywhere between the origin and the reader, points at asset URLs that no
+# longer exist. Those 404 into the SPA fallback, which answers with HTML, and
+# the browser then refuses the stylesheet and the module — leaving the
+# prerendered text on a white background, which is exactly the failure being
+# chased. Twice-weekly builds and 59 deploys make the window for that wide.
+/*
+  Cache-Control: public, max-age=0, must-revalidate
+
 # Hashed filenames never change contents, so they can be cached forever.
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
@@ -7,5 +27,8 @@
 /data/releases.json
   Cache-Control: public, max-age=300, must-revalidate
 
-/index.html
-  Cache-Control: public, max-age=0, must-revalidate
+# The whole point of this page is to report what the network in front of it is
+# doing. A cached copy of it would report on a different day's network.
+/diag/*
+  Cache-Control: no-store
+  X-Robots-Tag: noindex

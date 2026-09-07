@@ -114,6 +114,35 @@ jobs:
               ;;
           esac
 
+          # 3. What is it telling caches to do? _headers is applied by
+          #    Cloudflare, not by anything in this repo, and its rules are
+          #    matched against request paths — so a rule for "/index.html"
+          #    silently governed nothing, because no browser asks for that. A
+          #    stale page held anywhere in the middle points at hashed asset
+          #    URLs that no longer exist, which is one of the ways this site
+          #    can look broken while being served perfectly. Print both, so the
+          #    rule is checked against reality rather than against memory.
+          page_cc=$(curl -fsSI --max-time 20 "$SITE/" | tr -d '\r' | awk -F': ' 'tolower($1)=="cache-control" { print $2 }')
+          asset_cc=$(curl -fsSI --max-time 20 "$SITE$asset" | tr -d '\r' | awk -F': ' 'tolower($1)=="cache-control" { print $2 }')
+          echo "  page   cache-control: ${page_cc:-<none>}"
+          echo "  bundle cache-control: ${asset_cc:-<none>}"
+          case "$page_cc" in
+            *no-store*|*no-cache*|*must-revalidate*) ;;
+            *)
+              echo "::warning title=Pages are cacheable without revalidation::$SITE/ returned 'Cache-Control: ${page_cc:-nothing}'. A cache that holds this page will keep asking for asset filenames that the next deploy deletes, and the site will render its unstyled fallback until the copy expires."
+              ;;
+          esac
+
+          # 4. Is the loading check reachable? It is the one page a reader on a
+          #    filtered network is sent to, so it has to resolve as its own file
+          #    rather than being swallowed by the SPA fallback — which is exactly
+          #    what a local static server did on the first attempt at this path.
+          diag=$(curl -fsS --max-time 20 "$SITE/diag/" || true)
+          case "$diag" in
+            *"Loading check"*) echo "  /diag/ resolves" ;;
+            *) echo "::error title=The loading check is unreachable::$SITE/diag/ did not return the check page. The banner shown to a reader whose assets were blocked links there, so it has to resolve." ; exit 1 ;;
+          esac
+
           if [ "$live" != "$GITHUB_SHA" ]; then
             echo "::error title=Live site is not this commit::$SITE/build.txt reports '${live:-nothing}' rather than ${GITHUB_SHA:0:8}. The bundle loads, so the site works — it is just serving an older deploy."
             exit 1

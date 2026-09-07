@@ -37,5 +37,68 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+
+    <!--
+      Say so when the page does not finish loading.
+
+      Every page ships prerendered markup that React replaces on mount, which is
+      good for a crawler and for a slow connection and actively bad for a broken
+      one: if the stylesheet and the bundle never arrive, the fallback stays on
+      screen and the site looks like it was built that way. It was reported as a
+      styling bug, not a loading failure, and that cost a week of looking in the
+      wrong place.
+
+      Deliberately a classic script, not a module, and deliberately ES5: this
+      has to run in exactly the situation where the module did not.
+
+      Two triggers. The listener catches an asset that fails outright and fires
+      immediately; the timer catches the quieter version, where the file arrives
+      but is the SPA fallback's HTML rather than CSS or JavaScript, so nothing
+      errors and nothing runs.
+    -->
+    <script>
+      (function () {
+        var shown = false;
+        function warn(detail) {
+          if (shown) return;
+          shown = true;
+          var el = document.createElement('div');
+          el.setAttribute(
+            'style',
+            'position:fixed;left:0;right:0;top:0;z-index:2147483647;padding:12px 16px;' +
+              'background:#2a1214;border-bottom:1px solid #ff4d4d55;color:#ffd9d9;' +
+              "font:14px/1.5 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif",
+          );
+          el.innerHTML =
+            '<strong>This page did not finish loading.</strong> Its stylesheet and app code were ' +
+            'stopped before they reached the browser — usually a network filter between you and ' +
+            'the site, not the site itself. ' +
+            '<a href="/diag/" style="color:#ff9f9f">Run the check</a> to see what was blocked.';
+          (document.body || document.documentElement).appendChild(el);
+          // Fixed, so it stays put while the reader scrolls the fallback list —
+          // which means making room for it rather than covering the heading.
+          document.documentElement.style.paddingTop = el.offsetHeight + 'px';
+        }
+
+        // Capture phase: resource load failures do not bubble.
+        window.addEventListener(
+          'error',
+          function (e) {
+            var t = e.target;
+            if (!t || !t.tagName) return; // A script threw; that is a different problem.
+            var src = t.src || t.href || '';
+            if (src.indexOf('/assets/') !== -1) warn(src);
+          },
+          true,
+        );
+
+        setTimeout(function () {
+          var root = document.getElementById('root');
+          if (!root) return;
+          // React has replaced the prerendered markup by now, or it never will.
+          if (root.querySelector('.seo-fallback') || !root.firstChild) warn('timeout');
+        }, 8000);
+      })();
+    </script>
   </body>
 </html>

@@ -202,7 +202,25 @@ else {
 const S4 = 'Published pages';
 if (!pages) skip(S4, 'pages were generated', 'no dist/ — run npm run build');
 else {
-  pass(S4, 'pages were generated', `${pages.size} pages on disk`);
+  /**
+   * A page that tells crawlers not to index it is not a published page, and the
+   * checks below are all about what gets published: a canonical URL, a place in
+   * the sitemap, a link a crawler can follow. /diag/ is a tool a reader is sent
+   * to when the site fails to load on their network — it has no business in a
+   * search result and correctly carries noindex.
+   *
+   * Counted rather than quietly dropped. An exclusion nobody can see is how a
+   * grader starts agreeing with whatever it is grading: if a real page ever
+   * acquires a noindex by accident, this line is where it shows up.
+   */
+  // Taken before the split below: a link to a noindex page is still a link that
+  // has to land somewhere, and the banner on every page points at /diag/.
+  const onDisk = new Set([...pages.keys()]);
+
+  const utility = [...pages].filter(([, html]) => /name="robots"[^>]*noindex/.test(html));
+  for (const [path] of utility) pages.delete(path);
+  pass(S4, 'pages were generated', `${pages.size} indexable` +
+    (utility.length ? `, plus ${utility.length} noindex: ${utility.map(([p]) => p).join(', ')}` : ''));
 
   const noTitle = [...pages].filter(([, html]) => !/<title>[^<]{5,}<\/title>/.test(html));
   noTitle.length
@@ -227,12 +245,11 @@ else {
     : pass(S4, 'canonical matches the page it is on');
 
   // Every internal link a crawler can follow must land on a page that exists.
-  const known = new Set([...pages.keys()]);
   const broken = new Set();
   for (const [, html] of pages) {
     for (const m of html.matchAll(/href="(\/[^"#?]*)"/g)) {
       const href = m[1].replace(/\/$/, '') || '/';
-      if (!known.has(href) && !/\.(png|svg|xml|txt|json|ico|webmanifest|css|js)$/.test(href)) broken.add(href);
+      if (!onDisk.has(href) && !/\.(png|svg|xml|txt|json|ico|webmanifest|css|js)$/.test(href)) broken.add(href);
     }
   }
   broken.size
@@ -243,9 +260,12 @@ else {
   if (!sitemap) skip(S4, 'every sitemap entry exists', 'no sitemap.xml');
   else {
     const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => new URL(m[1]).pathname.replace(/\/$/, '') || '/');
-    const missing = locs.filter((l) => !known.has(l));
+    // Against the indexable set, not everything on disk: a sitemap entry
+    // pointing at a page marked noindex is a contradiction worth failing on,
+    // not a page that merely exists.
+    const missing = locs.filter((l) => !pages.has(l));
     missing.length
-      ? fail(S4, 'every sitemap entry exists', `${missing.length} of ${locs.length} do not`, missing.slice(0, 5))
+      ? fail(S4, 'every sitemap entry exists', `${missing.length} of ${locs.length} are missing or noindex`, missing.slice(0, 5))
       : pass(S4, 'every sitemap entry exists', `${locs.length} entries`);
   }
 }

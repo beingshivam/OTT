@@ -71,7 +71,32 @@ function formatDate(iso) {
   return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
 }
 
-const html = await readFile(HTML, 'utf8');
+/**
+ * Every page below is this file with a different head and body, so anything
+ * done to it here reaches all 129 of them.
+ *
+ * The one edit: Vite stamps `crossorigin` on the stylesheet and the module it
+ * emits. Both are same-origin, where the attribute changes nothing — the CORS
+ * check does not apply to a request that never leaves the origin. It changes
+ * something only when a middlebox puts itself in the path and answers a
+ * sub-resource from somewhere else: an inspection proxy that redirects an asset
+ * to its own notification host turns a plain request into a cross-origin one,
+ * and `crossorigin` is what makes the browser refuse the result rather than
+ * follow it. That fails the stylesheet and the bundle together while leaving
+ * the page itself alone, which is the shape of the failure reported from a
+ * corporate laptop — the prerendered text, unstyled, on white.
+ *
+ * This is a hypothesis, not a diagnosis: it cannot be reproduced from here, and
+ * public/diag.html tests it directly on the machine that has the problem.
+ * Dropping the attribute is worth doing either way, because on this site it
+ * buys nothing. It exists so a browser can report full error detail for
+ * cross-origin scripts and so SRI can be checked; there is no SRI here and no
+ * cross-origin script.
+ */
+const html = (await readFile(HTML, 'utf8')).replace(
+  /(<(?:script|link)\b[^>]*?)\s+crossorigin(?:="[^"]*")?/g,
+  '$1',
+);
 const feed = JSON.parse(await readFile(FEED, 'utf8'));
 
 /**
@@ -316,8 +341,26 @@ const analytics = ANALYTICS_TOKEN
   ? `    <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"${ANALYTICS_TOKEN}"}'></script>\n`
   : '';
 
+/**
+ * Enough styling that the pre-hydration paint reads as the page loading.
+ *
+ * The background and the font are here for a narrower reason than the rest: if
+ * the stylesheet is the thing that failed, this is all there is. Grey text at
+ * #8d94a4 was written against the app's near-black background, and on the white
+ * a bare document defaults to it is close to unreadable — the state reported
+ * from a locked-down laptop, where it read as a broken site rather than a
+ * blocked one.
+ *
+ * It goes on `html`, not `body`, on purpose. This block sits after the
+ * stylesheet in the head, so a `body` rule here would win over app.css and
+ * paint over the real background on every normal load. A background on `html`
+ * shows only where `body` has none — which is precisely the case where the
+ * stylesheet never arrived.
+ */
 const FALLBACK_CSS = `    <style>
-      .seo-fallback { max-width: 1180px; margin: 0 auto; padding: 32px 20px; color: #8d94a4; }
+      html { background: #06070a; }
+      .seo-fallback { max-width: 1180px; margin: 0 auto; padding: 32px 20px; color: #8d94a4;
+        font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
       .seo-fallback h1 { color: #f2f4f9; font-size: 28px; margin: 0 0 4px; }
       .seo-fallback h2 { color: #b6bdcc; font-size: 15px; margin: 24px 0 6px; }
       .seo-fallback ul { margin: 0; padding-left: 18px; line-height: 1.7; }
