@@ -49,9 +49,26 @@ export function sortReleases(releases: Release[], sort: SortKey): Release[] {
       return out.sort((a, b) => a.title.localeCompare(b.title));
     case 'trending':
     default:
-      return out.sort(
-        (a, b) => (b.heat ?? 0) - (a.heat ?? 0) || a.releaseDate.localeCompare(b.releaseDate),
-      );
+      /**
+       * Two different signals, because the two datasets carry different ones.
+       *
+       * Calendar rows have `heat`. Catalogue rows have `popRank` — a position
+       * within their own language — and sorting by it ascending interleaves the
+       * languages for free: every language's most popular title comes first,
+       * then every language's second. That is the whole reason the fetch stores
+       * a rank rather than a raw popularity: ranks compare across languages and
+       * raw numbers do not, so this ordering cannot quietly become a list of
+       * American television with an Indian title at the bottom.
+       */
+      return out.sort((a, b) => {
+        if (a.popRank != null || b.popRank != null) {
+          return (
+            (a.popRank ?? Number.MAX_SAFE_INTEGER) - (b.popRank ?? Number.MAX_SAFE_INTEGER) ||
+            (b.heat ?? 0) - (a.heat ?? 0)
+          );
+        }
+        return (b.heat ?? 0) - (a.heat ?? 0) || a.releaseDate.localeCompare(b.releaseDate);
+      });
   }
 }
 

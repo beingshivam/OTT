@@ -58,6 +58,18 @@ export interface Release {
   /** 0–100 popularity used for the Trending sort. Higher is hotter. */
   heat?: number;
   /**
+   * Rank within this title's own language on the back catalogue's popularity
+   * pass — 1 is the most popular Malayalam title, 1 is also the most popular
+   * Hindi one (scripts/fetch-catalogue.mjs).
+   *
+   * A rank rather than a raw popularity number, because raw numbers are not
+   * comparable across languages: TMDB's audience is not Indian, so a Malayalam
+   * hit scores far below an American one no matter how much India watched it.
+   * Ranks are comparable, which is what lets a trending view interleave the
+   * languages and stay both honest and diverse.
+   */
+  popRank?: number;
+  /**
    * IMDb's id for this title, from TMDB during enrichment.
    *
    * Only here so the IMDb score can be looked up by id rather than by name —

@@ -40,12 +40,16 @@ export function readFilters(
     genres: list(p, 'g').length ? list(p, 'g') : (route?.genres ?? []),
     query: p.get('q') ?? '',
     /**
-     * Trending everywhere except the catalogue, which has no heat on its rows —
-     * so that sort fell through to its date tiebreak and opened the "good things
-     * streaming" lens on The Godfather (1972) and Sholay (1975), oldest first.
-     * A lens whose whole promise is quality has to open on the best of it.
+     * Trending everywhere, including the catalogue.
+     *
+     * It defaulted to rating there, because catalogue rows carried no heat and
+     * the trending sort fell through to its date tiebreak — opening a lens about
+     * quality on The Godfather (1972), oldest first. They carry a popularity
+     * rank now, so trending means something on that lens: it opens on what is
+     * actually being watched in each language rather than on the highest score,
+     * which is the question a reader browsing "now streaming" is usually asking.
      */
-    sort: sort && SORT_VALUES.includes(sort) ? sort : route?.catalogue ? 'rating' : 'trending',
+    sort: sort && SORT_VALUES.includes(sort) ? sort : 'trending',
   };
 }
 
@@ -91,10 +95,7 @@ export function writeFilters(
   if (f.languages.length && !sameList(f.languages, route?.languages)) p.set('l', f.languages.join(','));
   if (f.genres.length && !sameList(f.genres, route?.genres)) p.set('g', f.genres.join(','));
   if (f.query) p.set('q', f.query);
-  // The lens's own default is not a choice worth writing down; echoing it would
-  // put ?sort=rating on every /streaming URL anyone copied.
-  const defaultSort = route?.catalogue ? 'rating' : 'trending';
-  if (f.sort !== defaultSort) p.set('sort', f.sort);
+  if (f.sort !== 'trending') p.set('sort', f.sort);
 
   const qs = p.toString();
   const next = `${window.location.pathname}${qs ? `?${qs}` : ''}`;
