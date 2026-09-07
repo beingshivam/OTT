@@ -105,11 +105,16 @@ export function ShareWeek({ releases, filters }: Props) {
         {state === 'done' ? <IconCheck /> : <IconShare />}
       </button>
 
+      {/*
+        No explainer above the two items.
+        There was one — "Saves a picture of this week with newonott.in on it" —
+        and it was the largest text in the menu, at the top, read by somebody
+        who had already decided to share. The items say what they do, and that
+        the card carries the address is the reason this feature exists rather
+        than something a reader needs told.
+      */}
       {open && (
         <div className="share__menu" role="menu">
-          <p className="share__note">
-            Saves a picture of this week with {window.location.host} on it.
-          </p>
           <button
             className="share__item"
             role="menuitem"

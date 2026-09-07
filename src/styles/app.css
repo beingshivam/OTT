@@ -1214,8 +1214,8 @@ a {
   top: calc(100% + 8px);
   right: 0;
   z-index: 60;
-  width: min(290px, calc(100vw - 32px));
-  padding: 10px;
+  width: min(256px, calc(100vw - 32px));
+  padding: 6px;
   border-radius: 16px;
   border: 1px solid var(--line-strong);
   background: var(--surface-solid);
@@ -1232,13 +1232,6 @@ a {
   .share__menu {
     animation: none;
   }
-}
-
-.share__note {
-  margin: 2px 4px 8px;
-  font-size: 12px;
-  line-height: 1.45;
-  color: var(--text-3);
 }
 
 .share__item {
