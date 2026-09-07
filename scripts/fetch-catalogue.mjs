@@ -223,6 +223,32 @@ async function providersFor(isMovie, id) {
   }
 }
 
+/**
+ * Last run's ranks, so the next one can say what moved.
+ *
+ * Read before anything is written, because this file is about to be replaced.
+ * A rank on its own says what is popular; a rank next to the previous one says
+ * what is *rising*, which is the more interesting claim and the one nobody else
+ * in this space makes — "up fourteen places this week" is a fact about
+ * attention, not a snapshot of it.
+ *
+ * Carried here rather than computed later because the data has to exist before
+ * the feature can: this file is regenerated wholesale on every refresh, so a
+ * run that does not preserve the previous ranks destroys the only baseline the
+ * next comparison could have used. Missing file, or a first run, simply leaves
+ * prevPopRank unset and the display has nothing to show — which is correct, not
+ * an error.
+ */
+const previousRank = new Map();
+try {
+  const prior = JSON.parse(await readFile(OUT, 'utf8'));
+  for (const t of prior.titles ?? []) {
+    if (t.popRank != null) previousRank.set(t.id, t.popRank);
+  }
+} catch {
+  /* No catalogue yet. */
+}
+
 // --- gather -----------------------------------------------------------------
 
 /** Keyed by our own id so a title returned under two languages is one row. */
@@ -381,6 +407,17 @@ for (const row of rows) {
   delete row.genreIds;
 }
 
+/** Only where both ends exist: a title new to the list has not "risen", and
+ *  saying it climbed from nowhere would invent movement that never happened. */
+let moved = 0;
+for (const row of rows) {
+  const before = previousRank.get(row.id);
+  if (before != null && row.popRank != null) {
+    row.prevPopRank = before;
+    if (before !== row.popRank) moved++;
+  }
+}
+
 rows.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0) || (b.votes ?? 0) - (a.votes ?? 0));
 
 await mkdir(dirname(OUT), { recursive: true });
@@ -402,6 +439,22 @@ for (const l of perLanguage) {
       `top ${kept[0]?.rating ?? '-'})`,
   );
 }
+if (previousRank.size) {
+  const risers = rows
+    .filter((r) => r.prevPopRank != null && r.prevPopRank > r.popRank)
+    .sort((a, b) => b.prevPopRank - b.popRank - (a.prevPopRank - a.popRank))
+    .slice(0, 5);
+  console.log(
+    `\n  ${moved} title(s) changed rank since the last run` +
+      (risers.length
+        ? `; biggest climbs: ` +
+          risers.map((r) => `${r.title} +${r.prevPopRank - r.popRank}`).join(', ')
+        : ''),
+  );
+} else {
+  console.log('\n  no previous ranks on disk — this run becomes the baseline for the next.');
+}
+
 console.log('\n  most popular, per language (the trending candidate):');
 for (const l of perLanguage) {
   const top = rows

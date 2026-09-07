@@ -70,6 +70,13 @@ export interface Release {
    */
   popRank?: number;
   /**
+   * The same rank on the previous refresh, where the title was on that list
+   * too. Absent for anything new to it — a title that was not ranked last week
+   * has not risen, and treating "absent" as "came from the bottom" would invent
+   * movement that never happened.
+   */
+  prevPopRank?: number;
+  /**
    * IMDb's id for this title, from TMDB during enrichment.
    *
    * Only here so the IMDb score can be looked up by id rather than by name —
