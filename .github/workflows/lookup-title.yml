@@ -1,0 +1,33 @@
+name: Why is this title missing?
+
+# Run from the Actions tab with a title, get the answer in the log.
+#
+# The question "why isn't <film> on the site?" has come up three times and been
+# answered each time by reasoning about the pipeline from the outside, which is
+# guessing. The credential lives here, so the check does too.
+on:
+  workflow_dispatch:
+    inputs:
+      title:
+        description: 'Title to look up, e.g. Hanuman Ansh'
+        required: true
+      region:
+        description: 'Region code'
+        default: 'IN'
+
+permissions:
+  contents: read
+
+jobs:
+  lookup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Ask TMDB
+        env:
+          TMDB_TOKEN: ${{ secrets.TMDB_TOKEN || secrets.TMDB_API_KEY }}
+          REGION: ${{ inputs.region }}
+        run: node scripts/lookup.mjs "${{ inputs.title }}"
