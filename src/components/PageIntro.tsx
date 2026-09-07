@@ -33,6 +33,14 @@ import { BRAND } from '../data/brand';
 
 interface Props {
   route: Route;
+  /**
+   * The rows to describe, when they are not the feed's.
+   *
+   * The catalogue lens draws from a different file entirely, so without this
+   * the intro computed its facts from the week's releases and headed a page of
+   * 398 catalogue titles "New releases" — a heading that was wrong twice over.
+   */
+  rows?: Release[];
   feed: ReleaseFeed;
   region: string;
   currentWeek: string;
@@ -49,7 +57,7 @@ const tally = (rows: Release[], pick: (r: Release) => string[]) => {
   return [...counts.entries()].sort((a, b) => b[1] - a[1]);
 };
 
-export function PageIntro({ route, feed, region, currentWeek, onOpen }: Props) {
+export function PageIntro({ route, rows, feed, region, currentWeek, onOpen }: Props) {
   const inRegion = (r: Release) => r.regions.includes(region);
 
   /**
@@ -76,7 +84,7 @@ export function PageIntro({ route, feed, region, currentWeek, onOpen }: Props) {
    *  date test on top of whatever else the route said. */
   const inSpan = (r: Release) =>
     !route.span || (r.releaseDate >= route.span.from && r.releaseDate <= route.span.to);
-  const scope = weeks.flatMap((w) => w.releases.filter(inRegion).filter(matches).filter(inSpan));
+  const scope = rows ?? weeks.flatMap((w) => w.releases.filter(inRegion).filter(matches).filter(inSpan));
   if (!scope.length) return null;
 
   const thisWeek = (feed.weeks.find((w) => w.id === currentWeek)?.releases ?? [])
@@ -95,10 +103,24 @@ export function PageIntro({ route, feed, region, currentWeek, onOpen }: Props) {
    * the tail of the current week while the strip below it ranked all 64 rows,
    * and both were labelled "Biggest this week".
    */
-  const ranked = route.span ? scope : thisWeek.length ? thisWeek : scope;
-  const biggest = [...ranked].sort((a, b) => (b.heat ?? 0) - (a.heat ?? 0)).slice(0, 3);
+  const ranked = route.catalogue || route.span ? scope : thisWeek.length ? thisWeek : scope;
+  /**
+   * Heat everywhere except the catalogue, whose rows carry none — sorting those
+   * by it would have listed three titles in whatever order they happened to
+   * arrive, under a label reading "Best rated". There, the score is the point,
+   * so the score is the sort.
+   */
+  const biggest = [...ranked]
+    .sort(
+      route.catalogue
+        ? (a, b) => (scoreOf(b)?.value ?? 0) - (scoreOf(a)?.value ?? 0)
+        : (a, b) => (b.heat ?? 0) - (a.heat ?? 0),
+    )
+    .slice(0, 3);
 
-  const biggestLabel = route.span
+  const biggestLabel = route.catalogue
+    ? 'Best rated'
+    : route.span
     ? route.span.kind === 'upcoming'
       ? 'Biggest coming up'
       : `Biggest in ${route.span.label}`
@@ -114,7 +136,9 @@ export function PageIntro({ route, feed, region, currentWeek, onOpen }: Props) {
   const films = scope.filter((r) => r.kind === 'film').length;
   const series = scope.length - films;
 
-  const heading = route.span
+  const heading = route.catalogue
+    ? 'Good things streaming right now'
+    : route.span
     ? route.span.kind === 'upcoming'
       ? 'Coming soon'
       : `Releases in ${route.span.label}`
@@ -135,6 +159,17 @@ export function PageIntro({ route, feed, region, currentWeek, onOpen }: Props) {
    * else answers "where do Tamil releases actually go", and it is a different
    * answer every month.
    */
+  /**
+   * A chip counts rows in *this* scope, so it has to lead back into this scope.
+   *
+   * On the catalogue lens these read "JioHotstar 165" and "Hindi 79" — figures
+   * from the back catalogue — while pointing at /jiohotstar and /hindi, which
+   * are calendar pages showing this week. Tapping a number would land on a page
+   * that could not possibly show it.
+   */
+  const within = (param: 'p' | 'l', value: string) =>
+    route.catalogue ? `/streaming?${param}=${value}` : undefined;
+
   const byPlatform = {
     label: 'Mostly on',
     items: tally(scope, (r) => r.platforms)
@@ -142,7 +177,11 @@ export function PageIntro({ route, feed, region, currentWeek, onOpen }: Props) {
       .map(([id, n]) => ({
         key: id,
         text: platformLinkText(platformById(id).name),
-        href: PLATFORMS.some((p) => p.id === id) ? `/${id}` : undefined,
+        href: route.catalogue
+          ? within('p', id)
+          : PLATFORMS.some((p) => p.id === id)
+            ? `/${id}`
+            : undefined,
         n,
       })),
   };
@@ -159,12 +198,18 @@ export function PageIntro({ route, feed, region, currentWeek, onOpen }: Props) {
       .map(([code, n]) => ({
         key: code,
         text: languageName(code),
-        href: LANGUAGES[code] ? `/${LANGUAGES[code].toLowerCase()}` : undefined,
+        href: route.catalogue
+          ? within('l', code)
+          : LANGUAGES[code]
+            ? `/${LANGUAGES[code].toLowerCase()}`
+            : undefined,
         n,
       })),
   });
 
-  const crosses = route.span
+  const crosses = route.catalogue
+    ? [byPlatform, byLanguage(6)]
+    : route.span
     ? /* A month names no facet of its own, so both splits are new information:
          where the month's releases land, and what languages it is carrying. */
       [byPlatform, byLanguage(5)]
@@ -197,7 +242,7 @@ export function PageIntro({ route, feed, region, currentWeek, onOpen }: Props) {
       <h1 className="pageintro__title">{heading}</h1>
       <p className="pageintro__stat">
         <strong>{scope.length}</strong> {scope.length === 1 ? 'title' : 'titles'}
-        {!route.weekId && (
+        {!route.weekId && !route.catalogue && (
           <>
             {' '}
             across{' '}

@@ -51,7 +51,13 @@ import { fileURLToPath } from 'node:url';
 import { callCount, requireToken, tmdb } from './tmdb.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const OUT = resolve(ROOT, 'data/catalogue.json');
+/**
+ * In public/, unlike the archive, because the browser actually reads this one:
+ * the "Now streaming" lens is a different set of titles, not a filter over the
+ * calendar, so the app has to fetch it. It is loaded on demand rather than up
+ * front — a reader who only ever wants this week should never pay for it.
+ */
+const OUT = resolve(ROOT, 'public/data/catalogue.json');
 const REGION = 'IN';
 
 const args = process.argv.slice(2);

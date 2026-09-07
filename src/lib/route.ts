@@ -24,6 +24,7 @@ import type { Filters } from '../types';
  *   /releases/september-2026
  *                     one calendar month
  *   /upcoming         everything not out yet
+ *   /streaming        the back catalogue — good things available now
  *   /ott-release-date/<slug>
  *                     one theatrical film, answering when it reaches streaming
  *
@@ -144,6 +145,14 @@ export type Route = Partial<Pick<Filters, 'platforms' | 'languages' | 'kinds' | 
   /** Set when the path names a stretch of dates rather than a week. The board
    *  reads across weeks and the week stepper steps aside. */
   span?: Span;
+  /**
+   * Set when the path asks for the back catalogue rather than the calendar.
+   *
+   * Unlike every other route this changes *which titles exist*, not which of
+   * the week's titles are shown — so the board is drawn from a different file
+   * and the week controls have nothing to act on.
+   */
+  catalogue?: true;
 };
 
 /** Language slugs, derived from the same table the app renders from, so a
@@ -177,6 +186,7 @@ export function routeFilters(pathname: string): Route | null {
   if (title) return { titleSlug: title[1] };
 
   if (path === '/upcoming') return { span: upcomingSpan() };
+  if (path === '/streaming') return { catalogue: true };
 
   const month = MONTH_PATH.exec(path);
   if (month) {

@@ -39,7 +39,13 @@ export function readFilters(
     languages: languages.length ? languages : (route?.languages ?? []),
     genres: list(p, 'g').length ? list(p, 'g') : (route?.genres ?? []),
     query: p.get('q') ?? '',
-    sort: sort && SORT_VALUES.includes(sort) ? sort : 'trending',
+    /**
+     * Trending everywhere except the catalogue, which has no heat on its rows —
+     * so that sort fell through to its date tiebreak and opened the "good things
+     * streaming" lens on The Godfather (1972) and Sholay (1975), oldest first.
+     * A lens whose whole promise is quality has to open on the best of it.
+     */
+    sort: sort && SORT_VALUES.includes(sort) ? sort : route?.catalogue ? 'rating' : 'trending',
   };
 }
 
@@ -85,7 +91,10 @@ export function writeFilters(
   if (f.languages.length && !sameList(f.languages, route?.languages)) p.set('l', f.languages.join(','));
   if (f.genres.length && !sameList(f.genres, route?.genres)) p.set('g', f.genres.join(','));
   if (f.query) p.set('q', f.query);
-  if (f.sort !== 'trending') p.set('sort', f.sort);
+  // The lens's own default is not a choice worth writing down; echoing it would
+  // put ?sort=rating on every /streaming URL anyone copied.
+  const defaultSort = route?.catalogue ? 'rating' : 'trending';
+  if (f.sort !== defaultSort) p.set('sort', f.sort);
 
   const qs = p.toString();
   const next = `${window.location.pathname}${qs ? `?${qs}` : ''}`;

@@ -20,6 +20,7 @@ import {
 import { BRAND, INSTAGRAM, INSTAGRAM_URL, SLUG, TAGLINE } from './data/brand';
 import { REGIONS } from './data/platforms';
 import { loadFeed, weekById } from './lib/feed';
+import { loadCatalogue } from './lib/catalogue';
 import {
   applyFilters,
   facetsFor,
@@ -54,6 +55,14 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [prefs, setPrefs] = useState<Prefs>(DEFAULT_PREFS);
   const [selected, setSelected] = useState<Release | null>(null);
+  /**
+   * The back catalogue, once someone asks for it.
+   *
+   * A quarter of a megabyte that most visits never need, so it is fetched on
+   * the first render of that lens rather than alongside the feed.
+   */
+  const [catalogue, setCatalogue] = useState<Release[] | null>(null);
+  const [catalogueError, setCatalogueError] = useState<string | null>(null);
 
   const today = useMemo(() => new Date(), []);
   const currentWeek = useMemo(() => weekIdFor(today), [today]);
@@ -152,6 +161,19 @@ export default function App() {
     return () => controller.abort();
   }, [route]);
 
+  /** Only on the lens that shows it, and only once — loadCatalogue memoises
+   *  the request, so a reader flipping back and forth pays for one fetch. */
+  useEffect(() => {
+    if (!route?.catalogue || catalogue) return;
+    let live = true;
+    loadCatalogue()
+      .then((c) => live && setCatalogue(c.titles))
+      .catch((e: unknown) => live && setCatalogueError((e as Error).message));
+    return () => {
+      live = false;
+    };
+  }, [route, catalogue]);
+
   useEffect(() => {
     writeFilters(
       filters,
@@ -241,11 +263,13 @@ export default function App() {
    * nothing renders.
    */
   const releases = useMemo(() => {
+    // A different set of titles entirely, not a filter over the week's.
+    if (route?.catalogue) return catalogue ?? [];
     if (!span) return week?.releases ?? [];
     return (feed?.weeks ?? [])
       .flatMap((w) => w.releases)
       .filter((r) => r.releaseDate >= span.from && r.releaseDate <= span.to);
-  }, [span, week, feed]);
+  }, [route, catalogue, span, week, feed]);
   const facets = useMemo(() => facetsFor(releases, filters.region), [releases, filters.region]);
   /**
    * The week's own titles, ranked by how much attention they are getting.
@@ -319,7 +343,7 @@ export default function App() {
     onNextWeek: () => stepWeek(1),
     // Same reason the stepper is hidden on a span page: the arrows would move a
     // week nothing on screen is drawn from.
-    blocked: selected !== null || Boolean(span),
+    blocked: selected !== null || Boolean(span) || Boolean(route?.catalogue),
   });
 
   /** Trending is a browse aid; once the reader has narrowed the week it is noise. */
@@ -336,11 +360,15 @@ export default function App() {
     // has however many dates its rows actually fall on, which is the only list
     // that makes sense across a month — enumerating 30 days to drop 20 empties
     // would arrive at the same place the long way round.
+    // The catalogue spans seventy years, so a day heading per release date
+    // would be three hundred sections holding one card each. One flat group,
+    // keyed on the empty string, which the poster view reads as "no heading".
+    if (route?.catalogue) return visible.length ? ([['', visible]] as const) : [];
     const days = span ? [...map.keys()].sort() : daysOfWeek(filters.weekId);
     return days
       .map((d) => [d, map.get(d) ?? []] as const)
       .filter(([, list]) => list.length > 0);
-  }, [visible, filters.weekId, span]);
+  }, [visible, filters.weekId, span, route]);
 
   return (
     <>
@@ -415,7 +443,7 @@ export default function App() {
         {/* A span page has no week to step through, and a stepper that changes
             a number nothing on screen reads would be a control that does
             nothing. The page's own name goes in PageIntro's h1 instead. */}
-        {!isTitlePage && !span && (
+        {!isTitlePage && !span && !route?.catalogue && (
         <div className="weekbar__week">
           <button
             className="weeknav__btn"
@@ -465,7 +493,7 @@ export default function App() {
           {/* The share card names the week it was made from, which is a true
               label for every page but these two. Rather than teach it a second
               vocabulary, a span page does without. */}
-          {!span && <ShareWeek releases={visible} filters={filters} />}
+          {!span && !route?.catalogue && <ShareWeek releases={visible} filters={filters} />}
           <span className="viewtoggle" role="group" aria-label="Layout">
             <button data-on={view === 'board'} onClick={() => setView('board')}>
               Board
@@ -477,6 +505,40 @@ export default function App() {
         </div>
         )}
       </div>
+
+      {/* What am I looking at — three lenses on the same board.
+          Real anchors to real prerendered pages rather than local state, so a
+          lens is shareable, bookmarkable and indexable, and so arriving from a
+          search result lands on the one it promised. The board and the poster
+          grid work identically in all three; only the source of the rows
+          changes.
+
+          Deliberately three, not four. "Trending" was asked for and is not
+          here: both signals available — TMDB's global trending list and its
+          popularity score — return American television for an Indian audience
+          (zero Indian-language titles in the top thirty by popularity), so a
+          tab with that label would be a lie about what the site knows. */}
+      {!isTitlePage && (
+        <nav className="lenses shell" aria-label="What to show">
+          <a className="lens" href="/" aria-current={!route ? 'page' : undefined}>
+            This week
+          </a>
+          <a
+            className="lens"
+            href="/streaming"
+            aria-current={route?.catalogue ? 'page' : undefined}
+          >
+            Now streaming
+          </a>
+          <a
+            className="lens"
+            href="/upcoming"
+            aria-current={route?.span?.kind === 'upcoming' ? 'page' : undefined}
+          >
+            Coming soon
+          </a>
+        </nav>
+      )}
 
       {/* The sentence the homepage never had.
           Someone arriving from Instagram had nothing on screen telling them
@@ -496,6 +558,7 @@ export default function App() {
       {route && feed && !isTitlePage && (
         <PageIntro
           route={route}
+          rows={route.catalogue ? releases : undefined}
           feed={feed}
           region={filters.region}
           currentWeek={currentWeek}
@@ -558,6 +621,26 @@ export default function App() {
 
         {!isTitlePage && !feed && !error && <LoadingBoard view={view} />}
 
+        {/* Its own state: the feed loaded fine, so the shell is right and only
+            this lens has nothing. Saying so beats an empty board that looks
+            like the catalogue is genuinely empty. */}
+        {route?.catalogue && feed && !error && catalogueError && (
+          <div className="empty">
+            <span className="empty__icon">
+              <IconCalendar />
+            </span>
+            <h3>Couldn't load the catalogue</h3>
+            <p>{catalogueError}</p>
+            <div className="empty__actions">
+              <a className="btn btn--lg" href="/streaming">Try again</a>
+              <a className="btn btn--lg" href="/">This week instead</a>
+            </div>
+          </div>
+        )}
+        {route?.catalogue && feed && !error && !catalogueError && !catalogue && (
+          <LoadingBoard view={view} />
+        )}
+
         {!isTitlePage && feed && !error && facets.total === 0 && (
           <div className="empty">
             <span className="empty__icon">
@@ -606,7 +689,7 @@ export default function App() {
                 same measure up top, so the strip would be a second copy of it
                 a few hundred pixels down — and its label says "this week",
                 which is not what a month page is ranking. */}
-            {!userNarrowed && !span && (
+            {!userNarrowed && !span && !route?.catalogue && (
               <TrendingStrip
                 releases={trendingNow.list}
                 live={trendingNow.live}
@@ -652,13 +735,16 @@ export default function App() {
                 onOpen={setSelected}
                 // A month spans five Fridays, so a weekday chip stops
                 // identifying anything and the date has to carry it.
-                dayLabel={byDay.length <= 1 ? 'none' : span ? 'date' : 'weekday'}
+                dayLabel={
+                  route?.catalogue ? 'year' : byDay.length <= 1 ? 'none' : span ? 'date' : 'weekday'
+                }
               />
             ) : (
               byDay.map(([date, list]) => {
                 const d = formatDay(date);
                 return (
-                  <section className="day" key={date} aria-label={`${d.weekday} ${d.day} ${d.month}`}>
+                  <section className="day" key={date || 'all'} aria-label={date ? `${d.weekday} ${d.day} ${d.month}` : 'All titles'}>
+                    {date && (
                     <div className="day__head">
                       <span className="day__date">
                         <span className="day__weekday">{d.weekday}</span>
@@ -669,6 +755,7 @@ export default function App() {
                       <span className="day__rule" />
                       <span className="day__count">{list.length}</span>
                     </div>
+                    )}
                     <div className="grid">
                       {list.map((r, i) => (
                         <ReleaseCard key={r.id} release={r} onOpen={setSelected} index={i} />

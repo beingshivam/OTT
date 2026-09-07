@@ -2620,3 +2620,49 @@ a {
 .footer__note {
   color: var(--text-3);
 }
+
+
+/* -------------------------------------------------------------- lenses ---- */
+
+/* Three views of the same board, so they read as one control rather than three
+   links: a single track, the active one lifted out of it. Sits directly under
+   the header because it answers the first question a reader has — what am I
+   looking at — before any filter is worth touching. */
+.lenses {
+  display: flex;
+  gap: 4px;
+  margin: 4px auto 0;
+  padding: 4px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  width: fit-content;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.lenses::-webkit-scrollbar {
+  display: none;
+}
+.lens {
+  flex: none;
+  padding: 7px 16px;
+  border-radius: var(--radius-pill);
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-2);
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background 0.18s var(--ease),
+    color 0.18s var(--ease);
+}
+.lens:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+.lens[aria-current='page'] {
+  background: var(--text);
+  color: var(--bg);
+}

@@ -776,6 +776,74 @@ for (const [code, name] of languagesPresent) {
 }
 
 /**
+ * The back catalogue, as a page.
+ *
+ * A reader asked for it: a release calendar can only answer "what is new", and
+ * plenty of evenings the question is "what is worth watching". This is the
+ * other lens on the same board — a different set of titles rather than a filter
+ * over the week, which is why it reads its own file.
+ *
+ * Grouped by language, never ranked across them. TMDB vote counts are wildly
+ * uneven between languages, so one merged "best of" ordering would put a
+ * 40,000-vote English title above an 80-vote Malayalam one and present the
+ * result as a judgement about the films. Within a language the comparison is
+ * fair, so that is the only comparison offered.
+ */
+const catalogue = await readFile(resolve(ROOT, 'public/data/catalogue.json'), 'utf8')
+  .then((raw) => JSON.parse(raw).titles ?? [])
+  .catch(() => []);
+
+if (catalogue.length >= MIN_PAGE_ROWS) {
+  const byLang = new Map();
+  for (const r of catalogue) {
+    const code = r.languages?.[0];
+    if (!code) continue;
+    if (!byLang.has(code)) byLang.set(code, []);
+    byLang.get(code).push(r);
+  }
+  /** Only languages with enough to be worth a heading, biggest first. */
+  const groups = [...byLang.entries()]
+    .filter(([, rows]) => rows.length >= MIN_PAGE_ROWS)
+    .sort((a, b) => b[1].length - a[1].length);
+
+  const platformCount = new Set(catalogue.flatMap((r) => r.platforms ?? [])).size;
+  const body = groups
+    .map(([code, rows]) => {
+      const top = [...rows].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0)).slice(0, 12);
+      return (
+        `<section><h2>Best ${esc(lname(code))} on streaming</h2><ul>` +
+        top
+          .map(
+            (r) =>
+              `<li>${esc(r.title)} (${esc(r.year)}) — ` +
+              `${esc(r.rating?.toFixed(1) ?? '')} · ${esc((r.platforms ?? []).map(pname).join(', '))}</li>`,
+          )
+          .join('') +
+        `</ul></section>`
+      );
+    })
+    .join('');
+
+  pages.push({
+    path: 'streaming',
+    group: 'lens',
+    crumb: 'Now streaming',
+    linkText: 'Now streaming',
+    rows: catalogue,
+    title: 'Best movies and shows streaming in India right now — every platform',
+    description:
+      `${catalogue.length} well-rated films and series you can watch right now in India, ` +
+      `across ${platformCount} streaming services — grouped by language, and every one included with a subscription rather than rented.`,
+    h1: 'Good things streaming right now',
+    lede:
+      `${catalogue.length} titles across ${platformCount} platforms, ranked within each language ` +
+      `because a Tamil film and an English one do not get compared on vote counts here.`,
+    facts: '',
+    body,
+  });
+}
+
+/**
  * Everything still to come.
  *
  * Overlaps the month pages by construction — it is their future half — and

@@ -44,8 +44,11 @@ interface Props {
    * 'weekday' a single week — "FRI" is unambiguous inside seven days.
    * 'date'    a month or the upcoming page, where the board spans weeks and
    *           five different Fridays would all read "FRI".
+   * 'year'    the back catalogue, which runs from the 1950s to this month — a
+   *           day or a weekday says nothing there, and the year is the fact a
+   *           reader is actually weighing.
    */
-  dayLabel: 'none' | 'weekday' | 'date';
+  dayLabel: 'none' | 'weekday' | 'date' | 'year';
 }
 
 export function Board({ releases, onOpen, dayLabel }: Props) {
@@ -112,7 +115,7 @@ function PanelCard({
   platformId: string;
   releases: Release[];
   onOpen: (r: Release) => void;
-  dayLabel: 'none' | 'weekday' | 'date';
+  dayLabel: 'none' | 'weekday' | 'date' | 'year';
   major: Set<string>;
 }) {
   const [expanded, setExpanded] = useState(false);
@@ -210,7 +213,7 @@ function BoardRow({
 }: {
   release: Release;
   onOpen: (r: Release) => void;
-  dayLabel: 'none' | 'weekday' | 'date';
+  dayLabel: 'none' | 'weekday' | 'date' | 'year';
   major?: boolean;
 }) {
   const Kind = KIND_ICON[release.kind] ?? KIND_ICON.film;
@@ -238,7 +241,11 @@ function BoardRow({
           <Rating release={release} />
           {dayLabel !== 'none' && (
             <span className="row__day">
-              {dayLabel === 'date' ? `${day.day} ${day.month}` : day.weekday}
+              {dayLabel === 'year'
+                ? release.releaseDate.slice(0, 4)
+                : dayLabel === 'date'
+                  ? `${day.day} ${day.month}`
+                  : day.weekday}
             </span>
           )}
         </span>
