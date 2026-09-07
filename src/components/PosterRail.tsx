@@ -113,6 +113,71 @@ export function PosterRail({
     return () => ro.disconnect();
   }, [measure, releases]);
 
+  /**
+   * A one-time hint that the row scrolls.
+   *
+   * Asked whether the row should advance on its own. It should not — a rail
+   * that drifts moves the card your thumb is already travelling towards, and
+   * anything auto-moving beside other content needs a pause control to satisfy
+   * WCAG 2.2.2. But the question was a fair reaction to a real gap: the only
+   * things saying this row continues are an edge fade and a cut-off third card,
+   * which is easy to miss on a first visit.
+   *
+   * So it moves once, ~44px and back, and then never again. Long enough to read
+   * as motion, over before a reader has reached it, and it cannot take anyone's
+   * place because it returns to where it started.
+   *
+   * Not on pointer devices, which get the arrows instead — two affordances for
+   * one gesture is noise. Not under reduced motion. Not if the reader has
+   * already scrolled the row, because then they know. And once per session
+   * rather than once per row, so the page hints rather than twitches.
+   */
+  useEffect(() => {
+    const el = track.current;
+    if (!el) return;
+    if (window.matchMedia('(hover: hover) and (min-width: 900px)').matches) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    // Nothing to reveal — the row already fits.
+    if (el.scrollWidth - el.clientWidth < 44) return;
+    try {
+      if (sessionStorage.getItem('dropday.nudged') === '1') return;
+      // Claimed when scheduled, not when it fires, so the second row does not
+      // schedule its own before the first has set the flag.
+      sessionStorage.setItem('dropday.nudged', '1');
+    } catch {
+      /* Blocked storage costs the once-per-session guard, not the hint. */
+    }
+
+    let back: ReturnType<typeof setTimeout> | undefined;
+    let done: ReturnType<typeof setTimeout> | undefined;
+    const out = setTimeout(() => {
+      // They got there first; the hint has nothing left to teach.
+      if (el.scrollLeft > 0) return;
+      /*
+        Snapping has to stand down for the duration.
+
+        The track snaps to card starts, and 44px is nearer the snap point it
+        began on than the next one — so the browser pulled it straight back and
+        the hint never rendered at all. It looked like the effect was not
+        running; it was running and being undone one frame later.
+      */
+      el.style.scrollSnapType = 'none';
+      el.scrollTo({ left: 44, behavior: 'smooth' });
+      back = setTimeout(() => {
+        el.scrollTo({ left: 0, behavior: 'smooth' });
+        done = setTimeout(() => {
+          el.style.scrollSnapType = '';
+        }, 500);
+      }, 430);
+    }, 700);
+    return () => {
+      clearTimeout(out);
+      if (back) clearTimeout(back);
+      if (done) clearTimeout(done);
+      el.style.scrollSnapType = '';
+    };
+  }, [releases]);
+
   const page = (dir: 1 | -1) => {
     const el = track.current;
     if (!el) return;

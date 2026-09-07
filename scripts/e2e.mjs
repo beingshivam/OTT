@@ -347,6 +347,80 @@ for (const [width, height] of [[360, 780], [390, 844], [1280, 900]]) {
   await ctx.close();
 }
 
+// --- the scroll hint ------------------------------------------------------
+
+/**
+ * The row moves once, then never again.
+ *
+ * Asked whether the rail should auto-advance. It should not — a drifting row
+ * moves the card a thumb is already travelling towards, and anything
+ * auto-moving beside other content owes WCAG 2.2.2 a pause control. But the
+ * question exposed a real gap: only an edge fade and a cut-off card say the row
+ * continues. So it nudges 44px and returns.
+ *
+ * Worth testing rather than eyeballing, because the first build of it silently
+ * did nothing: scroll snapping pulled the 44px straight back to the nearest
+ * snap point, one frame after it moved. Peak travel is the assertion that
+ * catches that; settling back to 0 is what proves it took nobody's place.
+ */
+console.log('\nThe scroll hint');
+for (const [label, width, height, reduced, shouldNudge] of [
+  ['phone', 390, 844, false, true],
+  ['phone, reduced motion', 390, 844, true, false],
+  ['desktop', 1280, 900, false, false],
+]) {
+  const ctx = await browser.newContext({
+    viewport: { width, height },
+    reducedMotion: reduced ? 'reduce' : 'no-preference',
+  });
+  const page = await ctx.newPage();
+  await page.addInitScript(() => {
+    window.__peak = 0;
+  });
+  await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('.landed__cell');
+  await page.evaluate(() => {
+    const tick = () => {
+      const el = document.querySelector('.landed--sub .landed__track');
+      if (el) window.__peak = Math.max(window.__peak, el.scrollLeft);
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  });
+  await page.waitForTimeout(3200);
+
+  const m = await page.evaluate(() => {
+    const el = document.querySelector('.landed--sub .landed__track');
+    return {
+      peak: Math.round(window.__peak),
+      settled: Math.round(el.scrollLeft),
+      snap: getComputedStyle(el).scrollSnapType,
+      others: [...document.querySelectorAll('.landed--sub .landed__track')].map((e) =>
+        Math.round(e.scrollLeft),
+      ),
+    };
+  });
+
+  if (shouldNudge) {
+    is(m.peak > 20, `${label}: the row hints that it scrolls`, `travelled ${m.peak}px`);
+  } else {
+    // Pointer devices get the arrows; reduced motion gets nothing that moves.
+    is(m.peak === 0, `${label}: no hint where it does not belong`, `travelled ${m.peak}px`);
+  }
+  is(m.settled === 0, `${label}: the hint gives the row back`, `left at ${m.settled}px`);
+  is(
+    m.snap !== 'none',
+    `${label}: snapping is restored afterwards`,
+    `scroll-snap-type left as "${m.snap}"`,
+  );
+  is(
+    m.others.every((x) => x === 0),
+    `${label}: no row is left mid-scroll`,
+    `rows at [${m.others}]`,
+  );
+  await ctx.close();
+}
+
 // --- opening a title --------------------------------------------------------
 
 console.log('\nOpening a title from the rail');
