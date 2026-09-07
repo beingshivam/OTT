@@ -44,9 +44,46 @@ interface Props {
    *  year is the right answer on another — and a rail that decides this for its
    *  caller ends up printing "2 weeks ago" over a film that is not out yet. */
   caption: (r: Release) => string;
+  /**
+   * Optional two-way split of the same row.
+   *
+   * The homepage row carries cinema and streaming together, which is the
+   * pairing this site has and the streaming-only competitors structurally
+   * cannot — but mixed, a cinema release is just another poster, and the run it
+   * is in the middle of is invisible. Segmenting says the two are different
+   * kinds of thing without giving cinema a whole tab in the nav.
+   *
+   * Absent on the other lenses, where there is nothing to split: /upcoming is
+   * all announcements and the catalogue has no cinema in it at all.
+   */
+  segments?: { id: string; label: string; count: number }[];
+  active?: string;
+  onSegment?: (id: string) => void;
+  /**
+   * A sub-row inside a titled section, rather than a section of its own.
+   *
+   * Smaller cards and an h3, so two of these cost roughly what one full row
+   * cost and the board does not get pushed off the fold. Used by the homepage
+   * pair; the single rows on the other lenses stay full size.
+   */
+  compact?: boolean;
 }
 
-export function PosterRail({ title, subtitle, releases, onOpen, caption }: Props) {
+/** Headings need ids to be referenced, and two rows on one page cannot share
+ *  one — the second would label itself with the first row's name. */
+const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+export function PosterRail({
+  title,
+  subtitle,
+  releases,
+  onOpen,
+  caption,
+  segments,
+  active,
+  onSegment,
+  compact,
+}: Props) {
   const track = useRef<HTMLUListElement>(null);
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
@@ -88,15 +125,44 @@ export function PosterRail({ title, subtitle, releases, onOpen, caption }: Props
     });
   };
 
-  if (!releases.length) return null;
+  // With segments the row stays even when this one is empty: the control is the
+  // only way back to the other side, and a row that vanishes on tap strands the
+  // reader on a page that just lost the thing they were using.
+  if (!releases.length && !segments) return null;
 
   return (
-    <section className="landed" aria-labelledby="landed-heading">
+    <section
+      className={compact ? 'landed landed--sub' : 'landed'}
+      aria-labelledby={`landed-${slug(title)}`}
+    >
       <div className="landed__head">
-        <h2 className="landed__title" id="landed-heading">
-          {title}
-        </h2>
-        <p className="landed__sub">{subtitle}</p>
+        {compact ? (
+          <h3 className="landed__title" id={`landed-${slug(title)}`}>
+            {title}
+          </h3>
+        ) : (
+          <h2 className="landed__title" id={`landed-${slug(title)}`}>
+            {title}
+          </h2>
+        )}
+        {segments ? (
+          <div className="landed__segs" role="tablist" aria-label={title}>
+            {segments.map((s) => (
+              <button
+                key={s.id}
+                role="tab"
+                aria-selected={s.id === active}
+                className="landed__seg"
+                onClick={() => onSegment?.(s.id)}
+              >
+                {s.label}
+                <span className="landed__segn">{s.count}</span>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <p className="landed__sub">{subtitle}</p>
+        )}
         {/* Hidden from assistive tech: these duplicate the arrow keys and the
             track's own scrolling, and announcing "previous/next" twice on a
             list that is already navigable is noise. */}
@@ -115,6 +181,9 @@ export function PosterRail({ title, subtitle, releases, onOpen, caption }: Props
           when the cards happen not to divide the track evenly — at 1280px they
           divide it almost exactly, 6.96 cards, and the row reads as finished.
           A fade that follows the actual scroll position is true at every width. */}
+      {!releases.length && (
+        <p className="landed__none">Nothing here in this window — try the other side.</p>
+      )}
       <ul
         className="landed__track"
         ref={track}

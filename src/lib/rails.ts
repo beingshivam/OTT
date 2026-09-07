@@ -33,9 +33,90 @@ export const MAX_ITEMS = 20;
 
 export interface JustLanded {
   releases: Release[];
+  /** How many qualified before the row was capped. The segment control shows
+   *  this rather than releases.length, which is MAX_ITEMS on any busy week and
+   *  would have told a reader both sides held exactly twenty. */
+  total: number;
   /** The first day in the window, so the caller can say what "recently" meant. */
   from: string;
   to: string;
+}
+
+/**
+ * The shared machinery: pick a date range, keep what belongs, order by day and
+ * interleave languages within one.
+ *
+ * Extracted when the row gained segments and a third copy of this loop was
+ * about to appear. The rules it encodes — days compare directly, popularity
+ * does not compare across languages — are the same rules in every row, and
+ * three hand-copied versions of them is three chances to fix a bug twice.
+ */
+function chronicle(
+  all: Release[],
+  region: string,
+  opts: { from: string; to: string; newestFirst: boolean; where?: (r: Release) => boolean },
+): JustLanded {
+  const { from, to, newestFirst, where } = opts;
+  const rows = all.filter(
+    (r) =>
+      r.regions?.includes(region) &&
+      r.releaseDate >= from &&
+      r.releaseDate <= to &&
+      (!where || where(r)) &&
+      Boolean(r.posterUrl),
+  );
+
+  const byDay = new Map<string, Release[]>();
+  for (const r of rows) {
+    if (!byDay.has(r.releaseDate)) byDay.set(r.releaseDate, []);
+    byDay.get(r.releaseDate)!.push(r);
+  }
+
+  const releases = [...byDay.keys()]
+    .sort((a, b) => (newestFirst ? b.localeCompare(a) : a.localeCompare(b)))
+    .flatMap((day) =>
+      interleaveByLanguage(byDay.get(day)!, (a, b) => (b.heat ?? 0) - (a.heat ?? 0)),
+    )
+    .slice(0, MAX_ITEMS);
+
+  return { releases, from, to, total: rows.length };
+}
+
+/** True when a row is a cinema listing. A film can be both — showing in
+ *  cinemas and already streaming — and belongs in both segments when it is. */
+const showing = (r: Release) => r.platforms.includes('theatres');
+const streaming = (r: Release) => r.platforms.some((p) => p !== 'theatres');
+
+/**
+ * How far back a film still counts as showing.
+ *
+ * A cinema run is four to eight weeks against streaming's fortnight, and the
+ * two were sharing a window because they were one row. Splitting the row is
+ * what makes the longer window possible: "just landed" over a five-week-old
+ * film was false, "in cinemas" over one still playing is not.
+ */
+export const CINEMA_DAYS = 42;
+
+/** What is playing now — the segment that had nowhere to live before, and the
+ *  only question on this site no streaming-only competitor can answer. */
+export function inCinemas(all: Release[], region: string, today: Date = new Date()): JustLanded {
+  return chronicle(all, region, {
+    from: toISODate(new Date(today.getTime() - (CINEMA_DAYS - 1) * 86_400_000)),
+    to: toISODate(today),
+    newestFirst: true,
+    where: showing,
+  });
+}
+
+/** The same fortnight the mixed row always used, narrowed to things you can
+ *  actually stream tonight. */
+export function landedOnOtt(all: Release[], region: string, today: Date = new Date()): JustLanded {
+  return chronicle(all, region, {
+    from: toISODate(new Date(today.getTime() - (WINDOW_DAYS - 1) * 86_400_000)),
+    to: toISODate(today),
+    newestFirst: true,
+    where: streaming,
+  });
 }
 
 export function justLanded(
@@ -43,51 +124,28 @@ export function justLanded(
   region: string,
   today: Date = new Date(),
 ): JustLanded {
-  const to = toISODate(today);
-  const from = toISODate(new Date(today.getTime() - (WINDOW_DAYS - 1) * 86_400_000));
-
-  const landed = all.filter(
-    (r) =>
-      r.regions?.includes(region) &&
-      r.releaseDate >= from &&
-      r.releaseDate <= to &&
-      // A rail is artwork. A row without a poster would render as generated
-      // fallback art beside real posters, which reads as a broken image rather
-      // than a design — it is honest on the board, where it sits among text,
-      // and conspicuous here. It stays on the board either way.
-      Boolean(r.posterUrl),
-  );
-
   /**
-   * Newest first, and languages interleaved only within a day.
+   * Newest first, and languages interleaved only within a day — see chronicle,
+   * which now owns both rules.
    *
    * The per-language rule exists because TMDB's popularity and vote counts
    * measure how well represented a language is in TMDB's audience, not how good
    * or how watched a title is — so those numbers cannot be compared across
    * languages. A release date carries no such bias: the 4th is the 4th in every
-   * language. Interleaving the whole row would therefore trade a fair ordering
-   * for a scrambled one, putting a twelve-day-old Bengali film above yesterday's
+   * language. Interleaving the whole row would trade a fair ordering for a
+   * scrambled one, putting a twelve-day-old Bengali film above yesterday's
    * Hindi release and making "just landed" describe something the row is not
    * doing.
    *
-   * So the two rules are applied where each is true. Days sort against each
-   * other directly. Within one day, where the only tiebreaker left is heat and
-   * heat is exactly the incomparable number, the languages interleave.
+   * No `where`: this is the mixed row, cinema beside streaming, which is the
+   * pairing the site is built on. The segments narrow it; they do not replace
+   * it, and /upcoming and the prerendered pages still read it whole.
    */
-  const byDay = new Map<string, Release[]>();
-  for (const r of landed) {
-    if (!byDay.has(r.releaseDate)) byDay.set(r.releaseDate, []);
-    byDay.get(r.releaseDate)!.push(r);
-  }
-
-  const releases = [...byDay.keys()]
-    .sort((a, b) => b.localeCompare(a))
-    .flatMap((day) =>
-      interleaveByLanguage(byDay.get(day)!, (a, b) => (b.heat ?? 0) - (a.heat ?? 0)),
-    )
-    .slice(0, MAX_ITEMS);
-
-  return { releases, from, to };
+  return chronicle(all, region, {
+    from: toISODate(new Date(today.getTime() - (WINDOW_DAYS - 1) * 86_400_000)),
+    to: toISODate(today),
+    newestFirst: true,
+  });
 }
 
 /** The other direction. Shorter, because anticipation has a shorter reach than
@@ -109,31 +167,13 @@ export const SOON_DAYS = 21;
  * languages interleave only within a day.
  */
 export function landingSoon(all: Release[], region: string, today: Date = new Date()): JustLanded {
-  const from = toISODate(new Date(today.getTime() + 86_400_000));
-  const to = toISODate(new Date(today.getTime() + SOON_DAYS * 86_400_000));
-
-  const upcoming = all.filter(
-    (r) =>
-      r.regions?.includes(region) &&
-      r.releaseDate >= from &&
-      r.releaseDate <= to &&
-      Boolean(r.posterUrl),
-  );
-
-  const byDay = new Map<string, Release[]>();
-  for (const r of upcoming) {
-    if (!byDay.has(r.releaseDate)) byDay.set(r.releaseDate, []);
-    byDay.get(r.releaseDate)!.push(r);
-  }
-
-  const releases = [...byDay.keys()]
-    .sort((a, b) => a.localeCompare(b))
-    .flatMap((day) =>
-      interleaveByLanguage(byDay.get(day)!, (a, b) => (b.heat ?? 0) - (a.heat ?? 0)),
-    )
-    .slice(0, MAX_ITEMS);
-
-  return { releases, from, to };
+  return chronicle(all, region, {
+    from: toISODate(new Date(today.getTime() + 86_400_000)),
+    to: toISODate(new Date(today.getTime() + SOON_DAYS * 86_400_000)),
+    // Nearest-first, the opposite of every other row: the thing coming on
+    // Friday matters more than the thing coming in three weeks.
+    newestFirst: false,
+  });
 }
 
 /**

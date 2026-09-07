@@ -20,7 +20,17 @@ import {
 import { BRAND, INSTAGRAM, INSTAGRAM_URL, SLUG, TAGLINE } from './data/brand';
 import { loadFeed, weekById } from './lib/feed';
 import { loadCatalogue } from './lib/catalogue';
-import { justLanded, landingSoon, popularNow, MIN_ITEMS, SOON_DAYS, WINDOW_DAYS } from './lib/rails';
+import {
+  justLanded,
+  landingSoon,
+  popularNow,
+  inCinemas,
+  landedOnOtt,
+  CINEMA_DAYS,
+  MIN_ITEMS,
+  SOON_DAYS,
+  WINDOW_DAYS,
+} from './lib/rails';
 import {
   applyFilters,
   facetsFor,
@@ -333,6 +343,25 @@ export default function App() {
     [feed, filters.region, today],
   );
 
+  /**
+   * The same row, split the way a reader actually chooses.
+   *
+   * "In cinemas" reaches six weeks back where "On OTT" reaches two, because a
+   * cinema run lasts that long and a streaming drop is permanent — mixed into
+   * one row they had to share the shorter window, and a film in its fourth week
+   * fell off the site while still playing. Splitting the row is what lets each
+   * side use its own clock.
+   */
+  const allRows = useMemo(() => feed?.weeks.flatMap((w) => w.releases) ?? [], [feed]);
+  const cinemaRail = useMemo(
+    () => inCinemas(allRows, filters.region, today),
+    [allRows, filters.region, today],
+  );
+  const ottRail = useMemo(
+    () => landedOnOtt(allRows, filters.region, today),
+    [allRows, filters.region, today],
+  );
+
   /** The same fortnight, pointed the other way, for the Coming soon lens. */
   const soon = useMemo(
     () => landingSoon(feed?.weeks.flatMap((w) => w.releases) ?? [], filters.region, today).releases,
@@ -553,7 +582,14 @@ export default function App() {
           here: both signals available — TMDB's global trending list and its
           popularity score — return American television for an Indian audience
           (zero Indian-language titles in the top thirty by popularity), so a
-          tab with that label would be a lie about what the site knows. */}
+          tab with that label would be a lie about what the site knows.
+
+          "In cinemas" was tried as a fourth tab and taken back out. Cinema is
+          72% of the feed's rows and genuinely had nowhere to live, but a tab
+          made it a separate destination — a fourth thing to choose between
+          before seeing anything, clipped at 390px, on a site whose name is the
+          other half. It reads better as one of the two rows under "Just
+          landed", which is where it now lives. */}
       {!isTitlePage && (
         <div className="shell lenses-row">
         <nav className="lenses" aria-label="What to show">
@@ -616,13 +652,45 @@ export default function App() {
       {!isTitlePage && feed && !error && facets.total > 0 && !userNarrowed && !span && !route?.catalogue && (
         <div className="shell">
           {landed.length >= MIN_ITEMS ? (
-            <PosterRail
-              title="Just landed"
-              subtitle={`Out in the last ${WINDOW_DAYS} days — streaming and in cinemas`}
-              releases={landed}
-              onOpen={setSelected}
-              caption={(r) => relativeDay(r.releaseDate, today)}
-            />
+            /*
+              Both rows, both on screen, rather than a toggle over one.
+
+              The toggle had to pick a side to open on, and neither pick was
+              defensible: opening on OTT hides the half that had no other home
+              on the site, opening on cinemas hides the half the site is named
+              after. When no default is right, the control that needs one is the
+              wrong control.
+
+              It also put the two counts side by side, which invited a
+              comparison they cannot support — 50 and 46 are drawn from a
+              six-week window and a two-week one. Split across two rows, each
+              number sits under the sentence that says what it counts.
+            */
+            <section className="landedpair" aria-labelledby="landedpair-heading">
+              <h2 className="landedpair__title" id="landedpair-heading">
+                Just landed
+              </h2>
+              <PosterRail
+                compact
+                title="In cinemas"
+                /* Short enough not to ellipsis at 390px, which ate the count on
+                   the first attempt — and the span is the half that matters:
+                   these two numbers are measured over different windows and
+                   would otherwise read as directly comparable. */
+                subtitle={`${cinemaRail.total} titles · last ${Math.round(CINEMA_DAYS / 7)} weeks`}
+                releases={cinemaRail.releases}
+                onOpen={setSelected}
+                caption={(r) => relativeDay(r.releaseDate, today)}
+              />
+              <PosterRail
+                compact
+                title="On OTT"
+                subtitle={`${ottRail.total} titles · last ${Math.round(WINDOW_DAYS / 7)} weeks`}
+                releases={ottRail.releases}
+                onOpen={setSelected}
+                caption={(r) => relativeDay(r.releaseDate, today)}
+              />
+            </section>
           ) : (
             /* Not enough recent artwork to make a row of posters — a thin rail
                reads as a bug rather than a selection. The text strip was always

@@ -1352,6 +1352,132 @@ a {
   }
 }
 
+/**
+ * The row's two sides.
+ *
+ * Sits where the subtitle sat, at the same weight as the heading rather than
+ * above it: this is a choice inside "Just landed", not a second navigation.
+ * Small enough that both fit beside the title at 320px, because a control that
+ * wraps to its own line is the second editorial band the header work spent
+ * 139px removing.
+ */
+.landed__segs {
+  display: flex;
+  gap: 2px;
+  flex: none;
+  padding: 2px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+.landed__seg {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--text-3);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 0.18s var(--ease),
+    color 0.18s var(--ease);
+}
+.landed__seg:hover {
+  color: var(--text);
+}
+.landed__seg[aria-selected='true'] {
+  background: var(--text);
+  color: var(--bg);
+}
+/* The count is the argument for tapping the other side — "In cinemas 29" says
+   there is something there. Dimmed on the selected side, where it is a fact
+   about what you are already looking at rather than an invitation. */
+.landed__segn {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-3);
+}
+.landed__seg[aria-selected='true'] .landed__segn {
+  color: var(--bg);
+  opacity: 0.55;
+}
+
+/**
+ * The pair: one titled band holding two rows.
+ *
+ * The cards shrink so the two together cost about what the single mixed row
+ * cost — the fold work above this spent 139px getting the board up the page and
+ * a second full-size row would hand most of it back. Everything else about a
+ * row is unchanged, so the two read as the same kind of object, which is the
+ * point: they are the same question asked of two different places.
+ */
+.landedpair {
+  margin-bottom: 4px;
+}
+.landedpair__title {
+  margin: 0 0 2px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.landed--sub {
+  margin-top: 10px;
+}
+.landed--sub .landed__title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+/* Sized against the fold, not by eye. Two rows at the full 124px card put the
+   board at 792px on a 390px phone and below the fold entirely at 360px; at
+   this size the pair costs 454px and the board comes back to ~750px, which is
+   on screen at both. Measured, not guessed — the first attempt at "compact"
+   was still 496px. */
+.landed--sub .landed__cell {
+  flex: 0 0 clamp(92px, 23vw, 124px);
+}
+.landed--sub .landed__track {
+  gap: 10px;
+}
+/* The subtitle carries each row's own window and its own count, so unlike the
+   full-size rows it has to survive a phone — it is the only thing on screen
+   saying that "50" and "46" were measured over different spans. */
+.landed--sub .landed__sub {
+  display: block;
+}
+
+/**
+ * At 320px the counts are the part that goes.
+ *
+ * "Just landed" plus both segments plus both counts overruns the line by a few
+ * pixels on the narrowest phone still in use, and the e2e run catches it. The
+ * count is the weakest thing on the row — it argues for tapping the other side,
+ * which the label already does — while the labels are the control itself and
+ * the heading says what the row is. So the numbers drop and nothing else moves.
+ */
+@media (max-width: 359px) {
+  .landed__segn {
+    display: none;
+  }
+  .landed__seg {
+    padding-inline: 8px;
+  }
+}
+
+.landed__none {
+  margin: 0;
+  padding: 24px 0 8px;
+  font-size: 13px;
+  color: var(--text-3);
+}
+
 .landed__arrows {
   margin-left: auto;
   display: none;

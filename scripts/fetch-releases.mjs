@@ -37,6 +37,31 @@ const WEEKS_BACK = argNum('weeks-back', 3);
 const WEEKS_AHEAD = argNum('weeks-ahead', 4);
 
 /**
+ * Cinema reaches further back than streaming, because the two decay at
+ * completely different rates and the old symmetric window modelled them as if
+ * they did not.
+ *
+ * A streaming release is a point event with a safety net: the title drops, and
+ * from then on it is permanently available and permanently in the catalogue. Its
+ * week ageing out of the feed costs nothing, because /streaming still carries
+ * it. A cinema release is the opposite — it has a *run*, typically four to eight
+ * weeks, during which it is the thing people are actually going out to watch,
+ * and it is in no catalogue at all, because a film in cinemas has no streaming
+ * provider by definition. So when its week aged out of a three-week window it
+ * stopped existing on this site entirely, while still playing down the road.
+ *
+ * Measured on the 7 Sep feed: 29 films were showing in Indian cinemas, present
+ * in the data, reachable only by stepping back through the week arrows, and
+ * none of them was in the catalogue. Three weeks later they would have been
+ * gone. That is the gap this closes.
+ *
+ * Only the cinema pass runs for these extra weeks — see buildWeek's cinemaOnly.
+ * Re-running the streaming discovery over old weeks would cost calls to
+ * rediscover titles the catalogue already holds.
+ */
+const THEATRE_WEEKS_BACK = argNum('theatre-weeks-back', 6);
+
+/**
  * Cinema listings are sorted by popularity, and one page is where the titles
  * anyone is waiting for live. A second page mostly adds long-tail regional
  * bookings — up to eighty rows a week across both regions, against a board that
@@ -96,10 +121,19 @@ function weekStart(date) {
   return new Date(d.getTime() - ((d.getUTCDay() + 2) % 7) * DAY);
 }
 
+/**
+ * Every week the feed carries, oldest first, each flagged with whether it gets
+ * the full build or only the cinema pass. Chronological order matters: the
+ * repeat-listing collapse downstream treats the first sighting of a film as its
+ * opening, so the extra cinema weeks have to lead, not trail.
+ */
 function weekIds() {
   const base = weekStart(new Date());
   const out = [];
-  for (let i = -WEEKS_BACK; i <= WEEKS_AHEAD; i++) out.push(iso(new Date(base.getTime() + i * 7 * DAY)));
+  const back = Math.max(WEEKS_BACK, THEATRE_WEEKS_BACK);
+  for (let i = -back; i <= WEEKS_AHEAD; i++) {
+    out.push({ id: iso(new Date(base.getTime() + i * 7 * DAY)), cinemaOnly: i < -WEEKS_BACK });
+  }
   return out;
 }
 
@@ -231,7 +265,7 @@ function normTitle(t) {
     .trim();
 }
 
-async function buildWeek(weekId, platforms, index) {
+async function buildWeek(weekId, platforms, index, cinemaOnly = false) {
   const cinema = platforms.find((p) => p.theatrical);
   const theatricalId = cinema?.id;
   const theatricalRegions = cinema?.regions ?? [];
@@ -241,7 +275,7 @@ async function buildWeek(weekId, platforms, index) {
   /** @type {Map<string, any>} */
   const byId = new Map();
 
-  for (const region of REGIONS) {
+  for (const region of cinemaOnly ? [] : REGIONS) {
     for (const isMovie of [true, false]) {
       for (let page = 1; page <= 3; page++) {
         const data = await discover({ isMovie, region, from, to, page });
@@ -459,9 +493,9 @@ const curatedByWeek = new Map(
 );
 
 const weeks = [];
-for (const id of weekIds()) {
-  process.stdout.write(`Building week ${id} … `);
-  const week = await buildWeek(id, platforms, index);
+for (const { id, cinemaOnly } of weekIds()) {
+  process.stdout.write(`Building week ${id}${cinemaOnly ? ' (cinema only)' : ''} … `);
+  const week = await buildWeek(id, platforms, index, cinemaOnly);
 
   const curated = curatedByWeek.get(id) ?? [];
   if (curated.length) {

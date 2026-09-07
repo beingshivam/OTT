@@ -27,9 +27,17 @@ execFileSync(
   ['--yes', 'esbuild', 'src/lib/rails.ts', '--bundle', '--format=esm', `--outfile=${join(dir, 'rails.mjs')}`],
   { stdio: 'pipe' },
 );
-const { justLanded, landingSoon, popularNow, WINDOW_DAYS, SOON_DAYS, MAX_ITEMS } = await import(
-  join(dir, 'rails.mjs'),
-);
+const {
+  justLanded,
+  landingSoon,
+  popularNow,
+  inCinemas,
+  landedOnOtt,
+  CINEMA_DAYS,
+  WINDOW_DAYS,
+  SOON_DAYS,
+  MAX_ITEMS,
+} = await import(join(dir, 'rails.mjs'));
 
 const TODAY = new Date('2026-09-07T12:00:00');
 const iso = (daysAgo) =>
@@ -243,4 +251,109 @@ test('the shipped catalogue produces a usable row', () => {
   const langs = new Set(out.map((r) => r.languages?.[0]));
   assert.ok(langs.size >= 3, `the row is only ${[...langs].join(', ')} — the interleave is not working`);
   console.log(`      ${out.length} in the row, ${langs.size} languages: ${[...langs].join(', ')}`);
+});
+
+/**
+ * The split under "Just landed".
+ *
+ * The two sides run on different clocks on purpose — a cinema run outlasts a
+ * streaming drop's news value by a month — and that asymmetry is the whole
+ * reason the row was split, so it is the thing most worth pinning down.
+ */
+
+test('in cinemas reaches back further than the streaming side', () => {
+  const old = row({ releaseDate: iso(30), platforms: ['theatres'] });
+  assert.equal(inCinemas([old], 'IN', TODAY).releases.length, 1);
+  assert.equal(
+    landedOnOtt([row({ releaseDate: iso(30) })], 'IN', TODAY).releases.length,
+    0,
+    'the OTT side keeps the fortnight it always had',
+  );
+});
+
+test('in cinemas stops at its own horizon', () => {
+  const rows = [
+    row({ releaseDate: iso(CINEMA_DAYS - 1), platforms: ['theatres'] }),
+    row({ releaseDate: iso(CINEMA_DAYS + 5), platforms: ['theatres'] }),
+  ];
+  assert.equal(inCinemas(rows, 'IN', TODAY).releases.length, 1);
+});
+
+test('neither side takes what has not opened yet', () => {
+  const future = [
+    row({ releaseDate: iso(-2), platforms: ['theatres'] }),
+    row({ releaseDate: iso(-2), platforms: ['netflix'] }),
+  ];
+  assert.equal(inCinemas(future, 'IN', TODAY).releases.length, 0);
+  assert.equal(landedOnOtt(future, 'IN', TODAY).releases.length, 0);
+});
+
+test('a film both showing and streaming appears on both sides', () => {
+  // The row the board draws as two platforms. Dropping it from either side
+  // would hide a real answer to that side's question.
+  const both = [row({ platforms: ['theatres', 'netflix'] })];
+  assert.equal(inCinemas(both, 'IN', TODAY).releases.length, 1);
+  assert.equal(landedOnOtt(both, 'IN', TODAY).releases.length, 1);
+});
+
+test('a cinema-only film never appears on the OTT side', () => {
+  const rows = [row({ platforms: ['theatres'] })];
+  assert.equal(landedOnOtt(rows, 'IN', TODAY).releases.length, 0);
+});
+
+test('both sides are newest first', () => {
+  const older = iso(9);
+  const newer = iso(2);
+  const cin = inCinemas(
+    [row({ releaseDate: older, platforms: ['theatres'] }), row({ releaseDate: newer, platforms: ['theatres'] })],
+    'IN',
+    TODAY,
+  ).releases;
+  assert.deepEqual([cin[0].releaseDate, cin[1].releaseDate], [newer, older]);
+
+  const ott = landedOnOtt(
+    [row({ releaseDate: older }), row({ releaseDate: newer })],
+    'IN',
+    TODAY,
+  ).releases;
+  assert.deepEqual([ott[0].releaseDate, ott[1].releaseDate], [newer, older]);
+});
+
+test('both sides respect region and require artwork', () => {
+  const rows = [
+    row({ platforms: ['theatres'], regions: ['US'] }),
+    row({ platforms: ['theatres'], posterUrl: undefined }),
+    row({ regions: ['US'] }),
+    row({ posterUrl: undefined }),
+  ];
+  assert.equal(inCinemas(rows, 'IN', TODAY).releases.length, 0);
+  assert.equal(landedOnOtt(rows, 'IN', TODAY).releases.length, 0);
+});
+
+test('one language cannot take the cinema row on a busy day', () => {
+  const day = iso(3);
+  const rows = [
+    ...Array.from({ length: 5 }, () => row({ releaseDate: day, platforms: ['theatres'], languages: ['hi'], heat: 90 })),
+    row({ releaseDate: day, platforms: ['theatres'], languages: ['ta'], heat: 10 }),
+  ];
+  const out = inCinemas(rows, 'IN', TODAY).releases;
+  assert.equal(out[1].languages[0], 'ta', 'the second slot goes to the other language, not the fifth Hindi row');
+});
+
+test('both sides cap the row', () => {
+  const many = Array.from({ length: MAX_ITEMS + 12 }, (_, i) =>
+    row({ releaseDate: iso((i % 10) + 1), platforms: ['theatres'] }),
+  );
+  assert.equal(inCinemas(many, 'IN', TODAY).releases.length, MAX_ITEMS);
+});
+
+test('the shipped feed fills both sides', () => {
+  const feed = JSON.parse(readFileSync('public/data/releases.json', 'utf8'));
+  const all = feed.weeks.flatMap((w) => w.releases);
+  const cin = inCinemas(all, 'IN', new Date()).releases;
+  const ott = landedOnOtt(all, 'IN', new Date()).releases;
+  assert.ok(cin.length > 0, 'no cinema titles in the real feed');
+  assert.ok(ott.length > 0, 'no streaming titles in the real feed');
+  assert.ok(cin.every((r) => r.platforms.includes('theatres')));
+  assert.ok(ott.every((r) => r.platforms.some((p) => p !== 'theatres')));
 });

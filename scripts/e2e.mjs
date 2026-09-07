@@ -233,6 +233,80 @@ console.log('\nThe rail');
   await ctx.close();
 }
 
+// --- the cinema / OTT split --------------------------------------------------
+
+/**
+ * The two rows under "Just landed", checked as behaviour rather than markup.
+ *
+ * The split exists because cinema and streaming decay at different rates and a
+ * single row had to pick one window, so what is worth asserting is that each
+ * row holds only its own kind, that each states its own span (the counts come
+ * from different windows and must never read as comparable), and that showing
+ * both does not push the board off the screen — which is the cost the design
+ * was chosen against and the thing most likely to regress silently.
+ */
+console.log('\nJust landed: in cinemas / on OTT');
+for (const [width, height] of [[360, 780], [390, 844], [1280, 900]]) {
+  const { ctx, page, errors } = await newPage(browser, { width, height });
+  await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('.landed__cell');
+
+  const rows = page.locator('.landed--sub');
+  is(await rows.count() === 2, `${width}px: both rows render`, `${await rows.count()} rows`);
+
+  const titles = await page.evaluate(() =>
+    [...document.querySelectorAll('.landed--sub .landed__title')].map((e) => e.textContent.trim()),
+  );
+  is(
+    titles[0] === 'In cinemas' && titles[1] === 'On OTT',
+    `${width}px: cinemas leads, OTT follows`,
+    titles.join(' / '),
+  );
+
+  // Each row's platform badges say what kind of thing it holds.
+  const kinds = await page.evaluate(() =>
+    [...document.querySelectorAll('.landed--sub')].map((row) =>
+      [...row.querySelectorAll('.landed__badge')].map(
+        (b) => b.querySelector('img,svg')?.getAttribute('alt') ?? b.textContent.trim(),
+      ),
+    ),
+  );
+  is(kinds[0].length > 0 && kinds[1].length > 0, `${width}px: both rows have cards`, 'a row is empty');
+
+  // The spans differ, so each row has to say its own or the counts mislead.
+  const subs = await page.evaluate(() =>
+    [...document.querySelectorAll('.landed--sub .landed__sub')].map((e) => e.textContent.trim()),
+  );
+  is(
+    subs.length === 2 && subs.every((t) => /last \d+ weeks/.test(t)),
+    `${width}px: each row states its own window`,
+    subs.join(' / '),
+  );
+  is(subs[0] !== subs[1], `${width}px: the two windows are not the same`, subs[0]);
+
+  // A subtitle that ellipsises loses the count, which happened at 390px.
+  const clipped = await page.evaluate(() =>
+    [...document.querySelectorAll('.landed--sub .landed__sub')].filter(
+      (e) => e.scrollWidth > e.clientWidth + 1,
+    ).length,
+  );
+  is(clipped === 0, `${width}px: neither subtitle is cut off`, `${clipped} truncated`);
+
+  // The board is the product; two rows must not bury it.
+  const boardTop = await page.evaluate(() => {
+    const b = document.querySelector('.board, .grid');
+    return b ? Math.round(b.getBoundingClientRect().top + scrollY) : null;
+  });
+  is(
+    boardTop !== null && boardTop < height,
+    `${width}px: the board still reaches the first screen`,
+    `board at ${boardTop}px against a ${height}px fold`,
+  );
+
+  is(errors.length === 0, `${width}px: no console errors`, errors[0]);
+  await ctx.close();
+}
+
 // --- opening a title --------------------------------------------------------
 
 console.log('\nOpening a title from the rail');
@@ -590,7 +664,12 @@ for (const [path, heading, expect] of [
     await page.waitForTimeout(900);
 
     const m = await page.evaluate(() => ({
-      heading: document.querySelector('.landed__title')?.textContent?.trim() ?? null,
+      // On the homepage the name of the band is the section heading; the two
+      // rows inside it carry their own. Everywhere else the row is the section.
+      heading:
+        document.querySelector('.landedpair__title')?.textContent?.trim() ??
+        document.querySelector('.landed__title')?.textContent?.trim() ??
+        null,
       captions: [...document.querySelectorAll('.landed__meta')].slice(0, 6).map((e) => e.textContent.trim()),
       cards: document.querySelectorAll('.landed__cell').length,
       overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
