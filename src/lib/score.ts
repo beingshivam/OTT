@@ -44,6 +44,20 @@ export const IMDB_MIN_VOTES = 1000;
  */
 export const IMDB_MAX_CREDIBLE = 9.5;
 
+/**
+ * And the same ceiling on TMDB's, which it did not have.
+ *
+ * The ceiling was written for IMDb and the reasoning never was: no film sits
+ * above the best-reviewed film ever made, whoever is counting. Left off the
+ * TMDB branch, the site suppressed a 10.0 from 1,029 IMDb votes while happily
+ * printing 9.6 from five TMDB ones — the less believable of the two.
+ *
+ * This is not the vote gate doing a second job. That decides whether a score is
+ * confident enough to colour; this decides whether it is a score at all. A 9.6
+ * from five people is not a quiet number, it is an artifact.
+ */
+export const MAX_CREDIBLE = 9.5;
+
 export interface Score {
   value: number;
   votes?: number;
@@ -74,7 +88,7 @@ export function scoreOf(release: Release): Score | null {
     };
   }
 
-  if (release.rating == null) return null;
+  if (release.rating == null || release.rating > MAX_CREDIBLE) return null;
 
   /**
    * A missing vote count means a hand-checked curated row, not a thinly-voted
