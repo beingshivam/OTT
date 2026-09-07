@@ -2666,3 +2666,82 @@ a {
   background: var(--text);
   color: var(--bg);
 }
+
+
+/* ------------------------------------------------- small-screen repairs ---- */
+
+/*
+ * Found by rendering the site at 390px, which is how most of its readers open
+ * it — not by reading the stylesheet.
+ */
+@media (max-width: 560px) {
+  /* The three lenses ran to 397px inside a 388px track, so "Coming soon" sat
+     under the right edge behind a scroll nobody could see. Splitting the full
+     width between them fits all three and makes each a bigger tap target than
+     it was. */
+  .lenses {
+    width: 100%;
+    justify-content: stretch;
+  }
+  .lens {
+    flex: 1 1 0;
+    text-align: center;
+    padding: 8px 6px;
+    font-size: 12.5px;
+  }
+
+  /*
+   * The page intro filled a phone screen on its own.
+   *
+   * On /streaming it ran to roughly fourteen wrapped pills — best rated, the
+   * platform split, six languages — so the board itself started below the fold
+   * and the first thing a reader saw on a page about films was no films. Each
+   * row becomes one scrollable line instead of a wrapping block, which keeps
+   * every fact and returns the screen to the titles.
+   */
+  .pageintro__facts {
+    gap: 10px 0;
+  }
+  /*
+   * Label on its own line, pills as a block scroller beneath it.
+   *
+   * The first attempt kept them side by side and relied on the pill row
+   * shrinking inside a flex parent. It would not: with min-width:0 and
+   * shrink enabled it still laid out at its content width of 411px and pushed
+   * the page 201px sideways. A block-level scroller with max-width:100% cannot
+   * do that, and reads better on a phone anyway — the row gets the full width
+   * instead of whatever the label leaves it.
+   */
+  .pageintro__fact {
+    display: block;
+    min-width: 0;
+  }
+  .pageintro__label {
+    display: block;
+    margin-bottom: 6px;
+  }
+  .pageintro__vals {
+    max-width: 100%;
+    min-width: 0;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    /* Room for the pill's focus ring, which a clipping scroller would cut. */
+    padding-bottom: 2px;
+  }
+  .pageintro__vals::-webkit-scrollbar {
+    display: none;
+  }
+  .pageintro__pill {
+    flex: none;
+  }
+
+  /*
+   * The poster held the top third of a title page, pushing the answer someone
+   * arrived for — "is it on OTT yet" — off the first screen. It stays, at a
+   * size that leaves room for the heading underneath it.
+   */
+  .titlepage__art {
+    max-width: 148px;
+  }
+}

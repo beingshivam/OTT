@@ -190,6 +190,17 @@ function packColumns(panels: Panel[], count: number): Panel[][] {
 function useColumnCount(): number {
   const measure = () => {
     const w = typeof window === 'undefined' ? 1280 : window.innerWidth;
+    /**
+     * One column on a phone.
+     *
+     * This floored at two, so a 390px screen — the commonest way this site is
+     * opened — split into two 175px columns. At that width a row is icon, title,
+     * score and a fixed 40px day chip, which leaves about a hundred pixels for
+     * the name: "Mirzapur: The Movie" wrapped onto three lines and the panel
+     * headings ellipsed to "Prime Vid…". Two columns of unreadable is worse
+     * than one column that fits.
+     */
+    if (w < 640) return 1;
     if (w < 900) return 2;
     if (w < 1280) return 3;
     return 4;

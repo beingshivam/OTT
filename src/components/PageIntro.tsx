@@ -128,10 +128,17 @@ export function PageIntro({ route, rows, feed, region, currentWeek, onOpen }: Pr
       ? 'Biggest this week'
       : 'Biggest right now';
 
-  const bestRated = [...scope]
-    .map((r) => ({ row: r, score: scoreOf(r) }))
-    .filter((x) => x.score?.confident)
-    .sort((a, b) => (b.score?.value ?? 0) - (a.score?.value ?? 0))[0];
+  /**
+   * Its own row everywhere except the catalogue, where the lead row is already
+   * ranked by score — so the page printed "BEST RATED" twice, a few pills
+   * apart, with Breaking Bad in both.
+   */
+  const bestRated = route.catalogue
+    ? undefined
+    : [...scope]
+        .map((r) => ({ row: r, score: scoreOf(r) }))
+        .filter((x) => x.score?.confident)
+        .sort((a, b) => (b.score?.value ?? 0) - (a.score?.value ?? 0))[0];
 
   const films = scope.filter((r) => r.kind === 'film').length;
   const series = scope.length - films;
