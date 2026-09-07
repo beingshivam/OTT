@@ -273,18 +273,26 @@ for (const [width, height] of [[360, 780], [390, 844], [1280, 900]]) {
   );
   is(kinds[0].length > 0 && kinds[1].length > 0, `${width}px: both rows have cards`, 'a row is empty');
 
-  // The spans differ, so each row has to say its own or the counts mislead.
+  /*
+    No window in the subtitle. It said "last 6 weeks" under a tab that says
+    "This week" — a contradiction the reader has to resolve before trusting
+    either. Recency now lives on each card, where it is per title and true.
+  */
   const subs = await page.evaluate(() =>
     [...document.querySelectorAll('.landed--sub .landed__sub')].map((e) => e.textContent.trim()),
   );
   is(
-    subs.length === 2 && subs.every((t) => /last \d+ weeks/.test(t)),
-    `${width}px: each row states its own window`,
+    subs.length === 2 && subs.every((t) => !/week|day/i.test(t)),
+    `${width}px: no row claims a window that fights the tab`,
     subs.join(' / '),
   );
-  is(subs[0] !== subs[1], `${width}px: the two windows are not the same`, subs[0]);
+  is(
+    subs.every((t) => /^\d+ titles$/.test(t)),
+    `${width}px: each row says how much it holds`,
+    subs.join(' / '),
+  );
 
-  // A subtitle that ellipsises loses the count, which happened at 390px.
+  // A subtitle that ellipsises loses its count.
   const clipped = await page.evaluate(() =>
     [...document.querySelectorAll('.landed--sub .landed__sub')].filter(
       (e) => e.scrollWidth > e.clientWidth + 1,
@@ -292,15 +300,47 @@ for (const [width, height] of [[360, 780], [390, 844], [1280, 900]]) {
   );
   is(clipped === 0, `${width}px: neither subtitle is cut off`, `${clipped} truncated`);
 
-  // The board is the product; two rows must not bury it.
-  const boardTop = await page.evaluate(() => {
-    const b = document.querySelector('.board, .grid');
-    return b ? Math.round(b.getBoundingClientRect().top + scrollY) : null;
+  /*
+    Two full posters and a glimpse of a third.
+
+    Four cards fit a phone only by shrinking each to 92px, at which point the
+    poster stops earning its place. Below two, the row stops being a row. The
+    partial third is what says it scrolls.
+  */
+  const fit = await page.evaluate(() => {
+    const row = document.querySelector('.landed--sub');
+    const cell = row.querySelector('.landed__cell');
+    const w = cell.getBoundingClientRect().width;
+    return (row.querySelector('.landed__track').clientWidth + 10) / (w + 10);
+  });
+  // The ceiling is a phone constraint: a 1280px desktop has room for a proper
+  // row and capping it there would waste the width, so only the floor applies.
+  const ceiling = width < 700 ? 3.2 : Infinity;
+  is(
+    fit >= 2 && fit < ceiling,
+    `${width}px: two posters and a peek, not a wall of thumbnails`,
+    `${fit.toFixed(2)} cards visible`,
+  );
+
+  /*
+    Both rows on the first screen.
+
+    This replaced an assertion that the *board* reached the first screen, which
+    bigger posters made false. The trade was deliberate: the first screen is now
+    what is new in both places, and the calendar begins immediately under it. So
+    what has to hold is that neither row is stranded below the fold — a second
+    row a reader never sees is the toggle's problem all over again, with none of
+    its compactness.
+  */
+  const secondRowBottom = await page.evaluate(() => {
+    const rows = [...document.querySelectorAll('.landed--sub')];
+    const r = rows[rows.length - 1].getBoundingClientRect();
+    return Math.round(r.bottom + scrollY);
   });
   is(
-    boardTop !== null && boardTop < height,
-    `${width}px: the board still reaches the first screen`,
-    `board at ${boardTop}px against a ${height}px fold`,
+    secondRowBottom <= height,
+    `${width}px: both rows land on the first screen`,
+    `the OTT row ends at ${secondRowBottom}px against a ${height}px fold`,
   );
 
   is(errors.length === 0, `${width}px: no console errors`, errors[0]);

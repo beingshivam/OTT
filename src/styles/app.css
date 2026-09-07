@@ -1435,13 +1435,21 @@ a {
   font-weight: 600;
   color: var(--text-2);
 }
-/* Sized against the fold, not by eye. Two rows at the full 124px card put the
-   board at 792px on a 390px phone and below the fold entirely at 360px; at
-   this size the pair costs 454px and the board comes back to ~750px, which is
-   on screen at both. Measured, not guessed — the first attempt at "compact"
-   was still 496px. */
+/*
+ * Two posters and a glimpse of the third, not four.
+ *
+ * Sized to the fold first, which was the wrong constraint: four cards fit a
+ * phone only by shrinking each to 92px, and a poster that small stops doing
+ * the one thing a poster is for — a wall of thumbnails is a list with worse
+ * density. Fitting fewer, larger cards is what makes the row worth having, and
+ * the ones off the edge are what the fade is for.
+ *
+ * ~2.35 cards at 390px, so the third is visibly cut and the row reads as
+ * continuing. This costs vertical space and pushes the board off the first
+ * screen; that is a deliberate trade, not an oversight — see the e2e note.
+ */
 .landed--sub .landed__cell {
-  flex: 0 0 clamp(92px, 23vw, 124px);
+  flex: 0 0 clamp(132px, 37vw, 172px);
 }
 .landed--sub .landed__track {
   gap: 10px;

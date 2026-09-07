@@ -26,10 +26,8 @@ import {
   popularNow,
   inCinemas,
   landedOnOtt,
-  CINEMA_DAYS,
   MIN_ITEMS,
   SOON_DAYS,
-  WINDOW_DAYS,
 } from './lib/rails';
 import {
   applyFilters,
@@ -673,11 +671,16 @@ export default function App() {
               <PosterRail
                 compact
                 title="In cinemas"
-                /* Short enough not to ellipsis at 390px, which ate the count on
-                   the first attempt — and the span is the half that matters:
-                   these two numbers are measured over different windows and
-                   would otherwise read as directly comparable. */
-                subtitle={`${cinemaRail.total} titles · last ${Math.round(CINEMA_DAYS / 7)} weeks`}
+                /*
+                  No window in the label.
+                  It read "last 6 weeks" directly under a tab that says "This
+                  week", which is a contradiction a reader has to resolve before
+                  they can trust either. The windows were there to stop the two
+                  counts looking comparable — but each card already carries its
+                  own "3 days ago", which is a truer answer to "how new is this"
+                  than a span covering the whole row, and it is per title.
+                */
+                subtitle={`${cinemaRail.total} titles`}
                 releases={cinemaRail.releases}
                 onOpen={setSelected}
                 caption={(r) => relativeDay(r.releaseDate, today)}
@@ -685,7 +688,7 @@ export default function App() {
               <PosterRail
                 compact
                 title="On OTT"
-                subtitle={`${ottRail.total} titles · last ${Math.round(WINDOW_DAYS / 7)} weeks`}
+                subtitle={`${ottRail.total} titles`}
                 releases={ottRail.releases}
                 onOpen={setSelected}
                 caption={(r) => relativeDay(r.releaseDate, today)}
