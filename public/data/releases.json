@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-07T08:49:55.536Z",
+  "generatedAt": "2026-09-07T13:48:39.604Z",
   "source": "tmdb",
   "weeks": [
     {
@@ -66,7 +66,7 @@
             "US"
           ],
           "rating": 6.4,
-          "votes": 449,
+          "votes": 451,
           "heat": 64,
           "synopsis": "After a mysterious cosmic event rips Oak Street from suburbia and transports their neighborhood to someplace unknown, the Platt family soon discovers that their very survival depends on them sticking together as they navigate their now unrecognizable surroundings.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/fYXqpgPmHMphSF2W30GbTeJVIa5.jpg",
@@ -148,7 +148,7 @@
             "US"
           ],
           "rating": 6.6,
-          "votes": 46,
+          "votes": 47,
           "heat": 55,
           "synopsis": "Following the brutal murder of two police officers, a tenacious detective reluctantly joins forces with his estranged ex-cop father to catch the killer.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/8iFUWLKBAWDrJ9rOunscgIDrGQ1.jpg",
@@ -186,7 +186,7 @@
             "US"
           ],
           "rating": 6.7,
-          "votes": 98,
+          "votes": 99,
           "heat": 51,
           "synopsis": "After years of slapdash sequels and waning fandom, the Camp Miasma slasher franchise is handed over to an enthusiastic young director for resurrection. But when she visits the original's star, a now-reclusive actress shrouded in mystery, the two women fall into a blood-soaked world of desire, fear, and delirium.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/5Cz1EJOKpZ8hqvBNZYF9C2zTB2T.jpg",
@@ -335,7 +335,7 @@
             "US"
           ],
           "rating": 5.7,
-          "votes": 20,
+          "votes": 21,
           "heat": 37,
           "synopsis": "Two codependent best friends living paycheck to paycheck and bong rip to bong rip get caught in a case of mistaken identity that throws their lives into chaos.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/iEJshwO6g4WKTP4HJgCHRTJMWEd.jpg",
@@ -519,8 +519,8 @@
             "IN",
             "US"
           ],
-          "rating": 6.1,
-          "votes": 37,
+          "rating": 6.2,
+          "votes": 39,
           "heat": 29,
           "synopsis": "Olli and Matze are best friends living, working and planning to travel the world together — until Matze's romance with Rebecca turns it all upside down.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/aWLshM7DZECutuQVpMfhDiPZUQC.jpg",
@@ -925,38 +925,6 @@
           "imdbVotes": 147
         },
         {
-          "id": "t-326901",
-          "title": "Take a Hike!",
-          "kind": "reality",
-          "platforms": [
-            "netflix"
-          ],
-          "languages": [
-            "ko"
-          ],
-          "genres": [
-            "Reality"
-          ],
-          "releaseDate": "2026-08-18",
-          "regions": [
-            "IN",
-            "US"
-          ],
-          "votes": 1,
-          "heat": 20,
-          "synopsis": "Four celebrity hiking newbies end up forming a club to tackle Korea's snow‑capped peaks. Can they figure out why on earth people go to the mountains?",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/ya3p0meUJJ92gjFRFcZ1C3TJ0nO.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/giJzZvC9p6QdSi9tCgcOJZcw2hY.jpg",
-          "imdbId": "tt39387594",
-          "cast": [
-            "Car, the garden",
-            "Yoon Do-woon",
-            "Lee Chae-min",
-            "Tarzzan"
-          ],
-          "trailerUrl": "https://www.youtube.com/watch?v=_8ZgMwteQkQ"
-        },
-        {
           "id": "t-294722",
           "title": "The Dynasty: UConn Huskies",
           "kind": "documentary",
@@ -989,6 +957,38 @@
           ],
           "trailerUrl": "https://www.youtube.com/watch?v=qygK7CQUe_o",
           "certification": "A"
+        },
+        {
+          "id": "t-326901",
+          "title": "Take a Hike!",
+          "kind": "reality",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "ko"
+          ],
+          "genres": [
+            "Reality"
+          ],
+          "releaseDate": "2026-08-18",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "votes": 1,
+          "heat": 20,
+          "synopsis": "Four celebrity hiking newbies end up forming a club to tackle Korea's snow‑capped peaks. Can they figure out why on earth people go to the mountains?",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/ya3p0meUJJ92gjFRFcZ1C3TJ0nO.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/giJzZvC9p6QdSi9tCgcOJZcw2hY.jpg",
+          "imdbId": "tt39387594",
+          "cast": [
+            "Car, the garden",
+            "Yoon Do-woon",
+            "Lee Chae-min",
+            "Tarzzan"
+          ],
+          "trailerUrl": "https://www.youtube.com/watch?v=_8ZgMwteQkQ"
         },
         {
           "id": "m-1742499",
@@ -1740,7 +1740,7 @@
             "US"
           ],
           "rating": 6.4,
-          "votes": 306,
+          "votes": 310,
           "heat": 88,
           "synopsis": "After witnessing his billionaire boss' murder and being framed for the crime, Cole Reed boards a cargo ship on a one-man crusade to avenge his boss' death only to discover an international conspiracy.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/pu2VxGlpGwffOx292w18b1tv96j.jpg",
@@ -1933,7 +1933,7 @@
             "US"
           ],
           "rating": 6.5,
-          "votes": 114,
+          "votes": 116,
           "heat": 64,
           "synopsis": "Gemma, a young mother raising her daughter in the house she grew up in, discovers she can travel into The Further, where she possesses an ability to bring what lives there back to the real world.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/4tTrW9dXCByS5wt2pXVWb58zNjz.jpg",
@@ -1974,8 +1974,8 @@
             "IN",
             "US"
           ],
-          "rating": 8.1,
-          "votes": 44,
+          "rating": 8,
+          "votes": 45,
           "heat": 61,
           "synopsis": "A defective lamp reveals a heartbreaking truth about what Homer believes is reality, and an AI-powered tablet befriends and controls Maggie. The Simpsons struggle to find the light through two dark tales of the curious and bizarre.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/1zdGvJAuuXC7dA3eV61OtUJNyjQ.jpg",
@@ -3544,7 +3544,7 @@
           "heat": 95,
           "synopsis": "After Acme products fail him one too many times in his dogged pursuit of the Roadrunner, Wile E. Coyote decides to hire a billboard lawyer to sue the Acme Corporation.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/orkLtdgMGiO9rTVMqJ1kKwrnup1.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/7GOW6jod9lLurW5utokAatxg7ql.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/l9mFW9HQnAZ4r1ChZJHoOT3jaal.jpg",
           "imdbId": "tt1756855",
           "runtimeMinutes": 103,
           "cast": [
@@ -3579,7 +3579,7 @@
             "US"
           ],
           "rating": 8.1,
-          "votes": 699,
+          "votes": 704,
           "heat": 88,
           "synopsis": "Professor Se-jeong is thrust into a bloody nightmare when a rapidly mutating virus is released during a biotech conference causing authorities to seal the facility. Trapped inside with no escape, Se-jeong along with a small group of survivors must fight to stay alive while the infected undergo horrific transformations.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/tN799oUR0f1gUKDYdMNrDaY7I51.jpg",
@@ -3619,7 +3619,7 @@
             "US"
           ],
           "rating": 6.7,
-          "votes": 285,
+          "votes": 302,
           "heat": 85,
           "synopsis": "Maia Marten, a brilliant London lawyer, has her life shattered by a single call on her morning run: her son has been taken. To get him back, she must keep running, obey every ruthless command, and trust no one-each second a test of how far a mother will go to save her child.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/uxCaBoYXsDC4A0SqTm3SISj0OwK.jpg",
@@ -3657,13 +3657,13 @@
             "US"
           ],
           "rating": 8,
-          "votes": 229,
+          "votes": 250,
           "heat": 84,
           "synopsis": "When a U.S. Navy pilot on a top-secret mission during the Cold War gets trapped behind enemy lines, his only chance at survival is to form an alliance with an eccentric ex-KGB agent.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/7tlkTHxcTSlrPYURo0VuglaLPXv.jpg",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/hVXjX1jLZ1ljFSNGXpjJfbTUOa7.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/4gyx49ibwQslyrwuUS1c58PJEEd.jpg",
           "imdbId": "tt28014327",
-          "runtimeMinutes": 110,
+          "runtimeMinutes": 111,
           "cast": [
             "Ryan Reynolds",
             "Kenneth Branagh",
@@ -3696,7 +3696,7 @@
             "US"
           ],
           "rating": 6.7,
-          "votes": 216,
+          "votes": 217,
           "heat": 68,
           "synopsis": "After the world's population has been ravaged by a pandemic, a man lives a lonesome existence in a Colorado airplane hangar with his dog and a dour gunman he has befriended. When a mysterious transmission comes through on the radio while he’s flying his old Cessna, it sparks a hunt for the provenance of the sound.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/5O616X9vmRzQdB68PHzBewPittd.jpg",
@@ -3736,7 +3736,7 @@
             "US"
           ],
           "rating": 7.2,
-          "votes": 55,
+          "votes": 57,
           "heat": 66,
           "synopsis": "A fictionalized drama film based on one of the most shocking crimes in Argentina's history. In 1992, Ricardo Barreda was an unassuming dentist, brutally murdered his wife, mother-in-law, and two adult daughters in their family home. Branding himself as a victim, Ricardo Barreda ignited a media storm and fueled a national scandal.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/hnr0QkZSDLlrJTvU2ecco65wcHo.jpg",
@@ -3812,8 +3812,8 @@
           "regions": [
             "US"
           ],
-          "rating": 6.9,
-          "votes": 19,
+          "rating": 7,
+          "votes": 20,
           "heat": 63,
           "synopsis": "When Chloe develops a destructive new superpower, the Hero League orders her to an elite boarding school for superheroes to learn control of her abilities. Faced with the prospect of sending Chloe away for years, the Thundermans split apart, with Phoebe, Barb and Billy taking her into hiding. Max, Hank, and Nora track their rogue family members, until the two factions face off against each other in a full-on battle for the Thundermans’ future.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/16oqRrWVzQm6qdGfBxvziZ2UiMT.jpg",
@@ -3864,7 +3864,7 @@
             "Virginia Gardner",
             "Sahajak Boonthanakit"
           ],
-          "director": "Michael Spierig",
+          "director": "Peter Spierig",
           "trailerUrl": "https://www.youtube.com/watch?v=Krs0VDIjhmE",
           "imdbRating": 5.7,
           "imdbVotes": 1154
@@ -3888,7 +3888,7 @@
             "US"
           ],
           "rating": 6.6,
-          "votes": 29,
+          "votes": 30,
           "heat": 52,
           "synopsis": "A criminal mastermind plans to fake his death for insurance money while framing his wife's lover. His wife plots to kill him for real and take it all. Both race to outmanoeuvre each other in a deadly battle of wits.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/glALx6QaIgw1u4joXsnfHTjWi6D.jpg",
@@ -4157,8 +4157,8 @@
             "IN",
             "US"
           ],
-          "rating": 6,
-          "votes": 5,
+          "rating": 6.7,
+          "votes": 6,
           "heat": 46,
           "synopsis": "Set during the Mexican Revolution, follow Emilia Sauri, a woman torn between two passionate loves while navigating a world dominated by violence and revolution.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/91s80WxRqIirFSpGVtiXJoS1GA5.jpg",
@@ -4380,7 +4380,7 @@
             "Samuel Free",
             "Beverly Gunn",
             "Russell Gunn",
-            "Tinylocks"
+            "Sammy Tinylocks"
           ],
           "director": "Chapman Way",
           "trailerUrl": "https://www.youtube.com/watch?v=OCZg5l9BfRg",
@@ -5327,7 +5327,7 @@
           ],
           "trailerUrl": "https://www.youtube.com/watch?v=8ZYhuvIv1pA",
           "certification": "A",
-          "votes": 2595,
+          "votes": 2596,
           "imdbId": "tt14688458",
           "imdbRating": 8.1,
           "imdbVotes": 218324
@@ -5482,7 +5482,7 @@
           "posterUrl": "https://image.tmdb.org/t/p/w500/hVXjX1jLZ1ljFSNGXpjJfbTUOa7.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w1280/4gyx49ibwQslyrwuUS1c58PJEEd.jpg",
           "synopsis": "When a U.S. Navy pilot on a top-secret mission during the Cold War gets trapped behind enemy lines, his only chance at survival is to form an alliance with an eccentric ex-KGB agent.",
-          "runtimeMinutes": 110,
+          "runtimeMinutes": 111,
           "cast": [
             "Ryan Reynolds",
             "Kenneth Branagh",
@@ -5494,7 +5494,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=om5Un9X720M",
           "certification": "U/A 16+",
           "rating": 8,
-          "votes": 229,
+          "votes": 250,
           "imdbId": "tt28014327",
           "imdbRating": 6.9,
           "imdbVotes": 9404
@@ -6135,8 +6135,8 @@
           "regions": [
             "US"
           ],
-          "rating": 8.3,
-          "votes": 10,
+          "rating": 8.1,
+          "votes": 11,
           "heat": 41,
           "synopsis": "In 1960s Mississippi, young Black FBI agent Wayne Strider is sent to investigate a wave of brutal killings targeting civil rights leaders. Forced to work alongside notorious mafia hitman Greg Scarpa, Strider finds himself pulled into a deadly hunt where the lines of justice and vengeance begin to blur.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/f4hdIed8vh10O8TkQ1CkHS8MQ3G.jpg",
@@ -6288,6 +6288,7 @@
           "posterUrl": "https://image.tmdb.org/t/p/w500/oQR5xUZrdVaLscJlk4mFcy8DrXJ.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/vBLVwTwtAquT9G6k2oBuj9wThA6.jpg",
           "imdbId": "tt32500181",
+          "runtimeMinutes": 109,
           "cast": [
             "Theo Rossi",
             "Ron Perlman",
@@ -6352,7 +6353,8 @@
           ],
           "releaseDate": "2026-09-10",
           "regions": [
-            "IN"
+            "IN",
+            "US"
           ],
           "heat": 17,
           "synopsis": "When the mysterious Black Dagger threatens national security, Inspector Vijay embarks on his most dangerous mission yet. As the battle unfolds, the extraordinary origin of legendary spy Sardar is finally revealed, uncovering the sacrifices that forged a legend and the secrets that could shape the future.",
@@ -6421,6 +6423,7 @@
             "IN",
             "US"
           ],
+          "votes": 1,
           "heat": 16,
           "synopsis": "After a typical day at the garage, a young mechanic swaps her stained overalls for a leather ensemble—as she shifts gears into a different kind of routine. Driving through bustling Paris, she helps a passerby cross the street, delivers plants to a hardware store, and picks up an enigmatic passenger.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/78vxqat2tlhg4zhyepC8Qb3HPDK.jpg",
@@ -6600,41 +6603,6 @@
           ],
           "director": "Mariyappan Chinna",
           "certification": "U/A 16+"
-        },
-        {
-          "id": "m-1599181",
-          "title": "Chronovisor",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Mystery",
-            "Science Fiction",
-            "Horror"
-          ],
-          "releaseDate": "2026-09-04",
-          "regions": [
-            "US"
-          ],
-          "heat": 15,
-          "synopsis": "A French academic is seduced into a world of untold histories in her scholarly quest to uncover the mystery of a history-capturing camera-like machine created by clandestine Benedictine monks. An academic-noir, armchair mystery in the lineage of Jorge Luis Borges and Umberto Eco.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/AngfVgLk5EngnbuFpISjvFJkYBz.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/fpv7UeON9GgkOIjCHQV2LdY3J99.jpg",
-          "imdbId": "tt39196981",
-          "runtimeMinutes": 99,
-          "cast": [
-            "Anne Laure Sellier",
-            "Nicholas Tebben",
-            "Nicole Dombrowski Risser",
-            "Alex Kolodkin",
-            "José Pacheco de Almeida"
-          ],
-          "director": "Kevin Walker",
-          "trailerUrl": "https://www.youtube.com/watch?v=KPt2iZg7M50"
         },
         {
           "id": "m-1465943",
@@ -7049,7 +7017,7 @@
           "regions": [
             "US"
           ],
-          "votes": 1,
+          "votes": 2,
           "heat": 27,
           "synopsis": "Experience the meteoric rise of Oasis through rare footage and untold stories as the band reunites for Oasis Live '25, chronicling their journey from Manchester streets to global rock stardom.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/nuNfPuFZKtkrglYnz2F9weQm3Ng.jpg",
@@ -8119,7 +8087,7 @@
           "heat": 27,
           "synopsis": "A struggling primary school teacher begins to make some questionable decisions after one of her students is injured.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/sDgb5jVuZ6ZOh4YjtSMMnbovkCi.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/dNCK3daKbOi6IHSsM9O2Nwyd91Y.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/A5sGEzVMjvbgh5ZniaHBXAxppKQ.jpg",
           "imdbId": "tt29714073",
           "runtimeMinutes": 100,
           "cast": [
@@ -10059,7 +10027,7 @@
             "US"
           ],
           "rating": 7.1,
-          "votes": 44,
+          "votes": 45,
           "heat": 82,
           "synopsis": "In a notorious prison, an invisible force begins killing inmates brutally, compelling enemy gangs and corrupt guards to work together as they try to survive the mounting bloodshed.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/zxcMdx0w5Zmg8yZuuiS7CJ8vOea.jpg",
@@ -10097,7 +10065,7 @@
           "heat": 29,
           "synopsis": "The most powerful man in the world embarks on a frantic mission to prove he is humanity's savior before the disaster he's unleashed destroys everything.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/1ATXKrIPJyKNwnJ6lcG088Sa6zi.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/b7t3r39Oll5qPxBKzLZ8eHMBD7l.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/u3EtxdmZeiliW98c5Oegk5LIGZa.jpg",
           "imdbId": "tt31450459",
           "cast": [
             "Tom Cruise",
@@ -11020,7 +10988,7 @@
         "US"
       ],
       "rating": 8.1,
-      "votes": 3233,
+      "votes": 3234,
       "heat": 96,
       "synopsis": "Jack Reacher, a veteran military police investigator, has just recently entered civilian life. Reacher is a drifter, carrying no phone and the barest of essentials as he travels the country and explores the nation he once served.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/f1VCQIG2iCyOookdgOzwtUpwWC0.jpg",
@@ -11099,7 +11067,7 @@
         "US"
       ],
       "rating": 6.7,
-      "votes": 299,
+      "votes": 302,
       "heat": 85,
       "synopsis": "Maia Marten, a brilliant London lawyer, has her life shattered by a single call on her morning run: her son has been taken. To get him back, she must keep running, obey every ruthless command, and trust no one-each second a test of how far a mother will go to save her child.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/uxCaBoYXsDC4A0SqTm3SISj0OwK.jpg",
@@ -11124,7 +11092,7 @@
         "US"
       ],
       "rating": 8.2,
-      "votes": 5346,
+      "votes": 5349,
       "heat": 85,
       "synopsis": "After breaking the mysterious \"One Wish Willow\" to win his crush's heart, a hopeless romantic finds himself getting exactly what he asked for but soon discovers that some desires come at a dark, sinister price.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/bRwnj8WEKBCvmfeUNOukJPwB43K.jpg",
@@ -11150,7 +11118,7 @@
         "IN"
       ],
       "rating": 8.3,
-      "votes": 277,
+      "votes": 278,
       "heat": 84,
       "synopsis": "Two intergalactic cops, new recruit John Stewart and Lantern legend Hal Jordan, are drawn into a dark, Earth-based mystery as they investigate a murder in the American heartland.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/gpC7h43xPMEV3goYMQShfJbTtLq.jpg",
@@ -11182,33 +11150,6 @@
       "synopsis": "When aristocratic Eddie inherits the family estate, he discovers that it's home to an enormous weed empire — and its proprietors aren't going anywhere.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/tw3tzfXaSpmUZIB8ZNqNEGzMBCy.jpg",
       "backdropUrl": "https://image.tmdb.org/t/p/w780/yG1wltFmkX5c5ocACKfpX0tp3SY.jpg"
-    },
-    {
-      "id": "trend-m-1137844",
-      "title": "Mayday",
-      "kind": "film",
-      "platforms": [
-        "appletv"
-      ],
-      "languages": [
-        "en"
-      ],
-      "genres": [
-        "Action",
-        "Comedy",
-        "War"
-      ],
-      "releaseDate": "2026-09-03",
-      "regions": [
-        "IN",
-        "US"
-      ],
-      "rating": 8,
-      "votes": 246,
-      "heat": 84,
-      "synopsis": "When a U.S. Navy pilot on a top-secret mission during the Cold War gets trapped behind enemy lines, his only chance at survival is to form an alliance with an eccentric ex-KGB agent.",
-      "posterUrl": "https://image.tmdb.org/t/p/w500/hVXjX1jLZ1ljFSNGXpjJfbTUOa7.jpg",
-      "backdropUrl": "https://image.tmdb.org/t/p/w780/4gyx49ibwQslyrwuUS1c58PJEEd.jpg"
     },
     {
       "id": "trend-t-30984",
@@ -11262,11 +11203,44 @@
         "US"
       ],
       "rating": 6.8,
-      "votes": 488,
+      "votes": 493,
       "heat": 77,
       "synopsis": "When his young son vanishes, a widower enlists help from his estranged father, a retired detective who put away the serial killer now linked to the case.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/6UqflU8Qqkz7Dq4swJPqs0ZJjY4.jpg",
       "backdropUrl": "https://image.tmdb.org/t/p/w780/xSJJQeAp9GBFmiKusysTRG6jQjt.jpg"
+    },
+    {
+      "id": "trend-t-65942",
+      "title": "Re:ZERO -Starting Life in Another World-",
+      "kind": "anime",
+      "platforms": [
+        "netflix",
+        "crunchyroll",
+        "sonyliv",
+        "prime",
+        "lionsgate",
+        "hulu"
+      ],
+      "languages": [
+        "ja"
+      ],
+      "genres": [
+        "Animation",
+        "Mystery",
+        "Action & Adventure",
+        "Sci-Fi & Fantasy"
+      ],
+      "releaseDate": "2016-04-04",
+      "regions": [
+        "IN",
+        "US"
+      ],
+      "rating": 8.1,
+      "votes": 768,
+      "heat": 74,
+      "synopsis": "Natsuki Subaru, an ordinary high school  student, is on his way home from the convenience store when he finds  himself transported to another world. As he's lost and confused in a new  world where he doesn't even know left from right, the only person to  reach out to him was a beautiful girl with silver hair. Determined to  repay her somehow for saving him from his own despair, Subaru agrees to  help the girl find something she's looking for.",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/oHqYrPAsIiTD5m4DuxumV4er8BU.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w780/7ZruEnSnHD6Jx5mF0hBt1E306Vt.jpg"
     },
     {
       "id": "trend-m-1083381",
@@ -11288,13 +11262,40 @@
         "IN"
       ],
       "rating": 7.1,
-      "votes": 3154,
+      "votes": 3157,
       "heat": 73,
       "synopsis": "A strange doorway appears in the basement of a furniture showroom.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/rhGx6E3qRNMgj3i5su2oukNHwIQ.jpg",
       "backdropUrl": "https://image.tmdb.org/t/p/w780/dqmMWNWfLnExDRpMtIMqI97GQFR.jpg"
+    },
+    {
+      "id": "trend-t-196322",
+      "title": "Dark Matter",
+      "kind": "series",
+      "platforms": [
+        "appletv",
+        "prime"
+      ],
+      "languages": [
+        "en"
+      ],
+      "genres": [
+        "Sci-Fi & Fantasy",
+        "Drama"
+      ],
+      "releaseDate": "2024-05-07",
+      "regions": [
+        "IN",
+        "US"
+      ],
+      "rating": 7.8,
+      "votes": 761,
+      "heat": 72,
+      "synopsis": "Jason Dessen is abducted into an alternate version of his life. To get back to his real family, he embarks on a harrowing journey to save them from the most terrifying foe imaginable: himself.",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/2DPmTlv8F0V1TQBPmlsGOVOhtWk.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w780/iBc82qaA05ntzSnrVndw8scv4Bn.jpg"
     }
   ],
-  "enrichedAt": "2026-09-07T08:50:42.081Z",
-  "ratedAt": "2026-09-07T08:50:59.865Z"
+  "enrichedAt": "2026-09-07T13:49:17.328Z",
+  "ratedAt": "2026-09-07T13:49:31.118Z"
 }
