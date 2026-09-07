@@ -145,6 +145,39 @@ async function discover(isMovie, language, minVotes, page) {
   });
 }
 
+/**
+ * The same query, ordered by attention rather than by score.
+ *
+ * "What is everyone watching" is a different question from "what is good", and
+ * the first attempt at answering it was wrong in an instructive way: it sorted
+ * the *rating-selected* sample by popularity and concluded the signal was
+ * useless because the result was American television. Of course it was — that
+ * sample was chosen for having the highest scores, and TMDB scores are highest
+ * where its voting population is densest.
+ *
+ * Asking TMDB for popular titles per language is a different query, and it is
+ * the same correction that made the rating lists work: a language is only ever
+ * ranked against itself, so the fact that TMDB's audience is not Indian stops
+ * mattering. The most popular Malayalam titles on Indian streaming are a real
+ * answer even if far fewer people voted on them than on Stranger Things.
+ *
+ * The vote floor drops to a fifth of the rating pass's. Trust in a *score*
+ * needs votes; presence on a popularity list does not, and holding it high
+ * would filter out exactly the recent titles a trending list exists to surface.
+ */
+async function discoverPopular(isMovie, language, minVotes, page) {
+  return tmdb(`/discover/${isMovie ? 'movie' : 'tv'}`, {
+    watch_region: REGION,
+    with_watch_providers: ALL_PROVIDERS,
+    with_watch_monetization_types: 'flatrate',
+    with_original_language: language,
+    sort_by: 'popularity.desc',
+    'vote_count.gte': Math.max(10, Math.round(minVotes / 5)),
+    include_adult: false,
+    page,
+  });
+}
+
 async function providersFor(isMovie, id) {
   try {
     const data = await tmdb(`/${isMovie ? 'movie' : 'tv'}/${id}/watch/providers`);
@@ -217,6 +250,65 @@ outer: for (const lang of LANGUAGES) {
   if (VERBOSE) console.log(`  ${lang.name.padEnd(10)} ${found} title(s)`);
 }
 
+// --- a second pass, ordered by attention ------------------------------------
+
+/**
+ * Rows already found keep their place and simply gain a rank; rows seen only
+ * here are added. `popRank` is the position within its own language, which is
+ * what makes a trending view fair to interleave: rank 1 in Malayalam and rank 1
+ * in Hindi are the same claim about different audiences, where raw popularity
+ * numbers are not comparable at all.
+ */
+const POP_PAGES = 2;
+if (!stopped) {
+  for (const lang of LANGUAGES) {
+    let rank = 0;
+    for (let page = 1; page <= POP_PAGES && !stopped; page++) {
+      if (Date.now() - startedAt > BUDGET_MS) {
+        stopped = `ran out of its ${Math.round(BUDGET_MS / 60_000)}-minute budget`;
+        break;
+      }
+      for (const isMovie of [true, false]) {
+        let data;
+        try {
+          data = await discoverPopular(isMovie, lang.code, lang.minVotes, page);
+        } catch {
+          continue;
+        }
+        for (const item of data.results ?? []) {
+          const id = `${isMovie ? 'm' : 't'}-${item.id}`;
+          const date = isMovie ? item.release_date : item.first_air_date;
+          const title = isMovie ? item.title : item.name;
+          if (!title || !date) continue;
+          rank += 1;
+          const existing = byId.get(id);
+          if (existing) {
+            existing.popRank = Math.min(existing.popRank ?? Infinity, rank);
+            continue;
+          }
+          byId.set(id, {
+            id,
+            title,
+            kind: isMovie ? 'film' : 'series',
+            year: Number(date.slice(0, 4)),
+            releaseDate: date,
+            languages: [item.original_language].filter(Boolean),
+            rating: Number(item.vote_average?.toFixed(1)),
+            votes: item.vote_count,
+            popularity: Number(item.popularity?.toFixed(1)),
+            popRank: rank,
+            genreIds: item.genre_ids ?? [],
+            synopsis: item.overview || undefined,
+            posterUrl: item.poster_path ? `${IMG}/w500${item.poster_path}` : undefined,
+            regions: [REGION],
+          });
+        }
+      }
+    }
+    if (VERBOSE) console.log(`  ${lang.name.padEnd(10)} popularity pass done`);
+  }
+}
+
 // --- which platform actually has each one -----------------------------------
 
 /**
@@ -279,6 +371,15 @@ for (const l of perLanguage) {
       `top ${kept[0]?.rating ?? '-'})`,
   );
 }
-if (noProvider) console.log(`  ${noProvider} dropped — no India provider on the detail call`);
+console.log('\n  most popular, per language (the trending candidate):');
+for (const l of perLanguage) {
+  const top = rows
+    .filter((r) => r.languages.includes(l.code) && r.popRank)
+    .sort((a, b) => a.popRank - b.popRank)
+    .slice(0, 5);
+  if (!top.length) continue;
+  console.log(`    ${l.name}: ` + top.map((r) => `${r.title} (${r.year})`).join(' · '));
+}
+if (noProvider) console.log(`\n  ${noProvider} dropped — no India provider on the detail call`);
 if (stopped) console.log(`\n  Stopped early: ${stopped}. Kept what was gathered.`);
 console.log(`  ${callCount()} API calls.\n`);
