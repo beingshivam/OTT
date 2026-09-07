@@ -129,9 +129,18 @@ jobs:
           case "$page_cc" in
             *no-store*|*no-cache*|*must-revalidate*) ;;
             *)
-              echo "::warning title=Pages are cacheable without revalidation::$SITE/ returned 'Cache-Control: ${page_cc:-nothing}'. A cache that holds this page will keep asking for asset filenames that the next deploy deletes, and the site will render its unstyled fallback until the copy expires."
+              echo "::warning title=Pages are cacheable without revalidation::$SITE/ returned 'Cache-Control: ${page_cc:-nothing}'. A cache that holds this page will keep asking for asset filenames that the next deploy deletes, and the site will render its unstyled fallback until the copy expires. Cloudflare's default for static assets used to supply this; if it has changed, _headers needs a rule for it — see the note in public/_headers about rules being added rather than replaced."
               ;;
           esac
+          # Cloudflare adds the headers from every matching _headers rule, so two
+          # rules that both match one file produce one header carrying both
+          # values — which is how the year-long cache on hashed assets was
+          # cancelled by a broad default sitting above it. A client may honour
+          # either value, so this is a real difference in behaviour, not
+          # cosmetic.
+          if [ "$(printf '%s' "$asset_cc" | grep -o 'max-age' | wc -l)" -gt 1 ]; then
+            echo "::warning title=Contradictory cache header on assets::$SITE$asset returned 'Cache-Control: $asset_cc'. Two _headers rules match this path and their values were combined. Make the rules disjoint."
+          fi
 
           # 4. Is the loading check reachable? It is the one page a reader on a
           #    filtered network is sent to, so it has to resolve as its own file
