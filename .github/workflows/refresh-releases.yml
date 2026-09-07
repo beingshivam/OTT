@@ -1,14 +1,28 @@
 name: Refresh release calendar
 
-# New titles land on Friday in India and midweek almost everywhere else, so the
-# calendar is rebuilt twice a week rather than once. Times are UTC.
+# Three runs a week, and the third one is the point.
 #
+# TMDB assigns a streaming provider *after* a title is available — the reason
+# scripts/fetch-releases.mjs has to ask for theatrical dates separately. So a
+# refresh that lands before Friday's drops cannot know which service they went
+# to: it gets the cinema listings right, because those dates are announced weeks
+# ahead, and leaves that day's streaming arrivals unplaced. A run on Friday
+# morning alone would therefore be freshest exactly when it knows least about
+# the day it is describing.
+#
+# Hence Saturday. Friday morning flips the week and keeps the page honest on the
+# day most people look; Saturday morning is what actually fills in where Friday
+# landed, before the weekend is spent deciding; Monday evening picks up the
+# weekend's corrections and the week taking shape.
+#
+# Times are UTC and the comments give IST, because that is the audience.
 # Scheduled workflows only ever run on the repository's default branch — if the
 # default branch changes, this schedule moves with it.
 on:
   schedule:
-    - cron: '30 19 * * 4' # Thu 19:30 UTC — Friday ~01:00 IST, ahead of the Friday drops
-    - cron: '30 19 * * 1' # Mon 19:30 UTC — Tuesday ~01:00 IST, for the midweek additions
+    - cron: '30 2 * * 5'  # Fri 02:30 UTC — Friday 08:00 IST, the week flips
+    - cron: '30 4 * * 6'  # Sat 04:30 UTC — Saturday 10:00 IST, Friday's drops now have providers
+    - cron: '30 13 * * 1' # Mon 13:30 UTC — Monday 19:00 IST, the weekend and the week ahead
   workflow_dispatch:
     inputs:
       weeks_back:

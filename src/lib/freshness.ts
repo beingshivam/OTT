@@ -30,8 +30,9 @@ export function relativeTime(iso: string, now = Date.now()): string {
  * London the same runs land on Monday and Thursday.
  */
 const SCHEDULE = [
-  { day: 1, hour: 19, minute: 30 }, // Mon 19:30 UTC — Tuesday ~01:00 IST
-  { day: 4, hour: 19, minute: 30 }, // Thu 19:30 UTC — Friday ~01:00 IST
+  { day: 5, hour: 2, minute: 30 }, // Fri 02:30 UTC — Friday 08:00 IST
+  { day: 6, hour: 4, minute: 30 }, // Sat 04:30 UTC — Saturday 10:00 IST
+  { day: 1, hour: 13, minute: 30 }, // Mon 13:30 UTC — Monday 19:00 IST
 ];
 
 /** The next runs after `now`, soonest first. */
@@ -60,8 +61,9 @@ export function nextRefreshLabel(now = new Date()): string {
 }
 
 /**
- * e.g. "Tuesdays & Fridays" in India, "Mondays & Thursdays" in the UK — the same
- * two runs, named in the reader's own timezone.
+ * e.g. "Fridays, Saturdays & Mondays" in India — the same runs, named in the
+ * reader's own timezone, which is why this is derived rather than written down.
+ * A reader in London gets the same three runs on the days they land there.
  */
 export function refreshDaysLabel(now = new Date()): string {
   const names = [
@@ -72,5 +74,7 @@ export function refreshDaysLabel(now = new Date()): string {
         .map((d) => `${d.toLocaleDateString(undefined, { weekday: 'long' })}s`),
     ),
   ];
-  return names.length === 2 ? `${names[0]} & ${names[1]}` : names.join(', ');
+  if (names.length <= 1) return names.join('');
+  // "A & B" for two, "A, B & C" for more — an ampersand only before the last.
+  return `${names.slice(0, -1).join(', ')} & ${names[names.length - 1]}`;
 }

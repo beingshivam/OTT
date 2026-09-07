@@ -270,6 +270,43 @@ else {
   }
 }
 
+// --- the schedule the site advertises ---------------------------------------
+
+const S6 = 'Refresh schedule';
+{
+  /**
+   * The cron and the copy have to be the same schedule.
+   *
+   * The workflow decides when the data is rebuilt; lib/freshness.ts decides what
+   * the footer tells a reader about it, and derives the weekday names from its
+   * own copy of the times so they come out right in the reader's timezone. Two
+   * copies of one fact, and the one nobody would notice going wrong is the copy
+   * that only shows up as a sentence at the bottom of a page.
+   */
+  const workflow = await readFile(resolve(ROOT, '.github/workflows/refresh-releases.yml'), 'utf8').catch(() => '');
+  const freshness = await readFile(resolve(ROOT, 'src/lib/freshness.ts'), 'utf8').catch(() => '');
+
+  if (!workflow || !freshness) skip(S6, 'the footer promises the schedule that runs', 'file missing');
+  else {
+    const DAY = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+    const cron = [...workflow.matchAll(/cron:\s*'(\d+)\s+(\d+)\s+\*\s+\*\s+(\d)'/g)]
+      .map(([, minute, hour, day]) => `${day}:${hour}:${minute}`)
+      .sort();
+    const copy = [...freshness.matchAll(/\{\s*day:\s*(\d+),\s*hour:\s*(\d+),\s*minute:\s*(\d+)\s*\}/g)]
+      .map(([, day, hour, minute]) => `${day}:${hour}:${minute}`)
+      .sort();
+
+    const show = (list) =>
+      list.map((t) => { const [d, h, m] = t.split(':'); return `${DAY[d]} ${h.padStart(2, '0')}:${m.padStart(2, '0')}`; }).join(', ');
+
+    cron.length && cron.join() === copy.join()
+      ? pass(S6, 'the footer promises the schedule that runs', `${cron.length} runs: ${show(cron)} UTC`)
+      : fail(S6, 'the footer promises the schedule that runs',
+          'the cron and lib/freshness.ts disagree',
+          [`cron:      ${show(cron) || '(none parsed)'}`, `freshness: ${show(copy) || '(none parsed)'}`]);
+  }
+}
+
 // --- the claim each title page makes ----------------------------------------
 
 const S5 = 'Title page claims';
