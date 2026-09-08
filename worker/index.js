@@ -116,7 +116,22 @@ export default {
      * actually publishes — platform ids, language names, slugs, ISO weeks — is
      * lowercase by construction, so nothing else here has a case to preserve.
      */
-    if (/[A-Z]/.test(url.pathname)) {
+    /**
+     * Page paths only — anything with a file extension keeps its capitals.
+     *
+     * The first version of this redirected on capitals alone and took the
+     * whole site down for the length of one deploy: Vite's hashed bundles are
+     * named like index-CqG28YpW.js, so every asset 301'd to a lowercase path
+     * that does not exist, fell through to the SPA fallback, and arrived at
+     * the browser as index.html with a JavaScript content type. The page then
+     * rendered its prerendered shell with no styling and no behaviour.
+     *
+     * A published page path never has a dot in it — platform ids, language
+     * names, slugs, /w/<iso-date> — and every dotted path is a file whose name
+     * is somebody else's to choose: bundles, /build.txt, /sitemap.xml, posters.
+     * So the extension is the test, not the casing.
+     */
+    if (/[A-Z]/.test(url.pathname) && !/\.[a-z0-9]+$/i.test(url.pathname)) {
       url.pathname = url.pathname.toLowerCase();
       return Response.redirect(url.toString(), 301);
     }

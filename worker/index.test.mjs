@@ -111,6 +111,28 @@ await test('the query string survives the redirect', async () => {
   assert.equal(res.headers.get('location'), `${ORIGIN}/netflix?w=2026-09-04`);
 });
 
+await test('a hashed bundle keeps its capitals', async () => {
+  // The regression that took the site down: Vite names bundles like
+  // index-CqG28YpW.js. Lowercasing one sends it to a path that does not exist,
+  // the SPA fallback answers with index.html, and the browser refuses to
+  // execute HTML as JavaScript.
+  const assets = { ...fakeAssets, fetched: [] };
+  const res = await worker.fetch(new Request(`${ORIGIN}/assets/index-CqG28YpW.js`), {
+    ASSETS: assets,
+  });
+  assert.notEqual(res.status, 301, 'a bundle must never be redirected');
+  assert.deepEqual(assets.fetched, ['/assets/index-CqG28YpW.js'], 'casing must reach the asset server intact');
+});
+
+await test('any dotted path keeps its capitals', async () => {
+  for (const path of ['/Build.txt', '/Sitemap.xml', '/assets/Index-AbC.css']) {
+    const assets = { ...fakeAssets, fetched: [] };
+    const res = await worker.fetch(new Request(`${ORIGIN}${path}`), { ASSETS: assets });
+    assert.notEqual(res.status, 301, `${path} should not redirect`);
+    assert.deepEqual(assets.fetched, [path]);
+  }
+});
+
 await test('an already-lowercase path is not redirected', async () => {
   const assets = { ...fakeAssets, fetched: [] };
   const res = await worker.fetch(new Request(`${ORIGIN}/theatres`), { ASSETS: assets });
