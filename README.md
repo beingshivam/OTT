@@ -53,27 +53,27 @@ Build settings in the dashboard: **build command** `npm run build`,
 No environment variables — Cloudflare only serves the committed `releases.json`.
 
 **How a refresh reaches the site:** the GitHub Action rebuilds the calendar and
-commits it → that commit triggers a Cloudflare build → the new week is live.
-`TMDB_TOKEN` stays a GitHub secret and is never needed by the host.
+commits it → the `workflow_run` trigger on `deploy-cloudflare.yml` fires when
+that job completes → the new week is live. It is the completion, not the
+commit, that starts the deploy: a push made with the default `GITHUB_TOKEN`
+does not trigger `on: push`. `TMDB_TOKEN` stays a GitHub secret and is never
+needed by the host.
 
 ### GitHub Pages
 
-Kept as a second, independent deploy. `.github/workflows/deploy.yml` publishes on every
-push to the default branch, and again whenever the calendar refresh commits new
-data. The build uses relative asset paths, so it serves correctly at
-`https://<user>.github.io/<repo>/` or under a custom domain. The deploy job
-prints the resolved URL.
+Removed on 8 September 2026. It was a second, independent deploy of the same
+site, and once Cloudflare was the real one it was costing more than it gave: a
+crawlable duplicate of all 129 pages competing for crawl budget on a domain
+with nothing indexed yet, plus a workflow that failed on GitHub's own artifact
+API and produced red marks nobody needed to act on.
 
-Note that a custom domain on your **user site** (`<user>.github.io`) claims
-project sites too: they get served from `<domain>/<repo>/`, and become
-unreachable if that domain's DNS doesn't point at GitHub. That's independent of
-this repo's settings — which is a good reason to keep Cloudflare as the primary.
-
-**One-time setup:** turn Pages on under *Settings › Pages › Source: **GitHub
-Actions***. Creating a Pages site needs repo-admin scope, which the Actions token
-deliberately doesn't have, so this can't be automated from inside the workflow.
-Until it's enabled the workflow still builds and stays green, logging a notice
-instead — flip the setting, re-run it, and the site goes up.
+The one thing it did that mattered has moved. A calendar refresh commits as
+`github-actions[bot]` using the default `GITHUB_TOKEN`, and GitHub does not
+start workflow runs from events a `GITHUB_TOKEN` caused — so `on: push` never
+fires for a refresh. That is why the Pages workflow carried a `workflow_run`
+trigger, and why `deploy-cloudflare.yml` now carries the same one. Without it
+the calendar would rebuild every Friday, commit cleanly, report success, and
+never reach the site.
 
 ### Netlify or Vercel
 
