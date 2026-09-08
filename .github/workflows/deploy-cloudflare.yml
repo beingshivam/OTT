@@ -11,16 +11,23 @@ name: Deploy to Cloudflare
 
 on:
   push:
-  # Inherited from the GitHub Pages workflow when that was removed, and not
-  # optional.
+  # Runs this workflow's build and tests over freshly refreshed data.
   #
-  # The Friday refresh commits the new calendar as github-actions[bot] using
-  # the default GITHUB_TOKEN, and GitHub deliberately does not start workflow
-  # runs from events a GITHUB_TOKEN caused — the rule that stops a workflow
-  # pushing itself into an infinite loop. So `push:` above never fires for a
-  # refresh, and without this the calendar would rebuild every Friday, commit
-  # cleanly, report success, and never reach the site. It would look like it
-  # was working right up until someone noticed the board was a week stale.
+  # The refresh commits as github-actions[bot] using the default GITHUB_TOKEN,
+  # and GitHub does not start workflow runs from events a GITHUB_TOKEN caused —
+  # the rule that stops a workflow pushing itself into a loop. So `push:` above
+  # never fires for a refresh, and this is what does.
+  #
+  # It does NOT carry the deploy, and an earlier version of this comment
+  # claimed it did. Production is published by the Cloudflare dashboard
+  # integration, which hears the same push through an outbound webhook — the
+  # GITHUB_TOKEN rule governs Actions triggers, not webhooks to third parties.
+  # This job's own Publish step is skipped until CLOUDFLARE_API_TOKEN and
+  # CLOUDFLARE_ACCOUNT_ID exist as secrets, so it could not publish anyway.
+  #
+  # What the trigger is actually worth: the grader and the end-to-end suite
+  # run against the new calendar, which is how a bad refresh gets noticed
+  # rather than quietly served.
   workflow_run:
     workflows: ['Refresh release calendar']
     types: [completed]
