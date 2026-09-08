@@ -52,6 +52,7 @@ jobs:
         run: |
           npm run typecheck
           npm run test:rail
+          npm run test:affiliates
           npm run eval
           # The library comes from package.json; this fetches the browser
           # binary it drives, which is not an npm package. Pinned by the

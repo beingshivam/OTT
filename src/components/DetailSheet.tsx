@@ -3,6 +3,7 @@ import { IconCalendar, IconClose, IconExternal, IconShare, IconCheck } from './i
 import { PosterArt } from './PosterArt';
 import { dropLabel } from './ReleaseCard';
 import { KIND_LABEL, languageName, platform } from '../data/platforms';
+import { outbound } from '../data/affiliates';
 import { formatDay } from '../lib/week';
 import { scoreOf, scoreTitle } from '../lib/score';
 import type { Release } from '../types';
@@ -125,19 +126,24 @@ export function DetailSheet({ release, onClose }: Props) {
             {/* One button per place it's actually available, not just the first. */}
             {release.platforms.map((id, i) => {
               const target = platform(id);
-              const href =
+              const destination =
                 i === 0
                   ? watchUrl
                   : target.searchUrl
                     ? target.searchUrl.replace('{q}', encodeURIComponent(release.title))
                     : target.homeUrl;
+              /* Wrapped only where a programme is actually live; otherwise this
+                 returns the same URL it was given. rel carries "sponsored"
+                 when it is paid, which is what Google asks of affiliate links
+                 and what keeps a search-dependent site out of trouble. */
+              const link = outbound(id, destination);
               return (
                 <a
                   key={id}
                   className={i === 0 ? 'btn btn--primary' : 'btn btn--lg'}
-                  href={href}
+                  href={link.href}
                   target="_blank"
-                  rel="noreferrer"
+                  rel={link.sponsored ? 'sponsored noopener noreferrer' : 'noreferrer'}
                 >
                   {/* An outward arrow, not a play triangle. The play icon said
                       "playback starts here" while the label said the opposite,

@@ -2,6 +2,7 @@ import { PosterArt } from './PosterArt';
 import { Rating } from './Rating';
 import { IconPlay, IconTicket, IconExternal } from './icons';
 import { platform as platformById, languageName } from '../data/platforms';
+import { outbound } from '../data/affiliates';
 import { formatWeekRange } from '../lib/week';
 import { scoreOf } from '../lib/score';
 import type { Release, ReleaseFeed } from '../types';
@@ -71,7 +72,13 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
     .slice(0, 6);
 
   const cinemas = platformById('theatres');
-  const bookUrl = cinemas.searchUrl?.replace('{q}', encodeURIComponent(release.title)) ?? cinemas.homeUrl;
+  /* The highest-intent click on the site: a cinema listing one step from a
+     ticket. Wrapped for affiliate credit when a programme is live, untouched
+     otherwise — see data/affiliates.ts. */
+  const book = outbound(
+    'theatres',
+    cinemas.searchUrl?.replace('{q}', encodeURIComponent(release.title)) ?? cinemas.homeUrl,
+  );
 
   return (
     <article className="titlepage">
@@ -206,7 +213,12 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
               </a>
             )}
             {!streaming.length && (
-              <a className="btn btn--lg" href={bookUrl} target="_blank" rel="noreferrer">
+              <a
+                className="btn btn--lg"
+                href={book.href}
+                target="_blank"
+                rel={book.sponsored ? 'sponsored noopener noreferrer' : 'noreferrer'}
+              >
                 <IconTicket />
                 {/* Advance booking usually opens days before a film does, but
                     not always, and this cannot tell which. "Book tickets" on a

@@ -33,7 +33,8 @@
     "eval": "node scripts/eval.mjs",
     "test:rail": "node --test src/lib/rails.test.mjs",
     "e2e": "node scripts/e2e.mjs",
-    "lookup": "node scripts/lookup.mjs"
+    "lookup": "node scripts/lookup.mjs",
+    "test:affiliates": "node --test src/data/affiliates.test.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

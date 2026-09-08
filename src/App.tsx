@@ -18,6 +18,7 @@ import {
   IconSearch,
 } from './components/icons';
 import { BRAND, INSTAGRAM, INSTAGRAM_URL, SLUG, TAGLINE } from './data/brand';
+import { affiliateNetworks, hasAffiliates } from './data/affiliates';
 import { loadFeed, weekById } from './lib/feed';
 import { loadCatalogue } from './lib/catalogue';
 import {
@@ -955,6 +956,18 @@ export default function App() {
             <span className="footer__note">
               We don't stream anything. Every title links out to the platform showing it.
             </span>
+            {/* Only once something is actually being earned.
+                ASCI requires a material connection to be disclosed up front,
+                and a standing "we may earn commission" line while no programme
+                is live would be a claim about the site that is not true — the
+                flag comes from the affiliate table itself, so the sentence and
+                the links can never disagree. */}
+            {hasAffiliates && (
+              <span className="footer__note">
+                Some links to {affiliateNetworks.join(' and ')} earn us a commission. It costs you
+                nothing and never changes what we list or how it's ordered.
+              </span>
+            )}
             <button className="footer__link" onClick={addWeeklyReminder}>
               <IconCalendar />
               Remind me every Friday
