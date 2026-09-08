@@ -72,11 +72,20 @@ Build settings in the dashboard: **build command** `npm run build`,
 No environment variables — Cloudflare only serves the committed `releases.json`.
 
 **How a refresh reaches the site:** the GitHub Action rebuilds the calendar and
-commits it → the `workflow_run` trigger on `deploy-cloudflare.yml` fires when
-that job completes → the new week is live. It is the completion, not the
-commit, that starts the deploy: a push made with the default `GITHUB_TOKEN`
-does not trigger `on: push`. `TMDB_TOKEN` stays a GitHub secret and is never
+commits it → GitHub sends a push webhook → the Cloudflare dashboard
+integration builds and deploys. `TMDB_TOKEN` stays a GitHub secret and is never
 needed by the host.
+
+Note which mechanism that is, because two similar-sounding ones are not doing
+this job. GitHub does not start *workflow runs* from a push made with the
+default `GITHUB_TOKEN`, so `on: push` in `deploy-cloudflare.yml` does not fire
+for a refresh — but that restriction covers Actions triggers, not outbound
+webhooks, so Cloudflare's integration hears the push regardless. And
+`deploy-cloudflare.yml` would not publish even if it ran: its Publish step is
+skipped until `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` exist as
+repository secrets. Its `workflow_run` trigger therefore buys a build-and-test
+pass over the refreshed data — the grader and the end-to-end suite run against
+the new calendar — not a deploy.
 
 ### GitHub Pages
 
