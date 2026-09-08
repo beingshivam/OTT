@@ -300,12 +300,29 @@ jobs:
       # sends reliably whatever a person's watch settings say — and it needs no
       # SMTP server, no app password and no third-party action holding a secret.
       #
-      # Weekly rather than per-run, on purpose. Three "it worked" emails a week
-      # is how a person learns to delete them unread, and an alert nobody reads
-      # is worse than none: it is the same silence with more noise. Monday's run
-      # reports; Friday's and Saturday's stay quiet unless something breaks.
+      # Every run reports, on the owner's instruction and against the argument
+      # this comment used to make.
+      #
+      # That argument was that three "it worked" notices a week teaches a person
+      # to delete them unread, so only Monday reported and the other two stayed
+      # quiet unless something broke. It is a good argument about alerts, and it
+      # is the wrong one here. Nobody watches this site. It refreshes itself,
+      # deploys itself and is read by strangers, so from the owner's side a
+      # working Friday and a Friday that never ran produce exactly the same
+      # experience: nothing. "No news is good news" only works when you would
+      # notice the bad news some other way, and here you would not — the board
+      # would simply go stale until somebody happened to look.
+      #
+      # So the confirmation is the product, not the noise. Three a week is the
+      # price of knowing the automation is alive.
+      #
+      # always() rather than naming crons: an earlier version matched
+      # github.event.schedule against a cron string, that string went out of
+      # date within a day of the schedule changing, and the digest silently
+      # stopped being drafted. This workflow only fires on schedule or dispatch,
+      # so there is nothing here that needs excluding.
       - name: Report the run
-        if: always() && (failure() || github.event_name == 'workflow_dispatch' || github.event.schedule == '30 13 * * 1')
+        if: always()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OWNER: ${{ github.repository_owner }}
