@@ -172,10 +172,10 @@ jobs:
           #    filtered network is sent to, so it has to resolve as its own file
           #    rather than being swallowed by the SPA fallback — which is exactly
           #    what a local static server did on the first attempt at this path.
-          diag=$(curl -fsS --max-time 20 "$SITE/diag/" || true)
+          diag=$(curl -fsS --max-time 20 "$SITE/diag" || true)
           case "$diag" in
-            *"Loading check"*) echo "  /diag/ resolves" ;;
-            *) echo "::error title=The loading check is unreachable::$SITE/diag/ did not return the check page. The banner shown to a reader whose assets were blocked links there, so it has to resolve." ; exit 1 ;;
+            *"Loading check"*) echo "  /diag resolves" ;;
+            *) echo "::error title=The loading check is unreachable::$SITE/diag did not return the check page. The banner shown to a reader whose assets were blocked links there, so it has to resolve." ; exit 1 ;;
           esac
 
           # 5. Does the poster proxy answer? The share card's artwork goes
