@@ -229,7 +229,18 @@ const SENDER = { name: 'New on OTT', email: 'mail@newonott.in' };
  * reads, so failures are logged and dropped.
  */
 async function sendWelcome(env, address) {
-  if (!env.BREVO_API_KEY) return; // Not configured — a signup still succeeds.
+  /**
+   * Every outcome says something, including the quiet ones.
+   *
+   * The first version logged only failures, so a working send and an
+   * unconfigured one were both silent — and "nothing in the log" could not
+   * distinguish "it worked" from "it never ran". That is the one thing a log
+   * exists to tell you.
+   */
+  if (!env.BREVO_API_KEY) {
+    console.log('welcome: skipped — no BREVO_API_KEY bound to this Worker');
+    return;
+  }
   try {
     const [html, text, subject] = await Promise.all(
       ['latest.html', 'latest.txt', 'subject.txt'].map((f) =>
@@ -239,7 +250,10 @@ async function sendWelcome(env, address) {
       ),
     );
     // No digest built into this deploy: skip rather than send an empty mail.
-    if (!html || html.length < 10) return;
+    if (!html || html.length < 10) {
+      console.log('welcome: skipped — no digest at /email/latest.html in this deploy');
+      return;
+    }
 
     /**
      * The unsubscribe token in the template is meant for a provider that
@@ -272,7 +286,12 @@ async function sendWelcome(env, address) {
       },
       body: JSON.stringify(body),
     });
-    if (!res.ok) console.error('welcome: brevo refused', res.status, await res.text());
+    if (res.ok) {
+      const { messageId } = await res.json().catch(() => ({}));
+      console.log('welcome: sent', address, messageId ?? '(no messageId)');
+    } else {
+      console.error('welcome: brevo refused', res.status, await res.text());
+    }
   } catch (err) {
     console.error('welcome: send failed', err);
   }
