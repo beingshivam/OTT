@@ -1254,6 +1254,38 @@ manifest.short_name = BRAND;
 await writeFile(MANIFEST, `${JSON.stringify(manifest, null, 2)}\n`);
 
 /**
+ * The week's email, shipped where the Worker can read it.
+ *
+ * `npm run digest` writes email/ at the repo root, which is right for a human
+ * pasting it into Gmail and useless to the Worker: the welcome message it
+ * sends a new subscriber has to come from somewhere at request time, and the
+ * only thing a Worker can read cheaply is its own asset bundle.
+ *
+ * Copying rather than moving the source of truth. The digest stays committed
+ * at the root where the docs say it is, and this puts a copy behind
+ * /email/ so env.ASSETS.fetch can reach it. It is rebuilt by the same refresh
+ * that rebuilds the calendar, so the welcome mail is always the current week
+ * without a second thing to remember.
+ *
+ * Carries noindex (see public/_headers): it is a mail body, not a page, and
+ * the site has spent enough of today closing duplicate copies of itself.
+ */
+const EMAIL_SRC = resolve(ROOT, 'email');
+const EMAIL_OUT = resolve(ROOT, 'dist', 'email');
+let emailed = 0;
+try {
+  await mkdir(EMAIL_OUT, { recursive: true });
+  for (const name of ['latest.html', 'latest.txt', 'subject.txt']) {
+    await writeFile(resolve(EMAIL_OUT, name), await readFile(resolve(EMAIL_SRC, name), 'utf8'));
+    emailed++;
+  }
+} catch {
+  // A build on a checkout where the digest has never been generated should
+  // still produce a site. The Worker treats a missing body as "no welcome
+  // mail this time" rather than as a failed signup.
+}
+
+/**
  * Counted by walking the groups that exist rather than naming them.
  *
  * The hand-written version listed six groups and silently stopped adding up
@@ -1267,5 +1299,6 @@ console.log(
   `SEO: build ${buildSha.slice(0, 8)}\n` +
     `     home titled "${title}" — ${rows.length} releases\n` +
     `     ${pages.length} pages: ${tallied}\n` +
-    `     sitemap, robots.txt, JSON-LD with breadcrumbs`,
+    `     sitemap, robots.txt, JSON-LD with breadcrumbs` +
+    (emailed ? `\n     ${emailed} email files for the welcome send` : `\n     no digest found — welcome mail will be skipped`),
 );

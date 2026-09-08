@@ -77,6 +77,155 @@ await test('a deep page path is handed over too', async () => {
   assert.deepEqual(assets.fetched, ['/ott-release-date/mirzapur-the-movie']);
 });
 
+// --- the welcome email -------------------------------------------------------
+
+/**
+ * What a new subscriber gets immediately, and everything that must not happen
+ * when it goes wrong.
+ *
+ * The rule under all of these: the row is the product, the email is best
+ * effort. Brevo being slow, broken, unconfigured or absent may cost the
+ * welcome mail and must never cost the subscription — the reader has already
+ * been told they are on the list, and they are.
+ */
+
+/** Collects what waitUntil was handed so a test can await the send. */
+function fakeCtx() {
+  const pending = [];
+  return { waitUntil: (p) => pending.push(p), settle: () => Promise.all(pending) };
+}
+
+/** Serves the digest the build copies into /email/. */
+const emailAssets = (files) => ({
+  fetched: [],
+  async fetch(request) {
+    const name = new URL(request.url).pathname.split('/').pop();
+    this.fetched.push(name);
+    const body = files[name];
+    return body == null
+      ? new Response('nope', { status: 404 })
+      : new Response(body, { status: 200 });
+  },
+});
+
+const DIGEST = {
+  'latest.html': '<p>Mirzapur: The Movie is out.</p><p>{{ unsubscribe }}</p>',
+  'latest.txt': 'Mirzapur: The Movie is out.\n{{ unsubscribe }}',
+  'subject.txt': '4-10 Sep: Mirzapur and 31 more\n',
+};
+
+/** Captures the Brevo call without making one. */
+function captureBrevo(response = new Response('{"messageId":"x"}', { status: 201 })) {
+  const calls = [];
+  globalThis.fetch = async (url, init) => {
+    calls.push({ url: String(url), init });
+    return response;
+  };
+  return calls;
+}
+
+await test('a new subscriber is sent this week\'s digest', async () => {
+  const calls = captureBrevo();
+  const ctx = fakeCtx();
+  const res = await worker.fetch(post({ email: 'Reader@Example.com' }), {
+    DB: fakeDB(),
+    ASSETS: emailAssets(DIGEST),
+    BREVO_API_KEY: 'test-key',
+  }, ctx);
+  assert.equal(res.status, 200);
+  await ctx.settle();
+
+  assert.equal(calls.length, 1, 'exactly one send');
+  const [call] = calls;
+  assert.equal(call.url, 'https://api.brevo.com/v3/smtp/email');
+  assert.equal(call.init.headers['api-key'], 'test-key');
+  const body = JSON.parse(call.init.body);
+  // The address as typed, not the lowercased key — mail servers may treat the
+  // local part as case-sensitive.
+  assert.deepEqual(body.to, [{ email: 'Reader@Example.com' }]);
+  assert.equal(body.subject, '4-10 Sep: Mirzapur and 31 more', 'subject is trimmed');
+  assert.match(body.htmlContent, /Mirzapur/);
+  assert.ok(body.headers['List-Unsubscribe'], 'inbox-level unsubscribe is offered');
+});
+
+await test('the unsubscribe placeholder never reaches an inbox', async () => {
+  // Shipping "{{ unsubscribe }}" literally is worse than having no unsubscribe.
+  const calls = captureBrevo();
+  const ctx = fakeCtx();
+  await worker.fetch(post({ email: 'a@b.co' }), {
+    DB: fakeDB(),
+    ASSETS: emailAssets(DIGEST),
+    BREVO_API_KEY: 'k',
+  }, ctx);
+  await ctx.settle();
+  const body = JSON.parse(calls[0].init.body);
+  assert.ok(!body.htmlContent.includes('{{'), `token left in html: ${body.htmlContent}`);
+  assert.ok(!body.textContent.includes('{{'), `token left in text: ${body.textContent}`);
+  assert.match(body.htmlContent, /stop/i, 'and says how to opt out');
+});
+
+await test('no API key means no send, and still a successful signup', async () => {
+  const calls = captureBrevo();
+  const ctx = fakeCtx();
+  const res = await worker.fetch(post({ email: 'a@b.co' }), {
+    DB: fakeDB(),
+    ASSETS: emailAssets(DIGEST),
+  }, ctx);
+  assert.equal(res.status, 200);
+  await ctx.settle();
+  assert.equal(calls.length, 0);
+});
+
+await test('a deploy with no digest sends nothing rather than an empty mail', async () => {
+  const calls = captureBrevo();
+  const ctx = fakeCtx();
+  const res = await worker.fetch(post({ email: 'a@b.co' }), {
+    DB: fakeDB(),
+    ASSETS: emailAssets({}),
+    BREVO_API_KEY: 'k',
+  }, ctx);
+  assert.equal(res.status, 200);
+  await ctx.settle();
+  assert.equal(calls.length, 0);
+});
+
+await test('Brevo refusing the send does not fail the subscription', async () => {
+  captureBrevo(new Response('{"code":"unauthorized"}', { status: 401 }));
+  const ctx = fakeCtx();
+  const res = await worker.fetch(post({ email: 'a@b.co' }), {
+    DB: fakeDB(),
+    ASSETS: emailAssets(DIGEST),
+    BREVO_API_KEY: 'wrong',
+  }, ctx);
+  assert.equal(res.status, 200);
+  await ctx.settle(); // must not reject
+});
+
+await test('Brevo being unreachable does not fail the subscription', async () => {
+  globalThis.fetch = async () => {
+    throw new TypeError('fetch failed');
+  };
+  const ctx = fakeCtx();
+  const res = await worker.fetch(post({ email: 'a@b.co' }), {
+    DB: fakeDB(),
+    ASSETS: emailAssets(DIGEST),
+    BREVO_API_KEY: 'k',
+  }, ctx);
+  assert.equal(res.status, 200);
+  await ctx.settle();
+});
+
+await test('a runtime that passes no ctx still stores the address', async () => {
+  // Optional-chaining guard: no welcome mail, but never a 500 on a stored row.
+  captureBrevo();
+  const res = await worker.fetch(post({ email: 'a@b.co' }), {
+    DB: fakeDB(),
+    ASSETS: emailAssets(DIGEST),
+    BREVO_API_KEY: 'k',
+  });
+  assert.equal(res.status, 200);
+});
+
 // --- one casing per page ----------------------------------------------------
 
 /**

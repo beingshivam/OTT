@@ -88,7 +88,7 @@ async function proxyPoster(request, url) {
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
     /**
@@ -101,23 +101,8 @@ export default {
     if (url.pathname.startsWith('/img/')) return proxyPoster(request, url);
 
     /**
-     * One casing per page.
-     *
-     * /THEATRES answered 200 — not with the theatres page, but with the SPA
-     * fallback, which then declared its canonical to be the homepage. So every
-     * case variant of every path was a crawlable URL serving a document that
-     * claimed to be a different one. Harmless to a reader who never types it,
-     * and free duplicate-URL surface for a crawler that finds it in somebody's
-     * mistyped link.
-     *
-     * Deliberately after the /img/ branch: TMDB poster filenames are
-     * case-sensitive (5PJNeckEmOcMVh8xT4YVjdUf5nj.jpg), and lowercasing one
-     * would turn every poster on the site into a 404. Every path this site
-     * actually publishes — platform ids, language names, slugs, ISO weeks — is
-     * lowercase by construction, so nothing else here has a case to preserve.
-     */
-    /**
-     * Page paths only — anything with a file extension keeps its capitals.
+     * One casing per page — but page paths only, because anything with a file
+     * extension keeps its capitals.
      *
      * The first version of this redirected on capitals alone and took the
      * whole site down for the length of one deploy: Vite's hashed bundles are
@@ -208,6 +193,87 @@ export default {
       return json(500, { error: 'store_failed' });
     }
 
+    /**
+     * The welcome mail, deliberately after the response is decided.
+     *
+     * waitUntil rather than await: the address is the durable thing and the
+     * email is best-effort, so a slow Brevo must not hold the form open and a
+     * dead one must not turn a stored subscription into a visible failure. The
+     * reader has done their part the moment the row exists.
+     */
+    // Optional-chained: the row is already written, and a runtime that hands
+    // us no ctx must not turn a successful subscription into a 500.
+    ctx?.waitUntil?.(sendWelcome(env, address));
     return json(200, { ok: true });
   },
 };
+
+/** Where the mail comes from. A verified sender on the site's own domain —
+ *  Brevo will refuse anything else, and so will most inboxes. */
+const SENDER = { name: 'New on OTT', email: 'mail@newonott.in' };
+
+/**
+ * Send the current week's digest to somebody who has just subscribed.
+ *
+ * Someone who signs up on a Tuesday and hears nothing until Friday has, by
+ * Friday, forgotten doing it. This closes that gap with the email they signed
+ * up for rather than a separate "thanks for subscribing" that says nothing —
+ * the first message proves what the subscription is worth.
+ *
+ * The body is the same file the build ships to /email/, rebuilt by every
+ * refresh, so there is no second template to keep in step with the first.
+ *
+ * Every failure here is swallowed on purpose. This runs after the subscriber
+ * has been told they are subscribed, and they have been: the row is written.
+ * Throwing would only produce an unhandled rejection in a context nobody
+ * reads, so failures are logged and dropped.
+ */
+async function sendWelcome(env, address) {
+  if (!env.BREVO_API_KEY) return; // Not configured — a signup still succeeds.
+  try {
+    const [html, text, subject] = await Promise.all(
+      ['latest.html', 'latest.txt', 'subject.txt'].map((f) =>
+        env.ASSETS.fetch(new Request(`https://newonott.in/email/${f}`)).then((r) =>
+          r.ok ? r.text() : null,
+        ),
+      ),
+    );
+    // No digest built into this deploy: skip rather than send an empty mail.
+    if (!html || html.length < 10) return;
+
+    /**
+     * The unsubscribe token in the template is meant for a provider that
+     * substitutes its own link. Brevo does not do that for transactional
+     * sends, so shipping it literally would print "{{ unsubscribe }}" in
+     * somebody's inbox — worse than having no unsubscribe at all.
+     */
+    const optOut = 'Don\u2019t want these? Reply with "stop" and you are off the list.';
+    const body = {
+      sender: SENDER,
+      to: [{ email: address }],
+      subject: (subject ?? 'New on OTT — this week').trim(),
+      htmlContent: html.replace(/\{\{\s*unsubscribe\s*\}\}/g, optOut),
+      textContent: (text ?? '').replace(/\{\{\s*unsubscribe\s*\}\}/g, optOut) || undefined,
+      /**
+       * Gives Gmail and Outlook a real unsubscribe control of their own. A
+       * mailto rather than a URL because there is no unsubscribe endpoint yet
+       * — this is honest about what exists, and an inbox-level unsubscribe
+       * button is worth more than a link nobody scrolls to.
+       */
+      headers: { 'List-Unsubscribe': `<mailto:${SENDER.email}?subject=unsubscribe>` },
+    };
+
+    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        accept: 'application/json',
+        'content-type': 'application/json',
+        'api-key': env.BREVO_API_KEY,
+      },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) console.error('welcome: brevo refused', res.status, await res.text());
+  } catch (err) {
+    console.error('welcome: send failed', err);
+  }
+}

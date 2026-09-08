@@ -39,3 +39,10 @@
 /diag/*
   Cache-Control: no-store
   X-Robots-Tag: noindex
+
+# The week's email body, copied here by the build so the Worker can read it
+# when sending a new subscriber their welcome mail. A mail body is not a page:
+# it has no canonical, no nav and no place in a search result.
+/email/*
+  X-Robots-Tag: noindex
+  Cache-Control: public, max-age=300, must-revalidate
