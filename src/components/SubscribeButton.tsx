@@ -60,10 +60,12 @@ export function SubscribeButton() {
 
       {open && (
         <div className="subscribe__menu" role="dialog" aria-label="Get the weekly email">
-          <p className="subscribe__pitch">
-            <strong>Every Friday, in your inbox.</strong> The week's releases, one email —
-            starting with this one, now.
-          </p>
+          {/* One line. An earlier version explained the cadence, the format and
+              that the first email arrives immediately — three facts stacked in
+              front of a field that takes four seconds to fill in. The
+              confirmation already says the first one is on its way, so saying
+              it here was buying nothing and costing a sentence. */}
+          <p className="subscribe__pitch">Each week's releases, in your inbox.</p>
           {/* The footer variant rather than the banner: this popover is already
               the reader's own decision to open, so it must not be dismissible
               from inside, and it should still render for somebody who waved

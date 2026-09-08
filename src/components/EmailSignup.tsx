@@ -108,12 +108,7 @@ export function EmailSignup({ variant = 'footer' }: { variant?: 'footer' | 'bann
               and the text after it become separate flex items and render as two
               columns once the row wraps on a phone. */}
           <span>
-            {/* The second sentence is the one that closes it. "Every Friday"
-                asks somebody to imagine a benefit four days out; "starting
-                now" is a thing that happens before they have left the page,
-                and it is true — signing up sends this week's list. */}
-            <strong>Every Friday, in your inbox.</strong> The week's releases, one email —
-            starting with this one, now.
+            <strong>Each week's releases, in your inbox.</strong>
           </span>
         </span>
       )}
