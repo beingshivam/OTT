@@ -51,8 +51,10 @@ export const ANALYTICS_TOKEN = '';
  * posts { email, email_address } so it fits whichever field name that service
  * reads.
  *
- * Leave it empty until the D1 database is bound (step 3 of the doc). Empty
- * hides both forms; set-but-unbound makes the endpoint answer 503, which the
- * form surfaces as an error rather than a false thank-you.
+ * Empty hides both forms; set-but-unbound makes the endpoint answer 503, which
+ * the form surfaces as an error rather than a false thank-you. Set on 8 Sep
+ * 2026, at the same time as the D1 binding in wrangler.jsonc — the two have to
+ * move together, and setting this one alone is the state that renders a field
+ * which cannot store what people type into it.
  */
-export const EMAIL_ENDPOINT = '';
+export const EMAIL_ENDPOINT = '/api/subscribe';

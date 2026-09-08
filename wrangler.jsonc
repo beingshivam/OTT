@@ -50,19 +50,18 @@
   }
 
   /**
-   * The subscriber list. Commented out until the database exists, because a
-   * binding naming a database_id that has not been created fails the deploy —
-   * and this config deploys the live site.
+   * The subscriber list. Live since 8 Sep 2026.
    *
-   * Create it (dashboard → Storage & Databases → D1, or `wrangler d1 create`),
-   * paste the id below, uncomment, and run the schema in docs/email-setup.md.
-   * Until then /api/subscribe answers 503 and the sign-up form stays hidden.
+   * The id is not a credential — it names a database that only this account's
+   * authenticated calls can reach, and it ships in this file either way. The
+   * schema it expects is in docs/email-setup.md §2 and must match the INSERT in
+   * worker/index.js: (email, address, created_at, country).
    */
-  // ,"d1_databases": [
-  //   {
-  //     "binding": "DB",
-  //     "database_name": "newonott-subscribers",
-  //     "database_id": "paste-the-id-here"
-  //   }
-  // ]
+  ,"d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "newonott-subscribers",
+      "database_id": "9670de78-9f16-457a-a8a1-38342deddc13"
+    }
+  ]
 }
