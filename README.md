@@ -32,7 +32,26 @@ BASE_PATH=/ott/ npm run build
 
 Connecting the repo in the Cloudflare dashboard creates a **Workers** project
 (new projects no longer land on Pages), which deploys with `npx wrangler deploy`
-and serves at `newonott.in` (and still at its `*.workers.dev` address).
+and serves at `newonott.in`. Its `*.workers.dev` addresses are switched off
+deliberately — see "One site, one address" below.
+
+### One site, one address
+
+The site is served at `newonott.in` and nowhere else. Four copies existed at
+various points, each a crawlable duplicate competing for crawl budget on a
+domain with nothing yet indexed:
+
+| Copy | Status |
+| --- | --- |
+| `dropday.newreleases.workers.dev` | Worker URL disabled |
+| `*-dropday.newreleases.workers.dev` | Preview URL disabled |
+| `shivamahirao.in/OTT/` (GitHub Pages) | Unpublished, workflow deleted |
+| `www.newonott.in` | 301 to the apex via a Cloudflare Redirect Rule |
+
+Canonical tags pointed at `newonott.in` throughout, which is why none of this
+became a ranking problem — but a canonical is a hint Google may ignore, not a
+rule it must follow. Serving one address is the version that does not rely on
+being believed.
 
 `wrangler.jsonc` in the repo root drives that deploy. It is deliberately
 **assets-only** — no Worker script, nothing running at request time — because the

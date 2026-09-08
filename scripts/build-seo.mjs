@@ -41,11 +41,13 @@ const FEED = resolve(ROOT, 'dist/data/releases.json');
  * The canonical home of the site.
  *
  * This is now a domain we own, so it is stated rather than derived from the
- * Worker's name and account subdomain. Those still resolve — the workers.dev
- * URL keeps working — but every canonical, sitemap entry and OG tag should
- * point at one address, and search engines should be told which one that is.
- * Two hosts serving identical content with no canonical between them is how a
- * site competes against itself.
+ * Worker's name and account subdomain. Every canonical, sitemap entry and OG
+ * tag points here, and the hosts that used to serve the same content beside it
+ * have been switched off rather than left to canonical their way out of
+ * trouble: the workers.dev production and preview URLs, a GitHub Pages copy on
+ * a personal domain, and www, which now 301s here. Two hosts serving identical
+ * content is how a site competes against itself, and a canonical tag is a hint
+ * rather than a guarantee.
  *
  * SITE_URL in the environment still wins, for previews and branch deploys.
  */
