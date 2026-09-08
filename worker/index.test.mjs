@@ -77,6 +77,66 @@ await test('a deep page path is handed over too', async () => {
   assert.deepEqual(assets.fetched, ['/ott-release-date/mirzapur-the-movie']);
 });
 
+// --- one casing per page ----------------------------------------------------
+
+/**
+ * /THEATRES used to answer 200 with the SPA fallback, whose canonical points at
+ * the homepage — a crawlable URL serving a document claiming to be a different
+ * one. These pin the redirect and, more importantly, pin the exception: poster
+ * filenames are case-sensitive, so lowercasing an /img/ path would 404 every
+ * poster on the site.
+ */
+
+await test('an uppercase path is redirected to its lowercase form', async () => {
+  const assets = { ...fakeAssets, fetched: [] };
+  const res = await worker.fetch(new Request(`${ORIGIN}/THEATRES`), { ASSETS: assets });
+  assert.equal(res.status, 301);
+  assert.equal(res.headers.get('location'), `${ORIGIN}/theatres`);
+  assert.deepEqual(assets.fetched, [], 'the asset server should not have been asked');
+});
+
+await test('mixed case anywhere in the path redirects', async () => {
+  const res = await worker.fetch(
+    new Request(`${ORIGIN}/ott-release-date/Sardar-2`),
+    { ASSETS: { ...fakeAssets, fetched: [] } },
+  );
+  assert.equal(res.status, 301);
+  assert.equal(res.headers.get('location'), `${ORIGIN}/ott-release-date/sardar-2`);
+});
+
+await test('the query string survives the redirect', async () => {
+  const res = await worker.fetch(new Request(`${ORIGIN}/Netflix?w=2026-09-04`), {
+    ASSETS: { ...fakeAssets, fetched: [] },
+  });
+  assert.equal(res.headers.get('location'), `${ORIGIN}/netflix?w=2026-09-04`);
+});
+
+await test('an already-lowercase path is not redirected', async () => {
+  const assets = { ...fakeAssets, fetched: [] };
+  const res = await worker.fetch(new Request(`${ORIGIN}/theatres`), { ASSETS: assets });
+  assert.equal(res.status, 200);
+  assert.deepEqual(assets.fetched, ['/theatres']);
+});
+
+await test('a poster path keeps its capitals', async () => {
+  // The one case that must never be lowercased: TMDB filenames are
+  // case-sensitive, and this branch runs before the redirect for that reason.
+  let asked = null;
+  globalThis.fetch = async (req) => {
+    asked = typeof req === 'string' ? req : req.url;
+    return new Response('jpeg', { status: 200, headers: { 'content-type': 'image/jpeg' } });
+  };
+  const res = await worker.fetch(
+    new Request(`${ORIGIN}/img/w500/5PJNeckEmOcMVh8xT4YVjdUf5nj.jpg`),
+    { ASSETS: { ...fakeAssets, fetched: [] } },
+  );
+  assert.notEqual(res.status, 301, 'a poster path must not be redirected');
+  assert.ok(
+    asked && asked.includes('5PJNeckEmOcMVh8xT4YVjdUf5nj.jpg'),
+    `upstream should have kept the original casing, asked for: ${asked}`,
+  );
+});
+
 // --- the endpoint's guards ---------------------------------------------------
 
 await test('GET on the endpoint is rejected, not passed to assets', async () => {

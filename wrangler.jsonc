@@ -18,6 +18,28 @@
     // still works from inside the Worker.
     "not_found_handling": "single-page-application",
     /**
+     * Serve /theatres, not /theatres/ — because that is the URL the rest of
+     * the site already claims.
+     *
+     * The default here is "auto-trailing-slash", which serves a folder index
+     * at its slashed form and 308s the bare path to it. That quietly put every
+     * non-homepage URL into a contradiction: the sitemap listed /theatres, the
+     * edge redirected it to /theatres/, and the page served there declared its
+     * canonical to be /theatres — the URL that had just redirected away. Google
+     * was told, on all 128 of them, that the canonical version of the page is
+     * somewhere that does not serve the page. Search Console showed 0 indexed
+     * pages against 126 discovered, and the homepage — the one URL that does
+     * not redirect and whose canonical resolves to itself — was carrying 48 of
+     * the site's 58 impressions.
+     *
+     * Fixing it from this end rather than by rewriting canonicals: the
+     * canonicals, the sitemap and every internal link already agree on the
+     * no-slash form, so moving the edge to match them is one line and changes
+     * no URLs. Rewriting them all to trailing-slash would have been correct
+     * too, and three files larger.
+     */
+    "html_handling": "drop-trailing-slash",
+    /**
      * Assets are normally matched before the Worker runs, and a path that
      * matches no asset would hit the SPA fallback above — which would serve
      * index.html for /api/subscribe and the endpoint would never exist. This

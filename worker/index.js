@@ -99,6 +99,28 @@ export default {
      * fallback from wrangler.jsonc, so unknown paths still serve the board.
      */
     if (url.pathname.startsWith('/img/')) return proxyPoster(request, url);
+
+    /**
+     * One casing per page.
+     *
+     * /THEATRES answered 200 — not with the theatres page, but with the SPA
+     * fallback, which then declared its canonical to be the homepage. So every
+     * case variant of every path was a crawlable URL serving a document that
+     * claimed to be a different one. Harmless to a reader who never types it,
+     * and free duplicate-URL surface for a crawler that finds it in somebody's
+     * mistyped link.
+     *
+     * Deliberately after the /img/ branch: TMDB poster filenames are
+     * case-sensitive (5PJNeckEmOcMVh8xT4YVjdUf5nj.jpg), and lowercasing one
+     * would turn every poster on the site into a 404. Every path this site
+     * actually publishes — platform ids, language names, slugs, ISO weeks — is
+     * lowercase by construction, so nothing else here has a case to preserve.
+     */
+    if (/[A-Z]/.test(url.pathname)) {
+      url.pathname = url.pathname.toLowerCase();
+      return Response.redirect(url.toString(), 301);
+    }
+
     if (url.pathname !== '/api/subscribe') return env.ASSETS.fetch(request);
 
     if (request.method !== 'POST') {
