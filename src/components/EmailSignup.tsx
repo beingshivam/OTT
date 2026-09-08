@@ -88,7 +88,13 @@ export function EmailSignup({ variant = 'footer' }: { variant?: 'footer' | 'bann
   if (state === 'done') {
     return (
       <p className={banner ? 'signup signup--banner signup--done' : 'signup signup--done'} role="status">
-        Done — the week's releases will land in your inbox on Friday.
+        {/*
+          Says what actually happens now, not what used to.
+          Signing up sends this week's digest immediately and the next one
+          lands on Friday — telling someone to wait until Friday, seconds
+          before an email arrives, makes the arrival look like a mistake.
+        */}
+        Done — this week's list is on its way now, and the next one lands Friday.
       </p>
     );
   }
@@ -102,7 +108,12 @@ export function EmailSignup({ variant = 'footer' }: { variant?: 'footer' | 'bann
               and the text after it become separate flex items and render as two
               columns once the row wraps on a phone. */}
           <span>
-            <strong>Every Friday, in your inbox.</strong> The week's releases, one email.
+            {/* The second sentence is the one that closes it. "Every Friday"
+                asks somebody to imagine a benefit four days out; "starting
+                now" is a thing that happens before they have left the page,
+                and it is true — signing up sends this week's list. */}
+            <strong>Every Friday, in your inbox.</strong> The week's releases, one email —
+            starting with this one, now.
           </span>
         </span>
       )}
