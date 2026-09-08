@@ -9,6 +9,7 @@ import { EmailSignup } from './components/EmailSignup';
 import { ReleaseCard } from './components/ReleaseCard';
 import { ShareWeek } from './components/ShareWeek';
 import { SearchBox } from './components/SearchBox';
+import { SubscribeButton } from './components/SubscribeButton';
 import { TrendingStrip, normalise } from './components/TrendingStrip';
 import { PosterRail, relativeDay } from './components/PosterRail';
 import {
@@ -565,6 +566,10 @@ export default function App() {
           {feed && !isTitlePage && !span && !route?.catalogue && (
             <ShareWeek releases={visible} filters={filters} />
           )}
+          {/* Before search rather than after: search is the one control a
+              reader reaches for by muscle memory and it should stay in the
+              rightmost slot it has always occupied. */}
+          <SubscribeButton />
           <SearchBox value={filters.query} onChange={(query) => update({ query })} />
         </div>
 

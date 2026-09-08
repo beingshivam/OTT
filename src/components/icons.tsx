@@ -170,3 +170,13 @@ export const KIND_ICON = {
   anime: IconSparkle,
   special: IconMic,
 } as const;
+
+/** An envelope, for the subscribe control in the header. Drawn to the same
+ *  24-box and 1.8 stroke as the rest so it sits level with its neighbours. */
+export const IconMail = () => (
+  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+       strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <rect x="2.5" y="4.5" width="19" height="15" rx="2.5" />
+    <path d="M3 7l8.2 5.6a1.5 1.5 0 0 0 1.6 0L21 7" />
+  </svg>
+);

@@ -3415,3 +3415,60 @@ a {
     max-width: 148px;
   }
 }
+
+/* The subscribe control.
+   Its own class rather than reusing .share: the two look alike and behave
+   alike, but sharing the wrapper class made `.share .iconbtn` match two
+   buttons and the end-to-end suite started clicking the wrong one. A selector
+   that names a component should name one component. */
+.subscribe {
+  position: relative;
+  flex: none;
+}
+
+/* The popover repeats .share__menu's frame rather than extending it, for the
+   same reason, and widens it because a form needs more room than two menu
+   items. */
+.subscribe__menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 60;
+  border-radius: 16px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface-solid);
+  box-shadow: var(--shadow-pop);
+  animation: sharein 0.16s var(--ease);
+  width: min(320px, calc(100vw - 32px));
+  padding: 14px;
+}
+.subscribe__pitch {
+  margin: 0 0 10px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--text-3);
+}
+.subscribe__pitch strong {
+  color: var(--text);
+}
+/* Inside the popover the form stacks: a 320px panel cannot hold a field and a
+   button side by side without squeezing the field to uselessness.
+   flex:none on both children is load-bearing, not tidiness. The field carries
+   `flex: 1 1 170px` for the horizontal layout it was designed for, and turning
+   the container vertical turns that basis into a *height* — the first build of
+   this rendered a 350px-tall rounded blob where the input should be. */
+.subscribe__menu .signup {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+.subscribe__menu .signup input {
+  flex: none;
+  width: 100%;
+  max-width: none;
+}
+.subscribe__menu .signup .btn {
+  flex: none;
+  width: 100%;
+  justify-content: center;
+}
