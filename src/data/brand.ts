@@ -28,6 +28,17 @@ export const BRAND = 'New on OTT';
 export const SLUG = 'newonott';
 
 /**
+ * Where a reader can reach a person.
+ *
+ * The same address the weekly email sends from, on purpose: a reply to the
+ * newsletter and a message from the footer arrive in one place, and somebody
+ * who wants off the list can use either without being told which is correct.
+ * It is also the unsubscribe target in the List-Unsubscribe header, so this
+ * one string has to stay in step with worker/index.js's SENDER.
+ */
+export const CONTACT_EMAIL = 'mail@newonott.in';
+
+/**
  * The Instagram handle, and only the handle.
  *
  * The URL it came from was a QR share link carrying `stkn` and `utm_source=qr`

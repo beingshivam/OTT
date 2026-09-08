@@ -15,10 +15,11 @@ import { PosterRail, relativeDay } from './components/PosterRail';
 import {
   IconCalendar,
   IconInstagram,
+  IconMail,
   IconPlay,
   IconSearch,
 } from './components/icons';
-import { BRAND, INSTAGRAM, INSTAGRAM_URL, SLUG, TAGLINE } from './data/brand';
+import { BRAND, CONTACT_EMAIL, INSTAGRAM, INSTAGRAM_URL, SLUG, TAGLINE } from './data/brand';
 import { affiliateNetworks, hasAffiliates } from './data/affiliates';
 import { loadFeed, weekById } from './lib/feed';
 import { loadCatalogue } from './lib/catalogue';
@@ -951,35 +952,53 @@ export default function App() {
             other page on the site. See components/BrowseLinks.tsx. */}
         <BrowseLinks feed={feed} region={filters.region} />
 
+        {/*
+          Three tiers, in the order somebody reads them: what this is, what
+          they can do about it, and the small print.
+
+          It used to be two wrapping flex stacks laid side by side, which at
+          desktop width put a tagline, a disclaimer, a reminder button, an
+          email form, a refresh cadence and a TMDB licence on roughly two
+          lines at one visual weight. Nothing was grouped with what it
+          belonged to and nothing was quieter than anything else, so the
+          whole block read as noise and the one action in it — the sign-up —
+          had no more prominence than the licence text.
+        */}
         <footer className="footer">
-          <div className="footer__stack">
-            <span>
-              {BRAND} — {TAGLINE}
-            </span>
-            {/* Said plainly, because a tagline can still be read the hopeful
-                way. This is the sentence that answers the question directly. */}
-            <span className="footer__note">
-              We don't stream anything. Every title links out to the platform showing it.
-            </span>
-            {/* Only once something is actually being earned.
-                ASCI requires a material connection to be disclosed up front,
-                and a standing "we may earn commission" line while no programme
-                is live would be a claim about the site that is not true — the
-                flag comes from the affiliate table itself, so the sentence and
-                the links can never disagree. */}
-            {hasAffiliates && (
-              <span className="footer__note">
-                Some links to {affiliateNetworks.join(' and ')} earn us a commission. It costs you
-                nothing and never changes what we list or how it's ordered.
-              </span>
-            )}
+          <div className="footer__about">
+            <p className="footer__brand">{BRAND}</p>
+            {/* TAGLINE is a fragment written to follow "New on OTT — ", so it
+                begins lowercase. Standing on its own line under the brand it
+                has to start a sentence, and capitalising it here beats editing
+                the constant, which reads correctly everywhere else it is used
+                — the page title, the OG tags, the manifest. */}
+            <p className="footer__what">
+              {TAGLINE.charAt(0).toUpperCase() + TAGLINE.slice(1)}
+              {/* Said plainly, because a tagline can still be read the hopeful
+                  way. This is the sentence that answers the question directly. */}
+              {' '}We don't stream anything — every title links out to the platform
+              showing it.
+            </p>
+          </div>
+
+          {/* The one thing the footer is asking for, given a tier of its own so
+              it is not competing with a licence notice for attention. */}
+          <div className="footer__act">
+            <EmailSignup />
+          </div>
+
+          <div className="footer__links">
             <button className="footer__link" onClick={addWeeklyReminder}>
               <IconCalendar />
               Remind me every Friday
             </button>
-            <EmailSignup />
+            <a className="footer__link" href={`mailto:${CONTACT_EMAIL}`}>
+              <IconMail />
+              {CONTACT_EMAIL}
+            </a>
           </div>
-          <div className="footer__stack">
+
+          <div className="footer__meta">
             <span>Refreshes {refreshDaysLabel()}</span>
             {/* Says whose scores these are — they are TMDB's, not IMDb's, and
                 the two differ by a few tenths often enough that leaving a bare
@@ -992,6 +1011,18 @@ export default function App() {
               </a>
               . This product uses the TMDB API but is not endorsed or certified by TMDB.
             </span>
+            {/* Only once something is actually being earned.
+                ASCI requires a material connection to be disclosed up front,
+                and a standing "we may earn commission" line while no programme
+                is live would be a claim about the site that is not true — the
+                flag comes from the affiliate table itself, so the sentence and
+                the links can never disagree. */}
+            {hasAffiliates && (
+              <span className="footer__credit">
+                Some links to {affiliateNetworks.join(' and ')} earn us a commission. It costs you
+                nothing and never changes what we list or how it's ordered.
+              </span>
+            )}
           </div>
         </footer>
       </main>

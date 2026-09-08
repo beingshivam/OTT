@@ -2386,15 +2386,26 @@ a {
 
 /* ------------------------------------------------------------ footer ---- */
 
+/**
+ * Four tiers down the page, not two columns across it.
+ *
+ * The previous rule was `display:flex; flex-wrap; justify-content:
+ * space-between` over two stacks that each wrapped again inside. At desktop
+ * width that put the tagline, the disclaimer, a reminder button, an email
+ * form, the refresh cadence and the TMDB licence onto about two lines, all at
+ * one size and one colour — so nothing was grouped with what it belonged to,
+ * and the only action in the block had no more weight than a licence notice.
+ *
+ * A footer is read top to bottom, so it is laid out that way: what this is,
+ * the ask, the links, the small print — each quieter than the one above it.
+ */
 .footer {
   margin-top: 40px;
-  padding-block: 30px 44px;
+  padding-block: 28px 44px;
   border-top: 1px solid var(--line);
   display: flex;
-  flex-wrap: wrap;
-  gap: 12px 24px;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 18px;
   font-size: 12.5px;
   color: var(--text-3);
 }
@@ -2407,11 +2418,51 @@ a {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
-.footer__stack {
+/* Tier one: who this is and what it does. The only part of the footer set in
+   the body colour, because it is the only part anybody needs to read once. */
+.footer__about {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 62ch;
+}
+.footer__brand {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.footer__what {
+  margin: 0;
+  line-height: 1.55;
+  color: var(--text-3);
+}
+
+/* Tier two: the ask, alone on its line so it is not competing with a licence
+   notice for the reader's attention. */
+.footer__act {
+  display: flex;
+}
+
+/* Tier three: the two things a reader might want to do next. */
+.footer__links {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 18px;
+  gap: 8px 20px;
   align-items: center;
+}
+
+/* Tier four: small print, and it should look like small print. Separated by a
+   rule rather than by spacing alone, so the eye can stop before it. */
+.footer__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  font-size: 11.5px;
+  line-height: 1.55;
 }
 
 /* The top-of-page version. Wider, warmer, and carrying its own pitch, but still
@@ -2541,9 +2592,7 @@ a {
 /* The attribution line. Deliberately the quietest thing on the page — it is a
    credit and a licence obligation, not something anyone came here to read. */
 .footer__credit {
-  max-width: 46ch;
-  font-size: 11.5px;
-  line-height: 1.5;
+  max-width: 70ch;
   color: var(--text-3);
 }
 .footer__credit a {
