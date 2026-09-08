@@ -1,5 +1,5 @@
 New on OTT — 4–10 Sep
-34 releases across 10 platforms.
+33 releases across 9 platforms.
 
 • Mirzapur: The Movie — In Theatres — Film · Hindi · Action
 • Dhamaal 4 — Netflix — Film · Hindi · Comedy
@@ -8,9 +8,9 @@ New on OTT — 4–10 Sep
 • The Court — JioHotstar — Series · Hindi · Drama
 • Dark Matter — Apple TV+ — Series · English · Sci-Fi & Fantasy
 
-…and 28 more, including everything in cinemas.
+…and 27 more, including everything in cinemas.
 
-See the full week: https://newonott.in/?w=2026-09-04
+See the full week: https://newonott.in/w/2026-09-04
 
 Ratings and release data from TMDB. This product uses the TMDB API but is not endorsed or certified by TMDB.
 {{ unsubscribe }}

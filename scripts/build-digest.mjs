@@ -102,7 +102,18 @@ const range = formatRange(week.id);
 const top = rows.slice(0, TEASER);
 const rest = rows.length - top.length;
 const platformCount = new Set(rows.flatMap((r) => r.platforms)).size;
-const link = `${SITE_URL}/?w=${week.id}`;
+/**
+ * The week's own page, not the homepage filtered to it.
+ *
+ * `/?w=<id>` was written before /w/<id> existed as a real page. Two reasons to
+ * prefer the page now. An email is read late — on the following Tuesday, or out
+ * of an archive in March — and the homepage by then shows whichever week is
+ * current, so a dated email would open on undated content. And every click is a
+ * visit to a URL that is trying to rank for "OTT releases 4–10 Sep 2026", which
+ * is exactly the query the page is built for; sending that traffic to the
+ * homepage instead spends it on a page that does not need it.
+ */
+const link = `${SITE_URL}/w/${week.id}`;
 
 /** "Film · Hindi · Crime" — the three things that decide whether it is for you. */
 const KIND = { film: 'Film', series: 'Series', documentary: 'Documentary', reality: 'Reality', anime: 'Anime', special: 'Special' };
