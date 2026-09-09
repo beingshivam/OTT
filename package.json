@@ -34,7 +34,8 @@
     "test:rail": "node --test src/lib/rails.test.mjs",
     "e2e": "node scripts/e2e.mjs",
     "lookup": "node scripts/lookup.mjs",
-    "test:affiliates": "node --test src/data/affiliates.test.mjs"
+    "test:affiliates": "node --test src/data/affiliates.test.mjs",
+    "coverage": "node scripts/coverage.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

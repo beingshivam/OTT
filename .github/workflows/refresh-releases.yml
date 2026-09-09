@@ -351,13 +351,26 @@ jobs:
             ].join("\n"));
           ')
 
+          # What the calendar is missing, and why.
+          #
+          # The refresh already says how much it holds; this says what it does
+          # not. Nobody is watching for a big release that quietly failed a
+          # gate — not a person between Fridays, not an assistant between
+          # conversations — so the pipeline reports its own coverage and the
+          # question stops needing to be asked.
+          #
+          # Non-fatal on purpose: a report that can fail the run it is
+          # reporting on would be a notification system that costs deploys.
+          coverage=$(node scripts/coverage.mjs 2>/dev/null || echo "- coverage report unavailable this run")
+
           if [ "$OUTCOME" = "success" ]; then
             head="✅ Refresh completed — $(date -u '+%a %d %b %Y, %H:%M UTC')"
           else
             head="⚠️ **Refresh FAILED** — $(date -u '+%a %d %b %Y, %H:%M UTC')"
           fi
 
-          body=$(printf '%s\n\n%s\n\n[Full log](%s)\n\n@%s' "$head" "$summary" "$RUN_URL" "$OWNER")
+          body=$(printf '%s\n\n%s\n\n**Coverage**\n\n%s\n\n[Full log](%s)\n\n@%s' \
+            "$head" "$summary" "$coverage" "$RUN_URL" "$OWNER")
 
           # One issue, reused. Found by title so the workflow needs nothing
           # stored anywhere; created on the first run that reports.
