@@ -49,6 +49,7 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { callCount, requireToken, tmdb } from './tmdb.mjs';
+import { baselineFor, weekStart } from './rank-movement.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 /**
@@ -260,22 +261,43 @@ async function detailFor(isMovie, id) {
 }
 
 /**
- * Last run's ranks, so the next one can say what moved.
+ * Where each title stood before, so the next run can say what moved.
  *
  * Read before anything is written, because this file is about to be replaced.
- * A rank on its own says what is popular; a rank next to the previous one says
+ * A rank on its own says what is popular; a rank beside an earlier one says
  * what is *rising*, which is the more interesting claim and the one nobody else
- * in this space makes — "up fourteen places this week" is a fact about
- * attention, not a snapshot of it.
+ * in this space makes.
+ *
+ * Two different earlier ranks, because they answer two different questions and
+ * conflating them is how the interesting claim becomes a false one:
+ *
+ *   prevPopRank  where it stood on the *previous run*. Runs are Friday,
+ *                Saturday and Monday, so this spans 26 hours, two days or four
+ *                depending on which one you catch. Useful for checking the
+ *                pipeline; useless as a sentence, because "up 14 places" would
+ *                silently mean a different window on Saturday than on Friday.
+ *
+ *   baseRank     where it stood when the current release week opened, carried
+ *                across every run inside that week. This is the one a reader
+ *                can be shown, because "this week" then means the same seven
+ *                days the rest of the site means by it.
+ *
+ * The distinction is not hypothetical. The first two catalogue runs to carry a
+ * baseline landed 27 minutes apart, and all 380 ranked titles came back with
+ * prevPopRank exactly equal to popRank — zero movement across the board. A
+ * "trending" label on that data would have been 380 flat arrows.
  *
  * Carried here rather than computed later because the data has to exist before
  * the feature can: this file is regenerated wholesale on every refresh, so a
- * run that does not preserve the previous ranks destroys the only baseline the
- * next comparison could have used. Missing file, or a first run, simply leaves
- * prevPopRank unset and the display has nothing to show — which is correct, not
- * an error.
+ * run that does not preserve these destroys the only baseline the next
+ * comparison could have used. A missing file, or a title new to the list,
+ * leaves both unset — absent is not the same as "climbed from the bottom", and
+ * the display must never render it as one.
  */
 const previousRank = new Map();
+/** id → { rank, week } from the last run, where `week` is the Friday that
+ *  opened the release week that baseline belongs to. */
+const priorBaseline = new Map();
 /** How many titles the last run shipped, as the sanity check further down needs
  *  the whole count and previousRank holds only the ranked ones. */
 let keptBefore = 0;
@@ -284,6 +306,9 @@ try {
   keptBefore = (prior.titles ?? []).length;
   for (const t of prior.titles ?? []) {
     if (t.popRank != null) previousRank.set(t.id, t.popRank);
+    if (t.baseRank != null && t.baseWeek) {
+      priorBaseline.set(t.id, { rank: t.baseRank, week: t.baseWeek });
+    }
   }
 } catch {
   /* No catalogue yet. */
@@ -487,13 +512,25 @@ for (const row of rows) {
 
 /** Only where both ends exist: a title new to the list has not "risen", and
  *  saying it climbed from nowhere would invent movement that never happened. */
+/* The week boundary and the baseline rule live in rank-movement.mjs, where
+   they can be tested — this script needs a token and a network on import, so
+   nothing inside it can be. See that file for why the baseline is weekly. */
+const thisWeek = weekStart(new Date());
+
 let moved = 0;
+let movedThisWeek = 0;
 for (const row of rows) {
   const before = previousRank.get(row.id);
   if (before != null && row.popRank != null) {
     row.prevPopRank = before;
     if (before !== row.popRank) moved++;
   }
+
+  if (row.popRank == null) continue;
+  const base = baselineFor(priorBaseline.get(row.id), before, thisWeek);
+  if (base) Object.assign(row, base);
+
+  if (row.baseRank != null && row.baseRank !== row.popRank) movedThisWeek++;
 }
 
 rows.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0) || (b.votes ?? 0) - (a.votes ?? 0));
@@ -522,11 +559,24 @@ if (previousRank.size) {
     .filter((r) => r.prevPopRank != null && r.prevPopRank > r.popRank)
     .sort((a, b) => b.prevPopRank - b.popRank - (a.prevPopRank - a.popRank))
     .slice(0, 5);
+  const weekRisers = rows
+    .filter((r) => r.baseRank != null && r.baseRank > r.popRank)
+    .sort((a, b) => b.baseRank - b.popRank - (a.baseRank - a.popRank))
+    .slice(0, 5);
   console.log(
     `\n  ${moved} title(s) changed rank since the last run` +
       (risers.length
         ? `; biggest climbs: ` +
           risers.map((r) => `${r.title} +${r.prevPopRank - r.popRank}`).join(', ')
+        : ''),
+  );
+  /* The number to judge a "trending this week" label on — the other one spans
+     whatever gap happened to fall between two runs. */
+  console.log(
+    `  ${movedThisWeek} title(s) changed rank since ${thisWeek}, the start of this week` +
+      (weekRisers.length
+        ? `; biggest climbs: ` +
+          weekRisers.map((r) => `${r.title} +${r.baseRank - r.popRank}`).join(', ')
         : ''),
   );
 } else {
