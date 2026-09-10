@@ -8,13 +8,13 @@ import type { Release } from '../types';
  * under the "Documentary" genre and reality shows under "Reality", so the naive
  * join produces "Reality · English · Reality".
  */
-export function metaLine(release: Release, maxGenres = 2): string {
+export function metaLine(release: Release, maxGenres = 2, withKind = true): string {
   const kind = KIND_LABEL[release.kind] ?? release.kind;
   const genres = release.genres
     .filter((g) => g.toLowerCase() !== kind.toLowerCase())
     .slice(0, maxGenres);
 
-  return [kind, release.languages.map(languageName).join(', '), genres.join(', ')]
+  return [withKind ? kind : '', release.languages.map(languageName).join(', '), genres.join(', ')]
     .filter(Boolean)
     .join(' · ');
 }

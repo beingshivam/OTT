@@ -743,6 +743,10 @@ export default function App() {
                 releases={cinemaRail.releases}
                 onOpen={setSelected}
                 caption={(r) => relativeDay(r.releaseDate, today)}
+                /* The heading is the answer here. Every card in this row is
+                   theatrical, so naming the platform on each one printed
+                   "Theatres" seven times across the posters. */
+                showPlatform={false}
               />
               <PosterRail
                 compact

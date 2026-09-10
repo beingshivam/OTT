@@ -3,7 +3,7 @@ import { KIND_ICON } from './icons';
 import { PlatformLogo } from './PlatformLogo';
 import { Rating } from './Rating';
 import { dropLabel } from './ReleaseCard';
-import { platform } from '../data/platforms';
+import { KIND_LABEL, platform } from '../data/platforms';
 import { listRuntime, metaLine } from '../lib/format';
 import { formatDay } from '../lib/week';
 import type { Release } from '../types';
@@ -131,7 +131,7 @@ function PanelCard({
       aria-label={p.name}
     >
       <header className="panel-card__head">
-        <PlatformLogo platformId={platformId} size={24} />
+        <PlatformLogo platformId={platformId} size={28} />
         <span className="panel-card__name">{p.name}</span>
         {/* The count stays the true total, so a collapsed panel never
             under-reports the week. */}
@@ -182,7 +182,7 @@ function packColumns(panels: Panel[], count: number): Panel[][] {
     // Collapsed height: what the panel actually occupies on arrival. Packing on
     // the full length would reserve a column for rows nobody has asked to see.
     const rows = Math.min(panel[1].length, PANEL_MAX);
-    heights[shortest] += 38 + rows * 44 + (panel[1].length > PANEL_MAX ? 30 : 0) + 14;
+    heights[shortest] += 42 + rows * 47 + (panel[1].length > PANEL_MAX ? 30 : 0) + 14;
   }
   return columns.filter((c) => c.length > 0);
 }
@@ -257,7 +257,15 @@ function BoardRow({
               … · 3h 17m" — a lone ellipsis where "Action, Cr…" at least says
               what kind of film it is. */}
           <span className="row__meta">
-            <span className="row__metatext">{metaLine(release)}</span>
+            {/* The kind is dropped from the text and carried by the icon at the
+                start of the row, which is already showing it. It cost seven
+                characters — "Film · " — on a line that had none to spare once
+                the type grew, and the squeeze was landing on the language:
+                rows were rendering "Film · Engli… · 1h 51m", clipping the one
+                field this audience filters by. Named for assistive tech below,
+                which reads the row's text and cannot see the icon. */}
+            <span className="sr-only">{KIND_LABEL[release.kind] ?? release.kind}. </span>
+            <span className="row__metatext">{metaLine(release, 2, false)}</span>
             {runtime && <span className="row__runtime">&nbsp;· {runtime}</span>}
           </span>
         </span>

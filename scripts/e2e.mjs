@@ -263,15 +263,42 @@ for (const [width, height] of [[360, 780], [390, 844], [1280, 900]]) {
     titles.join(' / '),
   );
 
-  // Each row's platform badges say what kind of thing it holds.
-  const kinds = await page.evaluate(() =>
-    [...document.querySelectorAll('.landed--sub')].map((row) =>
-      [...row.querySelectorAll('.landed__badge')].map(
-        (b) => b.querySelector('img,svg')?.getAttribute('alt') ?? b.textContent.trim(),
-      ),
+  /*
+    Cards are counted as cards, and the platform pill is asserted separately.
+
+    This used to count badges and call the result "both rows have cards", which
+    silently stopped meaning that the day the cinema row dropped its pill: every
+    card in that row is theatrical, so printing "Theatres" across all of them
+    was a label repeated until it stopped being read. The count and the pill are
+    two different claims and now fail for two different reasons.
+  */
+  const cards = await page.evaluate(() =>
+    [...document.querySelectorAll('.landed--sub')].map(
+      (row) => row.querySelectorAll('.landed__cell').length,
     ),
   );
-  is(kinds[0].length > 0 && kinds[1].length > 0, `${width}px: both rows have cards`, 'a row is empty');
+  is(cards[0] > 0 && cards[1] > 0, `${width}px: both rows have cards`, `${cards.join(' / ')} cards`);
+
+  /*
+    The OTT row names the service on every card; the cinema row names none.
+
+    "Which OTT is it on" was the single commonest piece of feedback on this row,
+    and the answer used to be an 18px logo with no words next to it. It is now a
+    pill carrying the mark and the name — and the cinema row, where the heading
+    already answers it, carries nothing.
+  */
+  const pills = await page.evaluate(() =>
+    [...document.querySelectorAll('.landed--sub')].map((row) => ({
+      cells: row.querySelectorAll('.landed__cell').length,
+      named: [...row.querySelectorAll('.landed__badgename')]
+        .map((e) => e.textContent.trim())
+        .filter(Boolean).length,
+    })),
+  );
+  is(pills[0].named === 0, `${width}px: the cinema row does not repeat "Theatres"`,
+     `${pills[0].named} pills on a row whose heading already says it`);
+  is(pills[1].named === pills[1].cells, `${width}px: every OTT card names its service`,
+     `${pills[1].named} of ${pills[1].cells} named`);
 
   /*
     No window in the subtitle. It said "last 6 weeks" under a tab that says

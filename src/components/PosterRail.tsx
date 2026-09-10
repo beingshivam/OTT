@@ -67,6 +67,17 @@ interface Props {
    * pair; the single rows on the other lenses stay full size.
    */
   compact?: boolean;
+  /**
+   * Whether each card names the service it is on.
+   *
+   * On everywhere it tells the reader something. The cinemas row is the one
+   * place it cannot: every card there is theatrical by construction, so the
+   * pill printed "Theatres" across all seven posters under a heading that had
+   * just said "In cinemas" — a label repeated until it stops being read, laid
+   * over the top of every poster to say nothing. Off there, and the artwork
+   * gets its corner back.
+   */
+  showPlatform?: boolean;
 }
 
 /** Headings need ids to be referenced, and two rows on one page cannot share
@@ -83,6 +94,7 @@ export function PosterRail({
   active,
   onSegment,
   compact,
+  showPlatform = true,
 }: Props) {
   const track = useRef<HTMLUListElement>(null);
   const [atStart, setAtStart] = useState(true);
@@ -278,9 +290,17 @@ export function PosterRail({
                        should. */
                     eager={i < 4}
                   />
-                  <span className="landed__badge">
-                    <PlatformLogo platformId={p.id} size={18} />
-                  </span>
+                  {/* Logo and name, not a logo alone. Asked to recognise
+                      Netflix from Apple TV+ at 18px on the first row of the
+                      homepage, readers reasonably could not — and the poster
+                      grid one screen down had been showing the name all along.
+                      See .landed__badge. */}
+                  {showPlatform && (
+                    <span className="landed__badge">
+                      <PlatformLogo platformId={p.id} size={20} />
+                      <span className="landed__badgename">{p.short}</span>
+                    </span>
+                  )}
                   {score && (
                     <span className="landed__score" data-strong={score.strong || undefined}>
                       ★ {score.value.toFixed(1)}

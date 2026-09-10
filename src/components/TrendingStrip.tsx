@@ -44,7 +44,7 @@ export function TrendingStrip({ releases, live, thisWeekIds, onOpen }: Props) {
                 style={{ '--pa': p.accent, '--ink': inkOn(p.accent) } as React.CSSProperties}
               >
                 <span className="strip__rank">{i + 1}</span>
-                <PlatformLogo platformId={p.id} size={18} />
+                <PlatformLogo platformId={p.id} size={20} />
                 <span className="strip__title">{r.title}</span>
                 {isNew && <span className="strip__new">NEW</span>}
               </button>

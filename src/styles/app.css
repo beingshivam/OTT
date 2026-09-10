@@ -885,7 +885,7 @@ a {
 }
 
 .panel-card__name {
-  font-size: 13px;
+  font-size: 14.5px;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: color-mix(in srgb, var(--pa) 72%, #ffffff);
@@ -919,7 +919,7 @@ a {
   border-radius: var(--radius-pill);
   background: rgba(255, 255, 255, 0.09);
   color: var(--text-2);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   display: grid;
@@ -972,7 +972,7 @@ a {
 }
 
 .row__title {
-  font-size: 13.5px;
+  font-size: 14.5px;
   font-weight: 600;
   line-height: 1.3;
   letter-spacing: -0.012em;
@@ -1035,7 +1035,7 @@ a {
 }
 
 .row__meta {
-  font-size: 11.5px;
+  font-size: 12.5px;
   color: var(--text-3);
   line-height: 1.35;
   overflow: hidden;
@@ -1121,8 +1121,8 @@ a {
   align-items: center;
   gap: 6px;
   flex: none;
-  font-size: 11.5px;
-  color: var(--text-3);
+  font-size: 12.5px;
+  color: var(--text-2);
 }
 .controls__fresh i {
   width: 6px;
@@ -1355,12 +1355,12 @@ a {
   display: flex;
   align-items: baseline;
   gap: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .landed__title {
   margin: 0;
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--text);
@@ -1374,8 +1374,8 @@ a {
 .landed__sub {
   display: none;
   margin: 0;
-  font-size: 12px;
-  color: var(--text-3);
+  font-size: 13px;
+  color: var(--text-2);
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1415,7 +1415,7 @@ a {
   background: none;
   color: var(--text-3);
   font: inherit;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
@@ -1434,7 +1434,7 @@ a {
    there is something there. Dimmed on the selected side, where it is a fact
    about what you are already looking at rather than an invitation. */
 .landed__segn {
-  font-size: 11px;
+  font-size: 12px;
   font-variant-numeric: tabular-nums;
   color: var(--text-3);
 }
@@ -1457,18 +1457,42 @@ a {
 }
 .landedpair__title {
   margin: 0 0 2px;
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--text);
 }
 .landed--sub {
-  margin-top: 10px;
+  margin-top: 8px;
 }
+/*
+ * The two sub-headings were the quietest text in their own block: 13px, weight
+ * 600, in --text-2, sitting under a 15px/700 parent in full --text. That is the
+ * hierarchy upside down. "Just landed" is a label; "In cinemas" and "On OTT"
+ * are the answer — they are the whole reason this band is split in two, and a
+ * reader who misses them sees one undifferentiated wall of posters.
+ *
+ * So they now read as headings: near the parent's size, its weight, and its
+ * colour. The parent grew too, to keep the step between them.
+ */
 .landed--sub .landed__title {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-2);
+  font-size: 15.5px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/*
+ * And the rows are told apart by more than a gap.
+ *
+ * Two poster rows stacked 10px apart read as one long row that happens to wrap.
+ * A rule and some air above the second says they are two groups — the cheapest
+ * separation that survives a phone, where the counts and the subtitle are
+ * already fighting for the line.
+ */
+.landed--sub + .landed--sub {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
 }
 /*
  * Two posters and a glimpse of the third, not four.
@@ -1552,7 +1576,7 @@ a {
   gap: 12px;
   list-style: none;
   margin: 0;
-  padding: 0 0 4px;
+  padding: 0 0 2px;
   overflow-x: auto;
   scroll-snap-type: x proximity;
   scrollbar-width: none;
@@ -1627,26 +1651,53 @@ a {
   transform: scale(1.04);
 }
 
+/*
+ * The platform, named.
+ *
+ * This was an 18px logo alone, which asks the reader to recognise Netflix's N
+ * from Apple's apple at the size of a full stop — on the row that is the first
+ * thing on the homepage. The poster grid below it has always shown the logo
+ * *and* the name, so the same fact was being presented two different ways in
+ * two views, and the more prominent view had the weaker one.
+ *
+ * Now it is a pill: a bigger mark, the platform's name beside it, and a ground
+ * solid enough to hold both over any poster. The name truncates rather than
+ * pushing the pill past the card — "JioHotstar" fits the narrowest card, and
+ * anything longer loses its tail, which still identifies the service.
+ */
 .landed__badge {
   position: absolute;
   top: 6px;
   left: 6px;
-  display: grid;
-  place-items: center;
-  padding: 3px;
-  border-radius: 8px;
-  background: color-mix(in srgb, #05060a 62%, transparent);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  max-width: calc(100% - 12px);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px 3px 4px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, #05060a 78%, transparent);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+}
+
+.landed__badgename {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11.5px;
+  font-weight: 650;
+  letter-spacing: -0.005em;
+  color: #f2f4f9;
 }
 
 .landed__score {
   position: absolute;
   right: 6px;
   bottom: 6px;
-  padding: 2px 6px;
+  padding: 3px 7px;
   border-radius: var(--radius-pill);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--text-2);
   background: color-mix(in srgb, #05060a 72%, transparent);
@@ -1666,8 +1717,8 @@ a {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  margin-top: 7px;
-  font-size: 12.5px;
+  margin-top: 5px;
+  font-size: 14px;
   font-weight: 620;
   line-height: 1.3;
   min-height: calc(2 * 1.3em);
@@ -1677,8 +1728,8 @@ a {
 .landed__meta {
   display: block;
   margin-top: 2px;
-  font-size: 11.5px;
-  color: var(--text-3);
+  font-size: 12.5px;
+  color: var(--text-2);
 }
 
 /* Arrows are a pointer affordance. A touch device scrolls the row directly, and
@@ -1942,13 +1993,13 @@ a {
   align-items: center;
   gap: 5px;
   max-width: calc(100% - 16px);
-  padding: 4px 9px 4px 7px;
+  padding: 3px 9px 3px 4px;
   border-radius: var(--radius-pill);
-  background: rgba(8, 9, 13, 0.72);
+  background: rgba(8, 9, 13, 0.78);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  font-size: 10.5px;
+  font-size: 11.5px;
   font-weight: 700;
   letter-spacing: 0.01em;
   color: #fff;
@@ -1956,14 +2007,15 @@ a {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.card__badge i {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  flex: none;
-  background: var(--card-accent, #fff);
-  box-shadow: 0 0 7px var(--card-accent, #fff);
+/* Both sit in the same 8px band at the top of the artwork, and the badge grew
+   when it gained the platform's name — so on a finale card "Apple TV+" ran
+   under the FINALE pill and lost its plus sign to something drawn on top of it.
+   The badge yields, because the flag is fixed-width and the name is the part
+   that can shorten gracefully. */
+.card__poster:has(.card__flag) .card__badge {
+  max-width: calc(100% - 70px);
 }
+
 .card__flag {
   position: absolute;
   top: 8px;
@@ -2025,7 +2077,7 @@ a {
   padding-inline: 2px;
 }
 .card__title {
-  font-size: 13.5px;
+  font-size: 14.5px;
   font-weight: 620;
   letter-spacing: -0.015em;
   line-height: 1.3;
@@ -2824,17 +2876,17 @@ a {
     padding: 7px 9px;
   }
   .panel-card__name {
-    font-size: 12px;
+    font-size: 13.5px;
   }
   .row {
     padding: 6px 7px;
     gap: 7px;
   }
   .row__title {
-    font-size: 12.5px;
+    font-size: 13.5px;
   }
   .row__meta {
-    font-size: 10.5px;
+    font-size: 11.5px;
   }
   .sheet-backdrop {
     padding: 0;

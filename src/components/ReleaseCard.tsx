@@ -1,5 +1,6 @@
 import { KIND_ICON } from './icons';
 import { PosterArt } from './PosterArt';
+import { PlatformLogo } from './PlatformLogo';
 import { Rating } from './Rating';
 import { KIND_LABEL, languageName, platform } from '../data/platforms';
 import { listRuntime } from '../lib/format';
@@ -47,8 +48,12 @@ export function ReleaseCard({ release, onOpen, index = 0 }: Props) {
           platformId={primary.id}
           imageUrl={release.posterUrl}
         />
+        {/* The service's own mark rather than a dot in its brand colour. The
+            dot needed the name to mean anything and still read as decoration;
+            the logo is the thing people actually recognise, and it matches the
+            poster rail above, which now carries the same pair. */}
         <span className="card__badge">
-          <i />
+          <PlatformLogo platformId={primary.id} size={18} />
           {primary.short}
         </span>
         {release.drop?.finale && <span className="card__flag">FINALE</span>}
