@@ -665,6 +665,75 @@ console.log('\nBoard controls');
   await ctx.close();
 }
 
+// --- search reaches past the week on screen ----------------------------------
+
+/**
+ * The regression this guards is silent and was live for months: search filtered
+ * the week the board happened to be showing, so a reader who typed a real title
+ * releasing three weeks out was told "no matches in this week" and reasonably
+ * concluded the site did not have it. Nothing errored, nothing looked broken,
+ * and the near-miss buttons underneath made it look considered.
+ *
+ * So the assertion is deliberately the strong one — a title the board is not
+ * currently showing must be findable by name — rather than "the box filters
+ * something".
+ */
+console.log('\nSearch is global');
+{
+  const { ctx, page, errors } = await newPage(browser, { width: 1440, height: 900 });
+  await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('.controls__row');
+
+  const onScreen = await page.evaluate(() =>
+    [...document.querySelectorAll('.row__title')].map((el) => el.textContent.trim()),
+  );
+
+  // A title the current week does not carry, drawn from the feed the page is
+  // actually serving, so this stays true as the calendar rolls forward.
+  const feed = JSON.parse(await readFile(join(DIST, 'data/releases.json'), 'utf8'));
+  const elsewhere = feed.weeks
+    .flatMap((w) => w.releases)
+    .filter((r) => (r.regions ?? []).includes('IN'))
+    .find((r) => r.title.length > 6 && !onScreen.some((t) => t.startsWith(r.title)));
+
+  if (!elsewhere) {
+    bad('a title exists outside the current week', 'the feed holds only this week');
+  } else {
+    await page.fill('.search input[type=search]', elsewhere.title);
+    await page.waitForTimeout(700);
+
+    const found = await page.evaluate((title) => ({
+      heading: document.querySelector('.controls__heading')?.textContent ?? '',
+      hit: [...document.querySelectorAll('.row__title')].some((el) =>
+        el.textContent.trim().startsWith(title),
+      ),
+      stepper: !!document.querySelector('.controls__row .weeknav'),
+      empty: !!document.querySelector('.empty'),
+    }), elsewhere.title);
+
+    is(found.hit, `"${elsewhere.title}" is found from another week`, 'the query stayed inside the week');
+    is(!found.empty, 'and the board is not the empty state', 'it said there were no matches');
+    is(
+      /results? for/.test(found.heading),
+      'the heading names the search rather than a week',
+      `heading was "${found.heading}"`,
+    );
+    is(!found.stepper, 'the week stepper stands down', 'the arrows would step a week nothing is drawn from');
+
+    // And clearing it puts the week back, rather than leaving the board global.
+    await page.locator('.search__clear').click();
+    await page.waitForTimeout(500);
+    is(
+      !!(await page.evaluate(() => document.querySelector('.controls__row .weeknav'))),
+      'clearing the query returns the week',
+      'the board stayed in search mode',
+    );
+  }
+
+  is(errors.length === 0, 'no console errors', errors[0]);
+  await ctx.close();
+}
+
 // --- sharing the week as a picture -------------------------------------------
 
 console.log('\nShare');

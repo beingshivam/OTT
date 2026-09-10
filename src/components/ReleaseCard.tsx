@@ -2,6 +2,7 @@ import { KIND_ICON } from './icons';
 import { PosterArt } from './PosterArt';
 import { Rating } from './Rating';
 import { KIND_LABEL, languageName, platform } from '../data/platforms';
+import { listRuntime } from '../lib/format';
 import type { Release } from '../types';
 
 /** "S2 E4", "S1", "" — the shorthand people actually use in group chats. */
@@ -66,6 +67,10 @@ export function ReleaseCard({ release, onOpen, index = 0 }: Props) {
           {[
             langs.slice(0, 2).join(', ') + (langs.length > 2 ? ` +${langs.length - 2}` : ''),
             release.genres.find((g) => g.toLowerCase() !== (KIND_LABEL[release.kind] ?? '').toLowerCase()),
+            // Same line rather than a badge on the poster: the foot already
+            // holds three things, and a fourth would crowd the artwork to say
+            // something this line has room for.
+            listRuntime(release),
           ]
             .filter(Boolean)
             .join(' · ')}

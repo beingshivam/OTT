@@ -1,7 +1,7 @@
 import { applyFilters } from './filters';
 import { formatWeekRange } from './week';
 import { KIND_LABEL, languageName, platform } from '../data/platforms';
-import type { Filters, ReleaseFeed } from '../types';
+import type { Filters, Release, ReleaseFeed } from '../types';
 
 /**
  * When a filter combination finds nothing, "clear filters" is a shrug. The
@@ -27,9 +27,21 @@ const DIMENSIONS: {
   { key: 'kinds', describe: (v) => v.map((x) => KIND_LABEL[x] ?? x).join(', ') },
 ];
 
-export function suggestions(feed: ReleaseFeed | null, filters: Filters): Suggestion[] {
+/**
+ * `pool` overrides the week to relax against, and is how a global search asks
+ * this question. Two things change when it is passed: the counts are drawn from
+ * everything searched rather than one week, and step 3 is skipped — offering
+ * "3 in 12–18 Sep" after a search that already read every week would be sending
+ * the reader somewhere they have just been told is empty.
+ */
+export function suggestions(
+  feed: ReleaseFeed | null,
+  filters: Filters,
+  pool?: Release[],
+): Suggestion[] {
   if (!feed) return [];
-  const week = feed.weeks.find((w) => w.id === filters.weekId);
+  const scope = pool ?? feed.weeks.find((w) => w.id === filters.weekId)?.releases;
+  const week = scope ? { releases: scope } : undefined;
   const out: Suggestion[] = [];
 
   // 1. Drop one constraint at a time, within this week.
@@ -61,7 +73,8 @@ export function suggestions(feed: ReleaseFeed | null, filters: Filters): Suggest
 
   // 3. Same filters, other weeks. A search that finds nothing this week but two
   //    matches next week should say so rather than claim there's nothing.
-  for (const other of feed.weeks) {
+  //    Moot when the caller already searched every week — see `pool` above.
+  for (const other of pool ? [] : feed.weeks) {
     if (other.id === filters.weekId) continue;
     const count = applyFilters(other.releases, { ...filters, weekId: other.id }).length;
     if (count > 0) {

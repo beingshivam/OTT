@@ -1041,6 +1041,25 @@ a {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  display: flex;
+  gap: 0;
+}
+
+/* The half that gives way. A panel column is narrow enough that "Film · Hindi,
+   Odia · Animation, Family" ellipses on its own, and simply appending the
+   runtime to that string put the ellipsis through the runtime instead —
+   "Comedy · 2h 2…", a number that reads as a broken field rather than an
+   answer. Splitting the line lets the genres absorb the squeeze while the
+   runtime stays whole, which is the right way round: a clipped genre still
+   says "Animation…", a clipped runtime says nothing at all. */
+.row__metatext {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.row__runtime {
+  flex: none;
 }
 
 .row__day {
@@ -1175,6 +1194,22 @@ a {
 .searchbox .search {
   flex: 1 1 auto;
   max-width: none;
+}
+
+/*
+ * The wordmark stands down while the field is open on a phone.
+ *
+ * At 390px the header holds a mark, a wordmark, three round buttons and — once
+ * someone taps search — an input. Something has to give, and left to itself it
+ * was the wordmark, which wrapped "New on OTT." onto three lines and pushed the
+ * whole header to 150px tall. The mark stays, so the way home does too; the
+ * name is not what anybody is reading mid-search, and it comes straight back
+ * when the field closes.
+ */
+@media (max-width: 719px) {
+  .weekbar__brand:has(.searchbox[data-open]) .logo__word {
+    display: none;
+  }
 }
 
 /* ------------------------------------------------------------- share ---- */

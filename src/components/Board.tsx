@@ -4,7 +4,7 @@ import { PlatformLogo } from './PlatformLogo';
 import { Rating } from './Rating';
 import { dropLabel } from './ReleaseCard';
 import { platform } from '../data/platforms';
-import { metaLine } from '../lib/format';
+import { listRuntime, metaLine } from '../lib/format';
 import { formatDay } from '../lib/week';
 import type { Release } from '../types';
 
@@ -230,6 +230,7 @@ function BoardRow({
   const Kind = KIND_ICON[release.kind] ?? KIND_ICON.film;
   const drop = dropLabel(release);
   const day = formatDay(release.releaseDate);
+  const runtime = listRuntime(release);
 
   return (
     <li>
@@ -241,9 +242,24 @@ function BoardRow({
             {drop && <span className="row__drop">{drop}</span>}
             {release.drop?.finale && <span className="row__flag">FINALE</span>}
           </span>
-          {/* Type, language, genre — the three things that decide whether a
-              title is for you, in the order you'd ask them. */}
-          <span className="row__meta">{metaLine(release)}</span>
+          {/* Type, language, genre, runtime — what decides whether a title is
+              for you, in the order you'd ask it. Runtime last because it is the
+              only one that is sometimes absent, so its gap falls off the end
+              rather than opening a hole in the middle of the line.
+
+              Two spans rather than one string, because the column is narrow
+              enough that this line already ellipsed at two genres — appending
+              to it put the ellipsis through the runtime, "Comedy · 2h 2…". Now
+              the genres give way and the number survives whole; see
+              .row__metatext. Dropping to one genre to make room was worse, not
+              better: a row squeezed by a score chip has budget for about
+              twenty-five characters either way, so all it bought was "Hindi ·
+              … · 3h 17m" — a lone ellipsis where "Action, Cr…" at least says
+              what kind of film it is. */}
+          <span className="row__meta">
+            <span className="row__metatext">{metaLine(release)}</span>
+            {runtime && <span className="row__runtime">&nbsp;· {runtime}</span>}
+          </span>
         </span>
         {/* Score and day share one right-hand column. Both are fixed width, so
             the numbers line up down the panel and a missing score leaves a gap

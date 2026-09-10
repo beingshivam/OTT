@@ -86,7 +86,12 @@ export function SearchBox({ value, onChange }: Props) {
           <input
             ref={input}
             type="search"
-            placeholder="Search titles, cast, genres"
+            /* "Search titles, cast, genres" was a list of the fields it
+               indexes, and it read as one — people asked whether they could
+               search for an actor while looking straight at the word "cast".
+               An invitation in the second person, naming the thing they were
+               unsure about, answers it without a feature. */
+            placeholder="Search a title, an actor, a genre"
             value={value}
             onChange={(e) => onChange(e.target.value)}
             onBlur={() => {

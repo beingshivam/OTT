@@ -87,6 +87,11 @@ export default function App() {
   const [filters, setFilters] = useState<Filters>(() =>
     readFilters({ weekId: weekIdFor(new Date()), region: 'IN' }, route),
   );
+
+  /** A live query, which changes what the whole board is drawn from — see the
+   *  `releases` memo below, where the reasoning lives. Declared up here because
+   *  the catalogue fetch depends on it. */
+  const searching = filters.query.trim().length > 0;
   // A week the reader actually asked for — via the arrows, or an inbound ?w —
   // is worth keeping in the URL. The landing auto-jump is not.
   // A /w/<date> page is as explicit as ?w= — the reader asked for that week by
@@ -199,10 +204,19 @@ export default function App() {
     return () => controller.abort();
   }, [route]);
 
-  /** Only on the lens that shows it, and only once — loadCatalogue memoises
-   *  the request, so a reader flipping back and forth pays for one fetch. */
+  /**
+   * Only when something needs it, and only once — loadCatalogue memoises the
+   * request, so a reader flipping back and forth pays for one fetch.
+   *
+   * Two things need it: the lens that shows it, and a search. A search that
+   * reads every week but not the catalogue would still be a scoped search — it
+   * would find Tom Cruise on /streaming and not on the homepage, which is the
+   * same inconsistency this change exists to remove, moved somewhere harder to
+   * notice. The quarter-megabyte is spent only by people who type, after the
+   * page they came for has already rendered.
+   */
   useEffect(() => {
-    if (!route?.catalogue || catalogue) return;
+    if ((!route?.catalogue && !searching) || catalogue) return;
     let live = true;
     loadCatalogue()
       .then((c) => live && setCatalogue(c.titles))
@@ -210,7 +224,7 @@ export default function App() {
     return () => {
       live = false;
     };
-  }, [route, catalogue]);
+  }, [route, catalogue, searching]);
 
   useEffect(() => {
     writeFilters(
@@ -300,14 +314,44 @@ export default function App() {
    * stepper is hidden on those pages rather than left there stepping something
    * nothing renders.
    */
+  /**
+   * Search is the one control that is not a lens.
+   *
+   * Everything else on this page narrows *the week on screen* — that is what a
+   * platform chip or a genre means, and it is the right scope for all of them.
+   * Search is different in kind: somebody typing a name is not narrowing the
+   * week, they are asking whether this site knows about a film, and answering
+   * "not in the seven days you happen to be looking at" is a wrong answer to
+   * the question they asked. It was wrong in a way that hid itself, too — the
+   * empty state said "no matches in this week", so the reader learnt the site
+   * did not have the title rather than that they were standing in the wrong
+   * week.
+   *
+   * The near-miss machinery underneath ("3 in 12–18 Sep") existed to soften
+   * exactly this, which is the tell: the fix was to stop scoping the query, not
+   * to keep apologising for it.
+   *
+   * So a query searches everything loaded — every week in the feed, plus the
+   * back catalogue if that lens has fetched it — while region and the facet
+   * chips still apply, because those are things the reader chose and did not
+   * take back.
+   */
   const releases = useMemo(() => {
+    if (searching) {
+      const rows = feed?.weeks.flatMap((w) => w.releases) ?? [];
+      // The catalogue overlaps the calendar — a title that is both a recent
+      // release and a back-catalogue row would otherwise appear twice, and the
+      // calendar copy is the one carrying this week's platform and date.
+      const seen = new Set(rows.map((r) => r.id));
+      return [...rows, ...(catalogue ?? []).filter((r) => !seen.has(r.id))];
+    }
     // A different set of titles entirely, not a filter over the week's.
     if (route?.catalogue) return catalogue ?? [];
     if (!span) return week?.releases ?? [];
     return (feed?.weeks ?? [])
       .flatMap((w) => w.releases)
       .filter((r) => r.releaseDate >= span.from && r.releaseDate <= span.to);
-  }, [route, catalogue, span, week, feed]);
+  }, [searching, route, catalogue, span, week, feed]);
   const facets = useMemo(() => facetsFor(releases, filters.region), [releases, filters.region]);
   /**
    * The week's own titles, ranked by how much attention they are getting.
@@ -404,8 +448,8 @@ export default function App() {
   // Only computed when the week comes back empty, so the extra passes over the
   // other weeks cost nothing in the normal case.
   const nearMisses = useMemo(
-    () => (visible.length === 0 ? suggestions(feed, filters) : []),
-    [feed, filters, visible.length],
+    () => (visible.length === 0 ? suggestions(feed, filters, searching ? releases : undefined) : []),
+    [feed, filters, visible.length, searching, releases],
   );
 
   const weekOffset = useMemo(() => {
@@ -430,9 +474,9 @@ export default function App() {
   useKeyboard({
     onPrevWeek: () => stepWeek(-1),
     onNextWeek: () => stepWeek(1),
-    // Same reason the stepper is hidden on a span page: the arrows would move a
-    // week nothing on screen is drawn from.
-    blocked: selected !== null || Boolean(span) || Boolean(route?.catalogue),
+    // Same reason the stepper is hidden on a span page, or during a search: the
+    // arrows would move a week nothing on screen is drawn from.
+    blocked: selected !== null || searching || Boolean(span) || Boolean(route?.catalogue),
   });
 
   /** Trending is a browse aid; once the reader has narrowed the week it is noise. */
@@ -491,12 +535,16 @@ export default function App() {
     // The catalogue spans seventy years, so a day heading per release date
     // would be three hundred sections holding one card each. One flat group,
     // keyed on the empty string, which the poster view reads as "no heading".
-    if (route?.catalogue) return visible.length ? ([['', visible]] as const) : [];
-    const days = span ? [...map.keys()].sort() : daysOfWeek(filters.weekId);
+    if (route?.catalogue && !searching) return visible.length ? ([['', visible]] as const) : [];
+    // A search reaches across every week loaded, so its results fall on
+    // whatever dates they fall on — the same shape a span has, and for the same
+    // reason. Enumerating one week's seven days would drop every match outside
+    // it on the floor.
+    const days = span || searching ? [...map.keys()].sort() : daysOfWeek(filters.weekId);
     return days
       .map((d) => [d, map.get(d) ?? []] as const)
       .filter(([, list]) => list.length > 0);
-  }, [visible, filters.weekId, span, route]);
+  }, [visible, filters.weekId, span, route, searching]);
 
   return (
     <>
@@ -521,7 +569,7 @@ export default function App() {
             </span>
             {/* Wordmark and dot share one flex item, or the .logo gap pushes
                 the dot away from the name it belongs to. */}
-            <span>
+            <span className="logo__word">
               {BRAND}
               <span className="logo__dot">.</span>
             </span>
@@ -625,7 +673,11 @@ export default function App() {
           titles, and a reader wrote in genuinely unsure whether she could
           watch things here. One quiet line, on the page a first visit lands
           on. The route pages have PageIntro doing this job already. */}
-      {!route && showExplainer && (
+      {/* Not while searching: the results run from April to December and this
+          line would sit above them insisting they are this week's, which is the
+          contradiction the whole change exists to remove. The heading on the
+          board says what is on screen instead. */}
+      {!route && showExplainer && !searching && (
         <div className="shell">
         <p className="explainer">
           Everything releasing this week — tap a title to see where to watch it.
@@ -728,10 +780,23 @@ export default function App() {
            page opens with an h1 saying "Coming soon" a hundred pixels above,
            and repeating it here would be the page telling you twice; the size
            of what you are looking at is the fact that line does not carry. */
-        heading={span || route?.catalogue ? `${facets.total} titles` : formatWeekRange(filters.weekId)}
-        showCount={!span && !route?.catalogue}
+        /* While searching the board is not a week, so it must not be labelled
+           one. Naming the query is also the only thing on screen that explains
+           why the reader is suddenly looking at five different weeks. */
+        heading={
+          searching
+            ? `${visible.length} ${visible.length === 1 ? 'result' : 'results'} for "${filters.query.trim()}"`
+            : span || route?.catalogue
+              ? `${facets.total} titles`
+              : formatWeekRange(filters.weekId)
+        }
+        /* `showCount` prints the size of the pool, which while searching is
+           every title we hold — a number that would sit next to the match count
+           contradicting it. The heading already carries the only count that
+           means anything here. */
+        showCount={!searching && !span && !route?.catalogue}
         step={
-          span || route?.catalogue
+          searching || span || route?.catalogue
             ? undefined
             : {
                 back: () => stepWeek(-1),
@@ -871,11 +936,17 @@ export default function App() {
                 <span className="empty__icon">
                   <IconSearch />
                 </span>
-                <h3>No matches in this week</h3>
+                {/* The old heading said "in this week" whatever had been typed,
+                    which turned a scoping accident into a claim about the
+                    catalogue. Now the search really has read everything, so it
+                    can say so — and only it can. */}
+                <h3>{searching ? `Nothing matches "${filters.query.trim()}"` : 'No matches in this week'}</h3>
                 <p>
                   {nearMisses.length
                     ? 'Nothing fits all of those at once. Here is the closest thing that does:'
-                    : 'Nothing here fits those filters.'}
+                    : searching
+                      ? `We searched every week we track${catalogue ? ' and the back catalogue' : ''}.`
+                      : 'Nothing here fits those filters.'}
                 </p>
                 {/* Offering only "clear filters" is a shrug. Name the nearest
                     thing that exists and take them there in one tap. */}
@@ -903,8 +974,18 @@ export default function App() {
                 onOpen={setSelected}
                 // A month spans five Fridays, so a weekday chip stops
                 // identifying anything and the date has to carry it.
+                /* A weekday means nothing once the rows come from eight
+                   different weeks — "Fri" would be true of four of them. */
                 dayLabel={
-                  route?.catalogue ? 'year' : byDay.length <= 1 ? 'none' : span ? 'date' : 'weekday'
+                  searching
+                    ? 'date'
+                    : route?.catalogue
+                      ? 'year'
+                      : byDay.length <= 1
+                        ? 'none'
+                        : span
+                          ? 'date'
+                          : 'weekday'
                 }
               />
             ) : (
