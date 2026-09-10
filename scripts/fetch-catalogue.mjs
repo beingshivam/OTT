@@ -198,11 +198,47 @@ async function discoverPopular(isMovie, language, minVotes, page) {
  * answers. What changes is that each platform now records which it is, so the
  * page can say so rather than implying subscription for all of them.
  */
-async function providersFor(isMovie, id) {
+async function detailFor(isMovie, id) {
   try {
-    const data = await tmdb(`/${isMovie ? 'movie' : 'tv'}/${id}/watch/providers`);
-    const scoped = data.results?.[REGION];
-    if (!scoped) return { platforms: [], tiers: {} };
+    /**
+     * One call, three answers.
+     *
+     * This asked /watch/providers directly and got back only providers, which
+     * left every catalogue row without a runtime or a cast list — so search by
+     * actor, which works perfectly on the calendar, found nothing across the
+     * 648 titles people are most likely to search *for*. Tom Cruise returned a
+     * single film.
+     *
+     * append_to_response bundles both onto the request this loop was already
+     * making, so the fix costs nothing: same one call per title, same budget.
+     * It is the same trick enrich-releases.mjs uses on the calendar side, and
+     * the two pipelines now carry the same fields for the same reason.
+     */
+    const data = await tmdb(`/${isMovie ? 'movie' : 'tv'}/${id}`, {
+      append_to_response: 'watch/providers,credits',
+    });
+
+    const runtime = isMovie ? data.runtime : data.episode_run_time?.[0];
+    const detail = {
+      runtimeMinutes: runtime || undefined,
+      // Five, matching the calendar — enough for the names a search would use,
+      // short enough that 648 rows do not double the file everyone downloads.
+      cast: data.credits?.cast?.slice(0, 5).map((c) => c.name) ?? [],
+    };
+
+    /**
+     * The appended block is keyed by its path, slash and all: data['watch/
+     * providers']. If that key were ever to move, every row would come back
+     * with no platforms and be dropped as unavailable — 648 titles quietly
+     * becoming zero, reported as "no provider" rather than as the shape error
+     * it is. So the two cases are told apart: a missing block is a bug and
+     * throws, while a block that simply has no entry for India is an ordinary
+     * answer and returns empty.
+     */
+    const block = data['watch/providers'];
+    if (!block) throw new Error(`no watch/providers block on ${isMovie ? 'movie' : 'tv'}/${id}`);
+    const scoped = block.results?.[REGION];
+    if (!scoped) return { platforms: [], tiers: {}, ...detail };
 
     const tiers = {};
     // Best terms win where a platform appears under more than one heading:
@@ -217,7 +253,7 @@ async function providersFor(isMovie, id) {
         if (id) tiers[id] = tier;
       }
     }
-    return { platforms: Object.keys(tiers), tiers };
+    return { platforms: Object.keys(tiers), tiers, ...detail };
   } catch {
     return { platforms: [], tiers: {} };
   }
@@ -240,8 +276,12 @@ async function providersFor(isMovie, id) {
  * an error.
  */
 const previousRank = new Map();
+/** How many titles the last run shipped, as the sanity check further down needs
+ *  the whole count and previousRank holds only the ranked ones. */
+let keptBefore = 0;
 try {
   const prior = JSON.parse(await readFile(OUT, 'utf8'));
+  keptBefore = (prior.titles ?? []).length;
   for (const t of prior.titles ?? []) {
     if (t.popRank != null) previousRank.set(t.id, t.popRank);
   }
@@ -370,7 +410,8 @@ if (!stopped) {
 
 /**
  * discover can filter *by* provider but never says which one matched, so each
- * title still costs one call to find out. Rows whose provider lookup comes back
+ * title still costs one call to find out. That call now carries the runtime and
+ * the cast back with it — see detailFor. Rows whose provider lookup comes back
  * empty are dropped rather than shipped: a catalogue entry that cannot say
  * where to watch it fails at the one job this site has.
  */
@@ -381,12 +422,49 @@ for (const row of byId.values()) {
     stopped = stopped ?? `ran out of its ${Math.round(BUDGET_MS / 60_000)}-minute budget`;
     break;
   }
-  const { platforms, tiers } = await providersFor(row.kind === 'film', Number(row.id.slice(2)));
+  const { platforms, tiers, runtimeMinutes, cast } = await detailFor(
+    row.kind === 'film',
+    Number(row.id.slice(2)),
+  );
   if (!platforms.length) {
     noProvider++;
     continue;
   }
-  rows.push({ ...row, platforms, tiers });
+  // Only when there is something to say: an undefined runtime and an empty cast
+  // are absent fields, not empty ones, and shipping `"cast":[]` on 648 rows
+  // would add weight to say nothing.
+  rows.push({
+    ...row,
+    platforms,
+    tiers,
+    ...(runtimeMinutes ? { runtimeMinutes } : {}),
+    ...(cast?.length ? { cast } : {}),
+  });
+}
+
+/**
+ * A run that kept almost nothing is a broken run, not an empty catalogue.
+ *
+ * detailFor swallows a failed lookup per title, which is right for a flaky
+ * connection and wrong for a change in the response shape: both come out as
+ * "no provider", and the second arrives as a collapse to near-zero that the
+ * summary below would report as a tidy count of drops.
+ *
+ * Measured against the last run rather than against how many titles discover
+ * offered, because the share that survives the provider check is a property of
+ * TMDB's India coverage and drifts; what does not drift is that a catalogue
+ * holding hundreds yesterday does not hold twenty today. A run cut short by the
+ * budget is exempt — a partial result is what that is *supposed* to produce.
+ *
+ * Throwing leaves the previous catalogue.json untouched, which is the outcome
+ * to want: yesterday's data beats a page saying nothing is streaming.
+ */
+if (!stopped && keptBefore >= 100 && rows.length < keptBefore / 4) {
+  throw new Error(
+    `catalogue: kept ${rows.length} titles where the last run kept ${keptBefore} ` +
+      `(${noProvider} had no India provider). That is a pipeline failure, not a result — ` +
+      `leaving the previous catalogue in place.`,
+  );
 }
 
 // --- genre names ------------------------------------------------------------
