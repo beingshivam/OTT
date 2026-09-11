@@ -1,0 +1,44 @@
+{
+  "_comment": [
+    "Streaming dates TMDB does not know, entered by hand.",
+    "",
+    "TMDB carries a digital date for a title and, measured over a full run, a",
+    "platform for four out of 142. The studio signal that was meant to cover the",
+    "gap recovered two more. So for a title like Lust Stories 3 — a Netflix",
+    "anthology whose service was public the day it was announced — there is no",
+    "automated source that knows, and the site had been printing 'Platform not",
+    "announced' about a platform that had very much been announced.",
+    "",
+    "This is the answer to that, and it is deliberately small. It is not a",
+    "catalogue to keep up to date: it is for the handful of titles a month that",
+    "people are actually waiting for, where the platform is public knowledge and",
+    "no API has it yet. Everything else is left to the automated passes, and a",
+    "small regional title that nothing can place simply waits — which is the",
+    "agreed trade.",
+    "",
+    "A row here is replaced by the real thing automatically. Once the title",
+    "lands, TMDB assigns a watch provider, the provider pass finds it, and the",
+    "discovered row supersedes this one. So an entry that goes stale costs",
+    "nothing; it is overtaken rather than left to rot.",
+    "",
+    "Fields: title and releaseDate and platform are required. platform must be",
+    "an id from src/data/platforms.ts — netflix, prime, jiohotstar, sonyliv,",
+    "zee5, sunnxt, hoichoi, aha, lionsgate, appletv. languages are ISO codes.",
+    "kind is film or series; it defaults to film.",
+    "",
+    "Only add a title whose platform you have actually seen announced. A wrong",
+    "platform is worse than no row, because it sends somebody to a subscription",
+    "they do not need — that is the whole reason the automated guess was thrown",
+    "away rather than loosened."
+  ],
+  "titles": [
+    {
+      "title": "Lust Stories 3",
+      "releaseDate": "2026-09-18",
+      "platform": "netflix",
+      "kind": "film",
+      "languages": ["hi"],
+      "regions": ["IN"]
+    }
+  ]
+}

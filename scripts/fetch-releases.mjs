@@ -735,6 +735,54 @@ const curatedByWeek = new Map(
   previous.weeks.map((w) => [w.id, w.releases.filter((r) => r.sample)]),
 );
 
+/**
+ * Streaming dates entered by hand, because nothing automated knows them.
+ *
+ * Measured: TMDB has a platform for four digital rows out of 142, and reading
+ * the production company recovered two more. For Lust Stories 3 — a Netflix
+ * anthology whose service was public the day it was announced — there is no
+ * automated source at all, and the site was printing "Platform not announced"
+ * about a platform that had very much been announced.
+ *
+ * Merged in as curated rows, so they use the machinery that already exists for
+ * titles discover misses, and are superseded automatically: once the title
+ * lands TMDB assigns a provider, the provider pass finds it, and the discovered
+ * row replaces this one. A stale entry is overtaken rather than left to rot.
+ *
+ * Missing or malformed is not an error. This file is an optional improvement to
+ * a calendar that has to keep building without it at two in the morning.
+ */
+const HAND_PLACED = resolve(ROOT, 'data/upcoming-ott.json');
+const handPlaced = await readFile(HAND_PLACED, 'utf8')
+  .then((raw) => JSON.parse(raw).titles ?? [])
+  .catch(() => []);
+
+let handAdded = 0;
+for (const row of handPlaced) {
+  if (!row?.title || !row.releaseDate || !row.platform) continue;
+  if (!index.size || !platforms.some((p) => p.id === row.platform)) {
+    console.log(`  skipping ${row.title}: "${row.platform}" is not a platform in the registry.`);
+    continue;
+  }
+  const week = iso(weekStart(new Date(`${row.releaseDate}T00:00:00Z`)));
+  const list = curatedByWeek.get(week) ?? [];
+  list.push({
+    // Distinct from any discovered id, and stable so the archive keeps it.
+    id: `hand-${normTitle(row.title).replace(/\s+/g, '-')}`,
+    title: row.title,
+    kind: row.kind ?? 'film',
+    platforms: [row.platform],
+    languages: row.languages ?? [],
+    genres: row.genres ?? [],
+    releaseDate: row.releaseDate,
+    regions: row.regions ?? ['IN'],
+    sample: true,
+  });
+  curatedByWeek.set(week, list);
+  handAdded++;
+}
+if (handAdded) console.log(`Merged ${handAdded} hand-placed streaming date(s).`);
+
 const weeks = [];
 for (const { id, cinemaOnly } of weekIds()) {
   process.stdout.write(`Building week ${id}${cinemaOnly ? ' (cinema only)' : ''} … `);
