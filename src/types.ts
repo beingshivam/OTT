@@ -107,6 +107,15 @@ export interface Release {
    * used to hold something back, never to promote it.
    */
   theatrical?: 'wide' | 'limited';
+  /**
+   * ISO country codes the film was produced in.
+   *
+   * Not a synonym for language: nine of the twelve titles this feed files as
+   * English in Indian cinemas are Indian films TMDB has mislabelled. Origin is
+   * the fact language was being asked to stand in for — see originFrom in
+   * scripts/enrich-releases.mjs.
+   */
+  origin?: string[];
   posterUrl?: string;
   backdropUrl?: string;
   trailerUrl?: string;

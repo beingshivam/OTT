@@ -135,6 +135,30 @@ function theatricalFrom(detail, isMovie) {
   return undefined;
 }
 
+/**
+ * Where the film was made — the other half of the same question.
+ *
+ * Language was standing in for this and cannot do the job. Of the twelve titles
+ * the feed files as English in Indian cinemas, nine are Indian films whose TMDB
+ * original_language is simply wrong — Oozhi, Ottamaram, Ozhiyathe, Wild Tamil
+ * Nadu. Three are not: Mutiny, Insidious, The End of Oak Street. Any rule that
+ * reads `en` as "foreign" would throw out nine Indian films to catch three
+ * imports, which is the opposite of what this site is for.
+ *
+ * The production country is the fact itself, and it is on a response already
+ * being fetched. It matters because TMDB popularity means a different thing on
+ * either side of it: for an Indian production the people looking a title up are
+ * substantially the people who might buy a ticket here, and for an import they
+ * are the world.
+ *
+ * Kept as the raw list rather than a boolean, because "is this Indian" is a
+ * question the caller should ask out loud — a co-production is both.
+ */
+function originFrom(detail) {
+  const codes = (detail.production_countries ?? []).map((c) => c.iso_3166_1).filter(Boolean);
+  return codes.length ? codes : undefined;
+}
+
 const feed = JSON.parse(await readFile(FEED, 'utf8'));
 let matched = 0;
 let skipped = 0;
@@ -234,6 +258,8 @@ for (const week of feed.weeks) {
       if (cert) release.certification = cert;
       const scale = theatricalFrom(detail, ref.isMovie);
       if (scale) release.theatrical = scale;
+      const origin = originFrom(detail);
+      if (origin) release.origin = origin;
 
       // Same bar as the discover pass, kept in step deliberately: a title should
       // not gain or lose its score depending on which pass happened to find it.
