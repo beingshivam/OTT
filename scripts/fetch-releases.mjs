@@ -809,9 +809,20 @@ for (const row of handPlaced) {
   }
   const week = iso(weekStart(new Date(`${row.releaseDate}T00:00:00Z`)));
   const list = curatedByWeek.get(week) ?? [];
-  list.push({
+  /*
+   * The previous feed already holds it.
+   *
+   * Curated rows are carried forward from the last build — that is what makes
+   * them curated — so appending this file's rows on top added a second copy on
+   * every refresh. Lust Stories 3 appeared twice within one run of finding out.
+   * The id is derived from the title, so it is the same on both, and matching
+   * on it means this file updates its own row rather than stacking on it.
+   */
+  const id = `hand-${normTitle(row.title).replace(/\s+/g, '-')}`;
+  const at = list.findIndex((r) => r.id === id);
+  const merged = {
     // Distinct from any discovered id, and stable so the archive keeps it.
-    id: `hand-${normTitle(row.title).replace(/\s+/g, '-')}`,
+    id,
     title: row.title,
     kind: row.kind ?? 'film',
     platforms: [row.platform],
@@ -820,7 +831,11 @@ for (const row of handPlaced) {
     releaseDate: row.releaseDate,
     regions: row.regions ?? ['IN'],
     sample: true,
-  });
+  };
+  // Anything enrichment already attached to the existing row — poster,
+  // synopsis, cast — is kept; this file owns only the facts it states.
+  if (at >= 0) list[at] = { ...list[at], ...merged };
+  else list.push(merged);
   curatedByWeek.set(week, list);
   handAdded++;
 }
