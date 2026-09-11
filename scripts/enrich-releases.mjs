@@ -75,6 +75,10 @@ function pick(candidates, release, isMovie) {
 
 const REGION = (process.env.REGIONS ?? 'IN').split(',')[0].trim() || 'IN';
 
+/** The marker a digital-date row wears until somebody can name the service.
+ *  Nothing ships with it — see the sweep at the end of this file. */
+const PENDING = 'ott';
+
 /**
  * A discovered row already carries its TMDB id — `m-1240889` is movie 1240889.
  * Reading it back saves the search call entirely and removes any chance of the
@@ -140,6 +144,62 @@ function theatricalFrom(detail, isMovie) {
 }
 
 /**
+ * The service, worked out from who made it.
+ *
+ * TMDB's release type 4 gives a digital date and, measured over a full run, a
+ * platform for four titles out of 142. That produced a column headed "Platform
+ * not announced" containing Lust Stories 3 — a Netflix anthology whose service
+ * was known the day it was announced — and the label was the lie: the platform
+ * had been announced, to everybody except this dataset.
+ *
+ * But TMDB does know, indirectly and for free. A streaming original is produced
+ * by the streamer: Netflix makes Netflix films, Amazon MGM Studios makes Prime
+ * titles, and a series carries its network outright. Both fields ride on the
+ * detail response this pass already fetches, so reading them costs nothing.
+ *
+ * Matched on the name rather than a company id on purpose. Guessed ids fail
+ * silently — a wrong number matches nothing and looks exactly like a title with
+ * no studio — and there is no way to check them from here. A name is legible
+ * and wrong in a way somebody can see.
+ *
+ * Conservative by design: only the service's own name counts. "Jio Studios" and
+ * "Zee Studios" produce theatrical films that go wherever the rights are sold,
+ * so they are not here; "JioHotstar" and "ZEE5" are the service saying it is
+ * the service. A wrong platform is worse than none, because it sends a reader
+ * to a subscription they do not need.
+ */
+const STUDIOS = [
+  [/netflix/i, 'netflix'],
+  [/amazon (mgm )?studios|prime video/i, 'prime'],
+  [/jiohotstar|hotstar/i, 'jiohotstar'],
+  [/sonyliv|sony liv/i, 'sonyliv'],
+  [/zee ?5/i, 'zee5'],
+  [/apple (tv|studios|original)/i, 'appletv'],
+  [/sun nxt/i, 'sunnxt'],
+  [/hoichoi/i, 'hoichoi'],
+  [/aha video/i, 'aha'],
+  [/lionsgate play/i, 'lionsgate'],
+  [/crunchyroll/i, 'crunchyroll'],
+  [/hbo max/i, 'hbomax'],
+  [/hulu/i, 'hulu'],
+  [/disney\+/i, 'disney'],
+  [/paramount\+/i, 'paramount'],
+  [/peacock/i, 'peacock'],
+];
+
+function serviceFrom(detail) {
+  const names = [
+    ...(detail.networks ?? []).map((n) => n.name),
+    ...(detail.production_companies ?? []).map((c) => c.name),
+  ].filter(Boolean);
+  const hits = new Set();
+  for (const name of names) {
+    for (const [pattern, id] of STUDIOS) if (pattern.test(name)) hits.add(id);
+  }
+  return [...hits];
+}
+
+/**
  * Where the film was made — the other half of the same question.
  *
  * Language was standing in for this and cannot do the job. Of the twelve titles
@@ -166,6 +226,8 @@ function originFrom(detail) {
 const feed = JSON.parse(await readFile(FEED, 'utf8'));
 let matched = 0;
 let skipped = 0;
+/** Rows whose service was recovered from the studio rather than a provider. */
+let placed = 0;
 
 for (const week of feed.weeks) {
   for (const release of week.releases) {
@@ -265,6 +327,21 @@ for (const week of feed.weeks) {
       const origin = originFrom(detail);
       if (origin) release.origin = origin;
 
+      /*
+       * Only onto a row that has nothing, and never over a real provider.
+       *
+       * A watch provider is where the title actually is; a studio is where it
+       * came from, which is strong evidence and not the same fact. So this
+       * fills the gap and never argues with the pass that knows.
+       */
+      if (release.platforms?.length === 1 && release.platforms[0] === PENDING) {
+        const service = serviceFrom(detail);
+        if (service.length) {
+          release.platforms = service;
+          placed++;
+        }
+      }
+
       // Same bar as the discover pass, kept in step deliberately: a title should
       // not gain or lose its score depending on which pass happened to find it.
       if (detail.vote_count >= 5) {
@@ -280,8 +357,40 @@ for (const week of feed.weeks) {
   }
 }
 
+/*
+ * Nothing ships that cannot say where to watch it.
+ *
+ * Asked for directly, twice, and the second time with the case that settles it:
+ * a column headed "Platform not announced" listing Lust Stories 3, a Netflix
+ * anthology. The platform *was* announced — when the show was announced — and
+ * the only party that did not know was TMDB. A label that reports our ignorance
+ * as the industry's is worse than saying nothing, on a site whose entire
+ * promise is telling you where a thing is.
+ *
+ * So the marker is internal now. A digital date survives this pass only if
+ * something named a service for it: the provider lookup in fetch-releases, or
+ * the studio above. Otherwise the row waits — and every refresh re-checks, so
+ * it returns the moment either can answer.
+ *
+ * The cost is stated rather than hidden: "Coming soon" carries fewer OTT rows
+ * than it could, and the ones it carries are all ones it can place.
+ */
+const dropped = [];
+for (const week of feed.weeks) {
+  week.releases = week.releases.filter((r) => {
+    const pending = r.platforms?.length === 1 && r.platforms[0] === PENDING;
+    if (pending) dropped.push(r.title);
+    return !pending;
+  });
+}
+
 feed.enrichedAt = new Date().toISOString();
 await writeFile(FEED, JSON.stringify(feed, null, 2) + '\n');
 console.log(
   `\nEnriched ${matched} title(s); ${skipped} left with generated art. ${callCount()} API calls.`,
 );
+console.log(
+  `Named ${placed} streaming date(s) from the studio; held back ${dropped.length} ` +
+    'that nothing could place.',
+);
+if (dropped.length) console.log(`  held back: ${dropped.slice(0, 10).join(', ')}`);
