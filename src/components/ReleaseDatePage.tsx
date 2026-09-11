@@ -67,6 +67,35 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
   const upcoming = daysOut < 0;
   const daysToGo = -daysOut;
 
+  /**
+   * The film's own streaming date, which lives on a different row.
+   *
+   * A title with an announced digital date is two rows in this feed: the cinema
+   * listing in the week it opened, and a second row in the week it reaches OTT.
+   * This page is built from the first, so it answered "when is this coming to
+   * OTT" with "not announced" while the feed three weeks along held the date —
+   * on the one page whose entire purpose is that question.
+   *
+   * Only the date. `ott` is the placeholder for a service TMDB has not assigned
+   * yet, and naming a platform we do not know would be exactly the invented
+   * answer this page refuses to give.
+   */
+  const dated = feed.weeks
+    .flatMap((w) => w.releases)
+    .find(
+      (r) =>
+        r.id === `${release.id}~ott` &&
+        r.platforms.includes('ott') &&
+        // The film's date *here*. The End of Oak Street has a US digital date
+        // and no Indian one, and printing an American release date to an Indian
+        // reader is a worse answer than admitting we do not have theirs.
+        r.regions.includes(region),
+    );
+  const streamsOn =
+    dated && Date.parse(`${dated.releaseDate}T00:00:00Z`) >= Date.now() - DAY
+      ? dated.releaseDate
+      : null;
+
   const week = feed.weeks.find((w) => w.releases.some((r) => r.id === release.id));
   const alsoThatWeek = (week?.releases ?? [])
     .filter((r) => r.regions.includes(region) && r.id !== release.id && r.platforms.includes('theatres'))
@@ -111,12 +140,15 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
               : upcoming
                 ? `When does ${release.title} release?`
                 : `When is ${release.title} coming to OTT?`}
+            {/* The heading keeps asking the question even when the answer is
+                a date rather than a platform — that is still what someone
+                typed, and the line below answers it outright. */}
           </h1>
 
           {/* The answer, first and unqualified. Everything below is context for
               a reader who wants it; someone who came for the date should be
               able to leave after one line. */}
-          <div className={streaming.length ? 'answer answer--yes' : 'answer'}>
+          <div className={streaming.length || streamsOn ? 'answer answer--yes' : 'answer'}>
             {streaming.length ? (
               <>
                 <strong>Streaming now</strong> on{' '}
@@ -127,6 +159,15 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
                   </span>
                 ))}
                 .
+              </>
+            ) : streamsOn ? (
+              /* The date is the answer, and it is a better one than this page
+                 has ever been able to give at this stage. Saying the platform
+                 is unannounced in the same breath is what keeps it honest — a
+                 reader must not leave thinking we have named a service. */
+              <>
+                <strong>Streaming from {fmtDate(streamsOn)}</strong> — the date is confirmed, the
+                platform has not been announced yet. This page names it the day one is.
               </>
             ) : upcoming ? (
               /* Before a film opens, "not announced" is a true answer to the

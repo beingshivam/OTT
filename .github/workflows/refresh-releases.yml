@@ -249,24 +249,61 @@ jobs:
       # step that actually publishes. Rebase first: a human push between the
       # checkout and here would otherwise reject this one and lose the refresh
       # until the next run.
+      # Publishing what this run built, including when another run got there
+      # first.
+      #
+      # The recovery used to be `git pull --rebase`, and that cannot work on this
+      # data. Every file here is generated — a whole-file rewrite of the same
+      # JSON on every run — so two overlapping refreshes conflict on essentially
+      # every line, and there is no meaningful merge of two full TMDB reads.
+      #
+      # Worse than failing: the failed rebase stopped mid-way and left conflict
+      # markers *inside* public/data/releases.json, then went on pushing from a
+      # detached HEAD. Two steps later the staleness guard parsed that file, hit
+      # `<<<<<<< HEAD` and died with a JSON SyntaxError — so the run reported a
+      # broken calendar for a file the run had corrupted itself, and emailed that
+      # to the owner. Run #21 on 11 Sep, after a dispatch overlapped a scheduled
+      # run.
+      #
+      # Generated output has last-writer-wins semantics and nothing else. The run
+      # that finishes later holds the fresher read, so it keeps its own files
+      # outside the work tree, resets onto whatever landed while it was working,
+      # lays them back down and pushes that. No merge, no rebase, nothing left
+      # half-applied for a later step to trip over.
       - name: Commit the updated calendar
         if: steps.fetch.outcome == 'success'
         run: |
-          if git diff --quiet -- public/data/releases.json public/data/logos.json data/archive.json public/data/catalogue.json email; then
+          FILES="public/data/releases.json public/data/logos.json data/archive.json public/data/catalogue.json email"
+
+          if git diff --quiet -- $FILES; then
             echo "::notice::Calendar already up to date — nothing to commit."
             exit 0
           fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public/data/releases.json public/data/logos.json data/archive.json public/data/catalogue.json email
+
+          # This run's output, kept where a reset cannot reach it.
+          SAVE="$(mktemp -d)"
+          for f in $FILES; do
+            [ -e "$f" ] && cp -r --parents "$f" "$SAVE/"
+          done
+
+          git add $FILES
           git commit -m "chore(data): refresh release calendar"
 
           for attempt in 1 2 3; do
-            if git push; then
+            # HEAD:branch rather than a bare push, so a detached HEAD — which is
+            # how the old loop ended up — still pushes to the right place.
+            if git push origin "HEAD:${GITHUB_REF_NAME}"; then
               exit 0
             fi
-            echo "Push rejected — rebasing onto the branch and retrying ($attempt/3)."
-            git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
+            echo "Push rejected — replaying this run's output onto the branch ($attempt/3)."
+            git rebase --abort 2>/dev/null || true
+            git fetch origin "${GITHUB_REF_NAME}"
+            git checkout -B "${GITHUB_REF_NAME}" "origin/${GITHUB_REF_NAME}"
+            cp -r "$SAVE/." .
+            git add $FILES
+            git diff --cached --quiet || git commit -m "chore(data): refresh release calendar"
             sleep $((attempt * 5))
           done
           echo "::error title=Could not publish the refresh::The calendar rebuilt but could not be pushed after three attempts."
@@ -293,7 +330,23 @@ jobs:
           node -e '
             const fs = require("fs");
             const max = Number(process.env.MAX_AGE_DAYS);
-            const feed = JSON.parse(fs.readFileSync("public/data/releases.json", "utf8"));
+
+            // An unreadable feed is its own diagnosis, and a different one.
+            //
+            // This used to be a bare JSON.parse, so when a half-finished rebase
+            // left conflict markers in the file the guard exited on a raw
+            // SyntaxError stack trace under the heading "guard against a stale
+            // calendar" — pointing at a missing TMDB token, which was not the
+            // problem. The step above no longer rebases, but any future way of
+            // writing a broken file should say so plainly rather than send the
+            // next reader after a credential that is fine.
+            let feed;
+            try {
+              feed = JSON.parse(fs.readFileSync("public/data/releases.json", "utf8"));
+            } catch (err) {
+              console.log(`::error title=The calendar file is unreadable::public/data/releases.json did not parse (${err.message}). This is a broken write in this run, not a stale feed — check the commit step above. Nothing has been published.`);
+              process.exit(1);
+            }
             const days = (Date.now() - Date.parse(feed.generatedAt)) / 86400000;
             const age = days.toFixed(1);
 

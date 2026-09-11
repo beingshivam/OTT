@@ -451,6 +451,21 @@ async function buildWeek(weekId, platforms, index, cinemaOnly = false) {
           // catalogue, not a drop. Same bar the cinema pass uses.
           if (isRevival(item.release_date, from)) continue;
 
+          /*
+           * The date has to be in this week, not merely near it.
+           *
+           * Every other pass clamps a stray date to the start of the week it is
+           * being built for, which is right when the row belongs here and the
+           * date field is the wrong one. It is wrong here: discover returns a
+           * film for a window its digital date is only adjacent to — a title
+           * dated the 24th comes back for the week beginning the 25th as well —
+           * and the clamp then invents a second release on the 25th. Spidey and
+           * the Avengers, Thomas & Friends and Matchbox the Movie each shipped
+           * twice with two different dates, and the week whose window actually
+           * contains the date already has the row, correctly.
+           */
+          if (!withinWeek(item.release_date, from, to)) continue;
+
           const key = `m-${item.id}`;
           const existing = byId.get(key);
           if (existing) {
@@ -467,13 +482,30 @@ async function buildWeek(weekId, platforms, index, cinemaOnly = false) {
 
           const genres = await genreNames('movie', item.genre_ids);
           byId.set(key, {
-            id: key,
+            /*
+             * Its own id, because it is its own calendar entry.
+             *
+             * byId is scoped to one week, so a film that opened in cinemas in
+             * August and reaches OTT in September is deduplicated within each
+             * week and duplicated across them — two rows carrying one id. That
+             * breaks the feed's no-duplicate-ids invariant, and it broke the
+             * title page too, which looks a film up by id and got whichever row
+             * it happened to find.
+             *
+             * The two rows are both correct and both wanted: a cinema listing
+             * in the week it opened, and a streaming date in the week it lands.
+             * What was wrong was calling them the same thing. The suffix keeps
+             * the TMDB id readable so enrichment still resolves it — see
+             * tmdbRef in scripts/enrich-releases.mjs, which parses past it.
+             */
+            id: `${key}~ott`,
             title: item.title ?? item.name,
             kind: classify(true, genres),
             platforms: [DIGITAL_ID],
             languages: [item.original_language].filter(Boolean),
             genres,
-            releaseDate: withinWeek(item.release_date, from, to) ? item.release_date : from,
+            // Guarded above: a row only reaches here when its date is in the week.
+            releaseDate: item.release_date,
             regions: [region],
             rating: item.vote_count >= MIN_VOTES ? Number(item.vote_average?.toFixed(1)) : undefined,
             votes: item.vote_count || undefined,

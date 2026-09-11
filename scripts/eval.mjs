@@ -47,6 +47,7 @@ const maybe = async (p) => readJson(p).catch(() => null);
 
 // --- inputs ------------------------------------------------------------------
 
+const TODAY = new Date().toISOString().slice(0, 10);
 const feed = await maybe(resolve(DIST, 'data/releases.json'));
 const catalogue = await maybe(resolve(ROOT, 'public/data/catalogue.json'));
 const archive = await maybe(resolve(ROOT, 'data/archive.json'));
@@ -351,10 +352,32 @@ else {
    * archive never get stamped — so the check was testing whether a field had
    * been written back, not whether a page had a title behind it.
    */
+  /**
+   * The cinema listing wins the slug, and its streaming date rides alongside.
+   *
+   * A film with an announced digital date is two rows sharing one page: the
+   * cinema listing the page is built from, and an `~ott` row carrying the date
+   * its service has not been attached to yet. Keyed naively, the second
+   * overwrote the first and this check then demanded the page say "Streaming
+   * now on" — about a film that is not streaming and whose platform nobody
+   * knows. The page was right and the check was wrong.
+   */
   const bySlug = new Map();
+  const datedBySlug = new Map();
   for (const r of [...feedRows, ...(archive?.titles ?? [])]) {
     const key = r.slug ?? slugify(r.title ?? '');
-    if (key) bySlug.set(key, r);
+    if (!key) continue;
+    if (String(r.id ?? '').endsWith('~ott')) {
+      // Region matters here and nowhere else in this map. feedRows is already
+      // scoped to India; the archive is not, and The End of Oak Street carries
+      // a US digital date and no Indian one. Counting that as the film's
+      // streaming date would have failed a page for refusing to publish an
+      // American release date to Indian readers — which is the page being
+      // right.
+      if ((r.regions ?? [REGION]).includes(REGION)) datedBySlug.set(key, r);
+      continue;
+    }
+    bySlug.set(key, r);
   }
 
   const titlePages = [...pages].filter(([p]) => p.startsWith('/ott-release-date/'));
@@ -368,10 +391,19 @@ else {
       continue;
     }
     const streams = (row.platforms ?? []).some((p) => p !== 'theatres');
+    const dated = datedBySlug.get(slug);
     const saysStreaming = /Streaming now on/.test(html);
     const saysUnannounced = /Not announced yet/.test(html);
+    const saysDated = /Streaming from/.test(html);
     if (streams && saysUnannounced) wrong.push(`${slug} — on ${row.platforms.join(',')} but says "Not announced yet"`);
     if (!streams && saysStreaming) wrong.push(`${slug} — no streaming platform but says "Streaming now"`);
+    // A known date must be on the page. This is the question the page exists to
+    // answer, and holding an answer back is as much a failure as inventing one.
+    if (!streams && dated && dated.releaseDate >= TODAY && !saysDated)
+      wrong.push(`${slug} — streams ${dated.releaseDate} and the page does not say so`);
+    // And a date must never be dressed up as a platform.
+    if (saysDated && saysStreaming)
+      wrong.push(`${slug} — claims both a streaming date and a platform`);
   }
   wrong.length
     ? fail(S5, 'streaming status matches the data', `${wrong.length} pages contradict their row`, wrong.slice(0, 5))

@@ -82,7 +82,11 @@ const REGION = (process.env.REGIONS ?? 'IN').split(',')[0].trim() || 'IN';
  * and have ids of their own, still need looking up.
  */
 function tmdbRef(release) {
-  const m = /^([mt])-(\d+)$/.exec(release.id ?? '');
+  // The `~ott` suffix marks a row that is the same film's streaming date rather
+  // than its cinema listing — a separate calendar entry with a separate id, and
+  // the same TMDB title underneath. Parsed past, so those rows are enriched
+  // like any other instead of silently shipping without a poster or a cast.
+  const m = /^([mt])-(\d+)(?:~[a-z]+)?$/.exec(release.id ?? '');
   return m ? { isMovie: m[1] === 'm', id: Number(m[2]) } : null;
 }
 

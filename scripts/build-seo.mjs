@@ -606,6 +606,11 @@ const everything = stockedWeeks.flatMap((w) =>
 
 const TODAY = new Date().toISOString().slice(0, 10);
 
+/** The synthetic platform a title carries when its digital date is known and
+ *  its service is not. Must match the registry entry in src/data/platforms.ts
+ *  and DIGITAL_ID in scripts/fetch-releases.mjs. */
+const DIGITAL_PLATFORM = 'ott';
+
 /**
  * Every title the feed has ever carried, not just the ones in it today.
  *
@@ -685,14 +690,24 @@ for (const r of titlePages) {
  * crawler has to the 47 title pages. A sitemap entry for a page nothing links
  * to is a page that does not get crawled.
  */
+/**
+ * A streaming-date row carries its own id and the same film's page.
+ *
+ * `m-1408162~ott` is Vishwanath & Sons reaching OTT — a separate calendar
+ * entry, deliberately, but not a separate film. Looked up by the bare id so
+ * the "Coming soon" card links to the page that answers the question it
+ * raises, instead of being the one card in the row that goes nowhere.
+ */
+const slugFor = (id) => slugById.get(id) ?? slugById.get(String(id).replace(/~[a-z]+$/, ''));
+
 for (const w of feed.weeks) {
   for (const r of w.releases) {
-    const slug = slugById.get(r.id);
+    const slug = slugFor(r.id);
     if (slug) r.slug = slug;
   }
 }
 for (const r of everything) {
-  const slug = slugById.get(r.id);
+  const slug = slugFor(r.id);
   if (slug) r.slug = slug;
 }
 
@@ -1115,11 +1130,33 @@ for (const r of titlePages) {
   const upcoming = r.releaseDate > TODAY;
   const opensOn = formatDate(r.releaseDate);
 
+  /**
+   * The film's own streaming date, which lives on a different row.
+   *
+   * A title with an announced digital date is two rows in this feed, not one:
+   * the cinema listing in the week it opened, and a second row in the week it
+   * reaches OTT. The page is built from the first, so it was answering "when
+   * is this coming to OTT" with "not announced" while the feed three weeks
+   * along held the date. Three films on 11 September — Vishwanath & Sons,
+   * The End of Oak Street, Thudakkam — and that is the one question this page
+   * exists to answer.
+   *
+   * `ott` is the placeholder for a date whose service TMDB has not assigned
+   * yet, so this is deliberately the date alone. Naming a platform we do not
+   * know would be the invented answer this page refuses to give.
+   */
+  const dated = titleCandidates.find(
+    (x) => x.id === `${r.id}~${DIGITAL_PLATFORM}` && x.platforms.includes(DIGITAL_PLATFORM),
+  );
+  const streamsOn = dated && dated.releaseDate >= TODAY ? dated.releaseDate : null;
+
   const answer = streaming.length
     ? `Streaming now on ${streaming.map(pname).join(', ')}.`
-    : upcoming
-      ? `In cinemas from ${opensOn}. No streaming date yet — a film is normally picked up by a platform after its theatrical run, and this page updates automatically when one announces.`
-      : `Not announced yet — no streaming date has been confirmed. This page updates automatically; every platform is re-checked twice a week.`;
+    : streamsOn
+      ? `Streaming from ${formatDate(streamsOn)} — the date is confirmed, the platform has not been announced yet. This page names it the day one is.`
+      : upcoming
+        ? `In cinemas from ${opensOn}. No streaming date yet — a film is normally picked up by a platform after its theatrical run, and this page updates automatically when one announces.`
+        : `Not announced yet — no streaming date has been confirmed. This page updates automatically; every platform is re-checked twice a week.`;
 
   const langs = (r.languages ?? []).map(lname);
 

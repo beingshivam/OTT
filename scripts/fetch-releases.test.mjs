@@ -124,9 +124,53 @@ test('a digital date with no service still reaches the calendar', () => {
   // Title 3 exists only in the release-type-4 response. Without this pass it
   // would not be in the feed at all, which is why "Coming soon" was cinema and
   // almost nothing else.
-  const only = byId.get('m-3');
+  const only = byId.get('m-3~ott');
   assert.ok(only, 'the digital-only title is missing from the feed entirely');
   assert.deepEqual(only.platforms, ['ott']);
+});
+
+test('a streaming date is its own row, not the cinema listing wearing its id', () => {
+  /*
+   * The invariant this protects is "no duplicate ids", and breaking it did real
+   * damage before anyone noticed. The digital pass deduplicates within a week,
+   * so a film in cinemas in August and on OTT in September came back as two
+   * rows sharing one id. The archive merge keys on id, so the streaming row
+   * *overwrote* the cinema listing in the permanent record — 146 entries — and
+   * the title page, which looks a film up by id, answered "when is this coming
+   * to OTT" with whichever row it happened to find.
+   */
+  const ids = new Set(rows.map((r) => r.id));
+  for (const id of ids) {
+    if (!id.endsWith('~ott')) continue;
+    assert.ok(
+      !ids.has(id.replace(/~ott$/, '')),
+      `${id} collides with the cinema listing it was meant to be distinct from`,
+    );
+  }
+  for (const r of rows) {
+    const digital = r.platforms.length === 1 && r.platforms[0] === 'ott';
+    assert.equal(
+      r.id.endsWith('~ott'),
+      digital,
+      `${r.id} is ${digital ? 'a digital row without' : 'not a digital row but has'} the suffix`,
+    );
+  }
+});
+
+test('a date outside the week is not dragged into it', () => {
+  // Discover returns a film for a window its digital date is only adjacent to,
+  // and the clamp that handles a stray date elsewhere then invented a second
+  // release on the week's first day: Spidey and the Avengers shipped twice,
+  // dated the 24th in one week and the 25th in the next.
+  for (const week of feed.weeks) {
+    for (const r of week.releases) {
+      if (!r.id.endsWith('~ott')) continue;
+      assert.ok(
+        r.releaseDate >= week.start && r.releaseDate <= week.end,
+        `${r.id} is dated ${r.releaseDate} in the week ${week.start}–${week.end}`,
+      );
+    }
+  }
 });
 
 test('a real provider is never overwritten by an unknown one', () => {
