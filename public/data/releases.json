@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-11T09:44:40.298Z",
+  "generatedAt": "2026-09-11T09:48:51.966Z",
   "source": "tmdb",
   "weeks": [
     {
@@ -11644,6 +11644,42 @@
           "trailerUrl": "https://www.youtube.com/watch?v=oegfFHcW7OE",
           "certification": "U/A 16+",
           "theatrical": "wide"
+        },
+        {
+          "id": "hand-lust-stories-3",
+          "title": "Lust Stories 3",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "hi"
+          ],
+          "genres": [
+            "Romance",
+            "Drama"
+          ],
+          "releaseDate": "2026-09-18",
+          "regions": [
+            "IN"
+          ],
+          "sample": true,
+          "posterUrl": "https://image.tmdb.org/t/p/w500/ixWYV97WTObTSvcnExYK9sMxzxb.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w1280/kgZFECKytirVvmIbWF6slEoWZng.jpg",
+          "synopsis": "Through four bite-sized yet emotionally resonant films, the anthology once again explores lust, love, relationships, and repressed desire, offering fresh perspectives on intimacy, longing, and human connection in all their complexity.",
+          "imdbId": "tt39667834",
+          "cast": [
+            "Radhika Apte",
+            "Konkona Sen Sharma",
+            "Vijay Varma",
+            "Abhishek Banerjee",
+            "Ali Fazal"
+          ],
+          "director": "Vikramaditya Motwane",
+          "certification": "A",
+          "origin": [
+            "IN"
+          ]
         }
       ]
     },
@@ -15118,6 +15154,6 @@
       "backdropUrl": "https://image.tmdb.org/t/p/w780/3GmRS3efCTp6jumogKOxYBrV5mO.jpg"
     }
   ],
-  "enrichedAt": "2026-09-11T09:45:19.991Z",
-  "ratedAt": "2026-09-11T09:45:20.236Z"
+  "enrichedAt": "2026-09-11T09:49:29.119Z",
+  "ratedAt": "2026-09-11T09:49:29.325Z"
 }
