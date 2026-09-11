@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-11T10:24:29.994Z",
+  "generatedAt": "2026-09-11T12:55:16.160Z",
   "source": "tmdb",
   "weeks": [
     {
@@ -188,8 +188,8 @@
           "regions": [
             "US"
           ],
-          "rating": 6.5,
-          "votes": 20,
+          "rating": 6.4,
+          "votes": 21,
           "heat": 27,
           "synopsis": "In the near future, architect Otone Komoto is married to Kensuke, who runs a construction company. The married couple decide to welcome a humanoid robot into their home as their son.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/sxAwnj01pLfDBTA4WobJtJw7y9q.jpg",
@@ -1077,7 +1077,7 @@
             "US"
           ],
           "rating": 6.8,
-          "votes": 90,
+          "votes": 92,
           "heat": 69,
           "synopsis": "Two love-starved strangers crash into each other on the one night of the year when single people are allowed to have sex.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/46q8z1TbbVcF8uhRHsvt5s0h2SH.jpg",
@@ -2371,7 +2371,7 @@
           ],
           "rating": 6.3,
           "votes": 470,
-          "heat": 67,
+          "heat": 66,
           "synopsis": "After a mysterious cosmic event rips Oak Street from suburbia and transports their neighborhood to someplace unknown, the Platt family soon discovers that their very survival depends on them sticking together as they navigate their now unrecognizable surroundings.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/fYXqpgPmHMphSF2W30GbTeJVIa5.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/b9q9VmbXDvJmTziRqkwdEmFdwhr.jpg",
@@ -2414,7 +2414,7 @@
             "US"
           ],
           "rating": 7,
-          "votes": 49,
+          "votes": 50,
           "heat": 65,
           "synopsis": "The Paw Patrol lands on a mysterious dinosaur island after a storm, where they meet Rex, a stranded pup. When Humdinger's reckless mining triggers a volcano, the team faces their biggest rescue mission yet to save the island.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/qnin56Syy5rbG7KCaxWY7SPuy6p.jpg",
@@ -2494,8 +2494,8 @@
           "regions": [
             "US"
           ],
-          "rating": 7,
-          "votes": 20,
+          "rating": 7.2,
+          "votes": 21,
           "heat": 31,
           "synopsis": "President Ronald Reagan races against time to salvage a deal with Soviet leader Mikhail Gorbachev that could dismantle nuclear arsenals—or ignite disaster. With pressure mounting on all sides, every word spoken brings the world closer to peace... or destruction.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/vCIQeQ2ynVqEjIvtbOXGnKtcgAX.jpg",
@@ -3094,7 +3094,8 @@
           "title": "Magudam",
           "kind": "film",
           "platforms": [
-            "theatres"
+            "theatres",
+            "prime"
           ],
           "languages": [
             "ta"
@@ -3386,7 +3387,7 @@
             "US"
           ],
           "rating": 8.8,
-          "votes": 594,
+          "votes": 600,
           "heat": 80,
           "synopsis": "Two Mexican officers must survive the final hours of their shift after crossing a ruthless cartel boss.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/alpf5v4UqSFawPmG9RX03Or4BDk.jpg",
@@ -3592,8 +3593,8 @@
             "IN",
             "US"
           ],
-          "rating": 8.2,
-          "votes": 11,
+          "rating": 8.4,
+          "votes": 12,
           "heat": 58,
           "synopsis": "New to Beijing, Shang Zhitao crosses paths with Luan Nian, a true creative genius. Bold and open-hearted, she grows stronger step by step and gradually breaks through the defenses around Luan's guarded heart. Drawn to each other, they find themselves caught in an intense, on-again, off-again relationship in the urban jungle. To love is to summon all your courage and leave no regrets, to heal each other, and to grow together. But when love and her career pull her in different directions, she puts her career first. When she has come into her own and he has learned to soften his sharp edges, they finally stand as equals, ready to write a new ending together...",
           "posterUrl": "https://image.tmdb.org/t/p/w500/lGFngmJWMO4HTPcI0sUGKBAFqMe.jpg",
@@ -3716,7 +3717,7 @@
           "heat": 43,
           "synopsis": "A modern family relocates to the countryside where the children discover a magical tree with eccentric residents. They're transported to fantastical lands, rekindling their family bond through adventures.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/udXvLxC5gAqN8SinemyFBEcHpTf.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/l2Iv2JVEvzlDu7Hxm7ZCm9QprqR.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/3o7t1gF0wbXAtELCkIcYyPXoIxA.jpg",
           "imdbId": "tt7734244",
           "runtimeMinutes": 110,
           "cast": [
@@ -5169,7 +5170,7 @@
             "US"
           ],
           "rating": 7.6,
-          "votes": 287,
+          "votes": 291,
           "heat": 95,
           "synopsis": "After Acme products fail him one too many times in his dogged pursuit of the Roadrunner, Wile E. Coyote decides to hire a billboard lawyer to sue the Acme Corporation.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/orkLtdgMGiO9rTVMqJ1kKwrnup1.jpg",
@@ -5250,8 +5251,8 @@
             "IN",
             "US"
           ],
-          "rating": 7.9,
-          "votes": 387,
+          "rating": 7.8,
+          "votes": 393,
           "heat": 84,
           "synopsis": "When a U.S. Navy pilot on a top-secret mission during the Cold War gets trapped behind enemy lines, his only chance at survival is to form an alliance with an eccentric ex-KGB agent.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/hVXjX1jLZ1ljFSNGXpjJfbTUOa7.jpg",
@@ -5292,7 +5293,7 @@
             "US"
           ],
           "rating": 6.7,
-          "votes": 369,
+          "votes": 375,
           "heat": 80,
           "synopsis": "Maia Marten, a brilliant London lawyer, has her life shattered by a single call on her morning run: her son has been taken. To get him back, she must keep running, obey every ruthless command, and trust no one-each second a test of how far a mother will go to save her child.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/uxCaBoYXsDC4A0SqTm3SISj0OwK.jpg",
@@ -5334,8 +5335,8 @@
           "regions": [
             "US"
           ],
-          "rating": 6.7,
-          "votes": 42,
+          "rating": 6.8,
+          "votes": 43,
           "heat": 80,
           "synopsis": "When Chloe develops a destructive new superpower, the Hero League orders her to an elite boarding school for superheroes to learn control of her abilities. Faced with the prospect of sending Chloe away for years, the Thundermans split apart, with Phoebe, Barb and Billy taking her into hiding. Max, Hank, and Nora track their rogue family members, until the two factions face off against each other in a full-on battle for the Thundermans’ future.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/16oqRrWVzQm6qdGfBxvziZ2UiMT.jpg",
@@ -5497,8 +5498,8 @@
             "IN",
             "US"
           ],
-          "rating": 6.3,
-          "votes": 75,
+          "rating": 6.2,
+          "votes": 78,
           "heat": 60,
           "synopsis": "After discovering she has a family and a shipping empire, a woman with amnesia returns to a wealthy and seemingly perfect past to uncover why she left.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/5FC5vUHFz0fbJOd0bhyzJpCSLrc.jpg",
@@ -5540,7 +5541,7 @@
           "heat": 51,
           "synopsis": "On a perilous climb across Thailand's Mount Kwan, two climbers become trapped thousands of feet above the ground, where vertigo-inducing heights, sheer exposure, and impossible odds turn every moment into a fight for survival.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/fgSm5ylwiXbIHn8UbUXDjk9RRu4.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/yQXU4rgJ5LVCzn16SeIg34T35lV.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/yBDxqDB29kpH9VojTytjGWBgmdJ.jpg",
           "imdbId": "tt31192372",
           "runtimeMinutes": 98,
           "cast": [
@@ -7144,7 +7145,7 @@
           ],
           "trailerUrl": "https://www.youtube.com/watch?v=8ZYhuvIv1pA",
           "certification": "A",
-          "votes": 2633,
+          "votes": 2635,
           "imdbId": "tt14688458",
           "imdbRating": 8.1,
           "imdbVotes": 218324,
@@ -7280,7 +7281,7 @@
           ],
           "trailerUrl": "https://www.youtube.com/watch?v=j6ucGt_Xp14",
           "certification": "A",
-          "votes": 764,
+          "votes": 765,
           "imdbId": "tt19231492",
           "imdbRating": 7.6,
           "imdbVotes": 70578,
@@ -7323,8 +7324,8 @@
           "director": "Jonathan Goldstein",
           "trailerUrl": "https://www.youtube.com/watch?v=om5Un9X720M",
           "certification": "U/A 16+",
-          "rating": 7.9,
-          "votes": 387,
+          "rating": 7.8,
+          "votes": 393,
           "imdbId": "tt28014327",
           "imdbRating": 6.9,
           "imdbVotes": 9404,
@@ -7687,7 +7688,7 @@
             "US"
           ],
           "rating": 6.7,
-          "votes": 31,
+          "votes": 34,
           "heat": 61,
           "synopsis": "Marfil Cortés, a daughter of a wealthy Spanish businessman, is kidnapped and released, leading her father to hire Sebastian Moore as a bodyguard. Despite initial clashes, they form an irremediable attraction, navigating a world where no one is who they say they are.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/6rpvddXbaQPOi0fB2HKWbZ3uUSg.jpg",
@@ -8303,6 +8304,7 @@
             "IN",
             "US"
           ],
+          "rating": 8.3,
           "votes": 5,
           "heat": 37,
           "synopsis": "Follow a brother and sister whose fun, messy lives in New York City are interrupted when their worst nightmare comes true: Their high-achieving older sister shows up and wants to hang out with them.",
@@ -8314,8 +8316,7 @@
             "Andrew Law",
             "Poppy Liu"
           ],
-          "trailerUrl": "https://www.youtube.com/watch?v=utE1mDVY0cA",
-          "rating": 8.3
+          "trailerUrl": "https://www.youtube.com/watch?v=utE1mDVY0cA"
         },
         {
           "id": "t-331033",
@@ -8643,7 +8644,7 @@
             "IN",
             "US"
           ],
-          "votes": 3,
+          "votes": 4,
           "heat": 19,
           "synopsis": "In this unruly set, Stavros Halkias imagines becoming a \"dirtbag\" uncle, roasts the health care system and warns of the risks of living your best life.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/lVdlQbkpnETCZXN76UwQzMiJH6m.jpg",
@@ -8869,6 +8870,37 @@
             "Kevin Langue"
           ],
           "trailerUrl": "https://www.youtube.com/watch?v=8KKx_f_V3Z4"
+        },
+        {
+          "id": "t-331164",
+          "title": "Bobby Flay’s The Line",
+          "kind": "reality",
+          "platforms": [
+            "hbomax"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Reality"
+          ],
+          "releaseDate": "2026-09-08",
+          "regions": [
+            "US"
+          ],
+          "heat": 14,
+          "synopsis": "Chef Bobby Flay is pulling back the curtain on the high-stakes realities of working on a restaurant line. In the new competition series, we get to watch Bobby lead his hand-picked home team of extraordinary chefs — Antonia Lofaso, Michael Jenkins and Claudette Zepeda — against some of the country’s most acclaimed restaurant staffs. These dueling lines must execute a flawless dinner service for real diners in real time. If the visiting restaurant team prevails, they'll win $25,000.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/hdWaAbmQn970EY8J85aBACDhn0h.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/4qKpFJzGCVTtnNg2J6o4BxAHKK0.jpg",
+          "imdbId": "tt45337087",
+          "runtimeMinutes": 45,
+          "cast": [
+            "Bobby Flay",
+            "Antonia Lofaso",
+            "Claudette Zepeda",
+            "Michael Jenkins"
+          ],
+          "trailerUrl": "https://www.youtube.com/watch?v=KxYp7ctpowY"
         },
         {
           "id": "m-1728047",
@@ -9818,7 +9850,7 @@
           ],
           "heat": 17,
           "synopsis": "A retired judge faces difficulty keeping his daughter safe from a convict he imprisoned. Later, when he gets murdered, a man with visual impairment who was loyal to him tries to defend his daughter.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/ykXYDPPvoPhTaBeQ90OibCaCOWX.jpg",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/3hvuuvYcvlhOuq6Gax2siAxoiJ5.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/w5Z4iBTDxRxm0H2Q8vx8uFZoEfL.jpg",
           "imdbId": "tt32378175",
           "runtimeMinutes": 164,
@@ -10271,6 +10303,7 @@
           "heat": 12,
           "synopsis": "Follows a woman constable who joins the police force through appointment after the death of her husband.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/zcxFgdE2aHOQq3tlKDDn6RYdVWr.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/bgneM7nHQVl8SxbL5FkupFLJ1Fd.jpg",
           "imdbId": "tt38265603",
           "cast": [
             "Parvathy Thiruvothu",
@@ -10466,6 +10499,40 @@
           ]
         },
         {
+          "id": "m-1513475",
+          "title": "Aasha",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "ml"
+          ],
+          "genres": [
+            "Thriller"
+          ],
+          "releaseDate": "2026-09-11",
+          "regions": [
+            "IN"
+          ],
+          "heat": 11,
+          "posterUrl": "https://image.tmdb.org/t/p/w500/yEafsiSDbdZTecOClzJA0YhK1km.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/tkRcmn2ZpXq3k6JEeilgVXGAVJ0.jpg",
+          "imdbId": "tt37894980",
+          "cast": [
+            "Urvashi",
+            "Joju George",
+            "Aishwarya Lekshmi",
+            "Vijayaraghavan",
+            "Ramesh Girija"
+          ],
+          "director": "Safar Sanal",
+          "theatrical": "wide",
+          "origin": [
+            "IN"
+          ]
+        },
+        {
           "id": "m-1734726",
           "title": "America America 2",
           "kind": "film",
@@ -10497,39 +10564,6 @@
           ],
           "director": "Nagathihalli Chandrashekar",
           "trailerUrl": "https://www.youtube.com/watch?v=vWa2Z-wlSfs",
-          "theatrical": "wide",
-          "origin": [
-            "IN"
-          ]
-        },
-        {
-          "id": "m-1513475",
-          "title": "Aasha",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "ml"
-          ],
-          "genres": [
-            "Thriller"
-          ],
-          "releaseDate": "2026-09-11",
-          "regions": [
-            "IN"
-          ],
-          "heat": 11,
-          "posterUrl": "https://image.tmdb.org/t/p/w500/yEafsiSDbdZTecOClzJA0YhK1km.jpg",
-          "imdbId": "tt37894980",
-          "cast": [
-            "Urvashi",
-            "Joju George",
-            "Aishwarya Lekshmi",
-            "Vijayaraghavan",
-            "Ramesh Girija"
-          ],
-          "director": "Safar Sanal",
           "theatrical": "wide",
           "origin": [
             "IN"
@@ -10592,6 +10626,7 @@
           "heat": 11,
           "synopsis": "An animated epilogue to The Transformers: The Movie (1986) and the final performance of Peter Cullen",
           "posterUrl": "https://image.tmdb.org/t/p/w500/2hPh4j6ISRtaRwg57HmMrnzTW7O.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/nQNZdohByHbQpLPe81sQrwM9PXe.jpg",
           "imdbId": "tt44940424",
           "runtimeMinutes": 12,
           "cast": [
@@ -11626,7 +11661,8 @@
             "IN"
           ],
           "heat": 0,
-          "synopsis": "A babysitter's unexpected stay transforms a family's life and relationships."
+          "synopsis": "A babysitter's unexpected stay transforms a family's life and relationships.",
+          "certification": "U/A 16+"
         },
         {
           "id": "m-1767978~ott",
@@ -11844,7 +11880,7 @@
           "regions": [
             "US"
           ],
-          "votes": 1,
+          "votes": 2,
           "heat": 29,
           "synopsis": "When Samuel is torn from his daughter and sent to a brutal prison, Warden Clancy offers him a high-stakes proposition: smuggle gold out of a remote mine with a dangerous crew of prisoners and he’ll win his freedom.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/8i5iZV50CoEtmDCFM7RSxCkpE8h.jpg",
@@ -11884,10 +11920,11 @@
           "regions": [
             "US"
           ],
+          "rating": 7.4,
           "votes": 5,
           "heat": 28,
           "synopsis": "A struggling primary school teacher begins to make some questionable decisions after one of her students is injured.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/sDgb5jVuZ6ZOh4YjtSMMnbovkCi.jpg",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/60BxAjKM20ABTSYnWZcJ8ExiVNL.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/A5sGEzVMjvbgh5ZniaHBXAxppKQ.jpg",
           "imdbId": "tt29714073",
           "runtimeMinutes": 100,
@@ -11903,8 +11940,7 @@
           "origin": [
             "GB",
             "US"
-          ],
-          "rating": 7.4
+          ]
         },
         {
           "id": "m-445466~ott",
@@ -12271,41 +12307,6 @@
           ]
         },
         {
-          "id": "m-1706702",
-          "title": "Daniel and the Fiery Furnace",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Drama"
-          ],
-          "releaseDate": "2026-09-18",
-          "regions": [
-            "US"
-          ],
-          "heat": 15,
-          "synopsis": "During the Jewish exile to Babylon, Daniel and his friends face trials as Babylon's armies conquer Jerusalem. Under King Nebuchadnezzar, they gain royal favor but make enemies. Their faith is tested at the fiery furnace.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/wOXpSTox0QxMf17ocXv4sHfOYLV.jpg",
-          "imdbId": "tt37542993",
-          "cast": [
-            "Mena Massoud",
-            "Elijah Alexander",
-            "Sophia Decaro",
-            "Vladimir Angelove",
-            "Zaki Ali"
-          ],
-          "director": "Matthew Kooman",
-          "trailerUrl": "https://www.youtube.com/watch?v=FYm_sWSw6Eo",
-          "origin": [
-            "CA",
-            "US"
-          ]
-        },
-        {
           "id": "m-1596296",
           "title": "The History of Concrete",
           "kind": "documentary",
@@ -12339,6 +12340,41 @@
           "director": "John Wilson",
           "trailerUrl": "https://www.youtube.com/watch?v=O05arcJjOd0",
           "origin": [
+            "US"
+          ]
+        },
+        {
+          "id": "m-1706702",
+          "title": "Daniel and the Fiery Furnace",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Drama"
+          ],
+          "releaseDate": "2026-09-18",
+          "regions": [
+            "US"
+          ],
+          "heat": 15,
+          "synopsis": "During the Jewish exile to Babylon, Daniel and his friends face trials as Babylon's armies conquer Jerusalem. Under King Nebuchadnezzar, they gain royal favor but make enemies. Their faith is tested at the fiery furnace.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/wOXpSTox0QxMf17ocXv4sHfOYLV.jpg",
+          "imdbId": "tt37542993",
+          "cast": [
+            "Mena Massoud",
+            "Elijah Alexander",
+            "Sophia Decaro",
+            "Vladimir Angelove",
+            "Zaki Ali"
+          ],
+          "director": "Matthew Kooman",
+          "trailerUrl": "https://www.youtube.com/watch?v=FYm_sWSw6Eo",
+          "origin": [
+            "CA",
             "US"
           ]
         },
@@ -16301,7 +16337,7 @@
           "heat": 19,
           "synopsis": "After a chance encounter sparks a sweeping romance, Maya's future is suddenly upended, sending her on an unexpected journey to love and live again.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/o7ZCmjeW59yujCcAJjjYSJRoZLe.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/7RrnaX9AkAXxCVE6PpxIfbcVVBC.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/mTUWpyf15tLs4YLvy3nirbn6xA9.jpg",
           "imdbId": "tt34384900",
           "runtimeMinutes": 106,
           "cast": [
@@ -19323,11 +19359,38 @@
         "US"
       ],
       "rating": 8.1,
-      "votes": 3264,
+      "votes": 3268,
       "heat": 96,
       "synopsis": "Jack Reacher, a veteran military police investigator, has just recently entered civilian life. Reacher is a drifter, carrying no phone and the barest of essentials as he travels the country and explores the nation he once served.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/f1VCQIG2iCyOookdgOzwtUpwWC0.jpg",
       "backdropUrl": "https://image.tmdb.org/t/p/w780/pF0qkRsrHkdYadPWY9AMeFZfcwk.jpg"
+    },
+    {
+      "id": "trend-t-113962",
+      "title": "Lioness",
+      "kind": "series",
+      "platforms": [
+        "prime",
+        "paramount"
+      ],
+      "languages": [
+        "en"
+      ],
+      "genres": [
+        "Drama",
+        "War & Politics"
+      ],
+      "releaseDate": "2023-07-23",
+      "regions": [
+        "IN",
+        "US"
+      ],
+      "rating": 8.2,
+      "votes": 1513,
+      "heat": 90,
+      "synopsis": "Cruz Manuelos, a rough-around-the-edges but passionate young Marine, is recruited to join the CIA's Lioness Engagement Team to help bring down a terrorist organization from within. Joe, the station chief of the Lioness program, is tasked with training, managing and leading her female undercover operatives.",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/rzpHPSEgPTpRs8EHbygwsOw7jC0.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w780/4NBYDOnEjAzyuP7CMkD5s7fs44K.jpg"
     },
     {
       "id": "trend-t-125988",
@@ -19349,7 +19412,7 @@
         "US"
       ],
       "rating": 8.2,
-      "votes": 2635,
+      "votes": 2636,
       "heat": 88,
       "synopsis": "In a ruined and toxic future, thousands live in a giant silo deep underground. After its sheriff breaks a cardinal rule and residents die mysteriously, engineer Juliette starts to uncover shocking secrets and the truth about the silo.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/gMYZZvnkVNTqSVnVCphWbPXwWwb.jpg",
@@ -19377,7 +19440,7 @@
         "US"
       ],
       "rating": 8.3,
-      "votes": 307,
+      "votes": 308,
       "heat": 85,
       "synopsis": "Two intergalactic cops, new recruit John Stewart and Lantern legend Hal Jordan, are drawn into a dark, Earth-based mystery as they investigate a murder in the American heartland.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/gpC7h43xPMEV3goYMQShfJbTtLq.jpg",
@@ -19403,7 +19466,7 @@
         "US"
       ],
       "rating": 7.8,
-      "votes": 392,
+      "votes": 393,
       "heat": 84,
       "synopsis": "When a U.S. Navy pilot on a top-secret mission during the Cold War gets trapped behind enemy lines, his only chance at survival is to form an alliance with an eccentric ex-KGB agent.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/hVXjX1jLZ1ljFSNGXpjJfbTUOa7.jpg",
@@ -19430,7 +19493,7 @@
         "US"
       ],
       "rating": 7.8,
-      "votes": 896,
+      "votes": 897,
       "heat": 84,
       "synopsis": "When aristocratic Eddie inherits the family estate, he discovers that it's home to an enormous weed empire — and its proprietors aren't going anywhere.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/tw3tzfXaSpmUZIB8ZNqNEGzMBCy.jpg",
@@ -19455,7 +19518,7 @@
         "US"
       ],
       "rating": 8.2,
-      "votes": 5420,
+      "votes": 5423,
       "heat": 81,
       "synopsis": "After breaking the mysterious \"One Wish Willow\" to win his crush's heart, a hopeless romantic finds himself getting exactly what he asked for but soon discovers that some desires come at a dark, sinister price.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/bRwnj8WEKBCvmfeUNOukJPwB43K.jpg",
@@ -19481,19 +19544,50 @@
         "US"
       ],
       "rating": 6.7,
-      "votes": 375,
+      "votes": 376,
       "heat": 80,
       "synopsis": "Maia Marten, a brilliant London lawyer, has her life shattered by a single call on her morning run: her son has been taken. To get him back, she must keep running, obey every ruthless command, and trust no one-each second a test of how far a mother will go to save her child.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/uxCaBoYXsDC4A0SqTm3SISj0OwK.jpg",
       "backdropUrl": "https://image.tmdb.org/t/p/w780/jzBWExXacS33rMQ2zLBrqIVweyG.jpg"
     },
     {
-      "id": "trend-t-196322",
-      "title": "Dark Matter",
+      "id": "trend-t-30984",
+      "title": "Bleach",
+      "kind": "anime",
+      "platforms": [
+        "netflix",
+        "crunchyroll",
+        "sonyliv",
+        "lionsgate",
+        "hulu"
+      ],
+      "languages": [
+        "ja"
+      ],
+      "genres": [
+        "Action & Adventure",
+        "Animation",
+        "Sci-Fi & Fantasy"
+      ],
+      "releaseDate": "2004-10-05",
+      "regions": [
+        "IN",
+        "US"
+      ],
+      "rating": 8.3,
+      "votes": 2266,
+      "heat": 77,
+      "synopsis": "For as long as he can remember, Ichigo Kurosaki has been able to see ghosts. But when he meets Rukia, a Soul Reaper who battles evil spirits known as Hollows, he finds his life is changed forever. Now, with a newfound wealth of spiritual energy, Ichigo discovers his true calling: to protect the living and the dead from evil.",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/2EewmxXe72ogD0EaWM8gqa0ccIw.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w780/o0NsbcIvsllg6CJX0FBFY8wWbsn.jpg"
+    },
+    {
+      "id": "trend-t-103516",
+      "title": "Star Trek: Strange New Worlds",
       "kind": "series",
       "platforms": [
-        "appletv",
-        "prime"
+        "jiohotstar",
+        "paramount"
       ],
       "languages": [
         "en"
@@ -19502,100 +19596,73 @@
         "Sci-Fi & Fantasy",
         "Drama"
       ],
-      "releaseDate": "2024-05-07",
+      "releaseDate": "2022-05-05",
       "regions": [
         "IN",
         "US"
       ],
-      "rating": 7.8,
-      "votes": 764,
-      "heat": 69,
-      "synopsis": "Jason Dessen is abducted into an alternate version of his life. To get back to his real family, he embarks on a harrowing journey to save them from the most terrifying foe imaginable: himself.",
-      "posterUrl": "https://image.tmdb.org/t/p/w500/2DPmTlv8F0V1TQBPmlsGOVOhtWk.jpg",
-      "backdropUrl": "https://image.tmdb.org/t/p/w780/iBc82qaA05ntzSnrVndw8scv4Bn.jpg"
+      "rating": 7.9,
+      "votes": 843,
+      "heat": 70,
+      "synopsis": "Follow Captain Christopher Pike, Science Officer Spock and Number One in the years before Captain Kirk boarded the U.S.S. Enterprise, as they explore new worlds around the galaxy.",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/97TTJuqiSMfU0DuXx1B4NG5QNP7.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w780/fZJs6xgU9dqIg9phIXjZAZOInzy.jpg"
     },
     {
-      "id": "trend-m-1440098",
-      "title": "Drawn Together",
-      "kind": "film",
-      "platforms": [
-        "prime"
-      ],
-      "languages": [
-        "es"
-      ],
-      "genres": [
-        "Romance",
-        "Thriller"
-      ],
-      "releaseDate": "2026-09-09",
-      "regions": [
-        "IN",
-        "US"
-      ],
-      "rating": 6.7,
-      "votes": 33,
-      "heat": 61,
-      "synopsis": "Marfil Cortés, a daughter of a wealthy Spanish businessman, is kidnapped and released, leading her father to hire Sebastian Moore as a bodyguard. Despite initial clashes, they form an irremediable attraction, navigating a world where no one is who they say they are.",
-      "posterUrl": "https://image.tmdb.org/t/p/w500/6rpvddXbaQPOi0fB2HKWbZ3uUSg.jpg",
-      "backdropUrl": "https://image.tmdb.org/t/p/w780/i65y7cMae36K0giN0GRaMjAHUru.jpg"
-    },
-    {
-      "id": "trend-t-258230",
-      "title": "Last Seen",
+      "id": "trend-t-287620",
+      "title": "Stuart Fails to Save the Universe",
       "kind": "series",
       "platforms": [
-        "appletv"
+        "jiohotstar",
+        "hbomax"
       ],
       "languages": [
         "en"
       ],
       "genres": [
-        "Crime",
-        "Drama",
-        "Mystery"
+        "Comedy",
+        "Sci-Fi & Fantasy"
       ],
-      "releaseDate": "2026-09-09",
+      "releaseDate": "2026-07-23",
       "regions": [
         "IN",
         "US"
       ],
-      "rating": 9,
-      "votes": 6,
-      "heat": 49,
-      "synopsis": "When emergency dispatcher Ian Ridley receives a frantic call from a teenager he believes could be his long-missing daughter, he stops at nothing to find her.",
-      "posterUrl": "https://image.tmdb.org/t/p/w500/vozJZjHv0Yyv4PjoOxF5tVMUGFI.jpg",
-      "backdropUrl": "https://image.tmdb.org/t/p/w780/kgaQnDdDaPqvGN7i8LLz1aWJdjP.jpg"
+      "rating": 8.9,
+      "votes": 148,
+      "heat": 69,
+      "synopsis": "After accidentally creating a new multiverse, comic book store owner Stuart Bloom must locate a quantum-interference device to restore reality.",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/txj8ujTZwGUjpCdhCsQBnTlh4aS.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w780/nW7oUFiJrIWwll4mZ8tYays7XRm.jpg"
     },
     {
-      "id": "trend-t-246473",
-      "title": "Made in Korea",
+      "id": "trend-t-298168",
+      "title": "The Shards",
       "kind": "series",
       "platforms": [
         "jiohotstar",
-        "disney",
         "hulu"
       ],
       "languages": [
-        "ko"
+        "en"
       ],
       "genres": [
-        "Crime",
-        "Drama"
+        "Drama",
+        "Mystery"
       ],
-      "releaseDate": "2025-12-24",
+      "releaseDate": "2026-08-05",
       "regions": [
         "IN",
         "US"
       ],
-      "rating": 8.1,
-      "votes": 34,
-      "heat": 44,
-      "synopsis": "In 1970s South Korea, follow two men on opposite sides of power — one driven by ambition, the other by justice. As their worlds collide, greed, loyalty, and survival intertwine in a battle that will shape a nation.",
-      "posterUrl": "https://image.tmdb.org/t/p/w500/cyBg9FJ2AmTWEGktA43gMo4t0Vj.jpg",
-      "backdropUrl": "https://image.tmdb.org/t/p/w780/3GmRS3efCTp6jumogKOxYBrV5mO.jpg"
+      "rating": 7.2,
+      "votes": 54,
+      "heat": 66,
+      "synopsis": "17-year-old Bret Easton Ellis is in his final year at the elite Buckley prep school. Upending his world is the arrival of a mysterious new student, Robert Mallory, whose unsettling presence coincides with the activities of a serial killer known as The Trawler.",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/wP0GdqwVu2g1y3q1KzBXuSrdTvX.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w780/AhzF2bkYYybcCT4PnqpoagRGBWJ.jpg"
     }
   ],
-  "enrichedAt": "2026-09-11T10:25:08.542Z",
-  "ratedAt": "2026-09-11T10:25:08.812Z"
+  "enrichedAt": "2026-09-11T12:55:58.121Z",
+  "ratedAt": "2026-09-11T12:55:58.378Z"
 }
