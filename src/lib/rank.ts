@@ -27,21 +27,6 @@ import type { Release } from '../types';
 export function interleaveByLanguage(
   rows: Release[],
   better: (a: Release, b: Release) => number,
-  /**
-   * Which language gets the first slot.
-   *
-   * 'count' — the language with the most rows leads. Right when the job is to
-   * spread one day's releases fairly: the biggest group is the one most at risk
-   * of being cut off by the cap, so it goes first.
-   *
-   * 'best' — the language whose best row is best leads. Right when the output
-   * is a shortlist rather than a spread, because there 'count' answers the
-   * wrong question entirely: on 11 Sep, Tamil had the most cinema listings and
-   * so took first place with a heat-33 film, ahead of a heat-95 one. Nobody
-   * asking what is big right now means "whichever language has the most films
-   * out".
-   */
-  order: 'count' | 'best' = 'count',
 ): Release[] {
   const byLang = new Map<string, Release[]>();
   for (const r of rows) {
@@ -53,9 +38,10 @@ export function interleaveByLanguage(
     byLang.get(code)!.push(r);
   }
 
+  // The language with the most rows leads: the biggest group is the one most at
+  // risk of being cut off by a cap, so it goes first.
   const queues = [...byLang.values()].map((list) => [...list].sort(better));
-  // Each queue is already sorted, so its head is that language's best.
-  queues.sort((a, b) => (order === 'best' ? better(a[0], b[0]) : b.length - a.length));
+  queues.sort((a, b) => b.length - a.length);
 
   const out: Release[] = [];
   for (let depth = 0; out.length < rows.length; depth++) {

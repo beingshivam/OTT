@@ -1391,7 +1391,7 @@ a {
  * The row's two sides.
  *
  * Sits where the subtitle sat, at the same weight as the heading rather than
- * above it: this is a choice inside "Just landed", not a second navigation.
+ * above it: this is a choice inside "On right now", not a second navigation.
  * Small enough that both fit beside the title at 320px, because a control that
  * wraps to its own line is the second editorial band the header work spent
  * 139px removing.
@@ -1468,7 +1468,7 @@ a {
 /*
  * The two sub-headings were the quietest text in their own block: 13px, weight
  * 600, in --text-2, sitting under a 15px/700 parent in full --text. That is the
- * hierarchy upside down. "Just landed" is a label; "In cinemas" and "On OTT"
+ * hierarchy upside down. "On right now" is a label; "In cinemas" and "On OTT"
  * are the answer — they are the whole reason this band is split in two, and a
  * reader who misses them sees one undifferentiated wall of posters.
  *
@@ -1523,7 +1523,7 @@ a {
 /**
  * At 320px the counts are the part that goes.
  *
- * "Just landed" plus both segments plus both counts overruns the line by a few
+ * "On right now" plus both segments plus both counts overruns the line by a few
  * pixels on the narrowest phone still in use, and the e2e run catches it. The
  * count is the weakest thing on the row — it argues for tapping the other side,
  * which the label already does — while the labels are the control itself and

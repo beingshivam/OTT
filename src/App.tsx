@@ -494,7 +494,7 @@ export default function App() {
    * One row per lens, each ranking what its own page is about.
    *
    * Asked whether the rail should be on the other two lenses as well: yes, and
-   * not the same one. "Just landed" over films that are not out yet is a false
+   * not the same one. "On right now" over films that are not out yet is a false
    * statement, and on the back catalogue it is the homepage a second time. So
    * the component is shared and the selection, the wording and the caption
    * belong to the lens.
@@ -732,8 +732,17 @@ export default function App() {
               number sits under the sentence that says what it counts.
             */
             <section className="landedpair" aria-labelledby="landedpair-heading">
+              {/*
+                "Just landed" stopped being true of the left-hand row the day it
+                started ranking by attention instead of by date — its first card
+                is now routinely a film five weeks into its run, which is the
+                point of the row and a contradiction of that heading. Both rows
+                are still honestly "on right now": one is playing, the other is
+                streamable tonight. The recency claim moves to the row that can
+                still make it.
+              */}
               <h2 className="landedpair__title" id="landedpair-heading">
-                Just landed
+                On right now
               </h2>
               <PosterRail
                 compact
@@ -755,9 +764,10 @@ export default function App() {
                    theatrical, so naming the platform on each one printed
                    "Theatres" seven times across the posters. */
                 showPlatform={false}
-                /* Marks however many of the leading cards were promoted on
-                   attention rather than date — see inCinemas. Zero on a week
-                   too thin to rank, and then the row says nothing about it. */
+                /* The whole row ranks by attention — see inCinemas — and this
+                   badges the leading few so a reader can tell that from the
+                   date order they would otherwise assume. Zero on a row too
+                   short to have standouts, and then it says nothing. */
                 trending={cinemaRail.trending}
                 /* The count has somewhere to go now. 89 in cinemas, twenty in
                    the row, and the rest were findable only by name. */

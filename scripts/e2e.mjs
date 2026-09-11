@@ -236,7 +236,7 @@ console.log('\nThe rail');
 // --- the cinema / OTT split --------------------------------------------------
 
 /**
- * The two rows under "Just landed", checked as behaviour rather than markup.
+ * The two rows under "On right now", checked as behaviour rather than markup.
  *
  * The split exists because cinema and streaming decay at different rates and a
  * single row had to pick one window, so what is worth asserting is that each
@@ -245,7 +245,7 @@ console.log('\nThe rail');
  * both does not push the board off the screen — which is the cost the design
  * was chosen against and the thing most likely to regress silently.
  */
-console.log('\nJust landed: in cinemas / on OTT');
+console.log('\nOn right now: in cinemas / on OTT');
 for (const [width, height] of [[360, 780], [390, 844], [1280, 900]]) {
   const { ctx, page, errors } = await newPage(browser, { width, height });
   await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
@@ -301,14 +301,15 @@ for (const [width, height] of [[360, 780], [390, 844], [1280, 900]]) {
      `${pills[1].named} of ${pills[1].cells} named`);
 
   /*
-    The cinema row leads on attention, and says so.
+    The cinema row ranks by attention, and says so.
 
     A cinema run lasts six weeks, so strict date order buried the biggest film
     on the board: Mirzapur: The Movie was the highest-attention title in Indian
     cinemas and sat nineteenth, behind eighteen that had merely opened later.
-    The promotion is only defensible if the reader can see it happened —
-    unmarked, three out-of-order cards at the front of a row sorted by date
-    read as a bug — so the chip is asserted, not just the ordering.
+    The whole row ranks now rather than just its head, and that is only
+    defensible if the reader can see it — a row of posters is read as a
+    calendar unless something says otherwise — so the chip is asserted, not
+    just the ordering.
   */
   const hot = await page.evaluate(() => {
     const row = document.querySelectorAll('.landed--sub')[0];
@@ -887,13 +888,13 @@ for (const width of [390, 1440]) {
 console.log('\nA rail on every lens');
 
 /**
- * The three rows must not be the same row. "Just landed" over films that are
- * not out yet is a false statement and the catalogue's row is the homepage
+ * The three rows must not be the same row. "Landing soon" over films that are
+ * already out is a false statement and the catalogue's row is the homepage
  * again — so this asserts the heading, and that the captions are pointing the
  * direction the heading claims.
  */
 for (const [path, heading, expect] of [
-  ['/', 'Just landed', 'past'],
+  ['/', 'On right now', 'past'],
   ['/upcoming', 'Landing soon', 'future'],
   ['/streaming', 'Popular now', 'year'],
 ]) {

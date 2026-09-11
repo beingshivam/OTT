@@ -3,8 +3,9 @@
  *
  * The rendering is checked in a real browser (scripts/e2e.mjs). What lives here
  * is the part a screenshot cannot tell you: that the window is the window, that
- * the ordering claim the label makes is the ordering the row has, and that one
- * language cannot take the row on a day it happens to be busy.
+ * the ordering claim the label makes is the ordering the row has, and that the
+ * per-language guard holds on the rows built to spread a field — and only
+ * there, since the cinema row is a deliberate exception to it.
  *
  * Run: npm run test:rail
  */
@@ -255,7 +256,7 @@ test('the shipped catalogue produces a usable row', () => {
 });
 
 /**
- * The split under "Just landed".
+ * The split under "On right now".
  *
  * The two sides run on different clocks on purpose — a cinema run outlasts a
  * streaming drop's news value by a month — and that asymmetry is the whole
@@ -331,13 +332,13 @@ test('both sides respect region and require artwork', () => {
   assert.equal(landedOnOtt(rows, 'IN', TODAY).releases.length, 0);
 });
 
-test('one language cannot take the cinema row on a busy day', () => {
+test('one language cannot take the OTT row on a busy day', () => {
   const day = iso(3);
   const rows = [
-    ...Array.from({ length: 5 }, () => row({ releaseDate: day, platforms: ['theatres'], languages: ['hi'], heat: 90 })),
-    row({ releaseDate: day, platforms: ['theatres'], languages: ['ta'], heat: 10 }),
+    ...Array.from({ length: 5 }, () => row({ releaseDate: day, platforms: ['netflix'], languages: ['hi'], heat: 90 })),
+    row({ releaseDate: day, platforms: ['netflix'], languages: ['ta'], heat: 10 }),
   ];
-  const out = inCinemas(rows, 'IN', TODAY).releases;
+  const out = landedOnOtt(rows, 'IN', TODAY).releases;
   assert.equal(out[1].languages[0], 'ta', 'the second slot goes to the other language, not the fifth Hindi row');
 });
 
@@ -360,7 +361,7 @@ test('the shipped feed fills both sides', () => {
 });
 
 /**
- * The cinema row leads on attention, then reverts to date.
+ * The cinema row ranks by attention, end to end.
  *
  * The bug this encodes: a cinema run lasts six weeks, so strict date order
  * buries the biggest film on the board behind everything that merely opened
@@ -377,38 +378,84 @@ test('the biggest film in cinemas leads, however old it is', () => {
   assert.equal(out.trending, TRENDING_IN_CINEMAS);
 });
 
-test('behind the promoted few, the row is chronological again', () => {
-  const rows = Array.from({ length: 10 }, (_, i) =>
-    row({ releaseDate: iso(i), platforms: ['theatres'], heat: 100 - i * 10 }),
+/**
+ * The whole row, not just its head — which is the half the first version got
+ * wrong and nobody noticed, because the three promoted cards looked right.
+ *
+ * Behind them the row was still chronological, so on a Friday it filled with
+ * whatever had opened in the previous two days: twenty slots, three earned and
+ * seventeen spent on small openings, several with no rating at all. A film with
+ * real attention that opened last month could not get in at any position.
+ */
+test('a quiet opening today does not outrank a big film from last month', () => {
+  const openedToday = Array.from({ length: MAX_ITEMS }, (_, i) =>
+    row({ releaseDate: iso(0), platforms: ['theatres'], heat: 5, title: `Small ${i}` }),
   );
-  const out = inCinemas(rows, 'IN', TODAY);
-  const tail = out.releases.slice(TRENDING_IN_CINEMAS).map((r) => r.releaseDate);
-  assert.deepEqual([...tail].sort().reverse(), tail, 'the tail lost its date order');
+  const stillPlaying = row({
+    releaseDate: iso(35),
+    platforms: ['theatres'],
+    heat: 42,
+    title: 'Word of mouth',
+  });
+  const out = inCinemas([...openedToday, stillPlaying], 'IN', TODAY).releases;
+  assert.equal(out[0].title, 'Word of mouth', `the row opened on ${out[0].title}`);
 });
 
-test('one language cannot take the whole shortlist', () => {
-  // Four loud Hindi films and one quieter Tamil one. A raw heat sort would give
-  // Hindi all three slots; interleaving is this site's spine and must hold here
-  // too, because popularity does not compare across languages.
+test('one language can take the whole shortlist when it owns the week', () => {
+  // The deliberate exception to this site's interleave rule, and the reason it
+  // needs a test of its own: everywhere else, four loud Hindi films crowding
+  // out a quieter Tamil one is the bug. Here it is the answer. A reader asking
+  // which films are big in cinemas right now is not asking for one per
+  // language, and a rail that hands a slot to a heat-40 film because of its
+  // language is answering a question nobody asked.
   const hindi = Array.from({ length: 4 }, (_, i) =>
     row({ releaseDate: iso(i + 2), platforms: ['theatres'], languages: ['hi'], heat: 90 - i }),
   );
   const tamil = row({ releaseDate: iso(9), platforms: ['theatres'], languages: ['ta'], heat: 40 });
   const out = inCinemas([...hindi, tamil], 'IN', TODAY);
   const lead = out.releases.slice(0, TRENDING_IN_CINEMAS).map((r) => r.languages[0]);
-  assert.ok(lead.includes('ta'), `one language took the shortlist: ${lead.join(', ')}`);
+  assert.deepEqual(lead, ['hi', 'hi', 'hi'], `the interleave is still in the way: ${lead.join(', ')}`);
 });
 
-test('a row too thin to rank says nothing rather than crowning everything', () => {
-  // Three cinema listings and a shortlist of three would be the whole row
-  // wearing a badge, which tells a reader nothing.
+test('the interleave still holds on the rows built to spread a field', () => {
+  // The exception above is the cinema row only. Removing it there must not
+  // quietly remove it from the row beside it, which is a day-by-day calendar
+  // and the place the rule was written for.
+  const day = iso(3);
+  const rows = [
+    ...Array.from({ length: 4 }, (_, i) =>
+      row({ releaseDate: day, platforms: ['netflix'], languages: ['hi'], heat: 90 - i }),
+    ),
+    row({ releaseDate: day, platforms: ['netflix'], languages: ['ta'], heat: 40 }),
+  ];
+  const lead = landedOnOtt(rows, 'IN', TODAY).releases.slice(0, 3).map((r) => r.languages[0]);
+  assert.ok(lead.includes('ta'), `one language took the streaming row: ${lead.join(', ')}`);
+});
+
+test('a row too short to have standouts says nothing rather than crowning everything', () => {
+  // Three cinema listings and a badge on three would be the whole row wearing
+  // one, which tells a reader nothing.
   const rows = Array.from({ length: 3 }, (_, i) =>
     row({ releaseDate: iso(i), platforms: ['theatres'], heat: 50 }),
   );
   assert.equal(inCinemas(rows, 'IN', TODAY).trending, undefined);
 });
 
-test('promotion never duplicates a title', () => {
+test('the count is everything playing, not everything the row could show', () => {
+  // The heading prints this number and /in-cinemas has to agree with it, so it
+  // counts films without posters that the poster row itself cannot carry.
+  const rows = [
+    ...Array.from({ length: MAX_ITEMS + 5 }, (_, i) =>
+      row({ releaseDate: iso(i % 30), platforms: ['theatres'], heat: i }),
+    ),
+    row({ releaseDate: iso(2), platforms: ['theatres'], posterUrl: undefined }),
+  ];
+  const out = inCinemas(rows, 'IN', TODAY);
+  assert.equal(out.total, MAX_ITEMS + 6);
+  assert.equal(out.releases.length, MAX_ITEMS);
+});
+
+test('ranking never duplicates a title', () => {
   const rows = Array.from({ length: 12 }, (_, i) =>
     row({ releaseDate: iso(i), platforms: ['theatres'], heat: i * 7 }),
   );
@@ -416,10 +463,17 @@ test('promotion never duplicates a title', () => {
   assert.equal(new Set(out.map((r) => r.id)).size, out.length, 'a title appears twice');
 });
 
-test('the shipped feed promotes the film that prompted this', () => {
+test('the shipped feed ranks the films that prompted this', () => {
   const feed = JSON.parse(readFileSync('public/data/releases.json', 'utf8'));
   const all = feed.weeks.flatMap((w) => w.releases);
   const out = inCinemas(all, 'IN', new Date('2026-09-11T06:00:00Z'));
   assert.equal(out.trending, TRENDING_IN_CINEMAS);
   assert.equal(out.releases[0].title, 'Mirzapur: The Movie');
+
+  // The film the change was asked for. It opened on 7 August and is rated 8.6,
+  // and under date order it was seventieth of eighty-nine — off the row by
+  // fifty places. Nothing about its numbers puts it in the top three; what the
+  // row owed it was a place on the row at all.
+  const seat = out.releases.findIndex((r) => r.title === 'Hanuman Ansh');
+  assert.ok(seat >= 0 && seat < MAX_ITEMS, `Hanuman Ansh is still off the row (${seat})`);
 });

@@ -41,11 +41,11 @@ export interface JustLanded {
   from: string;
   to: string;
   /**
-   * How many of the leading releases are there on merit rather than on date.
+   * How many leading cards to mark as the standouts.
    *
-   * Zero on every row but the cinema one. The caller marks this many cards and
-   * says nothing otherwise, so a row that could not rank anything degrades to
-   * the plain chronological row it always was.
+   * Zero on every row but the cinema one, which is the only row not ordered by
+   * date — the badge is what tells a reader the order is attention rather than
+   * recency, so a row too thin to have standouts sets nothing and says nothing.
    */
   trending?: number;
 }
@@ -106,12 +106,13 @@ const streaming = (r: Release) => r.platforms.some((p) => p !== 'theatres');
 export const CINEMA_DAYS = 42;
 
 /**
- * How many cinema listings lead on attention rather than on date.
+ * How many leading cards wear the badge.
  *
  * Three, because the question this answers is "what is the big film on right
- * now" and that question has about three answers in any given week. More and it
- * stops being a shortlist; fewer and a reader whose language is not one of them
- * gets nothing.
+ * now" and that question has about three answers in any given week. The badge
+ * is a signpost rather than a cut — the whole row is ranked the same way — and
+ * three is what a reader scanning a poster row takes in before they start
+ * swiping.
  */
 export const TRENDING_IN_CINEMAS = 3;
 
@@ -119,79 +120,65 @@ export const TRENDING_IN_CINEMAS = 3;
  * What is playing now — the segment that had nowhere to live before, and the
  * only question on this site no streaming-only competitor can answer.
  *
- * Sorted newest-first like every other row, with one exception at the front: a
- * cinema run lasts six weeks, so date order buries the biggest film on the
- * board the moment a quieter Friday follows it. Mirzapur: The Movie was the
- * highest-attention title in Indian cinemas — heat 95 against a field where
- * second place was 85 — and sat nineteenth in this row, behind eighteen films
- * that had merely opened more recently. A reader asking what is on right now
- * was being answered with what opened last, which is a different question and
- * the wrong one for a medium where a hit plays for a month.
+ * The one row here that is not a calendar. Every other row answers "what is
+ * new", where the date is the news and chronology is the honest spine. This one
+ * answers "what is on", and for a medium where a hit plays for six weeks those
+ * are different questions with different answers.
  *
- * So the top few by attention are promoted to the front and the rest keep their
- * chronology. Promoted through interleaveByLanguage rather than raw heat,
- * because that is this site's spine: TMDB popularity is not comparable across
- * languages, and a straight sort would let one language own the shortlist on a
- * week when it happens to be loud. Interleaving takes the best of each language
- * in turn, so three slots mean up to three languages.
+ * Date order gave the wrong one, and not marginally. On 11 September the row
+ * held twenty cards: three promoted on attention, and then seventeen films that
+ * had opened in the previous forty-eight hours — heat 0 to 17, several with no
+ * rating at all. Hanuman Ansh, rated 8.6 and still playing five weeks in, sat
+ * seventieth of eighty-nine. A reader asking what is on at the cinema was being
+ * shown two days of small openings and told that was the answer.
+ *
+ * So the whole row ranks by attention, not just its head. The films that opened
+ * this morning are not lost — the board directly beneath this row is the
+ * current week in date order, which is where "what opened today" belongs and
+ * where it reads as news rather than as a ranking nobody made.
+ *
+ * And ranked flat, without the per-language interleave that guards every other
+ * list on this site. That is a deliberate exception, asked for and worth
+ * naming: interleaving asks each language for its best in turn, so a week that
+ * one language genuinely owns comes out looking like a week five languages
+ * shared. For a shortlist of what is big in Indian cinemas right now, that is a
+ * fairness the reader did not ask for and cannot see the benefit of. The guard
+ * still holds everywhere it was built for — the day-by-day rows, the catalogue,
+ * the best-rated lists — where the job is to spread a field rather than to say
+ * which film is the big one.
  */
 export function inCinemas(all: Release[], region: string, today: Date = new Date()): JustLanded {
-  const row = chronicle(all, region, {
-    from: toISODate(new Date(today.getTime() - (CINEMA_DAYS - 1) * 86_400_000)),
-    to: toISODate(today),
-    newestFirst: true,
-    where: showing,
-  });
+  const from = toISODate(new Date(today.getTime() - (CINEMA_DAYS - 1) * 86_400_000));
+  const to = toISODate(today);
 
   /*
    * The count is everything playing, not everything with artwork.
    *
-   * chronicle() gates on a poster, correctly — a poster row cannot show a card
-   * with no poster. But it then reports that filtered number as the total, and
-   * the total is what the heading prints and what the link to /in-cinemas
-   * promises. The page has no poster gate because it is a text board, so the
-   * rail said 89 and the page it linked to said 93. Whichever number is right,
-   * two of them is wrong.
+   * A poster row cannot show a card with no poster, so the row is gated on one.
+   * But the count is what the heading prints and what the link to /in-cinemas
+   * promises, and that page has no poster gate because it is a text board — so
+   * the rail said 89 and the page it linked to said 93. Whichever number is
+   * right, two of them is wrong.
    */
   const playing = all.filter(
-    (r) =>
-      r.regions?.includes(region) &&
-      r.releaseDate >= row.from &&
-      r.releaseDate <= row.to &&
-      showing(r),
-  ).length;
-  row.total = playing;
+    (r) => r.regions?.includes(region) && r.releaseDate >= from && r.releaseDate <= to && showing(r),
+  );
 
-  const ranked = interleaveByLanguage(
-    all.filter(
-      (r) =>
-        r.regions?.includes(region) &&
-        r.releaseDate >= row.from &&
-        r.releaseDate <= row.to &&
-        showing(r) &&
-        Boolean(r.posterUrl),
-    ),
-    (a, b) => (b.heat ?? 0) - (a.heat ?? 0),
-    // By best rather than by count: the default asks which language has the
-    // most films out, which is not the question a shortlist answers. See
-    // interleaveByLanguage.
-    'best',
-  ).slice(0, TRENDING_IN_CINEMAS);
+  const releases = playing
+    .filter((r) => Boolean(r.posterUrl))
+    // Ties break to the newer film: two titles drawing equal attention, the one
+    // that opened this week is the more useful answer to "what is on".
+    .sort(
+      (a, b) => (b.heat ?? 0) - (a.heat ?? 0) || b.releaseDate.localeCompare(a.releaseDate),
+    )
+    .slice(0, MAX_ITEMS);
 
-  // Nothing to promote is a real state — a week where the whole row opened on
-  // one day, or a region with three cinema listings — and it has to read as the
-  // ordinary row rather than as a shortlist of everything there is.
-  if (ranked.length < TRENDING_IN_CINEMAS || row.total <= TRENDING_IN_CINEMAS) return row;
+  const row: JustLanded = { releases, from, to, total: playing.length };
 
-  const lead = new Set(ranked.map((r) => r.id));
-  return {
-    ...row,
-    trending: ranked.length,
-    // The tail keeps the date order it already had; only the front is re-cut.
-    // Re-sliced to MAX_ITEMS because promoting from deep in the window can pull
-    // in titles the cap had excluded.
-    releases: [...ranked, ...row.releases.filter((r) => !lead.has(r.id))].slice(0, MAX_ITEMS),
-  };
+  // A row with nothing but standouts is the whole row wearing a badge, which
+  // tells a reader nothing. Then it is simply a short ranked row, unmarked.
+  if (releases.length <= TRENDING_IN_CINEMAS) return row;
+  return { ...row, trending: TRENDING_IN_CINEMAS };
 }
 
 /** The same fortnight the mixed row always used, narrowed to things you can
