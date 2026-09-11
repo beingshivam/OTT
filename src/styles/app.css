@@ -3156,6 +3156,26 @@ select,
   }
 
   /*
+   * And the heading keeps its words, now that the arrows take more of the row.
+   *
+   * Going from 28px to 44px arrows cost the board's title exactly the 32px it
+   * needed: it wanted 127px, was given 93, and rendered "11 – 17 Se…" — a date
+   * range that no longer names its month, which is most of what a date range
+   * is for. Nothing else in that row can give the space back; the arrows, the
+   * layout toggle and Filters are all at the minimum a thumb can use.
+   *
+   * So the row wraps instead. The title takes its own line and the controls sit
+   * under it, which is what a phone does with a header and its actions anyway.
+   * It costs about 34px of height and buys a heading that is true.
+   */
+  .controls__row {
+    flex-wrap: wrap;
+  }
+  .controls__heading {
+    flex: 1 0 100%;
+  }
+
+  /*
    * The header icons, given a fingertip without being given more room.
    *
    * Instagram, share, subscribe and search are 34px circles in a row that
@@ -3204,13 +3224,23 @@ select,
     height: 44px;
   }
 
-  /* The lens nav and the layout toggle are the two things a reader taps most
-     after a title, and both sat under 40. Height only — neither is near the
-     width limit. */
-  .lens {
-    min-height: 44px;
-    display: inline-flex;
-    align-items: center;
+  /*
+   * The lens nav, given its 44px from padding and nothing else.
+   *
+   * The first version set `display: inline-flex` to centre the label
+   * vertically, and broke it horizontally: the phone breakpoint centres these
+   * with `text-align: center`, and text-align does not position flex items. So
+   * every label jumped to flex-start inside a pill that is still equal-width
+   * via `flex: 1 1 0` — "This week" sat with 6px to its left and 36px of dead
+   * space to its right. Visible immediately to anyone holding a phone, and
+   * invisible to a check that only asserted the height I had just changed.
+   *
+   * Padding leaves the display mode alone, so the centring that was already
+   * working keeps working. Scoped past the phone breakpoint below, which sets
+   * `padding: 8px 6px` and would otherwise win on source order.
+   */
+  .lenses .lens {
+    padding-block: 13px;
   }
 
   /* The pill was already tall enough; the <select> inside it was not, and the

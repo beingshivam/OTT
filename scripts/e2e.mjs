@@ -1002,6 +1002,54 @@ console.log('\nTouch targets');
   }
 
   /*
+    Growing a control must not move what is inside it.
+    
+    The first touch pass reached 44px on the lens nav by switching it to
+    inline-flex, which blockified to flex — and the phone breakpoint centres
+    these labels with `text-align: center`, which does not position flex items.
+    Every label jumped to the left edge of a pill that is still equal-width via
+    `flex: 1 1 0`: "This week" sat with 6px to its left and 36px of dead space
+    to its right, on the first row of the homepage.
+    
+    The check that shipped alongside that change asserted the height, which was
+    the number being changed and therefore the one thing guaranteed to be right.
+    This asserts the thing that broke.
+  */
+  const centred = await page.evaluate(() =>
+    [...document.querySelectorAll('.lens')].map((e) => {
+      const pill = e.getBoundingClientRect();
+      const range = document.createRange();
+      range.selectNodeContents(e);
+      const text = range.getBoundingClientRect();
+      return {
+        label: e.textContent.trim(),
+        left: Math.round(text.left - pill.left),
+        right: Math.round(pill.right - text.right),
+      };
+    }),
+  );
+  const lopsided = centred.filter((c) => Math.abs(c.left - c.right) > 2);
+  is(
+    lopsided.length === 0,
+    'every lens label is centred in its pill',
+    lopsided.map((c) => `"${c.label}" ${c.left}px left, ${c.right}px right`).join('; '),
+  );
+
+  /*
+    The other thing bigger controls cost: the board's own title.
+    
+    28px arrows to 44px took exactly the 32px the heading needed, and it
+    rendered "11 – 17 Se…" — a date range that no longer names its month. The
+    row wraps now, so this asserts the words survive rather than that the row
+    fits, which it did either way.
+  */
+  const head = await page.evaluate(() => {
+    const h = document.querySelector('.controls__heading');
+    return { clipped: h.scrollWidth > h.clientWidth + 1, text: h.textContent.trim() };
+  });
+  is(!head.clipped, 'the week heading is not cut off', `heading reads "${head.text}" and is clipped`);
+
+  /*
     The header icons stay 34px on purpose — that row already spends 346 of 358
     available pixels at 390px, and growing them overflows the narrowest phones.
     They get the target through an invisible box instead, so the assertion has
