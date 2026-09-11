@@ -31,13 +31,14 @@ import { COLLECTIONS, inCollection } from '../data/collections';
  * "Netflix" under "Platforms" needs nothing more, and ten repetitions of the
  * word "releases" is noise.
  *
- * Exported because the build prerenders this same markup
- * (scripts/build-seo.mjs) and the two must not disagree. They did: the
- * prerender said "In cinemas" while this component rendered "New on In
- * Theatres" — broken English, and a crawler seeing different link text than a
- * person is exactly the cloaking problem this component exists to avoid.
+ * The registry used to call cinema "In Theatres", so this component rendered
+ * "New on In Theatres" — broken English — while the prerender of the same
+ * markup said "In cinemas", which is a crawler seeing different link text from
+ * a person, the cloaking problem this component exists to avoid. A helper here
+ * rewrote the one word for the one surface. The registry now says "In cinemas"
+ * itself and the helper is gone: the same fix, made where the name is chosen
+ * rather than where it happened to read badly.
  */
-export const platformLinkText = (name: string) => (name === 'In Theatres' ? 'In cinemas' : name);
 
 export function BrowseLinks({ feed, region }: { feed: ReleaseFeed | null; region: string }) {
   if (!feed) return null;
@@ -131,7 +132,7 @@ export function BrowseLinks({ feed, region }: { feed: ReleaseFeed | null; region
               style={{ ['--chip-accent' as string]: p.accent }}
             >
               <i className="chip__dot" />
-              {platformLinkText(p.name)}
+              {p.name}
             </a>
           ))}
         </div>

@@ -3350,9 +3350,30 @@ select,
     height: 40px;
   }
 
+  /*
+   * A segmented control, not two circles in a capsule.
+   *
+   * The label inside these buttons is display:none at this size, so the button
+   * collapses to 46×44 — and `border-radius: var(--radius-pill)` on a shape
+   * that square is a circle. The active half rendered as a white disc bulging
+   * out of the left end of a capsule, which is why it was reported as looking
+   * broken: it does not fill its half, so it reads as a stray blob rather than
+   * as one of two states.
+   *
+   * Invisible on a desktop, where the words "Board" and "Posters" make the
+   * button wide enough for the same radius to read as the capsule it was drawn
+   * for. Two corner radii, both rounded rectangles, and the active half now
+   * fills its side. The arrows either side stay circles, which helps rather
+   * than hurts: a two-state control should not look like the single-action
+   * buttons beside it.
+   */
+  .viewtoggle {
+    border-radius: 16px;
+  }
   .viewtoggle button {
     min-height: 44px;
     padding-inline: 16px;
+    border-radius: 13px;
   }
 
   .chip {

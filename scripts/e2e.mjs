@@ -301,7 +301,7 @@ for (const [width, height] of [[360, 780], [390, 844], [1280, 900]]) {
   const saysTheatres = await page.evaluate(() =>
     [...document.querySelectorAll('.landed--sub')[0].querySelectorAll('.landed__badgename')]
       .map((e) => e.textContent.trim())
-      .filter((t) => /theatre/i.test(t)).length,
+      .filter((t) => /cinema|theatre/i.test(t)).length,
   );
   is(saysTheatres === 0, `${width}px: the cinema row does not repeat "Theatres"`,
      `${saysTheatres} cards label a cinema row "Theatres"`);

@@ -4,7 +4,6 @@ import { interleaveByLanguage } from '../lib/rank';
 import type { Release, ReleaseFeed } from '../types';
 import type { Route } from '../lib/route';
 import { collectionBySlug, inCollection } from '../data/collections';
-import { platformLinkText } from './BrowseLinks';
 import { scoreOf } from '../lib/score';
 import { BRAND } from '../data/brand';
 
@@ -219,7 +218,7 @@ export function PageIntro({ route, rows, feed, region, currentWeek, onOpen, rail
       .slice(0, 4)
       .map(([id, n]) => ({
         key: id,
-        text: platformLinkText(platformById(id).name),
+        text: platformById(id).name,
         href: route.catalogue
           ? within('p', id)
           : PLATFORMS.some((p) => p.id === id)

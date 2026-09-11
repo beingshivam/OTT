@@ -72,7 +72,13 @@ export interface Platform {
  * thing. It stays available for other regions if that ever changes.
  */
 export const PLATFORMS: Platform[] = [
-  { id: 'theatres',    name: 'In Theatres',  short: 'Theatres',  mark: '▶',  accent: '#FFC94A', accent2: '#FF8A3D', tmdb: [],           regions: ['IN', 'US'], theatrical: true, homeUrl: 'https://in.bookmyshow.com/', searchUrl: 'https://in.bookmyshow.com/explore/movies?q={q}' },
+  /* "In cinemas", and it matches everywhere now. The rail, the lens page and
+     the title pages all said "In cinemas" while the board's own group header
+     said "In Theatres" and its filter chip said "Theatres" — three names for
+     one thing on a single screen. There was even a helper rewriting the name
+     for browse links, which is the shape of a problem patched at one surface
+     instead of at its source. */
+  { id: 'theatres',    name: 'In cinemas',   short: 'Cinemas',   mark: '▶',  accent: '#FFC94A', accent2: '#FF8A3D', tmdb: [],           regions: ['IN', 'US'], theatrical: true, homeUrl: 'https://in.bookmyshow.com/', searchUrl: 'https://in.bookmyshow.com/explore/movies?q={q}' },
   /**
    * A digital release date with no service attached yet.
    *
