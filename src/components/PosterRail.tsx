@@ -307,7 +307,7 @@ export function PosterRail({
                    and a screen reader announcing the wrong medium is worse than
                    announcing none. */
                 aria-label={`${r.title} — ${p.name}, ${caption(r)}${
-                  isTrending ? ', among the top three right now' : ''
+                  isTrending ? ', trending' : ''
                 }`}
               >
                 <span className="landed__art">
@@ -333,19 +333,24 @@ export function PosterRail({
                       <span className="landed__badgename">{p.short}</span>
                     </span>
                   )}
-                  {/* "TOP 3", bottom-left, and both of those are measurements
-                      rather than taste. The streaming row is the first to carry
-                      a platform badge and this chip at once, and a card is
-                      133px wide at 360: the chip was 75px and the badge needs
-                      75px for "Prime", so top-right put TRENDING straight over
-                      the platform name — Netflix rendered as "N". Reserving
-                      room for both left 40px for a name. The only free corner
-                      is bottom-left, where the chip shares a line with the
-                      50px score, and "TRENDING" does not fit there either. The
-                      shorter word does, with room to spare, and says the same
-                      thing more precisely: this is the shortlist, not a
-                      property of the film. */}
-                  {isTrending && <span className="landed__hot">TOP 3</span>}
+                  {/* Bottom-left, sentence case, and both are measurements as
+                      much as taste.
+
+                      A card is 133px wide at 360px and carries three chips: the
+                      platform badge (75px for "Prime"), the score (50px) and
+                      this. Top-right put it straight over the platform name —
+                      Netflix rendered as "N" — so bottom-left, beside the
+                      score, is the only corner left.
+
+                      "TRENDING" did not fit there, by four pixels. But most of
+                      that width was the styling rather than the word: all-caps
+                      with 0.08em tracking is the widest way to set eight
+                      characters. Sentence case with normal tracking is the same
+                      word, a third narrower, and legible at a larger size than
+                      the shouted version it replaces. "TOP 3" was the
+                      workaround for a problem that turned out to be typographic.
+                   */}
+                  {isTrending && <span className="landed__hot">Trending</span>}
                   {score && (
                     <span className="landed__score" data-strong={score.strong || undefined}>
                       ★ {score.value.toFixed(1)}

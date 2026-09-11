@@ -331,6 +331,12 @@ for (const [width, height] of [[360, 780], [390, 844], [1280, 900]]) {
     here at every width instead of being asserted in a comment.
   */
   const collisions = await page.evaluate(() => {
+    /* Clearance, not merely absence of overlap. Two pills a pixel apart have
+       not collided and still read as one smear, and the margin here is thin by
+       necessity: at 320px the card is 132px and the chip and score take 115 of
+       it between the insets. Two pixels is the floor at which they are still
+       visibly two things. */
+    const MIN_GAP = 2;
     const out = [];
     for (const cell of document.querySelectorAll('.landed__cell')) {
       const parts = ['.landed__badge', '.landed__hot', '.landed__score']
@@ -340,16 +346,20 @@ for (const [width, height] of [[360, 780], [390, 844], [1280, 900]]) {
         for (let j = i + 1; j < parts.length; j++) {
           const [an, a] = parts[i];
           const [bn, b] = parts[j];
-          const overlap =
-            a.left < b.right - 0.5 && b.left < a.right - 0.5 &&
-            a.top < b.bottom - 0.5 && b.top < a.bottom - 0.5;
-          if (overlap) out.push(`${cell.querySelector('.landed__name')?.textContent?.trim()}: ${an} over ${bn}`);
+          // Apart on either axis is apart; only a pair overlapping on both is
+          // sharing space.
+          const gapX = Math.max(a.left - b.right, b.left - a.right);
+          const gapY = Math.max(a.top - b.bottom, b.top - a.bottom);
+          if (Math.max(gapX, gapY) < MIN_GAP) {
+            const name = cell.querySelector('.landed__name')?.textContent?.trim();
+            out.push(`${name}: ${an} and ${bn} are ${Math.max(gapX, gapY).toFixed(0)}px apart`);
+          }
         }
       }
     }
     return out;
   });
-  is(collisions.length === 0, `${width}px: nothing on a card overlaps anything else`, collisions.slice(0, 3).join('; '));
+  is(collisions.length === 0, `${width}px: every chip on a card has room of its own`, collisions.slice(0, 3).join('; '));
 
   /*
     And the platform name is readable, not a first initial.
