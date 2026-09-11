@@ -88,7 +88,7 @@ export const PLATFORMS: Platform[] = [
    * Synthetic like `theatres`: no TMDB provider id, because it is not a
    * provider. Nothing that maps providers will ever match it.
    */
-  { id: 'ott',         name: 'Platform not announced', short: 'Platform TBA', mark: '?', accent: '#7C5CFF', accent2: '#3AA0FF', tmdb: [],        regions: ['IN', 'US'] },
+  { id: 'ott',         name: 'Releasing on OTT', short: 'On OTT',  mark: '▶',  accent: '#7C5CFF', accent2: '#3AA0FF', tmdb: [],        regions: ['IN', 'US'] },
   { id: 'netflix',     name: 'Netflix',      short: 'Netflix',   mark: 'N',    accent: '#E50914', accent2: '#FF3B30', tmdb: [8, 1796],    regions: ['IN', 'US'], homeUrl: 'https://www.netflix.com/', searchUrl: 'https://www.netflix.com/search?q={q}' },
   { id: 'prime',       name: 'Prime Video',  short: 'Prime',     mark: 'pv',   accent: '#00A8E1', accent2: '#48D2FF', tmdb: [9, 119],     regions: ['IN', 'US'], homeUrl: 'https://www.primevideo.com/', searchUrl: 'https://www.primevideo.com/search/ref=atv_nb_sr?phrase={q}' },
   { id: 'jiohotstar',  name: 'JioHotstar',   short: 'JioHotstar',mark: 'JH',   accent: '#7B5CFF', accent2: '#22B8FF', tmdb: [2336, 122, 970], regions: ['IN'],   homeUrl: 'https://www.hotstar.com/in', searchUrl: 'https://www.hotstar.com/in/search?q={q}' },

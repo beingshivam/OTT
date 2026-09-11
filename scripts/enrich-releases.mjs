@@ -358,30 +358,31 @@ for (const week of feed.weeks) {
 }
 
 /*
- * Nothing ships that cannot say where to watch it.
+ * The title stays. Only the false claim goes.
  *
- * Asked for directly, twice, and the second time with the case that settles it:
- * a column headed "Platform not announced" listing Lust Stories 3, a Netflix
- * anthology. The platform *was* announced — when the show was announced — and
- * the only party that did not know was TMDB. A label that reports our ignorance
- * as the industry's is worse than saying nothing, on a site whose entire
- * promise is telling you where a thing is.
+ * I dropped these rows entirely, and that was the wrong call — corrected the
+ * moment it was measured. The week of 11 September went to a single streaming
+ * row against the previous week's twenty-six, and the question came back:
+ * "so nothing is released between 11–17 Sep on any OTT platform?" Of course
+ * something is. Seven of them were in this feed with dates TMDB had supplied,
+ * and one was confirmed on Netflix by hand, so they are real releases and not
+ * noise. The site was hiding titles it knew about.
  *
- * So the marker is internal now. A digital date survives this pass only if
- * something named a service for it: the provider lookup in fetch-releases, or
- * the studio above. Otherwise the row waits — and every refresh re-checks, so
- * it returns the moment either can answer.
+ * What was actually wrong was never the row — it was the words "Platform not
+ * announced" printed beside it, which reported our ignorance as the industry's
+ * on a title whose service had been public for weeks. That claim is gone: the
+ * group names what is true, that the title is reaching OTT this week, and the
+ * cards inside it say nothing further. Same pattern as the cinema rail, where
+ * the heading carries the medium and no card repeats it.
  *
- * The cost is stated rather than hidden: "Coming soon" carries fewer OTT rows
- * than it could, and the ones it carries are all ones it can place.
+ * A real platform still supersedes this the moment anything can name one — the
+ * provider lookup, the studio, or the hand-placed file.
  */
-const dropped = [];
+let pending = 0;
 for (const week of feed.weeks) {
-  week.releases = week.releases.filter((r) => {
-    const pending = r.platforms?.length === 1 && r.platforms[0] === PENDING;
-    if (pending) dropped.push(r.title);
-    return !pending;
-  });
+  for (const r of week.releases) {
+    if (r.platforms?.length === 1 && r.platforms[0] === PENDING) pending++;
+  }
 }
 
 feed.enrichedAt = new Date().toISOString();
@@ -390,7 +391,6 @@ console.log(
   `\nEnriched ${matched} title(s); ${skipped} left with generated art. ${callCount()} API calls.`,
 );
 console.log(
-  `Named ${placed} streaming date(s) from the studio; held back ${dropped.length} ` +
-    'that nothing could place.',
+  `Named ${placed} streaming date(s) from the studio; ${pending} still carry a date ` +
+    'with no service named.',
 );
-if (dropped.length) console.log(`  held back: ${dropped.slice(0, 10).join(', ')}`);
