@@ -99,6 +99,14 @@ export interface Release {
   cast?: string[];
   director?: string;
   certification?: string;
+  /**
+   * How widely the film opened in cinemas here, from TMDB's release types.
+   *
+   * Absent on most rows and on every series, and absence means unknown rather
+   * than small — see theatricalFrom in scripts/enrich-releases.mjs. Only ever
+   * used to hold something back, never to promote it.
+   */
+  theatrical?: 'wide' | 'limited';
   posterUrl?: string;
   backdropUrl?: string;
   trailerUrl?: string;

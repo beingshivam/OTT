@@ -106,6 +106,35 @@ function certificationFrom(detail, isMovie) {
   return row?.rating || undefined;
 }
 
+/**
+ * How widely a film actually opened here — the difference between a release and
+ * a technicality.
+ *
+ * TMDB's release types separate a wide theatrical run (3) from a limited one
+ * (2), and the calendar has been asking discover for `2|3` and throwing the
+ * distinction away. It matters on exactly one question: a foreign film carries
+ * a TMDB popularity score earned by its worldwide audience, and when that score
+ * is read as evidence of Indian demand a straight-to-VOD action picture can
+ * outrank the Hindi release that is genuinely filling seats. Screen count is
+ * the fact that separates them, and this is the closest thing to it we can get.
+ *
+ * Free: release_dates is already appended to the detail call for the
+ * certificate, and this reads a field from the same response.
+ *
+ * Undefined when TMDB has no Indian entry at all, which is not the same as
+ * limited and must never be treated as it — callers demote what they know is
+ * small, never what they merely have not been told about.
+ */
+function theatricalFrom(detail, isMovie) {
+  if (!isMovie) return undefined;
+  const types = (
+    detail.release_dates?.results?.find((r) => r.iso_3166_1 === REGION)?.release_dates ?? []
+  ).map((d) => d.type);
+  if (types.includes(3)) return 'wide';
+  if (types.includes(2)) return 'limited';
+  return undefined;
+}
+
 const feed = JSON.parse(await readFile(FEED, 'utf8'));
 let matched = 0;
 let skipped = 0;
@@ -203,6 +232,8 @@ for (const week of feed.weeks) {
       if (trailer) release.trailerUrl = trailer;
       const cert = certificationFrom(detail, ref.isMovie);
       if (cert) release.certification = cert;
+      const scale = theatricalFrom(detail, ref.isMovie);
+      if (scale) release.theatrical = scale;
 
       // Same bar as the discover pass, kept in step deliberately: a title should
       // not gain or lose its score depending on which pass happened to find it.
