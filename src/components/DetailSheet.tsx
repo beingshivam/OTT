@@ -4,6 +4,7 @@ import { PosterArt } from './PosterArt';
 import { dropLabel } from './ReleaseCard';
 import { KIND_LABEL, languageName, platform } from '../data/platforms';
 import { outbound } from '../data/affiliates';
+import { runtimeLabel } from '../lib/format';
 import { formatDay } from '../lib/week';
 import { scoreOf, scoreTitle } from '../lib/score';
 import type { Release } from '../types';
@@ -190,7 +191,7 @@ export function DetailSheet({ release, onClose }: Props) {
             {release.runtimeMinutes != null && (
               <div className="sheet__stat">
                 <dt>Runtime</dt>
-                <dd>{release.runtimeMinutes} min</dd>
+                <dd>{runtimeLabel(release.runtimeMinutes)}</dd>
               </div>
             )}
             {release.director && (

@@ -1023,6 +1023,36 @@ console.log('\nTouch targets');
   is(reach['.searchbox__toggle'] === 'hit', 'and beside the search toggle',
      `.searchbox__toggle: ${reach['.searchbox__toggle']}`);
 
+  /*
+    A tap has to be acknowledged.
+
+    The stylesheet had forty-odd :hover rules and not one :active — a complete
+    design for a mouse and an empty one for a finger, since a finger never
+    hovers. Every tap went unacknowledged until the next screen arrived, and
+    iOS filled the silence with its default grey box. Held down rather than
+    clicked, because the whole point is what happens *during* the press.
+  */
+  const card = page.locator('.landed__card').first();
+  const b = await card.boundingBox();
+  await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2);
+  await page.mouse.down();
+  await page.waitForTimeout(140);
+  const pressed = await card.evaluate((e) => ({
+    transform: getComputedStyle(e).transform,
+    opacity: Number(getComputedStyle(e).opacity),
+    highlight: getComputedStyle(e).webkitTapHighlightColor,
+  }));
+  await page.mouse.up();
+  await page.waitForTimeout(250);
+  const released = await card.evaluate((e) => getComputedStyle(e).transform);
+
+  is(pressed.transform !== 'none' || pressed.opacity < 1,
+     'a held card visibly responds', 'nothing changes while a card is pressed');
+  is(released === 'none', 'and returns when released', `left at ${released}`);
+  is(/rgba\(0, 0, 0, 0\)|transparent/.test(pressed.highlight),
+     "iOS's grey tap box is turned off, since we draw our own",
+     `tap highlight is ${pressed.highlight}`);
+
   await ctx.close();
 }
 

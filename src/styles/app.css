@@ -3012,6 +3012,121 @@ a {
   appearance: none;
 }
 
+
+/* ------------------------------------------------------ press feedback ---- */
+
+/*
+ * What a tap feels like.
+ *
+ * This stylesheet had 40-odd `:hover` rules and not one `:active`. On a mouse
+ * that is a complete design; on a phone it is a design with nothing in it,
+ * because a finger never hovers. Every tap on the site — a poster, a board row,
+ * Book tickets — was acknowledged by nothing at all until the next screen
+ * arrived, and iOS filled the silence with its default grey box, which is the
+ * clearest tell there is that a page is a document rather than an app.
+ *
+ * So: the grey box goes, and something deliberate takes its place. The scale is
+ * small on purpose — 1.5% on a card, 6% on a button, because a button is small
+ * enough that the same ratio would not read. 90ms, which is under the ~100ms
+ * that separates "responded" from "lagged".
+ *
+ * `:active` rather than a touch-only media query, so a mouse press gets the
+ * same acknowledgement. It costs nothing on desktop and keeps one behaviour to
+ * reason about.
+ */
+button,
+a,
+input,
+select,
+[role='tab'] {
+  /* We draw our own; iOS should not draw one too. */
+  -webkit-tap-highlight-color: transparent;
+}
+
+.landed__card,
+.card,
+.row,
+.btn,
+.btn--lg,
+.iconbtn,
+.searchbox__toggle,
+.weeknav__btn,
+.lens,
+.chip,
+.browse__chip,
+.landed__seg,
+.viewtoggle button,
+.panel-card__more {
+  /* Only the pressed state animates; everything else about these is unchanged,
+     so this cannot fight the entrance animation on .card, which animates
+     translateY from its own keyframes and finishes before a tap lands. */
+  transition: transform 0.09s var(--ease), opacity 0.09s var(--ease);
+}
+
+.landed__card:active,
+.card:active,
+.row:active {
+  transform: scale(0.985);
+  opacity: 0.86;
+}
+
+.btn:active,
+.btn--lg:active,
+.iconbtn:active,
+.searchbox__toggle:active,
+.weeknav__btn:active:not(:disabled),
+.lens:active,
+.chip:active,
+.browse__chip:active,
+.landed__seg:active,
+.viewtoggle button:active,
+.panel-card__more:active {
+  transform: scale(0.94);
+  opacity: 0.9;
+}
+
+/*
+ * Motion is the part that can be unwelcome; acknowledgement is not. Under
+ * reduced motion the press still registers, it just stops moving — dropping the
+ * feedback entirely would hand those readers the dead-tap page this whole block
+ * exists to fix.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .landed__card,
+  .card,
+  .row,
+  .btn,
+  .btn--lg,
+  .iconbtn,
+  .searchbox__toggle,
+  .weeknav__btn,
+  .lens,
+  .chip,
+  .browse__chip,
+  .landed__seg,
+  .viewtoggle button,
+  .panel-card__more {
+    transition: opacity 0.09s linear;
+  }
+  .landed__card:active,
+  .card:active,
+  .row:active,
+  .btn:active,
+  .btn--lg:active,
+  .iconbtn:active,
+  .searchbox__toggle:active,
+  .weeknav__btn:active:not(:disabled),
+  .lens:active,
+  .chip:active,
+  .browse__chip:active,
+  .landed__seg:active,
+  .viewtoggle button:active,
+  .panel-card__more:active {
+    transform: none;
+    opacity: 0.8;
+  }
+}
+
 /* ------------------------------------------------------- touch targets ---- */
 
 /*

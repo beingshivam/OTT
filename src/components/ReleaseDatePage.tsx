@@ -3,6 +3,7 @@ import { Rating } from './Rating';
 import { IconPlay, IconTicket, IconExternal } from './icons';
 import { platform as platformById, languageName } from '../data/platforms';
 import { outbound } from '../data/affiliates';
+import { runtimeLabel } from '../lib/format';
 import { formatWeekRange } from '../lib/week';
 import { scoreOf } from '../lib/score';
 import type { Release, ReleaseFeed } from '../types';
@@ -192,7 +193,7 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
             {release.runtimeMinutes && (
               <div>
                 <dt>Runtime</dt>
-                <dd>{release.runtimeMinutes} min</dd>
+                <dd>{runtimeLabel(release.runtimeMinutes)}</dd>
               </div>
             )}
             {scoreOf(release) && (
