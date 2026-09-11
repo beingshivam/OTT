@@ -921,9 +921,37 @@ for (const path of ['/streaming', '/upcoming', '/hindi', '/netflix']) {
   await page.waitForTimeout(1200);
   const m = await page.evaluate(() => {
     const d = document.documentElement;
-    return { overflow: d.scrollWidth - d.clientWidth, rows: document.querySelectorAll('.board li, .grid > *').length };
+    return {
+      overflow: d.scrollWidth - d.clientWidth,
+      rows: document.querySelectorAll('.board li, .grid > *').length,
+      // A named empty state, with words in it. The distinction below turns on
+      // this being a deliberate explanation rather than an empty container.
+      empty: document.querySelector('.empty h3')?.textContent?.trim() ?? '',
+    };
   });
-  is(m.overflow === 0 && m.rows > 0, `${path} renders and fits`, `overflow ${m.overflow}px, ${m.rows} rows`);
+  /*
+    Two claims, split, because they fail for different reasons.
+
+    They used to be one assertion — fits AND has rows — and it went red on a
+    Friday morning for something that was not a defect. /netflix carried no
+    titles because the calendar week had just rolled over and TMDB assigns a
+    streaming provider only once a title is actually out, which is the whole
+    reason a second refresh runs on Saturday. The page was fine; the week was
+    genuinely empty for four more hours.
+
+    A test that goes red every Friday for a correct page is a test that gets
+    ignored, and this repository has already been caught measuring one thing
+    while claiming another — counting badges and calling it "both rows have
+    cards". So: the layout claim stands on its own, and the content claim
+    accepts an empty state, because what must never happen is a page that
+    renders nothing and explains nothing.
+  */
+  is(m.overflow === 0, `${path} fits its viewport`, `overflow ${m.overflow}px`);
+  is(
+    m.rows > 0 || m.empty.length > 0,
+    `${path} shows either titles or a reason there are none`,
+    `${m.rows} rows and no empty state`,
+  );
   is(errors.length === 0, `${path}: no console errors`, errors[0]);
   await ctx.close();
 }
