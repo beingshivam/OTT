@@ -127,16 +127,24 @@ export function Controls({
     <div className="controls">
       <div className="shell">
         <div className="controls__row">
-          {freshness && (
-            <span className="controls__fresh" title={freshness.title}>
-              <i />
-              <span className="controls__fresh-label">{freshness.label}</span>
-            </span>
-          )}
-          <h2 className="controls__heading">
-            {heading}
-            {showCount && <span className="controls__count"> · {facets.total} titles</span>}
-          </h2>
+          {/* The dot and the date are one label and have to wrap as one. Apart,
+              the phone rule that gives the heading its own line left the dot
+              stranded on the line above it, which reads as a stray mark rather
+              than as a freshness indicator. display:contents keeps this
+              transparent to the row's flex layout everywhere else, so nothing
+              about the desktop arrangement changes. */}
+          <div className="controls__label">
+            {freshness && (
+              <span className="controls__fresh" title={freshness.title}>
+                <i />
+                <span className="controls__fresh-label">{freshness.label}</span>
+              </span>
+            )}
+            <h2 className="controls__heading">
+              {heading}
+              {showCount && <span className="controls__count"> · {facets.total} titles</span>}
+            </h2>
+          </div>
 
           {step && (
             <span className="weeknav" role="group" aria-label="Change week">

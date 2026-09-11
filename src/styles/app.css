@@ -1101,6 +1101,13 @@ a {
   min-width: 0;
 }
 
+/* Transparent to the row's flex layout: the dot and the heading stay two
+   independent flex items exactly as they were, until the phone rule below
+   needs them to wrap together. */
+.controls__label {
+  display: contents;
+}
+
 .controls__heading {
   margin: 0;
   font-size: 14.5px;
@@ -3257,8 +3264,23 @@ select,
   .controls__row {
     flex-wrap: wrap;
   }
-  .controls__heading {
+  /*
+   * The whole label takes the line, not just the date.
+   *
+   * Giving the heading `flex: 1 0 100%` put it on its own line and left the
+   * freshness dot behind on the line above — a lone green dot with nothing
+   * beside it, reported as misplaced and rightly so. They are one label; they
+   * wrap as one.
+   */
+  .controls__label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     flex: 1 0 100%;
+    min-width: 0;
+  }
+  .controls__heading {
+    flex: 0 1 auto;
   }
 
   /*

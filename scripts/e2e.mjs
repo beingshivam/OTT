@@ -370,6 +370,31 @@ for (const [width, height] of [[360, 780], [390, 844], [1280, 900]]) {
   is(collisions.length === 0, `${width}px: every chip on a card has room of its own`, collisions.slice(0, 3).join('; '));
 
   /*
+   * The freshness dot sits on the same line as the date it describes.
+   *
+   * The phone rule that gives the week heading its own line — added so the
+   * range stopped rendering as "11 – 17 Se…" — put the heading at 100% width
+   * and left the dot stranded on the line above, alone. Two separate fixes
+   * fighting, and the sort of thing that reads as broken without looking like
+   * anything a size or overflow check would catch.
+   */
+  const label = await page.evaluate(() => {
+    const dot = document.querySelector('.controls__fresh i');
+    const head = document.querySelector('.controls__heading');
+    if (!dot || !head) return null;
+    const d = dot.getBoundingClientRect();
+    const h = head.getBoundingClientRect();
+    return { gap: Math.abs(d.top + d.height / 2 - (h.top + h.height / 2)), text: head.textContent.trim() };
+  });
+  if (label) {
+    is(
+      label.gap < 12,
+      `${width}px: the freshness dot rides with the date, not above it`,
+      `${label.gap.toFixed(0)}px apart vertically`,
+    );
+  }
+
+  /*
     And the platform name is readable, not a first initial.
 
     "Which OTT is it on" is the commonest piece of feedback this site has had.
