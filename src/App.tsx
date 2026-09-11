@@ -24,7 +24,6 @@ import { affiliateNetworks, hasAffiliates } from './data/affiliates';
 import { loadFeed, weekById } from './lib/feed';
 import { loadCatalogue } from './lib/catalogue';
 import {
-  justLanded,
   landingSoon,
   popularNow,
   inCinemas,
@@ -404,11 +403,6 @@ export default function App() {
    * the week arrows and stepping back, which is a lot to ask of someone whose
    * question is what to watch tonight.
    */
-  const landed = useMemo(
-    () => justLanded(feed?.weeks.flatMap((w) => w.releases) ?? [], filters.region, today).releases,
-    [feed, filters.region, today],
-  );
-
   /**
    * The same row, split the way a reader actually chooses.
    *
@@ -419,13 +413,37 @@ export default function App() {
    * side use its own clock.
    */
   const allRows = useMemo(() => feed?.weeks.flatMap((w) => w.releases) ?? [], [feed]);
+  /**
+   * The rails narrow with the reader instead of disappearing.
+   *
+   * Reported: "when I'm selecting the theatre or OTT as filter the top rails
+   * are gone." They were, deliberately, and the reasoning was that the rows
+   * below now answer a question the reader asked while an unfiltered row above
+   * them answers a different one. That is true of an *unfiltered* row. It is
+   * not an argument for no row: tapping a chip made two thirds of the page
+   * vanish, which reads as breakage rather than as focus, and the reader has to
+   * undo their own filter to get the page back.
+   *
+   * So the same filters that narrow the board narrow the rails, and each rail
+   * hides itself only when it has genuinely nothing left. Selecting Netflix
+   * leaves a Netflix rail; selecting Theatres leaves the cinema rail and drops
+   * the streaming one, which is the honest outcome rather than a bug.
+   *
+   * The week is deliberately not applied. These rows read across weeks — that
+   * is the whole reason they exist — so narrowing them to the open week would
+   * make them a second copy of the board.
+   */
+  const railRows = useMemo(
+    () => (activeFilterCount(filters) > 0 ? applyFilters(allRows, filters) : allRows),
+    [allRows, filters],
+  );
   const cinemaRail = useMemo(
-    () => inCinemas(allRows, filters.region, today),
-    [allRows, filters.region, today],
+    () => inCinemas(railRows, filters.region, today),
+    [railRows, filters.region, today],
   );
   const ottRail = useMemo(
-    () => landedOnOtt(allRows, filters.region, today),
-    [allRows, filters.region, today],
+    () => landedOnOtt(railRows, filters.region, today),
+    [railRows, filters.region, today],
   );
 
   /** The same fortnight, pointed the other way, for the Coming soon lens. */
@@ -502,6 +520,23 @@ export default function App() {
 
   /** Trending is a browse aid; once the reader has narrowed the week it is noise. */
   const userNarrowed = activeFilterCount(filters) > 0;
+
+  /**
+   * Whether the band above the board has anything honest to say.
+   *
+   * Two different bars, because a narrowed page is a different question. Unfiltered,
+   * a row of fewer than six posters reads as a mistake rather than a selection, and
+   * the text strip is the better shape — that rule has not changed. Filtered, three
+   * Netflix titles are not a thin row, they are the answer, so any at all is worth
+   * showing.
+   *
+   * And when a filter empties both rails, the band goes rather than falling through
+   * to the trending strip. That strip is drawn from the whole feed, so under an
+   * active filter it would put unrelated titles above a board the reader has just
+   * narrowed — which is the objection that started this, in a smaller form.
+   */
+  const railTotal = cinemaRail.releases.length + ottRail.releases.length;
+  const showRails = userNarrowed ? railTotal > 0 : true;
 
   /**
    * One row per lens, each ranking what its own page is about.
@@ -727,9 +762,9 @@ export default function App() {
         the order is the same: what the page is, then the row worth looking at,
         then the controls that act on the board underneath.
       */}
-      {!isTitlePage && feed && !error && facets.total > 0 && !userNarrowed && !span && !route?.catalogue && (
+      {!isTitlePage && feed && !error && facets.total > 0 && !span && !route?.catalogue && showRails && (
         <div className="shell">
-          {landed.length >= MIN_ITEMS ? (
+          {railTotal >= (userNarrowed ? 1 : MIN_ITEMS) ? (
             /*
               Both rows, both on screen, rather than a toggle over one.
 
@@ -745,6 +780,9 @@ export default function App() {
               number sits under the sentence that says what it counts.
             */
             <section className="landedpair" aria-labelledby="landedpair-heading">
+              {/* Each side stands down on its own. A reader who filtered to
+                  Theatres should see the cinema row and no empty streaming one
+                  beneath it pretending to be loading. */}
               {/*
                 "Just landed" stopped being true of the left-hand row the day it
                 started ranking by attention instead of by date — its first card
@@ -757,6 +795,7 @@ export default function App() {
               <h2 className="landedpair__title" id="landedpair-heading">
                 On right now
               </h2>
+              {cinemaRail.releases.length > 0 && (
               <PosterRail
                 compact
                 title="In cinemas"
@@ -786,6 +825,8 @@ export default function App() {
                    the row, and the rest were findable only by name. */
                 href="/in-cinemas"
               />
+              )}
+              {ottRail.releases.length > 0 && (
               <PosterRail
                 compact
                 title="On OTT"
@@ -798,6 +839,7 @@ export default function App() {
                    keeps its chronology. */
                 trending={ottRail.trending}
               />
+              )}
             </section>
           ) : (
             /* Not enough recent artwork to make a row of posters — a thin rail

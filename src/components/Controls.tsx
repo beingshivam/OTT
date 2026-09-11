@@ -162,17 +162,24 @@ export function Controls({
             two-way toggle and a screen reader has no colour to read.
           */}
           <span className="viewtoggle" role="group" aria-label="Layout">
-            <button data-on={view === 'board'} aria-pressed={view === 'board'} onClick={() => onView('board')}>
+            {/* aria-label as well as the word, because the word is the half
+                that disappears. .btn__text is display:none below the desktop
+                breakpoint, which removes it from the accessibility tree along
+                with the pixels — so on a phone these were two buttons a screen
+                reader could only announce as "button", and the Filters control
+                beside them was a third. Found by a keyboard-and-name sweep, not
+                by looking. */}
+            <button aria-label="Board view" data-on={view === 'board'} aria-pressed={view === 'board'} onClick={() => onView('board')}>
               <IconRows />
               <span className="btn__text">Board</span>
             </button>
-            <button data-on={view === 'grid'} aria-pressed={view === 'grid'} onClick={() => onView('grid')}>
+            <button aria-label="Poster view" data-on={view === 'grid'} aria-pressed={view === 'grid'} onClick={() => onView('grid')}>
               <IconGrid />
               <span className="btn__text">Posters</span>
             </button>
           </span>
 
-          <button className="btn" data-active={open} onClick={() => setOpen((v) => !v)} aria-expanded={open}>
+          <button className="btn" aria-label="Filters" data-active={open} onClick={() => setOpen((v) => !v)} aria-expanded={open}>
             <IconSliders />
             <span className="btn__text">Filters</span>
             {active > 0 && <span className="btn__count">{active}</span>}

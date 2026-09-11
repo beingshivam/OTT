@@ -952,6 +952,84 @@ for (const width of [390, 1440]) {
   await ctx.close();
 }
 
+// --- what a filter does to the page -------------------------------------------
+
+/**
+ * Two checks that came out of a tester pass rather than a bug report, after
+ * being told — fairly — that this was too much back and forth.
+ *
+ * The first: selecting a platform used to remove both poster rails, so tapping
+ * a chip made two thirds of the page vanish and the only way back was to undo
+ * your own filter. The rails narrow with the reader now, and a rail with
+ * nothing left stands down on its own rather than taking its neighbour with it.
+ *
+ * The second: every visible control must have a name a screen reader can say.
+ * Three of them did not on a phone and did on a desktop, because the label is
+ * inside a span that is display:none below the breakpoint — which takes it out
+ * of the accessibility tree along with the pixels. That is invisible to
+ * looking, invisible to a type checker, and invisible to every other check in
+ * this file.
+ */
+console.log('\nFiltering, and what it leaves behind');
+for (const width of [360, 1280]) {
+  const { ctx, page, errors } = await newPage(browser, { width, height: 900 });
+  await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('.landed__cell', { timeout: 15_000 }).catch(() => {});
+  await page.waitForTimeout(900);
+
+  const nameless = await page.evaluate(() => {
+    const out = [];
+    for (const el of document.querySelectorAll('button, a[href], [role="tab"]')) {
+      const box = el.getBoundingClientRect();
+      if (!box.width && !box.height) continue;
+      // Deliberately hidden from assistive tech is not the same as unnamed —
+      // the rail arrows duplicate the keyboard and say so.
+      if (el.closest('[aria-hidden="true"]')) continue;
+      const labelled = el.getAttribute('aria-label') || el.getAttribute('title') || '';
+      // Only text a screen reader would actually reach: a label inside a
+      // display:none span is gone from the tree, not merely invisible.
+      const spoken = [...el.childNodes]
+        .map((n) =>
+          n.nodeType === 3
+            ? n.textContent
+            : n.nodeType === 1 && getComputedStyle(n).display !== 'none'
+              ? n.textContent
+              : '',
+        )
+        .join('')
+        .trim();
+      if (!labelled && !spoken) out.push(el.className || el.tagName);
+    }
+    return out;
+  });
+  is(
+    nameless.length === 0,
+    `${width}px: every visible control has a name`,
+    `unnamed: ${[...new Set(nameless)].slice(0, 4).join(', ')}`,
+  );
+
+  // The platform chips live in the poster view.
+  await page.locator('.viewtoggle button').nth(1).click();
+  await page.waitForTimeout(700);
+  const chips = await page.locator('.chip--logo').count();
+  is(chips > 0, `${width}px: the poster view offers platform chips`, `${chips} chips`);
+
+  if (chips > 0) {
+    await page.locator('.chip--logo').first().click();
+    await page.waitForTimeout(800);
+    const after = await page.evaluate(() => ({
+      rails: document.querySelectorAll('.landed--sub').length,
+      cards: document.querySelectorAll('.card').length,
+      chips: document.querySelectorAll('.chip--logo').length,
+    }));
+    is(after.cards > 0, `${width}px: a filter leaves a board`, `${after.cards} cards`);
+    is(after.rails > 0, `${width}px: and leaves the rail that still has something`, `${after.rails} rails`);
+    is(after.chips > 0, `${width}px: and a way back out`, 'the chips vanished with the filter');
+  }
+  is(errors.length === 0, `${width}px: filtering raises no console errors`, errors[0]);
+  await ctx.close();
+}
+
 // --- one row per lens, each true to its own page ------------------------------
 
 console.log('\nA rail on every lens');
