@@ -3026,9 +3026,76 @@ a {
  * larger targets and a narrow desktop window keeps the compact ones.
  */
 @media (pointer: coarse) {
+  /*
+   * Matched on specificity, not just written.
+   *
+   * This rule said 44px and measured 28. `.controls__row .weeknav__btn` sets
+   * 28px in the phone breakpoint above, and a media query adds no specificity
+   * — so the narrower selector won on exactly the devices this block exists
+   * for. The accessibility fix had never once applied. Scoped to match.
+   */
+  .controls__row .weeknav__btn,
   .weeknav__btn {
     width: 44px;
     height: 44px;
+  }
+
+  /*
+   * The header icons, given a fingertip without being given more room.
+   *
+   * Instagram, share, subscribe and search are 34px circles in a row that
+   * already spends 346 of 358 available pixels at 390px — growing them would
+   * overflow the narrowest phones the e2e covers. So the visible circle stays
+   * and an invisible box extends the hit area to 44px, which is what a thumb
+   * actually lands on. Same trick for the week arrows, whose row is tighter
+   * still.
+   */
+  .iconbtn,
+  .searchbox__toggle,
+  .weeknav__btn,
+  .signup__dismiss {
+    position: relative;
+  }
+  .iconbtn::after,
+  .searchbox__toggle::after,
+  .weeknav__btn::after,
+  .signup__dismiss::after {
+    content: '';
+    position: absolute;
+    /* Whatever the visible size, this reaches 44px: 5px around a 34px circle,
+       8px around a 28px one. Set per-control below where they differ. */
+    inset: -5px;
+  }
+  .signup__dismiss::after {
+    inset: -8px;
+  }
+
+  /*
+   * 16px, or iOS zooms the page and does not zoom back.
+   *
+   * Safari magnifies any input it focuses whose text is under 16px, leaving
+   * the reader pinching their way back out of a page they were trying to give
+   * an email address to. The field was 13px, which is the single most
+   * mechanical "not mobile friendly" defect the site had. The height goes with
+   * it, because 16px text in a 34px box is cramped and 44px is the target
+   * anyway.
+   */
+  .signup input,
+  .search input {
+    font-size: 16px;
+  }
+  .signup input,
+  .signup button {
+    height: 44px;
+  }
+
+  /* The lens nav and the layout toggle are the two things a reader taps most
+     after a title, and both sat under 40. Height only — neither is near the
+     width limit. */
+  .lens {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
   }
 
   /* The pill was already tall enough; the <select> inside it was not, and the
@@ -3053,12 +3120,28 @@ a {
   }
 
   .viewtoggle button {
-    min-height: 38px;
+    min-height: 44px;
     padding-inline: 16px;
   }
 
   .chip {
     min-height: 40px;
+  }
+
+  /* The site's own navigation, and the densest thing on the page: ten
+     collection links, five platforms, twelve languages, every one of them a
+     28px row. This is how somebody reaches /thriller or /tamil, so it is worth
+     a fingertip even at the cost of a taller footer. */
+  /* Scoped, because the base .browse__chip rule is defined *below* this block
+     and equal specificity loses on source order — the same trap the week
+     arrows fell into, in its other form. */
+  .browse .browse__chip {
+    height: 40px;
+  }
+
+  /* The filters button sits between two 44px controls and was 38. */
+  .controls__row .btn {
+    min-height: 44px;
   }
 
   .strip__item {

@@ -940,6 +940,92 @@ for (const [path, heading, expect] of [
   }
 }
 
+// --- a phone can actually hit things ----------------------------------------
+
+/**
+ * Touch targets, measured rather than declared.
+ *
+ * There was already a `@media (pointer: coarse)` block raising these to 44px,
+ * with a comment explaining why it mattered, and it had never once applied:
+ * `.controls__row .weeknav__btn` sets 28px in the phone breakpoint and a media
+ * query adds no specificity, so the narrower selector won on exactly the
+ * devices the block was written for. The week arrows measured 28.
+ *
+ * A rule that can lose silently needs a test that measures the result, not one
+ * that greps the stylesheet. So this runs a real touch context and asks the
+ * page how big its controls came out — and where the visible control is
+ * deliberately smaller than its target, it hit-tests the gap.
+ */
+console.log('\nTouch targets');
+{
+  const ctx = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    isMobile: true,
+    hasTouch: true,
+  });
+  const page = await ctx.newPage();
+  await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('.landed__cell');
+
+  is(
+    await page.evaluate(() => matchMedia('(pointer: coarse)').matches),
+    'the touch stylesheet is in play at all',
+    'pointer: coarse does not match, so nothing below proves anything',
+  );
+
+  // iOS magnifies any focused input under 16px and does not zoom back out.
+  const inputs = await page.evaluate(() =>
+    [...document.querySelectorAll('input')].map((e) => parseFloat(getComputedStyle(e).fontSize)),
+  );
+  is(
+    inputs.length > 0 && inputs.every((px) => px >= 16),
+    'no input is small enough to make iOS zoom',
+    `font sizes: ${inputs.join(', ')}px`,
+  );
+
+  // The controls a reader uses most, by their rendered height.
+  const sized = await page.evaluate(() => {
+    const h = (sel) => {
+      const e = document.querySelector(sel);
+      return e ? Math.round(e.getBoundingClientRect().height) : 0;
+    };
+    return {
+      week: h('.controls__row .weeknav__btn'),
+      view: h('.controls__row .viewtoggle button'),
+      filters: h('.controls__row .btn'),
+      lens: h('.lens'),
+      browse: h('.browse__chip'),
+    };
+  });
+  for (const [name, px] of Object.entries(sized)) {
+    is(px >= 40, `${name} is a fingertip, not a pixel (${px}px)`, `${name} came out ${px}px`);
+  }
+
+  /*
+    The header icons stay 34px on purpose — that row already spends 346 of 358
+    available pixels at 390px, and growing them overflows the narrowest phones.
+    They get the target through an invisible box instead, so the assertion has
+    to be a tap rather than a measurement.
+  */
+  const reach = await page.evaluate(() => {
+    const out = {};
+    for (const sel of ['.iconbtn', '.searchbox__toggle']) {
+      const el = document.querySelector(sel);
+      if (!el) { out[sel] = 'absent'; continue; }
+      const r = el.getBoundingClientRect();
+      const hit = document.elementFromPoint(r.left - 4, r.top + r.height / 2);
+      out[sel] = hit && (hit === el || el.contains(hit)) ? 'hit' : 'miss';
+    }
+    return out;
+  });
+  is(reach['.iconbtn'] === 'hit', 'a thumb landing beside a header icon still hits it',
+     `.iconbtn: ${reach['.iconbtn']}`);
+  is(reach['.searchbox__toggle'] === 'hit', 'and beside the search toggle',
+     `.searchbox__toggle: ${reach['.searchbox__toggle']}`);
+
+  await ctx.close();
+}
+
 // --- other pages still work -------------------------------------------------
 
 console.log('\nOther routes');
