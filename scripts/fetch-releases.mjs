@@ -466,6 +466,32 @@ async function buildWeek(weekId, platforms, index, cinemaOnly = false) {
            */
           if (!withinWeek(item.release_date, from, to)) continue;
 
+          /*
+           * Ask who has it before saying nobody knows.
+           *
+           * This pass shipped without ever calling providersFor, and the
+           * omission is not harmless: reported from the site, a film released
+           * on OTT *today* wearing "Platform TBA" when its service had been
+           * publicly announced for weeks. Of course it had been — a title
+           * landing today is a title somebody is advertising.
+           *
+           * The provider pass above could not cover it. That one asks discover
+           * for titles whose *primary* release date falls in the week, and a
+           * film that opened in cinemas in August and streams in September has
+           * its primary date in August, so it is never returned for the week it
+           * actually lands in. This row is the only place that lookup can
+           * happen, and it was the one place not doing it.
+           *
+           * The placeholder is what is left when TMDB genuinely has nobody yet,
+           * which is the real state for something weeks out — not a label for a
+           * question nobody asked.
+           */
+          const known = [
+            ...new Set(
+              (await providersFor(true, item.id, region)).map((p) => index.get(p)).filter(Boolean),
+            ),
+          ];
+
           const key = `m-${item.id}`;
           const existing = byId.get(key);
           if (existing) {
@@ -475,7 +501,7 @@ async function buildWeek(weekId, platforms, index, cinemaOnly = false) {
               existing.regions = [...new Set([...existing.regions, region])];
               continue;
             }
-            existing.platforms = [DIGITAL_ID];
+            existing.platforms = known.length ? known : [DIGITAL_ID];
             existing.regions = [...new Set([...existing.regions, region])];
             continue;
           }
@@ -501,7 +527,7 @@ async function buildWeek(weekId, platforms, index, cinemaOnly = false) {
             id: `${key}~ott`,
             title: item.title ?? item.name,
             kind: classify(true, genres),
-            platforms: [DIGITAL_ID],
+            platforms: known.length ? known : [DIGITAL_ID],
             languages: [item.original_language].filter(Boolean),
             genres,
             // Guarded above: a row only reaches here when its date is in the week.

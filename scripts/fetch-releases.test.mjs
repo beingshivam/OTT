@@ -65,18 +65,22 @@ globalThis.fetch = async (url) => {
 
   if (p.endsWith('/genre/movie/list') || p.endsWith('/genre/tv/list')) return json({ genres: [] });
 
-  // Providers: title 1 is on Netflix (provider 8); nothing else is.
+  // Providers: 1 is on Netflix (8); 4 is on Prime (9) and reaches the feed only
+  // through the digital pass; nothing else has a service yet.
   if (/\\/watch\\/providers$/.test(p)) {
     const id = p.split('/')[3];
-    return json(id === '1' ? { results: { IN: { flatrate: [{ provider_id: 8 }] } } } : { results: {} });
+    if (id === '1') return json({ results: { IN: { flatrate: [{ provider_id: 8 }] } } });
+    if (id === '4') return json({ results: { IN: { flatrate: [{ provider_id: 9 }] } } });
+    return json({ results: {} });
   }
 
   if (p.endsWith('/discover/movie')) {
     // The theatrical pass asks for types 2|3, the digital one for 4.
     if (q.with_release_type === '2|3') return json({ results: [movie(2)], total_pages: 1 });
     if (q.with_release_type === '4') {
-      // 1 is already on Netflix, 2 already in cinemas, 3 is digital-only.
-      return json({ results: [movie(1), movie(2), movie(3)], total_pages: 1 });
+      // 1 is already on Netflix, 2 already in cinemas, 3 is digital-only with
+      // nobody attached, 4 is a digital date TMDB has already named.
+      return json({ results: [movie(1), movie(2), movie(3), movie(4)], total_pages: 1 });
     }
     // The provider pass.
     return json({ results: [movie(1)], total_pages: 1 });
@@ -147,13 +151,17 @@ test('a streaming date is its own row, not the cinema listing wearing its id', (
       `${id} collides with the cinema listing it was meant to be distinct from`,
     );
   }
+  /*
+   * One direction only. The suffix says "this row is the film's streaming
+   * date", not "this row has no platform" — a digital row whose service TMDB
+   * already knows carries that service and keeps its suffix, because it is
+   * still a separate calendar entry from the cinema listing. What must never
+   * happen is the reverse: the placeholder appearing on a row that is not a
+   * streaming date, which would be a cinema listing claiming to be an OTT one.
+   */
   for (const r of rows) {
-    const digital = r.platforms.length === 1 && r.platforms[0] === 'ott';
-    assert.equal(
-      r.id.endsWith('~ott'),
-      digital,
-      `${r.id} is ${digital ? 'a digital row without' : 'not a digital row but has'} the suffix`,
-    );
+    if (!r.platforms.includes('ott')) continue;
+    assert.ok(r.id.endsWith('~ott'), `${r.id} wears the placeholder without being a streaming date`);
   }
 });
 
@@ -188,6 +196,34 @@ test('a cinema listing is not also "coming to streaming"', () => {
   assert.ok(cinema, 'the theatrical title vanished');
   assert.ok(!cinema.platforms.includes('ott'), `got ${cinema.platforms.join(', ')}`);
   assert.ok(cinema.platforms.includes('theatres'));
+});
+
+test('a digital date asks who has it before saying nobody knows', () => {
+  /*
+   * Reported from the site: a film released on OTT *today* showing "Platform
+   * TBA" when its service had been announced for weeks. This pass shipped
+   * without ever calling watch/providers, and it is the only pass that can
+   * cover these rows — the provider discovery above asks TMDB for titles whose
+   * *primary* release date falls in the week, so a film that opened in cinemas
+   * in August and streams in September is never returned for the week it
+   * actually lands in.
+   */
+  const named = byId.get('m-4~ott');
+  assert.ok(named, 'the digital row is missing');
+  assert.deepEqual(named.platforms, ['prime'], `got ${named.platforms.join(', ')}`);
+  assert.ok(
+    calls.some((c) => /\/movie\/4\/watch\/providers$/.test(c.path)),
+    'the digital pass never asked who has it',
+  );
+});
+
+test('the placeholder is what is left when TMDB really has nobody', () => {
+  // Title 3 has a date and no provider anywhere. That is the state the
+  // placeholder exists for, and it has to survive — the fix above must not
+  // turn "no service yet" into no row.
+  const pending = byId.get('m-3~ott');
+  assert.ok(pending, 'the unplaced digital title vanished');
+  assert.deepEqual(pending.platforms, ['ott']);
 });
 
 test('the digital query asks TMDB for digital dates, by region', () => {
