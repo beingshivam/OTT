@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-11T08:55:34.307Z",
+  "generatedAt": "2026-09-11T09:15:48.192Z",
   "source": "tmdb",
   "weeks": [
     {
@@ -47,9 +47,7 @@
           "theatrical": "wide",
           "origin": [
             "US"
-          ],
-          "imdbRating": 8.1,
-          "imdbVotes": 183571
+          ]
         },
         {
           "id": "m-1288059",
@@ -87,9 +85,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=q5oWCPS3akw",
           "origin": [
             "US"
-          ],
-          "imdbRating": 6,
-          "imdbVotes": 4928
+          ]
         },
         {
           "id": "m-1477712",
@@ -132,9 +128,7 @@
             "GB",
             "FR",
             "JP"
-          ],
-          "imdbRating": 3.8,
-          "imdbVotes": 1832
+          ]
         },
         {
           "id": "m-1545486",
@@ -294,9 +288,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=0LB3yWX1R8Y",
           "origin": [
             "US"
-          ],
-          "imdbRating": 3.6,
-          "imdbVotes": 584
+          ]
         },
         {
           "id": "m-1741770",
@@ -1101,9 +1093,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=lDsAVq9lo9g",
           "origin": [
             "US"
-          ],
-          "imdbRating": 6.3,
-          "imdbVotes": 6744
+          ]
         },
         {
           "id": "m-1329016",
@@ -1145,9 +1135,7 @@
           "origin": [
             "US",
             "CA"
-          ],
-          "imdbRating": 7.7,
-          "imdbVotes": 156
+          ]
         },
         {
           "id": "m-1616131",
@@ -1227,9 +1215,7 @@
           "origin": [
             "GB",
             "US"
-          ],
-          "imdbRating": 7.1,
-          "imdbVotes": 912
+          ]
         },
         {
           "id": "m-1709391",
@@ -1473,9 +1459,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=cYFevn5frf0",
           "origin": [
             "US"
-          ],
-          "imdbRating": 6.2,
-          "imdbVotes": 687
+          ]
         },
         {
           "id": "m-1506736",
@@ -1783,9 +1767,7 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 7.3,
-          "imdbVotes": 1097
+          ]
         },
         {
           "id": "m-1254800",
@@ -1824,9 +1806,7 @@
           "origin": [
             "FR",
             "US"
-          ],
-          "imdbRating": 5.5,
-          "imdbVotes": 335
+          ]
         },
         {
           "id": "m-1285895",
@@ -1941,9 +1921,7 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 7.1,
-          "imdbVotes": 4430
+          ]
         },
         {
           "id": "m-1740942",
@@ -2362,9 +2340,7 @@
           "theatrical": "wide",
           "origin": [
             "US"
-          ],
-          "imdbRating": 6.6,
-          "imdbVotes": 18446
+          ]
         },
         {
           "id": "m-1185806",
@@ -2407,9 +2383,7 @@
           "origin": [
             "CA",
             "US"
-          ],
-          "imdbRating": 6.2,
-          "imdbVotes": 1038
+          ]
         },
         {
           "id": "m-1408162",
@@ -2489,9 +2463,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=a-T0TlMN-RE",
           "origin": [
             "US"
-          ],
-          "imdbRating": 6.3,
-          "imdbVotes": 2103
+          ]
         },
         {
           "id": "m-1036081",
@@ -2571,9 +2543,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=zrcg8YHSys8",
           "origin": [
             "US"
-          ],
-          "imdbRating": 5.4,
-          "imdbVotes": 1500
+          ]
         },
         {
           "id": "m-1124142",
@@ -2595,7 +2565,7 @@
             "US"
           ],
           "rating": 6.6,
-          "votes": 35,
+          "votes": 37,
           "heat": 24,
           "synopsis": "Deep within the backwoods of rural Oklahoma, charismatic and musically gifted Amziah King herds a bluegrass-playing band of misfits while overseeing the premier honey-making operation in town. When Amziah’s estranged foster daughter unexpectedly returns, Amziah leaps at the possibility to renew connection and create a family business. But the honey game is ruthless, and Amziah’s rivals threaten to destroy everything he has built.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/3iVDCDS1VwHIm95PjWEPwsfdhaf.jpg",
@@ -2614,9 +2584,7 @@
           "origin": [
             "GB",
             "US"
-          ],
-          "imdbRating": 7.7,
-          "imdbVotes": 348
+          ]
         },
         {
           "id": "m-1444466",
@@ -2775,9 +2743,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=5mtbOhpqroo",
           "origin": [
             "US"
-          ],
-          "imdbRating": 7.7,
-          "imdbVotes": 147
+          ]
         },
         {
           "id": "m-1742499",
@@ -2954,9 +2920,7 @@
             "GB",
             "DE",
             "IT"
-          ],
-          "imdbRating": 5.2,
-          "imdbVotes": 196
+          ]
         },
         {
           "id": "m-1706696",
@@ -3347,9 +3311,7 @@
           "origin": [
             "GB",
             "US"
-          ],
-          "imdbRating": 5.7,
-          "imdbVotes": 17192
+          ]
         },
         {
           "id": "m-1621552",
@@ -3390,9 +3352,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=Rk0efhpa-5Y",
           "origin": [
             "MX"
-          ],
-          "imdbRating": 6.7,
-          "imdbVotes": 6577
+          ]
         },
         {
           "id": "m-1516698",
@@ -3413,8 +3373,8 @@
             "IN",
             "US"
           ],
-          "rating": 6.6,
-          "votes": 143,
+          "rating": 6.7,
+          "votes": 145,
           "heat": 75,
           "synopsis": "Ry, a college student with a chronic illness, escapes to Mallorca for the summer with her mother, where she unexpectedly falls for a local and begins to embrace living in the moment. But as her condition worsens and long-hidden family secrets come to light, everything she has found before summer's end is threatened.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/3PWJqDfygN0YNNjWsDUOXclCp3h.jpg",
@@ -3560,9 +3520,7 @@
           "theatrical": "wide",
           "origin": [
             "US"
-          ],
-          "imdbRating": 6.2,
-          "imdbVotes": 13228
+          ]
         },
         {
           "id": "t-299952",
@@ -3599,9 +3557,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=7JsnZ47CTDg",
           "origin": [
             "CN"
-          ],
-          "imdbRating": 8.4,
-          "imdbVotes": 366
+          ]
         },
         {
           "id": "m-1729723",
@@ -3723,9 +3679,7 @@
           "origin": [
             "GB",
             "US"
-          ],
-          "imdbRating": 6.2,
-          "imdbVotes": 4800
+          ]
         },
         {
           "id": "m-813418",
@@ -3769,9 +3723,7 @@
             "PL",
             "GR",
             "SE"
-          ],
-          "imdbRating": 4.6,
-          "imdbVotes": 303
+          ]
         },
         {
           "id": "m-1000866",
@@ -3811,9 +3763,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=f9i2ImuGEVs",
           "origin": [
             "FR"
-          ],
-          "imdbRating": 7.4,
-          "imdbVotes": 5131
+          ]
         },
         {
           "id": "m-1235304",
@@ -3855,9 +3805,7 @@
           "origin": [
             "FR",
             "BE"
-          ],
-          "imdbRating": 7.5,
-          "imdbVotes": 774
+          ]
         },
         {
           "id": "t-275224",
@@ -4178,9 +4126,7 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 8.9,
-          "imdbVotes": 1175
+          ]
         },
         {
           "id": "t-330540",
@@ -4253,9 +4199,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=9k7jckaHeuA",
           "origin": [
             "US"
-          ],
-          "imdbRating": 5.7,
-          "imdbVotes": 4354
+          ]
         },
         {
           "id": "t-326879",
@@ -4334,9 +4278,7 @@
           "origin": [
             "SA",
             "EG"
-          ],
-          "imdbRating": 5.6,
-          "imdbVotes": 4984
+          ]
         },
         {
           "id": "m-1740313",
@@ -4507,9 +4449,7 @@
           ],
           "origin": [
             "BR"
-          ],
-          "imdbRating": 7.5,
-          "imdbVotes": 22
+          ]
         },
         {
           "id": "m-1529024",
@@ -4549,9 +4489,7 @@
             "LU",
             "IE",
             "CZ"
-          ],
-          "imdbRating": 6.8,
-          "imdbVotes": 222
+          ]
         },
         {
           "id": "t-330438",
@@ -4871,9 +4809,7 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 6.6,
-          "imdbVotes": 6203
+          ]
         },
         {
           "id": "m-1756456",
@@ -5011,9 +4947,7 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 10,
-          "imdbVotes": 1029
+          ]
         },
         {
           "id": "m-1639137",
@@ -5201,9 +5135,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=kMsiD1Nky5I",
           "origin": [
             "US"
-          ],
-          "imdbRating": 7.6,
-          "imdbVotes": 18537
+          ]
         },
         {
           "id": "m-1375646",
@@ -5225,7 +5157,7 @@
             "US"
           ],
           "rating": 8.1,
-          "votes": 746,
+          "votes": 744,
           "heat": 88,
           "synopsis": "Professor Se-jeong is thrust into a bloody nightmare when a rapidly mutating virus is released during a biotech conference causing authorities to seal the facility. Trapped inside with no escape, Se-jeong along with a small group of survivors must fight to stay alive while the infected undergo horrific transformations.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/tN799oUR0f1gUKDYdMNrDaY7I51.jpg",
@@ -5245,9 +5177,7 @@
           "theatrical": "wide",
           "origin": [
             "KR"
-          ],
-          "imdbRating": 6.5,
-          "imdbVotes": 10630
+          ]
         },
         {
           "id": "m-1137844",
@@ -5288,9 +5218,7 @@
           "certification": "U/A 16+",
           "origin": [
             "US"
-          ],
-          "imdbRating": 6.9,
-          "imdbVotes": 9404
+          ]
         },
         {
           "id": "m-1386315",
@@ -5331,9 +5259,7 @@
           "origin": [
             "US",
             "GB"
-          ],
-          "imdbRating": 4.1,
-          "imdbVotes": 13027
+          ]
         },
         {
           "id": "m-1506560",
@@ -5376,9 +5302,7 @@
           "origin": [
             "CA",
             "US"
-          ],
-          "imdbRating": 4.6,
-          "imdbVotes": 415
+          ]
         },
         {
           "id": "m-1514026",
@@ -5419,9 +5343,7 @@
           "origin": [
             "US",
             "IL"
-          ],
-          "imdbRating": 7.1,
-          "imdbVotes": 5019
+          ]
         },
         {
           "id": "m-1384216",
@@ -5460,9 +5382,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=-xSxaE1ClEE",
           "origin": [
             "US"
-          ],
-          "imdbRating": 6.5,
-          "imdbVotes": 13521
+          ]
         },
         {
           "id": "m-1471168",
@@ -5583,9 +5503,7 @@
           "origin": [
             "GB",
             "US"
-          ],
-          "imdbRating": 5.7,
-          "imdbVotes": 1565
+          ]
         },
         {
           "id": "m-1355228",
@@ -5666,9 +5584,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=LlAajeOoFBo",
           "origin": [
             "GB"
-          ],
-          "imdbRating": 7.5,
-          "imdbVotes": 16
+          ]
         },
         {
           "id": "m-1731694",
@@ -5752,9 +5668,7 @@
           "origin": [
             "GB",
             "US"
-          ],
-          "imdbRating": 7.2,
-          "imdbVotes": 939
+          ]
         },
         {
           "id": "t-290193",
@@ -5795,9 +5709,7 @@
           "certification": "U/A 16+",
           "origin": [
             "KR"
-          ],
-          "imdbRating": 7,
-          "imdbVotes": 1258
+          ]
         },
         {
           "id": "t-290234",
@@ -5831,9 +5743,7 @@
             "Diana Bovio",
             "Iván Amozurrutia"
           ],
-          "trailerUrl": "https://www.youtube.com/watch?v=3-oqCwQd8Ec",
-          "imdbRating": 5.7,
-          "imdbVotes": 123
+          "trailerUrl": "https://www.youtube.com/watch?v=3-oqCwQd8Ec"
         },
         {
           "id": "t-305644",
@@ -5871,9 +5781,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=KapADxhCvvM",
           "origin": [
             "KR"
-          ],
-          "imdbRating": 8.7,
-          "imdbVotes": 241
+          ]
         },
         {
           "id": "m-1127625",
@@ -19669,6 +19577,6 @@
       "backdropUrl": "https://image.tmdb.org/t/p/w780/i65y7cMae36K0giN0GRaMjAHUru.jpg"
     }
   ],
-  "enrichedAt": "2026-09-11T08:56:13.364Z",
-  "ratedAt": "2026-09-11T08:56:19.089Z"
+  "enrichedAt": "2026-09-11T09:16:39.534Z",
+  "ratedAt": "2026-09-11T09:16:39.714Z"
 }
