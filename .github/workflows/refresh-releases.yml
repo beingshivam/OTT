@@ -11,9 +11,20 @@ name: Refresh release calendar
 # the day it is describing.
 #
 # Hence Saturday. Friday morning flips the week and keeps the page honest on the
-# day most people look; Saturday morning is what actually fills in where Friday
-# landed, before the weekend is spent deciding; Monday evening picks up the
-# weekend's corrections and the week taking shape.
+# day most people look; Friday afternoon is the one that can actually say where
+# Friday's drops went; Saturday morning catches anything that landed late,
+# before the weekend is spent deciding; Monday evening picks up the weekend's
+# corrections and the week taking shape.
+#
+# Friday needs two runs, which took evidence to establish rather than taste.
+# TMDB assigns a title its watch provider on release day, not before — every one
+# of the fifteen streaming rows in the 4–10 Sep week carried 4 September as its
+# release date, and they were absent from an 03:47 UTC run and present in one at
+# 07:08. So the 02:30 slot, chosen so the page is fresh at 08:00 IST, is
+# structurally three hours too early to see any of it: it can only ever report
+# cinema. On 11 September that produced a board with eighteen theatrical
+# listings and no streaming at all, on the morning of the day, on a site called
+# New on OTT. The second slot is what makes the name true before the weekend.
 #
 # Times are UTC and the comments give IST, because that is the audience.
 # Scheduled workflows only ever run on the repository's default branch — if the
@@ -33,7 +44,8 @@ name: Refresh release calendar
 on:
   schedule:
     - cron: '30 2 * * 5'  # Fri 02:30 UTC — Friday 08:00 IST, the week flips
-    - cron: '30 4 * * 6'  # Sat 04:30 UTC — Saturday 10:00 IST, Friday's drops now have providers
+    - cron: '30 8 * * 5'  # Fri 08:30 UTC — Friday 14:00 IST, the day's OTT drops now exist
+    - cron: '30 4 * * 6'  # Sat 04:30 UTC — Saturday 10:00 IST, anything that landed late
     - cron: '30 13 * * 1' # Mon 13:30 UTC — Monday 19:00 IST, the weekend and the week ahead
   workflow_dispatch:
     inputs:

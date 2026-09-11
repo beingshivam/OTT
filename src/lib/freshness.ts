@@ -31,6 +31,7 @@ export function relativeTime(iso: string, now = Date.now()): string {
  */
 const SCHEDULE = [
   { day: 5, hour: 2, minute: 30 }, // Fri 02:30 UTC — Friday 08:00 IST
+  { day: 5, hour: 8, minute: 30 }, // Fri 08:30 UTC — Friday 14:00 IST
   { day: 6, hour: 4, minute: 30 }, // Sat 04:30 UTC — Saturday 10:00 IST
   { day: 1, hour: 13, minute: 30 }, // Mon 13:30 UTC — Monday 19:00 IST
 ];

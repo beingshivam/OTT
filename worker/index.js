@@ -248,7 +248,8 @@ export default {
  */
 const REFRESH_SLOTS = [
   { day: 5, hour: 2, minute: 30 }, // Fri 02:30 UTC — the week flips
-  { day: 6, hour: 4, minute: 30 }, // Sat 04:30 UTC — Friday's drops get providers
+  { day: 5, hour: 8, minute: 30 }, // Fri 08:30 UTC — Friday's own OTT drops
+  { day: 6, hour: 4, minute: 30 }, // Sat 04:30 UTC — anything that landed late
   { day: 1, hour: 13, minute: 30 }, // Mon 13:30 UTC — the weekend and the week ahead
 ];
 
