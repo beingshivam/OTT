@@ -535,6 +535,34 @@ async function buildWeek(weekId, platforms, index, cinemaOnly = false) {
           const known = [...new Set(offer.subscription.map((p) => index.get(p)).filter(Boolean))];
           if (!known.length) unplaced.push({ title: item.title ?? item.name, region, offer });
 
+          /*
+           * A date we cannot place is news before the date and an admission
+           * after it.
+           *
+           * Measured rather than assumed: of 142 digital rows without a
+           * service, TMDB had four as rent-or-buy and 138 with nothing in any
+           * bucket at all. So this is the normal state of release type 4, not
+           * an edge case — TMDB carries the date and, for most titles, never
+           * carries the platform until well after the film has landed.
+           *
+           * Before the date that is still worth printing: "on OTT from the
+           * 18th, platform to be announced" answers the question people
+           * actually arrive with, and no platform having been announced *to
+           * TMDB* is consistent with none having been announced at all.
+           *
+           * On or after it, the same row is a different claim. Reported from
+           * the site: a film released today showing "Platform TBA" when its
+           * service had been public for weeks. It had been — the platform was
+           * known to everyone except this dataset, and dressing our ignorance
+           * up as the industry's is the one thing a site called New on OTT
+           * cannot do. So the row waits until it can name somewhere.
+           *
+           * Self-healing: every refresh re-checks these, so the row appears
+           * with its real platform the moment TMDB has one, which is usually
+           * days after the drop.
+           */
+          if (!known.length && item.release_date <= TODAY) continue;
+
           const key = `m-${item.id}`;
           const existing = byId.get(key);
           if (existing) {

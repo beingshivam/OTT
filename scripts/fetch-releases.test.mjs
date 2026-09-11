@@ -38,7 +38,7 @@ const movie = (id, over = {}) => ({
   id,
   title: 'Title ' + id,
   original_language: 'hi',
-  release_date: TODAY,
+  release_date: SOON,
   genre_ids: [],
   popularity: 10,
   vote_average: 7,
@@ -78,9 +78,13 @@ globalThis.fetch = async (url) => {
     // The theatrical pass asks for types 2|3, the digital one for 4.
     if (q.with_release_type === '2|3') return json({ results: [movie(2)], total_pages: 1 });
     if (q.with_release_type === '4') {
-      // 1 is already on Netflix, 2 already in cinemas, 3 is digital-only with
-      // nobody attached, 4 is a digital date TMDB has already named.
-      return json({ results: [movie(1), movie(2), movie(3), movie(4)], total_pages: 1 });
+      // 1 is already on Netflix, 2 already in cinemas, 3 is digital-only and
+      // still ahead, 4 is a digital date TMDB has already named, and 5 has
+      // arrived with nobody attached — the case that must not ship.
+      return json({
+        results: [movie(1), movie(2), movie(3), movie(4), movie(5, { release_date: TODAY })],
+        total_pages: 1,
+      });
     }
     // The provider pass.
     return json({ results: [movie(1)], total_pages: 1 });
@@ -95,8 +99,14 @@ function run() {
   const dir = mkdtempSync(join(tmpdir(), 'feed-'));
   const out = join(dir, 'releases.json');
   const today = new Date().toISOString().slice(0, 10);
+  // Three days out, so the pre-release case and the arrived case are both in
+  // the same week and the same run.
+  const soon = new Date(Date.now() + 3 * 86_400_000).toISOString().slice(0, 10);
   const preload = join(dir, 'stub.mjs');
-  writeFileSync(preload, `const TODAY = ${JSON.stringify(today)};\n${STUB}`);
+  writeFileSync(
+    preload,
+    `const TODAY = ${JSON.stringify(today)};\nconst SOON = ${JSON.stringify(soon)};\n${STUB}`,
+  );
 
   execFileSync(
     process.execPath,
@@ -120,17 +130,33 @@ function run() {
   return { feed, calls };
 }
 
+const TODAY = new Date().toISOString().slice(0, 10);
 const { feed, calls } = run();
 const rows = feed.weeks.flatMap((w) => w.releases);
 const byId = new Map(rows.map((r) => [r.id, r]));
 
-test('a digital date with no service still reaches the calendar', () => {
+test('a digital date with no service still reaches the calendar, before the date', () => {
   // Title 3 exists only in the release-type-4 response. Without this pass it
   // would not be in the feed at all, which is why "Coming soon" was cinema and
-  // almost nothing else.
+  // almost nothing else. Dated ahead, so it is a promise rather than a shrug.
   const only = byId.get('m-3~ott');
   assert.ok(only, 'the digital-only title is missing from the feed entirely');
   assert.deepEqual(only.platforms, ['ott']);
+  assert.ok(only.releaseDate > TODAY, 'the fixture no longer tests the pre-release case');
+});
+
+test('a date we cannot place is dropped once it has arrived', () => {
+  /*
+   * Reported: a film released today showing "Platform TBA" when its service
+   * had been public for weeks. It had been — known to everyone except TMDB,
+   * which of 142 unplaced digital rows had four as rent-or-buy and 138 with
+   * nothing in any bucket at all. Before the date, "platform to be announced"
+   * is plausible and useful. On or after it, it is our ignorance wearing the
+   * industry's clothes, which is the one thing a site called New on OTT
+   * cannot do.
+   */
+  const out = byId.get('m-5~ott');
+  assert.equal(out, undefined, 'a released title with no service is still being published');
 });
 
 test('a streaming date is its own row, not the cinema listing wearing its id', () => {
