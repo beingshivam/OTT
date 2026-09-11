@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-11T09:21:17.715Z",
+  "generatedAt": "2026-09-11T09:26:14.065Z",
   "source": "tmdb",
   "weeks": [
     {
@@ -9362,47 +9362,6 @@
           ]
         },
         {
-          "id": "m-1408162~ott",
-          "title": "Vishwanath & Sons",
-          "kind": "film",
-          "platforms": [
-            "ott"
-          ],
-          "languages": [
-            "ta"
-          ],
-          "genres": [
-            "Drama",
-            "Romance"
-          ],
-          "releaseDate": "2026-09-11",
-          "regions": [
-            "IN"
-          ],
-          "rating": 7,
-          "votes": 11,
-          "heat": 40,
-          "synopsis": "Sanjay Vishwanath is an acclaimed professional handgunner in his 40s with a major stake in fame and wealth. When he comes across a woman named Maddy in her 20s, their dynamic poses many issues that they must come to terms with.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/mLsvCffzpxxDwC7yVLJSLLjgzoq.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/mHTkvCDHIazVnmO3FborbN2j9t5.jpg",
-          "imdbId": "tt35836025",
-          "runtimeMinutes": 161,
-          "cast": [
-            "Suriya",
-            "Mamitha Baiju",
-            "Radhika Sarathkumar",
-            "Raveena Tandon",
-            "Sunil"
-          ],
-          "director": "Venky Atluri",
-          "trailerUrl": "https://www.youtube.com/watch?v=wjycKdvm8bE",
-          "certification": "U/A 16+",
-          "theatrical": "wide",
-          "origin": [
-            "IN"
-          ]
-        },
-        {
           "id": "m-1228834",
           "title": "The Fix",
           "kind": "film",
@@ -9515,44 +9474,6 @@
           ]
         },
         {
-          "id": "m-1372059~ott",
-          "title": "Ghamasaan",
-          "kind": "film",
-          "platforms": [
-            "ott"
-          ],
-          "languages": [
-            "hi"
-          ],
-          "genres": [
-            "Thriller",
-            "Action"
-          ],
-          "releaseDate": "2026-09-11",
-          "regions": [
-            "IN"
-          ],
-          "heat": 20,
-          "synopsis": "A cat-and-mouse tale set in the Hindi heartland, where male friendships and rivalries unveil homoerotic tensions. Men on both sides of the law traverse arid lands, creating a sense of place where unexplored histories reside.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/tiiCF0MkRRNooqO53Esu0jtTYMJ.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/7yCPyIQVyFkx0wtKnFbVMKccqUQ.jpg",
-          "imdbId": "tt33744610",
-          "runtimeMinutes": 142,
-          "cast": [
-            "Pratik Gandhi",
-            "Arshad Warsi",
-            "Ishita Dutta",
-            "Rajpal Yadav",
-            "Jatin Goswami"
-          ],
-          "director": "Tigmanshu Dhulia",
-          "trailerUrl": "https://www.youtube.com/watch?v=OEvaXgDTPmU",
-          "certification": "U/A 16+",
-          "origin": [
-            "IN"
-          ]
-        },
-        {
           "id": "m-1523553",
           "title": "Dark Horse",
           "kind": "film",
@@ -9626,44 +9547,6 @@
           "origin": [
             "CA",
             "US"
-          ]
-        },
-        {
-          "id": "m-1542187~ott",
-          "title": "Varavu",
-          "kind": "film",
-          "platforms": [
-            "ott"
-          ],
-          "languages": [
-            "ml"
-          ],
-          "genres": [
-            "Action",
-            "Thriller"
-          ],
-          "releaseDate": "2026-09-11",
-          "regions": [
-            "IN"
-          ],
-          "heat": 18,
-          "synopsis": "A family falls victim to the powerful elite in a small town. One man's return forces a confrontation that will expose decades of lies and corruption",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/xUBo6JBHGV52xbfPwg3xxyvBLPx.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/321ed6TvXWw5Y6SRcFF2DuAgpjC.jpg",
-          "imdbId": "tt37963237",
-          "runtimeMinutes": 143,
-          "cast": [
-            "Joju George",
-            "Vani Viswanath",
-            "Murali Gopy",
-            "Arjun Ashokan",
-            "Saniya Iyyappan"
-          ],
-          "director": "Shaji Kailas",
-          "trailerUrl": "https://www.youtube.com/watch?v=aQ7tTufi63s",
-          "theatrical": "wide",
-          "origin": [
-            "IN"
           ]
         },
         {
@@ -10025,42 +9908,6 @@
           ]
         },
         {
-          "id": "m-1753614~ott",
-          "title": "Tribeca 25",
-          "kind": "documentary",
-          "platforms": [
-            "ott"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Documentary"
-          ],
-          "releaseDate": "2026-09-11",
-          "regions": [
-            "US"
-          ],
-          "heat": 16,
-          "synopsis": "25 years after 9/11, discover how Robert De Niro and Jane Rosenthal transformed an ambitious effort to revive Lower Manhattan into one of the world's leading cultural institutions. Through rare archival footage, exclusive interviews and behind-the-scenes access, explore how art can foster community, confront injustice, and help shape culture.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/u2QerAAASBDxb4WwjfOglwdqtqO.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/Ao3j6UGri7f82XKsyNqRZXaA8Ep.jpg",
-          "imdbId": "tt43675910",
-          "runtimeMinutes": 52,
-          "cast": [
-            "Robert De Niro",
-            "Jane Rosenthal",
-            "Martin Scorsese",
-            "Francis Ford Coppola",
-            "Damien Chazelle"
-          ],
-          "director": "Matt Tyrnauer",
-          "trailerUrl": "https://www.youtube.com/watch?v=-3ybhlaI2Ac",
-          "origin": [
-            "US"
-          ]
-        },
-        {
           "id": "m-1747479",
           "title": "Jayanti 2",
           "kind": "film",
@@ -10419,41 +10266,6 @@
           ]
         },
         {
-          "id": "m-1558568~ott",
-          "title": "Go Team!",
-          "kind": "film",
-          "platforms": [
-            "ott"
-          ],
-          "languages": [
-            "es"
-          ],
-          "genres": [
-            "Comedy"
-          ],
-          "releaseDate": "2026-09-11",
-          "regions": [
-            "US"
-          ],
-          "heat": 12,
-          "synopsis": "Gracias, equipo follows a struggling Spanish cheese company whose rural team-building retreat spirals into betrayal and layoffs, satirizing office politics and corporate absurdity.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/brPyXyvpYI87ybV3LXtaeLijVnw.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/1hwrvoeqSe6oM59BHR8zFO082kF.jpg",
-          "imdbId": "tt38616652",
-          "cast": [
-            "Alexandra Jiménez",
-            "Maribel Verdú",
-            "Pedro Casablanc",
-            "Pepe Viyuela",
-            "Raúl Tejón"
-          ],
-          "director": "Diego Núñez Irigoyen",
-          "trailerUrl": "https://www.youtube.com/watch?v=VSN8YM6urHo",
-          "origin": [
-            "ES"
-          ]
-        },
-        {
           "id": "m-1734726",
           "title": "America America 2",
           "kind": "film",
@@ -10630,42 +10442,6 @@
           ]
         },
         {
-          "id": "m-1731502~ott",
-          "title": "Vivaah",
-          "kind": "film",
-          "platforms": [
-            "ott"
-          ],
-          "languages": [
-            "ml"
-          ],
-          "genres": [
-            "Romance",
-            "Drama",
-            "Family"
-          ],
-          "releaseDate": "2026-09-11",
-          "regions": [
-            "IN"
-          ],
-          "heat": 10,
-          "posterUrl": "https://image.tmdb.org/t/p/w500/x0U4ZSi740GBPCBGJvh2k2mA3W8.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/7re2w7c5TPdfOTyZQg6wYdDUVDj.jpg",
-          "imdbId": "tt43675327",
-          "runtimeMinutes": 101,
-          "cast": [
-            "Dhyan Sreenivasan",
-            "Nayana Elza",
-            "Aneesh Gopal",
-            "Sruthi Jayan",
-            "Dhruvan"
-          ],
-          "director": "Blessonn Elssa",
-          "origin": [
-            "IN"
-          ]
-        },
-        {
           "id": "m-1753880~ott",
           "title": "Daughters of 9/11",
           "kind": "documentary",
@@ -10771,40 +10547,6 @@
           ]
         },
         {
-          "id": "m-1377900~ott",
-          "title": "Knightfall",
-          "kind": "film",
-          "platforms": [
-            "ott"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Action",
-            "Thriller"
-          ],
-          "releaseDate": "2026-09-11",
-          "regions": [
-            "US"
-          ],
-          "heat": 9,
-          "synopsis": "MI5 Weapons Tech Ros Knight finds herself unexpectedly called into a Black Ops mission headed up by her Field Agent boyfriend Hugh. When the mission goes fatally wrong, Ros finds herself on the run with a target on her back and must turn to the only man she can trust, her estranged father – legendary retired spy catcher Charles Knight.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/r7yyC7tBmoaRP515CGWCCm99oHr.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/zxI3jUzMjvzSuFOyfNiiLXpGUSn.jpg",
-          "imdbId": "tt28224861",
-          "runtimeMinutes": 82,
-          "cast": [
-            "Ian Ogilvy",
-            "Jeanine Nerissa Sothcott",
-            "Geoffrey Moore",
-            "Nick Moran",
-            "Michael Paré"
-          ],
-          "director": "Ben Mole",
-          "trailerUrl": "https://www.youtube.com/watch?v=F2fp96C1gSI"
-        },
-        {
           "id": "m-1242197",
           "title": "Beporoya",
           "kind": "film",
@@ -10898,43 +10640,6 @@
           "trailerUrl": "https://www.youtube.com/watch?v=zjRord_P7Bg"
         },
         {
-          "id": "m-1378742~ott",
-          "title": "Drive Through Fire",
-          "kind": "film",
-          "platforms": [
-            "ott"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Action",
-            "Crime",
-            "Thriller"
-          ],
-          "releaseDate": "2026-09-11",
-          "regions": [
-            "US"
-          ],
-          "heat": 8,
-          "synopsis": "The story follows an addict war veteran turned rideshare driver who helps a terrified passenger escape a human trafficking ring serving wealthy clients.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/jCZ9cJR8DY0sxSuwUX0tDQBtDAS.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/cQjiLpk1zHNJLEQ4BZmEVFbheJr.jpg",
-          "imdbId": "tt33512134",
-          "cast": [
-            "Michael Jai White",
-            "Dan Bakkedahl",
-            "Jim Carlson",
-            "Jennifer Bond",
-            "Kate Duffy"
-          ],
-          "director": "Lauren Bond",
-          "trailerUrl": "https://www.youtube.com/watch?v=qRG0OTAHSlI",
-          "origin": [
-            "US"
-          ]
-        },
-        {
           "id": "m-1764166~ott",
           "title": "Thomas & Friends: Really Helpful Engines",
           "kind": "film",
@@ -10959,63 +10664,6 @@
           "backdropUrl": "https://image.tmdb.org/t/p/w780/7h3kuVVOtsBtEdTmL9hCBGQieiU.jpg",
           "runtimeMinutes": 30,
           "trailerUrl": "https://www.youtube.com/watch?v=gI2ddjpDaM4"
-        },
-        {
-          "id": "m-1759325~ott",
-          "title": "Together ( Music Album )",
-          "kind": "film",
-          "platforms": [
-            "ott"
-          ],
-          "languages": [
-            "ml"
-          ],
-          "genres": [],
-          "releaseDate": "2026-09-11",
-          "regions": [
-            "IN"
-          ],
-          "heat": 7,
-          "synopsis": "Something close to our hearts.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/hdYc35Pxrj21KFGqeQFmM1qJDbP.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/q7sZniNhP62Ay3Hg7Z3DzVZ7ohA.jpg",
-          "cast": [
-            "Fathima Noora",
-            "Adhila Nasarin"
-          ],
-          "director": "Vignesh",
-          "certification": "UA"
-        },
-        {
-          "id": "m-1664866~ott",
-          "title": "Wired Together",
-          "kind": "film",
-          "platforms": [
-            "ott"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Drama",
-            "Romance"
-          ],
-          "releaseDate": "2026-09-11",
-          "regions": [
-            "US"
-          ],
-          "heat": 7,
-          "synopsis": "Ivy and Alex are two normal people who happened to fall in love at first sight in the library. Neither of them knew the toll and effect the other's presence, or lack thereof, would have on their life. As they enter the first major challenge of their relationship, long distance, they must accept that sometimes things do change.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/6HyIPkTlQq8xyGSnqQJPiRgeZvL.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/4SSmDx8t56qkHsC0QwtwPYwdA8I.jpg",
-          "imdbId": "tt43657962",
-          "runtimeMinutes": 15,
-          "cast": [
-            "Zander Mapes",
-            "Abigail Owers"
-          ],
-          "director": "Zander Mapes",
-          "trailerUrl": "https://www.youtube.com/watch?v=5dK_2SuX9nY"
         },
         {
           "id": "m-1758271~ott",
@@ -11446,37 +11094,6 @@
           ]
         },
         {
-          "id": "m-1766537~ott",
-          "title": "Screwy People or: The Pickleball Ordeal",
-          "kind": "film",
-          "platforms": [
-            "ott"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Comedy"
-          ],
-          "releaseDate": "2026-09-11",
-          "regions": [
-            "US"
-          ],
-          "heat": 2,
-          "synopsis": "A rivalry between two coworkers reaches its breaking point when they find themselves competing for the same promotion. They decide to settle the matter on the pickleball court, but what begins as a simple competition quickly spirals into a bitter battle of hostility, desperation, and increasingly poor sportsmanship.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/u32w8hLzxalcxTyJvNsXEAJUKfx.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/j9aTR1OyqEb2MTfmP4MwZ5NJ3qK.jpg",
-          "runtimeMinutes": 22,
-          "cast": [
-            "Max Balderston",
-            "Abby Rankin",
-            "Andrew Sulfsted",
-            "Damien Middleton",
-            "James Austin Black"
-          ],
-          "director": "Max Ortiz"
-        },
-        {
           "id": "m-1766963~ott",
           "title": "Wingmen",
           "kind": "film",
@@ -11529,83 +11146,6 @@
           "director": "Farook Abdul Rahiman",
           "trailerUrl": "https://www.youtube.com/watch?v=gbSeBJCmWcs",
           "theatrical": "wide"
-        },
-        {
-          "id": "m-1768289~ott",
-          "title": "Aanandham Sadha Neetho",
-          "kind": "film",
-          "platforms": [
-            "ott"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Romance",
-            "Comedy",
-            "Drama"
-          ],
-          "releaseDate": "2026-09-11",
-          "regions": [
-            "IN"
-          ],
-          "heat": 0,
-          "synopsis": "Presenting  \"Aanandham Sadha Neetho\", a RomCom Short Film.  Releasing on 11 - Sep - 2026  Produced by Helo Bro Originals in association with Talk Town Pictures  Title: Aanandham Sadha Neetho  Cast: Vignesh Arravolu, Tejaswi Jagadeesh, Jaya Beena, Vedavyas Beena  Produced by: Vignesh Arravolu, Vasagiri Manudeep, Radha Krishna Murthy  Written & Directed by: Vignesh Arravolu  Cinematography by: Radha Krishna Murthy  Edited by: Vasagiri Manudeep  V.O Artists: Vasu Aryan, Hema  Original Score: AI Generated by Radha Krishna Murthy",
-          "runtimeMinutes": 44,
-          "trailerUrl": "https://www.youtube.com/watch?v=FQGbZL9N4Jw"
-        },
-        {
-          "id": "m-1768221~ott",
-          "title": "Adkitta",
-          "kind": "film",
-          "platforms": [
-            "ott"
-          ],
-          "languages": [
-            "mr"
-          ],
-          "genres": [
-            "Drama",
-            "Family"
-          ],
-          "releaseDate": "2026-09-11",
-          "regions": [
-            "IN"
-          ],
-          "heat": 0,
-          "synopsis": "A babysitter's unexpected stay transforms a family's life and relationships."
-        },
-        {
-          "id": "m-1767978~ott",
-          "title": "UFOs and God",
-          "kind": "documentary",
-          "platforms": [
-            "ott"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Documentary"
-          ],
-          "releaseDate": "2026-09-11",
-          "regions": [
-            "US"
-          ],
-          "heat": 0,
-          "synopsis": "A thought-provoking documentary that examines the modern surge of UFO sightings, government disclosures, and cultural fascination with extra-terrestrial intelligence through a distinctly Christian worldview.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/96TyVbpmWezXXX8BdpMATY1VgLD.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/ojsGza8Fm5sntsYay9Qn89lm5gh.jpg",
-          "imdbId": "tt38988564",
-          "cast": [
-            "Amanda Llewellyn",
-            "Wes Llewellyn",
-            "Hugh Ross",
-            "Jeff Zweerink",
-            "Greg Koukl"
-          ],
-          "director": "Amanda Llewellyn",
-          "trailerUrl": "https://www.youtube.com/watch?v=A57NrzfIjUg"
         }
       ]
     },
@@ -19577,6 +19117,6 @@
       "backdropUrl": "https://image.tmdb.org/t/p/w780/i65y7cMae36K0giN0GRaMjAHUru.jpg"
     }
   ],
-  "enrichedAt": "2026-09-11T09:21:56.248Z",
-  "ratedAt": "2026-09-11T09:21:56.503Z"
+  "enrichedAt": "2026-09-11T09:27:09.623Z",
+  "ratedAt": "2026-09-11T09:27:09.870Z"
 }
