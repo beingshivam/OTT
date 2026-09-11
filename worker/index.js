@@ -206,7 +206,160 @@ export default {
     ctx?.waitUntil?.(sendWelcome(env, address));
     return json(200, { ok: true });
   },
+
+  /**
+   * The dead man's switch.
+   *
+   * The refresh is a GitHub Actions cron, and GitHub's scheduler is best-effort:
+   * its own documentation says a scheduled run can be delayed under load and
+   * dropped entirely. This repository has seen both — the one scheduled run on
+   * record started 2h16m after its slot, and the Friday slot on 11 Sep produced
+   * nothing at all.
+   *
+   * A late refresh is survivable. What is not is that a refresh which never
+   * happens looks exactly like one that worked: the site keeps serving, the
+   * board keeps rendering, and the only symptom is a date quietly falling
+   * behind. The owner found out because a page looked thin, four days later.
+   * Monitoring that lives inside the job being monitored cannot report the job
+   * not running, which is the one failure that matters here.
+   *
+   * So the check runs somewhere else entirely. Cloudflare's cron fires this
+   * Worker daily, it reads the feed the site is actually serving — not a
+   * status page, not a build log, the same JSON a reader gets — and if that
+   * feed is older than the last refresh that should have happened, it says so
+   * by email. It needs no GitHub token and no third-party service: the sender
+   * is already configured for the welcome mail.
+   *
+   * It cannot fix anything. It exists so that silence stops meaning "fine".
+   */
+  async scheduled(event, env, ctx) {
+    ctx?.waitUntil?.(checkFreshness(env));
+  },
 };
+
+/**
+ * The refresh schedule, mirrored from .github/workflows/refresh-releases.yml.
+ *
+ * Two statements of one fact, which is a real risk and named here rather than
+ * hidden: if the cron there changes and this does not, the watchdog starts
+ * alerting on a schedule nobody runs, and an alert that cries wolf is deleted
+ * unread — the same silence it was built to end. Kept as UTC weekday/hour/minute
+ * because that is exactly how the workflow states them.
+ */
+const REFRESH_SLOTS = [
+  { day: 5, hour: 2, minute: 30 }, // Fri 02:30 UTC — the week flips
+  { day: 6, hour: 4, minute: 30 }, // Sat 04:30 UTC — Friday's drops get providers
+  { day: 1, hour: 13, minute: 30 }, // Mon 13:30 UTC — the weekend and the week ahead
+];
+
+/**
+ * How long after a slot a run is still considered merely late.
+ *
+ * Three hours, from the evidence: the one scheduled run on record was 2h16m
+ * late and completed fine. Alerting sooner would page on GitHub being GitHub.
+ */
+const GRACE_HOURS = 3;
+
+/**
+ * The most recent slot that is far enough in the past that a run should have
+ * finished by now. Returns a Date, or null if none has come due yet.
+ */
+export function lastDueSlot(now, graceHours = GRACE_HOURS) {
+  const cutoff = now.getTime() - graceHours * 3600_000;
+  let best = null;
+  // Walk back eight days so the answer is right on a Monday, when the most
+  // recent due slot is the previous Saturday's.
+  for (let back = 0; back <= 8; back++) {
+    const d = new Date(now.getTime() - back * 86_400_000);
+    for (const slot of REFRESH_SLOTS) {
+      if (d.getUTCDay() !== slot.day) continue;
+      const at = Date.UTC(
+        d.getUTCFullYear(),
+        d.getUTCMonth(),
+        d.getUTCDate(),
+        slot.hour,
+        slot.minute,
+      );
+      if (at <= cutoff && (best === null || at > best)) best = at;
+    }
+  }
+  return best === null ? null : new Date(best);
+}
+
+async function checkFreshness(env) {
+  const due = lastDueSlot(new Date());
+  if (!due) return; // Nothing has come due yet — nothing to say.
+
+  let generatedAt = null;
+  try {
+    const res = await env.ASSETS.fetch(new Request('https://newonott.in/data/releases.json'));
+    if (res.ok) generatedAt = (await res.json()).generatedAt ?? null;
+  } catch (err) {
+    console.error('watchdog: could not read the feed', err);
+  }
+
+  // A feed the Worker cannot read at all is worse than a stale one, so it
+  // alerts rather than returning quietly — the alternative is the exact
+  // silence this exists to remove.
+  const built = generatedAt ? Date.parse(generatedAt) : NaN;
+  if (Number.isFinite(built) && built >= due.getTime()) {
+    console.log(`watchdog: feed built ${generatedAt}, after the ${due.toISOString()} slot — ok`);
+    return;
+  }
+
+  const hours = Number.isFinite(built)
+    ? Math.round((Date.now() - built) / 3600_000)
+    : null;
+  const detail = Number.isFinite(built)
+    ? `The feed was last rebuilt ${generatedAt} — ${hours} hours ago.`
+    : 'The Worker could not read a build time from the feed at all.';
+
+  console.error(`watchdog: stale. ${detail}`);
+  await sendAlert(
+    env,
+    'New on OTT: the refresh has not run',
+    [
+      `The refresh that was due at ${due.toISOString()} has not produced a new feed.`,
+      '',
+      detail,
+      '',
+      'The site is still up and still serving — this is about the data behind it',
+      'going stale, which nothing else would have told you about.',
+      '',
+      'To fix it now, run the "Refresh release calendar" workflow by hand:',
+      'https://github.com/beingshivam/OTT/actions/workflows/refresh-releases.yml',
+      '',
+      'This check runs once a day from the Cloudflare Worker, deliberately outside',
+      'GitHub, so that a refresh which never starts is still able to tell you.',
+    ].join('\n'),
+  );
+}
+
+/** Plain text, to the site's own address. No template and no digest — an alert
+ *  that needs a build artefact to render is an alert that fails when the build
+ *  is what broke. */
+async function sendAlert(env, subject, text) {
+  if (!env.BREVO_API_KEY) {
+    console.log('watchdog: would have alerted, but no BREVO_API_KEY is bound');
+    return;
+  }
+  const to = env.ALERT_EMAIL || SENDER.email;
+  try {
+    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        accept: 'application/json',
+        'content-type': 'application/json',
+        'api-key': env.BREVO_API_KEY,
+      },
+      body: JSON.stringify({ sender: SENDER, to: [{ email: to }], subject, textContent: text }),
+    });
+    if (res.ok) console.log('watchdog: alert sent to', to);
+    else console.error('watchdog: brevo refused', res.status, await res.text());
+  } catch (err) {
+    console.error('watchdog: alert failed', err);
+  }
+}
 
 /** Where the mail comes from. A verified sender on the site's own domain —
  *  Brevo will refuse anything else, and so will most inboxes. */

@@ -11,7 +11,7 @@
  */
 
 import assert from 'node:assert/strict';
-import worker from './index.js';
+import worker, { lastDueSlot } from './index.js';
 
 const ORIGIN = 'https://newonott.in';
 
@@ -511,6 +511,51 @@ await test('the query string is not forwarded', async () => {
 });
 
 
+
+/**
+ * The watchdog's clock.
+ *
+ * Worth testing rather than eyeballing, because both ways of being wrong are
+ * silent. Too eager and it emails every week about a refresh that ran fine,
+ * which teaches the owner to ignore it — the same silence it exists to end.
+ * Too lax and it never fires, which is where this started: a refresh that did
+ * not happen looked exactly like one that did, for four days.
+ */
+const at = (iso) => new Date(iso);
+
+await test('a slot inside its grace period is late, not missing', async () => {
+  // Friday 02:30 UTC slot; two hours later is still within the 3h grace, so
+  // the most recent *due* slot is the previous Monday, not this morning.
+  const due = lastDueSlot(at('2026-09-11T04:30:00Z'));
+  assert.equal(due.toISOString(), '2026-09-07T13:30:00.000Z');
+});
+
+await test('past its grace period, the slot is the one to measure against', async () => {
+  const due = lastDueSlot(at('2026-09-11T09:00:00Z'));
+  assert.equal(due.toISOString(), '2026-09-11T02:30:00.000Z');
+});
+
+await test('Saturday morning measures against Saturday', async () => {
+  const due = lastDueSlot(at('2026-09-12T09:00:00Z'));
+  assert.equal(due.toISOString(), '2026-09-12T04:30:00.000Z');
+});
+
+await test('Sunday and Monday morning still measure against Saturday', async () => {
+  // Monday's own slot is 13:30, so at 09:00 it is not due yet — expecting a
+  // Monday build on a Monday morning is exactly the false alarm to avoid.
+  assert.equal(lastDueSlot(at('2026-09-13T09:00:00Z')).toISOString(), '2026-09-12T04:30:00.000Z');
+  assert.equal(lastDueSlot(at('2026-09-14T09:00:00Z')).toISOString(), '2026-09-12T04:30:00.000Z');
+});
+
+await test('Tuesday measures against Monday, once Monday has passed', async () => {
+  assert.equal(lastDueSlot(at('2026-09-15T09:00:00Z')).toISOString(), '2026-09-14T13:30:00.000Z');
+});
+
+await test('a quiet midweek still measures against the last real slot', async () => {
+  // Thursday. Nothing is scheduled between Monday and Friday, so a feed built
+  // on Monday is correct and must not alert.
+  assert.equal(lastDueSlot(at('2026-09-17T09:00:00Z')).toISOString(), '2026-09-14T13:30:00.000Z');
+});
 
 console.log(results.join('\n'));
 console.log(process.exitCode ? '\nsome checks failed' : `\n${results.length} checks passed`);

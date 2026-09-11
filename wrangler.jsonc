@@ -50,6 +50,23 @@
   }
 
   /**
+   * The watchdog's clock.
+   *
+   * Not the refresh — that still runs in GitHub Actions, where it has a
+   * checkout, a Node toolchain and somewhere to commit to. This is the daily
+   * check that the refresh actually happened, and it lives here for one reason:
+   * GitHub cannot report its own scheduler failing to fire. See the `scheduled`
+   * handler in worker/index.js.
+   *
+   * 09:00 UTC — 14:30 IST — because by then every slot in the week is either
+   * comfortably past its grace period or not yet due, so the check never has to
+   * guess whether a run is late or missing.
+   */
+  ,"triggers": {
+    "crons": ["0 9 * * *"]
+  }
+
+  /**
    * The subscriber list. Live since 8 Sep 2026.
    *
    * The id is not a credential — it names a database that only this account's
