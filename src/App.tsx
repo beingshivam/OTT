@@ -263,10 +263,19 @@ export default function App() {
    */
   const titlePage = useMemo(() => {
     if (!route?.titleSlug || !feed) return undefined;
-    for (const w of feed.weeks) {
-      const hit = w.releases.find((r) => r.slug === route.titleSlug);
-      if (hit) return hit;
-    }
+    /*
+     * The cinema listing, not the streaming-date row.
+     *
+     * A film with an announced OTT date is two rows sharing this slug — the
+     * listing the page is built from, and an `~ott` row carrying the date. This
+     * used to take the first match in week order, which is whichever the feed
+     * happened to hold first, and the streaming-date row has no cast, no
+     * certificate and a platform called "Platform not announced". The page is
+     * about the film; the other row is one fact about it, read below.
+     */
+    const rows = feed.weeks.flatMap((w) => w.releases).filter((r) => r.slug === route.titleSlug);
+    const hit = rows.find((r) => r.platforms.includes('theatres')) ?? rows[0];
+    if (hit) return hit;
     /**
      * Not in the window any more — so read the row the build put in the page.
      *
@@ -780,6 +789,10 @@ export default function App() {
                 releases={ottRail.releases}
                 onOpen={setSelected}
                 caption={(r) => relativeDay(r.releaseDate, today)}
+                /* The same badge as the cinema row, on a row that is otherwise
+                   still a calendar — see landedOnOtt for why only this one
+                   keeps its chronology. */
+                trending={ottRail.trending}
               />
             </section>
           ) : (

@@ -1712,10 +1712,19 @@ a {
  * biggest thing on. Top-right, because the platform pill owns the top-left and
  * the cinema row does not draw one anyway.
  */
+/*
+ * Bottom-left, which is the only corner left.
+ *
+ * Top-left is the platform badge, bottom-right is the score, and top-right put
+ * this chip on top of the badge the moment the streaming row started showing
+ * both — at 360px a card is 133px, the chip was 75px and the badge needs 75px
+ * for the word "Prime". Down here it shares a line with the 50px score instead,
+ * which "TRENDING" would also have overrun; "TOP 3" leaves about 20px clear.
+ */
 .landed__hot {
   position: absolute;
-  top: 6px;
-  right: 6px;
+  bottom: 6px;
+  left: 6px;
   padding: 3px 7px;
   border-radius: var(--radius-pill);
   font-size: 9.5px;
@@ -1726,7 +1735,8 @@ a {
   box-shadow: 0 4px 14px -5px rgba(255, 160, 60, 0.9);
 }
 
-/* The score sits bottom-right and the chip top-right, so they never meet. */
+/* Both are on the bottom line now, one corner each — the e2e run measures the
+   gap between them at every width rather than trusting this comment. */
 .landed__score {
   position: absolute;
   right: 6px;

@@ -320,6 +320,57 @@ for (const [width, height] of [[360, 780], [390, 844], [1280, 900]]) {
       names: cells.slice(0, 1).map((c) => c.querySelector('.landed__name')?.textContent?.trim()),
     };
   });
+  /*
+    Nothing on a card may sit on top of anything else on it.
+
+    The chip used to be top-right, opposite the platform badge, and that held
+    only while no row showed both. The streaming row does, and at 360px a card
+    is 133px against a 75px chip and a 75px badge — TRENDING landed on the
+    platform name and Netflix rendered as "N". Caught by looking, which is the
+    thing this file exists to stop being necessary, so the geometry is measured
+    here at every width instead of being asserted in a comment.
+  */
+  const collisions = await page.evaluate(() => {
+    const out = [];
+    for (const cell of document.querySelectorAll('.landed__cell')) {
+      const parts = ['.landed__badge', '.landed__hot', '.landed__score']
+        .map((sel) => [sel, cell.querySelector(sel)?.getBoundingClientRect()])
+        .filter(([, r]) => r && r.width > 0);
+      for (let i = 0; i < parts.length; i++) {
+        for (let j = i + 1; j < parts.length; j++) {
+          const [an, a] = parts[i];
+          const [bn, b] = parts[j];
+          const overlap =
+            a.left < b.right - 0.5 && b.left < a.right - 0.5 &&
+            a.top < b.bottom - 0.5 && b.top < a.bottom - 0.5;
+          if (overlap) out.push(`${cell.querySelector('.landed__name')?.textContent?.trim()}: ${an} over ${bn}`);
+        }
+      }
+    }
+    return out;
+  });
+  is(collisions.length === 0, `${width}px: nothing on a card overlaps anything else`, collisions.slice(0, 3).join('; '));
+
+  /*
+    And the platform name is readable, not a first initial.
+
+    "Which OTT is it on" is the commonest piece of feedback this site has had.
+    A badge squeezed to 40px by something beside it answers it with "N", which
+    is the same failure as not showing it at all — and it passes a test that
+    only checks the pill exists.
+  */
+  const squeezed = await page.evaluate(() =>
+    [...document.querySelectorAll('.landed--sub')[1].querySelectorAll('.landed__cell')]
+      .map((c) => {
+        const el = c.querySelector('.landed__badgename');
+        if (!el) return null;
+        // scrollWidth beyond clientWidth is text the reader cannot see.
+        return el.scrollWidth > el.clientWidth + 1 ? el.textContent.trim() : null;
+      })
+      .filter(Boolean),
+  );
+  is(squeezed.length === 0, `${width}px: every service name fits its pill`, `clipped: ${squeezed.join(', ')}`);
+
   is(hot.marked === 3, `${width}px: three cinema cards are marked trending`, `${hot.marked} marked`);
   is(hot.leading === 3, `${width}px: and they are the three at the front`,
      `${hot.leading} of the first three carry the chip`);

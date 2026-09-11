@@ -333,13 +333,17 @@ test('both sides respect region and require artwork', () => {
 });
 
 test('one language cannot take the OTT row on a busy day', () => {
+  // Behind the badged few this row is still the calendar it always was, and
+  // the per-language rule still governs it: a quieter Tamil film must not sit
+  // behind every Hindi one released the same day.
   const day = iso(3);
   const rows = [
     ...Array.from({ length: 5 }, () => row({ releaseDate: day, platforms: ['netflix'], languages: ['hi'], heat: 90 })),
     row({ releaseDate: day, platforms: ['netflix'], languages: ['ta'], heat: 10 }),
   ];
-  const out = landedOnOtt(rows, 'IN', TODAY).releases;
-  assert.equal(out[1].languages[0], 'ta', 'the second slot goes to the other language, not the fifth Hindi row');
+  const out = landedOnOtt(rows, 'IN', TODAY);
+  const tail = out.releases.slice(out.trending ?? 0);
+  assert.equal(tail[0].languages[0], 'ta', `the tail leads with ${tail[0].languages[0]}, not the other language`);
 });
 
 test('both sides cap the row', () => {
@@ -418,9 +422,9 @@ test('one language can take the whole shortlist when it owns the week', () => {
 });
 
 test('the interleave still holds on the rows built to spread a field', () => {
-  // The exception above is the cinema row only. Removing it there must not
-  // quietly remove it from the row beside it, which is a day-by-day calendar
-  // and the place the rule was written for.
+  // The exception is the ordering of the cinema row, not the rule itself.
+  // Behind the badge the streaming row is a day-by-day calendar and the place
+  // the per-language rule was written for, so it has to survive there.
   const day = iso(3);
   const rows = [
     ...Array.from({ length: 4 }, (_, i) =>
@@ -428,8 +432,78 @@ test('the interleave still holds on the rows built to spread a field', () => {
     ),
     row({ releaseDate: day, platforms: ['netflix'], languages: ['ta'], heat: 40 }),
   ];
-  const lead = landedOnOtt(rows, 'IN', TODAY).releases.slice(0, 3).map((r) => r.languages[0]);
-  assert.ok(lead.includes('ta'), `one language took the streaming row: ${lead.join(', ')}`);
+  const out = landedOnOtt(rows, 'IN', TODAY);
+  const tail = out.releases.slice(out.trending ?? 0).map((r) => r.languages[0]);
+  assert.equal(tail[0], 'ta', `the tail buried the quieter language: ${tail.join(', ')}`);
+});
+
+test('the streaming row leads on attention and then returns to its calendar', () => {
+  // Asked for: strictly newest-first, a Friday fills every visible card with
+  // whatever dropped that morning and the week's biggest arrival is behind it.
+  const big = row({ releaseDate: iso(9), platforms: ['netflix'], heat: 99, title: 'The big one' });
+  const today = Array.from({ length: 9 }, (_, i) =>
+    row({ releaseDate: iso(0), platforms: ['netflix'], heat: i, title: `Quiet ${i}` }),
+  );
+  const out = landedOnOtt([...today, big], 'IN', TODAY);
+  assert.equal(out.releases[0].title, 'The big one', `the row opened on ${out.releases[0].title}`);
+  assert.equal(out.trending, TRENDING_IN_CINEMAS);
+  const tail = out.releases.slice(out.trending).map((r) => r.releaseDate);
+  assert.deepEqual([...tail].sort().reverse(), tail, 'the tail lost its date order');
+});
+
+test('a date with no service yet stays out of the row that names services', () => {
+  /*
+   * Every card in "On OTT" carries a platform pill, because "which OTT is it
+   * on" is the commonest thing anyone has asked of this site. A placeholder
+   * reading "Platform TBA" answers it with the word streaming, which the
+   * heading already said — three of the first six cards were that. The titles
+   * keep their place in "Coming soon", on the board and on their own page.
+   */
+  const rows = [
+    ...Array.from({ length: 8 }, (_, i) =>
+      row({ releaseDate: iso(i), platforms: ['netflix'], title: `Real ${i}` }),
+    ),
+    row({ releaseDate: iso(0), platforms: ['ott'], title: 'Date only' }),
+  ];
+  const out = landedOnOtt(rows, 'IN', TODAY);
+  assert.ok(
+    !out.releases.some((r) => r.platforms.includes('ott')),
+    'a row that cannot name a service is in the row that exists to name services',
+  );
+  assert.equal(out.total, 8, 'and it is not counted there either');
+});
+
+test('an import is never crowned, and is not thrown off the row either', () => {
+  /*
+   * Reported: "doesn't make sense mutiny is on #2". It did not. TMDB
+   * popularity for a British-American action picture is earned worldwide —
+   * 343 against Hanuman Ansh's 34 — and read as Indian demand it put Statham
+   * second in Indian cinemas. The badge is a claim about Indian cinemas; the
+   * position is just the only attention number there is.
+   */
+  const local = Array.from({ length: 4 }, (_, i) =>
+    row({ releaseDate: iso(i + 2), platforms: ['theatres'], heat: 70 - i, origin: ['IN'], title: `Local ${i}` }),
+  );
+  const loud = row({ releaseDate: iso(3), platforms: ['theatres'], heat: 95, origin: ['GB', 'US'], title: 'Import' });
+  const out = inCinemas([...local, loud], 'IN', TODAY);
+  const crowned = out.releases.slice(0, out.trending).map((r) => r.title);
+  assert.ok(!crowned.includes('Import'), `the import was crowned: ${crowned.join(', ')}`);
+  assert.ok(out.releases.some((r) => r.title === 'Import'), 'the import fell off the row entirely');
+});
+
+test('a co-production counts as local, and an unknown origin is not an import', () => {
+  // Mirzapur: The Movie is IN/US and is the biggest film in Indian cinemas.
+  // Eighteen of the ninety-three films in the window record no country at all,
+  // including obviously Indian ones, so silence must never demote anything.
+  const co = row({ releaseDate: iso(2), platforms: ['theatres'], heat: 95, origin: ['IN', 'US'], title: 'Co-production' });
+  const quiet = row({ releaseDate: iso(3), platforms: ['theatres'], heat: 90, title: 'No origin recorded' });
+  const rest = Array.from({ length: 4 }, (_, i) =>
+    row({ releaseDate: iso(i + 4), platforms: ['theatres'], heat: 50 - i, origin: ['IN'] }),
+  );
+  const out = inCinemas([co, quiet, ...rest], 'IN', TODAY);
+  const crowned = out.releases.slice(0, out.trending).map((r) => r.title);
+  assert.ok(crowned.includes('Co-production'), `India among several was treated as foreign: ${crowned.join(', ')}`);
+  assert.ok(crowned.includes('No origin recorded'), `an unrecorded origin was treated as foreign: ${crowned.join(', ')}`);
 });
 
 test('a row too short to have standouts says nothing rather than crowning everything', () => {

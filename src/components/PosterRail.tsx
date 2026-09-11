@@ -303,8 +303,11 @@ export function PosterRail({
               <button
                 className="landed__card"
                 onClick={() => onOpen(r)}
+                /* Not "in cinemas": this row is on the streaming side too now,
+                   and a screen reader announcing the wrong medium is worse than
+                   announcing none. */
                 aria-label={`${r.title} — ${p.name}, ${caption(r)}${
-                  isTrending ? ', trending in cinemas' : ''
+                  isTrending ? ', among the top three right now' : ''
                 }`}
               >
                 <span className="landed__art">
@@ -330,7 +333,19 @@ export function PosterRail({
                       <span className="landed__badgename">{p.short}</span>
                     </span>
                   )}
-                  {isTrending && <span className="landed__hot">TRENDING</span>}
+                  {/* "TOP 3", bottom-left, and both of those are measurements
+                      rather than taste. The streaming row is the first to carry
+                      a platform badge and this chip at once, and a card is
+                      133px wide at 360: the chip was 75px and the badge needs
+                      75px for "Prime", so top-right put TRENDING straight over
+                      the platform name — Netflix rendered as "N". Reserving
+                      room for both left 40px for a name. The only free corner
+                      is bottom-left, where the chip shares a line with the
+                      50px score, and "TRENDING" does not fit there either. The
+                      shorter word does, with room to spare, and says the same
+                      thing more precisely: this is the shortlist, not a
+                      property of the film. */}
+                  {isTrending && <span className="landed__hot">TOP 3</span>}
                   {score && (
                     <span className="landed__score" data-strong={score.strong || undefined}>
                       ★ {score.value.toFixed(1)}

@@ -90,10 +90,48 @@ function chronicle(
   return { releases, from, to, total: rows.length };
 }
 
+/** The placeholder a title wears when its streaming date is known and its
+ *  service is not. Not a platform — see src/data/platforms.ts. */
+export const DIGITAL = 'ott';
+
 /** True when a row is a cinema listing. A film can be both — showing in
  *  cinemas and already streaming — and belongs in both segments when it is. */
 const showing = (r: Release) => r.platforms.includes('theatres');
-const streaming = (r: Release) => r.platforms.some((p) => p !== 'theatres');
+
+/**
+ * True when we can tell someone where to watch it.
+ *
+ * The placeholder does not count, and that distinction is the whole point of
+ * the "On OTT" row. Every card there carries a service pill because "which OTT
+ * is it on" was the single commonest piece of feedback this site has had — and
+ * a row of cards reading "Digital" answers it with the word "streaming", which
+ * is what the heading already said. Three of the first six cards were that.
+ *
+ * Those titles are not lost: they keep their place in "Coming soon", on the
+ * week board and on their own page, where a date with no service yet is a
+ * useful thing to know rather than a pill that fails to name anything.
+ */
+const streaming = (r: Release) => r.platforms.some((p) => p !== 'theatres' && p !== DIGITAL);
+
+/**
+ * Whose audience the attention number describes.
+ *
+ * TMDB popularity means a different thing on either side of this line. For an
+ * Indian production the people looking a title up are broadly the people who
+ * could buy a ticket here; for an import they are the world, and Mutiny's 343
+ * against Hanuman Ansh's 34 is a fact about Jason Statham's global following
+ * rather than about what is filling seats in India.
+ *
+ * So an import is never crowned. It keeps its place in the row — it is playing,
+ * and someone may want it — but the badge is a claim about Indian cinemas and
+ * that claim is the one thing this number cannot support.
+ *
+ * Only ever demotes on positive evidence. Eighteen of the ninety-three films in
+ * the window have no production country recorded at all, including obviously
+ * Indian ones, so an unknown origin is treated as local. And India among several
+ * counts as India: Mirzapur: The Movie is IN/US and is not an import.
+ */
+const imported = (r: Release) => Boolean(r.origin?.length) && !r.origin!.includes('IN');
 
 /**
  * How far back a film still counts as showing.
@@ -178,18 +216,75 @@ export function inCinemas(all: Release[], region: string, today: Date = new Date
   // A row with nothing but standouts is the whole row wearing a badge, which
   // tells a reader nothing. Then it is simply a short ranked row, unmarked.
   if (releases.length <= TRENDING_IN_CINEMAS) return row;
-  return { ...row, trending: TRENDING_IN_CINEMAS };
+
+  /*
+   * The badged few are the ones the claim can be made about.
+   *
+   * Straight heat put Mutiny second — a British-American action picture ahead
+   * of everything in Indian cinemas except Mirzapur, on a popularity score
+   * earned worldwide. Reported as not making sense, and it does not.
+   *
+   * Promoting the eligible three to the front rather than badging them where
+   * they sit: badges landing on cards one, three and four read as a bug, and
+   * the row's first three cards are the ones anyone actually sees.
+   */
+  const lead = releases.filter((r) => !imported(r)).slice(0, TRENDING_IN_CINEMAS);
+  if (lead.length < TRENDING_IN_CINEMAS) return { ...row, trending: 0 };
+
+  const crowned = new Set(lead.map((r) => r.id));
+  return {
+    ...row,
+    trending: TRENDING_IN_CINEMAS,
+    releases: [...lead, ...releases.filter((r) => !crowned.has(r.id))],
+  };
 }
 
-/** The same fortnight the mixed row always used, narrowed to things you can
- *  actually stream tonight. */
+/**
+ * The same fortnight the mixed row always used, narrowed to things you can
+ * actually stream tonight.
+ *
+ * This one keeps its calendar, and the asymmetry with the cinema row above is
+ * deliberate rather than an oversight. A cinema run lasts six weeks, so date
+ * order there is close to noise — the biggest film on the board sat nineteenth.
+ * A streaming drop's news value is measured in days inside a fourteen-day
+ * window, so "what landed" is a real ordering here and throwing it away would
+ * cost more than it bought.
+ *
+ * What it gains is the front of the row. Asked for, and right: strictly
+ * newest-first, a Friday fills the visible cards with whatever dropped that
+ * morning and buries the week's biggest arrival behind it. So the same few
+ * lead on attention and wear the same badge, and everything behind them is the
+ * chronology it always was.
+ */
 export function landedOnOtt(all: Release[], region: string, today: Date = new Date()): JustLanded {
-  return chronicle(all, region, {
+  const row = chronicle(all, region, {
     from: toISODate(new Date(today.getTime() - (WINDOW_DAYS - 1) * 86_400_000)),
     to: toISODate(today),
     newestFirst: true,
     where: streaming,
   });
+
+  if (row.releases.length <= TRENDING_IN_CINEMAS || row.total <= TRENDING_IN_CINEMAS) return row;
+
+  /*
+   * Ranked across the whole window rather than within a day, because that is
+   * what the badge claims. Imports are ineligible here for the same reason as
+   * in cinemas — a global popularity score is not evidence of Indian demand —
+   * and the row simply says nothing rather than crowning one when there are not
+   * enough local titles to fill the shortlist.
+   */
+  const lead = [...row.releases]
+    .filter((r) => !imported(r))
+    .sort((a, b) => (b.heat ?? 0) - (a.heat ?? 0) || b.releaseDate.localeCompare(a.releaseDate))
+    .slice(0, TRENDING_IN_CINEMAS);
+  if (lead.length < TRENDING_IN_CINEMAS) return row;
+
+  const crowned = new Set(lead.map((r) => r.id));
+  return {
+    ...row,
+    trending: lead.length,
+    releases: [...lead, ...row.releases.filter((r) => !crowned.has(r.id))].slice(0, MAX_ITEMS),
+  };
 }
 
 export function justLanded(
