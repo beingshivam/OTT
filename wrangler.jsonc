@@ -58,12 +58,16 @@
    * GitHub cannot report its own scheduler failing to fire. See the `scheduled`
    * handler in worker/index.js.
    *
-   * 09:00 UTC — 14:30 IST — because by then every slot in the week is either
-   * comfortably past its grace period or not yet due, so the check never has to
-   * guess whether a run is late or missing.
+   * 12:00 UTC — 17:30 IST — set from the schedule rather than picked. The
+   * latest slot in the week that this check has to judge is Friday's 08:30,
+   * and it is not fair to call that missing until its three-hour grace has
+   * run out at 11:30. Any earlier and a Friday failure would go unreported
+   * until Saturday's check, which is most of a day on the site's busiest
+   * evening. Monday's 13:30 run sits after this, so Monday measures against
+   * Saturday and does not expect a build that has not happened yet.
    */
   ,"triggers": {
-    "crons": ["0 9 * * *"]
+    "crons": ["0 12 * * *"]
   }
 
   /**

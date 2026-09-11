@@ -1,30 +1,34 @@
 name: Refresh release calendar
 
-# Three runs a week, and the third one is the point.
+# Three runs a week, and when Friday runs is the point.
 #
 # TMDB assigns a streaming provider *after* a title is available — the reason
 # scripts/fetch-releases.mjs has to ask for theatrical dates separately. So a
 # refresh that lands before Friday's drops cannot know which service they went
 # to: it gets the cinema listings right, because those dates are announced weeks
-# ahead, and leaves that day's streaming arrivals unplaced. A run on Friday
-# morning alone would therefore be freshest exactly when it knows least about
-# the day it is describing.
+# ahead, and leaves that day's streaming arrivals unplaced. A Friday-morning run
+# is therefore freshest exactly when it knows least about the day it describes.
 #
-# Hence Saturday. Friday morning flips the week and keeps the page honest on the
-# day most people look; Friday afternoon is the one that can actually say where
-# Friday's drops went; Saturday morning catches anything that landed late,
-# before the weekend is spent deciding; Monday evening picks up the weekend's
-# corrections and the week taking shape.
+# One run per day, three days. Friday flips the week and reports its drops;
+# Saturday catches anything that landed late; Monday evening picks up the
+# weekend's corrections and the week taking shape.
 #
-# Friday needs two runs, which took evidence to establish rather than taste.
-# TMDB assigns a title its watch provider on release day, not before — every one
-# of the fifteen streaming rows in the 4–10 Sep week carried 4 September as its
-# release date, and they were absent from an 03:47 UTC run and present in one at
-# 07:08. So the 02:30 slot, chosen so the page is fresh at 08:00 IST, is
-# structurally three hours too early to see any of it: it can only ever report
-# cinema. On 11 September that produced a board with eighteen theatrical
-# listings and no streaming at all, on the morning of the day, on a site called
-# New on OTT. The second slot is what makes the name true before the weekend.
+# Friday is at 14:00 IST rather than 08:00, which is the whole lesson here and
+# was arrived at the expensive way. TMDB assigns a title its watch provider on
+# release day, not before: all fifteen streaming rows in the 4–10 Sep week
+# carried 4 September as their release date, and a run at 03:47 UTC found none
+# of them while one at 07:08 found all fifteen. A Friday-dawn refresh is
+# therefore structurally incapable of saying where that day's titles went — on
+# 11 September it produced eighteen theatrical listings and no streaming at all,
+# on the morning of the day, on a site called New on OTT.
+#
+# The first fix was to add an afternoon run and keep the morning one. That was
+# the wrong shape: a dawn run buys about five extra cinema listings, because the
+# week's theatrical dates were already fetched by Monday's run four days
+# earlier — the feed carries four weeks ahead. Five listings for six hours is
+# not worth a fourth job, a fourth line in every mirror of this schedule, and a
+# second "refresh completed" note in the same morning. Moving the one Friday run
+# is the same fix with none of that.
 #
 # Times are UTC and the comments give IST, because that is the audience.
 # Scheduled workflows only ever run on the repository's default branch — if the
@@ -43,8 +47,7 @@ name: Refresh release calendar
 # never correctness.
 on:
   schedule:
-    - cron: '30 2 * * 5'  # Fri 02:30 UTC — Friday 08:00 IST, the week flips
-    - cron: '30 8 * * 5'  # Fri 08:30 UTC — Friday 14:00 IST, the day's OTT drops now exist
+    - cron: '30 8 * * 5'  # Fri 08:30 UTC — Friday 14:00 IST, the week flips and its drops exist
     - cron: '30 4 * * 6'  # Sat 04:30 UTC — Saturday 10:00 IST, anything that landed late
     - cron: '30 13 * * 1' # Mon 13:30 UTC — Monday 19:00 IST, the weekend and the week ahead
   workflow_dispatch:
@@ -233,7 +236,7 @@ jobs:
         id: digest
         if: >-
           steps.fetch.outcome == 'success' &&
-          (github.event_name != 'schedule' || github.event.schedule == '30 2 * * 5')
+          (github.event_name != 'schedule' || github.event.schedule == '30 8 * * 5')
         continue-on-error: true
         run: node scripts/build-digest.mjs
 
