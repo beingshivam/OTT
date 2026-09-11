@@ -2428,6 +2428,45 @@ a {
   outline: 2px solid #fff;
   outline-offset: 2px;
 }
+/*
+ * The four links the touch pass missed, found by measuring on a real touch
+ * device rather than by eye.
+ *
+ * The earlier pass raised the icon buttons and the chips and stopped there,
+ * because those are the controls that look like controls. These four are text:
+ * the wordmark (26px tall), the Instagram link in the header (34px), the "87
+ * titles →" link that is the only route to the full cinema list (20px), and the
+ * TMDB credit (14px). A link being made of words does not make it easier to
+ * hit — the 20px one is the narrowest thing on the page and it is the entrance
+ * to a page of ninety titles.
+ *
+ * Grown with an inset pseudo-element rather than padding, which is the pattern
+ * the rest of this file already uses: the hit area reaches 44px while the text
+ * stays exactly where it was laid out, so nothing moves and no line re-wraps.
+ */
+@media (pointer: coarse) {
+  .logo,
+  .iglink,
+  .landed__all,
+  .footer a,
+  .credit a {
+    position: relative;
+  }
+  .logo::after,
+  .iglink::after,
+  .landed__all::after,
+  .footer a::after,
+  .credit a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 44px;
+    transform: translateY(-50%);
+  }
+}
+
 @media (pointer: coarse) {
   /* The one control someone reaches for in a hurry, and it was 34px against a
      44px guideline — missed when the other touch targets were raised because

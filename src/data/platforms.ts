@@ -162,6 +162,48 @@ export const LANGUAGES: Record<string, string> = {
   es: 'Spanish',
   fr: 'French',
   de: 'German',
+  /*
+   * Past the Indian languages and the four that carry most of what reaches
+   * India, these are the ones an audit actually found in the feed rather than
+   * the ones a list like this usually guesses at: Chinese on three titles,
+   * Arabic on 7 Dogs, Portuguese and Danish on one each. Without a name the
+   * fallback prints the raw code, so the board read "ZH · Drama" and a chip in
+   * the language filter said "AR".
+   *
+   * The rest are the neighbours TMDB is most likely to hand us next, added now
+   * because the cost is a line each and the failure is silent — nobody reports
+   * a two-letter code, they just do not click it.
+   */
+  zh: 'Chinese',
+  ar: 'Arabic',
+  pt: 'Portuguese',
+  da: 'Danish',
+  it: 'Italian',
+  ru: 'Russian',
+  tr: 'Turkish',
+  th: 'Thai',
+  id: 'Indonesian',
+  nl: 'Dutch',
+  sv: 'Swedish',
+  no: 'Norwegian',
+  pl: 'Polish',
+  fa: 'Persian',
+  he: 'Hebrew',
+  vi: 'Vietnamese',
+  tl: 'Filipino',
+  ne: 'Nepali',
+  si: 'Sinhala',
+  as: 'Assamese',
+  bho: 'Bhojpuri',
+  ks: 'Kashmiri',
+  sd: 'Sindhi',
+  kok: 'Konkani',
+  mai: 'Maithili',
+  sa: 'Sanskrit',
+  tu: 'Tulu',
+  mni: 'Manipuri',
+  lt: 'Lithuanian',
+  ro: 'Romanian',
 };
 
 export function languageName(code: string): string {

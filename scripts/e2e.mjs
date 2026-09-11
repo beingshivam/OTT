@@ -1030,6 +1030,76 @@ for (const width of [360, 1280]) {
   await ctx.close();
 }
 
+// --- what the audit found, kept so it cannot come back ------------------------
+
+/**
+ * Two findings from an end-to-end audit that no report had surfaced.
+ *
+ * Every language the data carries must have a name. The fallback prints the
+ * raw code, so a Chinese title read "ZH · Drama" and the language filter
+ * offered a chip labelled "AR" — silent, because nobody reports a two-letter
+ * code, they just do not click it.
+ *
+ * And every target on a touch device must reach 44px. The earlier touch pass
+ * raised the icon buttons and the chips, which are the things that look like
+ * controls, and left four links made of words: the wordmark at 26px, the
+ * Instagram link at 34, the TMDB credit at 14, and "87 titles →" at 20 — the
+ * narrowest thing on the page, and the only route to the full cinema list.
+ */
+console.log('\nNames and targets');
+{
+  const feedRaw = await readFile(join(ROOT, 'dist/data/releases.json'), 'utf8').catch(() => null);
+  const registry = await readFile(join(ROOT, 'src/data/platforms.ts'), 'utf8').catch(() => '');
+  if (feedRaw && registry) {
+    const named = new Set(
+      [...(registry.match(/LANGUAGES[^{]*\{([\s\S]*?)\n\};/) ?? ['', ''])[1].matchAll(/(\w+):\s*'/g)].map(
+        (m) => m[1],
+      ),
+    );
+    const unnamed = new Set();
+    for (const w of JSON.parse(feedRaw).weeks)
+      for (const r of w.releases) for (const l of r.languages ?? []) if (!named.has(l)) unnamed.add(l);
+    is(
+      unnamed.size === 0,
+      'every language in the feed has a name the UI can print',
+      `raw codes would reach the page: ${[...unnamed].join(', ')}`,
+    );
+  }
+}
+{
+  const ctx = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    hasTouch: true,
+    isMobile: true,
+    deviceScaleFactor: 3,
+  });
+  const page = await ctx.newPage();
+  await page.route('**fonts.g**', (r) => r.abort());
+  await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('.landed__cell', { timeout: 15_000 }).catch(() => {});
+  await page.waitForTimeout(900);
+  const small = await page.evaluate(() => {
+    const out = [];
+    for (const el of document.querySelectorAll('button, a[href]')) {
+      if (el.closest('[aria-hidden="true"]')) continue;
+      const box = el.getBoundingClientRect();
+      if (!box.height) continue;
+      // An inset ::after is how this file grows a hit area without moving the
+      // text, so the measurement has to look for one.
+      const after = getComputedStyle(el, '::after');
+      let h = box.height;
+      if (after.content && after.content !== 'none' && after.position === 'absolute') {
+        const ah = parseFloat(after.height);
+        if (ah > h) h = ah;
+      }
+      if (h < 40) out.push(`${Math.round(h)}px ${(el.getAttribute('aria-label') || el.textContent || '').trim().slice(0, 20)}`);
+    }
+    return out;
+  });
+  is(small.length === 0, 'every target on a touch device is reachable with a thumb', small.slice(0, 3).join(', '));
+  await ctx.close();
+}
+
 // --- one row per lens, each true to its own page ------------------------------
 
 console.log('\nA rail on every lens');
