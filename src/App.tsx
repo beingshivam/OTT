@@ -365,8 +365,12 @@ export default function App() {
           r.releaseDate <= span.to &&
           // "In cinemas" is the one span that is a platform question as well as
           // a date one — everything in its window that you cannot buy a ticket
-          // for does not belong on it.
-          (!span.theatrical || r.platforms.includes('theatres')),
+          // for does not belong on it, and a film that has since reached
+          // streaming is exactly that. Same rule as `showing` in lib/rails.ts,
+          // and it has to be the same rule: the rail links here with a count,
+          // and the two saying 87 and 93 is how the e2e run caught this.
+          (!span.theatrical ||
+            (r.platforms.includes('theatres') && !r.platforms.some((p) => p !== 'theatres'))),
       );
   }, [searching, route, catalogue, span, week, feed]);
   const facets = useMemo(() => facetsFor(releases, filters.region), [releases, filters.region]);

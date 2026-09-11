@@ -967,8 +967,15 @@ const CINEMA_WINDOW_DAYS = 42;
 const cinemaFrom = new Date(Date.parse(`${TODAY}T00:00:00Z`) - (CINEMA_WINDOW_DAYS - 1) * 86_400_000)
   .toISOString()
   .slice(0, 10);
+/* Still only in a cinema — the same rule as the rail, and for the same reason:
+   a film you can stream tonight is not an answer to "what is on near me".
+   See `showing` in src/lib/rails.ts. */
 const inCinemasRows = everything.filter(
-  (r) => r.platforms.includes('theatres') && r.releaseDate >= cinemaFrom && r.releaseDate <= TODAY,
+  (r) =>
+    r.platforms.includes('theatres') &&
+    !r.platforms.some((p) => p !== 'theatres') &&
+    r.releaseDate >= cinemaFrom &&
+    r.releaseDate <= TODAY,
 );
 if (inCinemasRows.length >= MIN_PAGE_ROWS) {
   const langs = tally(inCinemasRows, (r) => r.languages).length;

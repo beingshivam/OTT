@@ -94,9 +94,28 @@ function chronicle(
  *  service is not. Not a platform — see src/data/platforms.ts. */
 export const DIGITAL = 'ott';
 
-/** True when a row is a cinema listing. A film can be both — showing in
- *  cinemas and already streaming — and belongs in both segments when it is. */
-const showing = (r: Release) => r.platforms.includes('theatres');
+/**
+ * True when a film is something you can still only see in a cinema.
+ *
+ * This used to be "has a theatrical listing", on the reasoning that a film can
+ * be both and belongs in both rows when it is. Day-and-date releases exist, so
+ * the reasoning is not wrong — it is just not how Indian releases usually work.
+ * The normal shape is a theatrical run that *ends*, and then a streaming date,
+ * and the window here is six weeks, which is long enough to span both.
+ *
+ * The result was absurd and was reported as such: Vishwanath & Sons led the
+ * "In cinemas" row wearing a Netflix badge, with DC on Sun NXT and G.D.N on
+ * Netflix beside it. Somebody reading that row is deciding whether to book a
+ * ticket. A film they can stream at home tonight is not an answer to that
+ * question, whatever its opening date says.
+ *
+ * So a streaming platform retires the cinema listing from this row. The row
+ * itself keeps both — it opened in cinemas, and that is true and belongs on its
+ * week and on its page — but "on at the cinema right now" is a claim only one
+ * of them can support.
+ */
+const showing = (r: Release) =>
+  r.platforms.includes('theatres') && !r.platforms.some((p) => p !== 'theatres');
 
 /**
  * True when we can tell someone where to watch it.

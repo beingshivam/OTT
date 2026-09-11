@@ -290,12 +290,24 @@ test('neither side takes what has not opened yet', () => {
   assert.equal(landedOnOtt(future, 'IN', TODAY).releases.length, 0);
 });
 
-test('a film both showing and streaming appears on both sides', () => {
-  // The row the board draws as two platforms. Dropping it from either side
-  // would hide a real answer to that side's question.
+test('a film that has reached streaming leaves the cinema row', () => {
+  /*
+   * This asserted the opposite, and shipped the result: Vishwanath & Sons led
+   * the "In cinemas" row wearing a Netflix badge, DC beside it on Sun NXT.
+   *
+   * The old reasoning was that a film can be both and dropping it from either
+   * side hides a real answer. Day-and-date releases exist, so that is not
+   * wrong in general — it is wrong for this window. An Indian theatrical run
+   * ends and *then* the film streams, and the row looks back six weeks, which
+   * spans both. Somebody reading it is deciding whether to book a ticket, and a
+   * film they can stream tonight is not an answer to that.
+   *
+   * The row keeps both platforms. Only the claim "on at the cinema right now"
+   * is withdrawn, because only one of them can support it.
+   */
   const both = [row({ platforms: ['theatres', 'netflix'] })];
-  assert.equal(inCinemas(both, 'IN', TODAY).releases.length, 1);
-  assert.equal(landedOnOtt(both, 'IN', TODAY).releases.length, 1);
+  assert.equal(inCinemas(both, 'IN', TODAY).releases.length, 0, 'still offering a ticket for a film on Netflix');
+  assert.equal(landedOnOtt(both, 'IN', TODAY).releases.length, 1, 'and it has to be somewhere');
 });
 
 test('a cinema-only film never appears on the OTT side', () => {
