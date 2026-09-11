@@ -149,7 +149,9 @@ export function PageIntro({ route, rows, feed, region, currentWeek, onOpen, rail
     : route.span
     ? route.span.kind === 'upcoming'
       ? 'Biggest coming up'
-      : `Biggest in ${route.span.label}`
+      : route.span.kind === 'cinemas'
+        ? 'Biggest in cinemas'
+        : `Biggest in ${route.span.label}`
     : thisWeek.length
       ? 'Biggest this week'
       : 'Biggest right now';
@@ -174,7 +176,9 @@ export function PageIntro({ route, rows, feed, region, currentWeek, onOpen, rail
     : route.span
     ? route.span.kind === 'upcoming'
       ? 'Coming soon'
-      : `Releases in ${route.span.label}`
+      : route.span.kind === 'cinemas'
+        ? 'Playing in cinemas now'
+        : `Releases in ${route.span.label}`
     : collection
     ? collection.label
     : route.platforms

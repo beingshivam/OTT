@@ -350,7 +350,15 @@ export default function App() {
     if (!span) return week?.releases ?? [];
     return (feed?.weeks ?? [])
       .flatMap((w) => w.releases)
-      .filter((r) => r.releaseDate >= span.from && r.releaseDate <= span.to);
+      .filter(
+        (r) =>
+          r.releaseDate >= span.from &&
+          r.releaseDate <= span.to &&
+          // "In cinemas" is the one span that is a platform question as well as
+          // a date one — everything in its window that you cannot buy a ticket
+          // for does not belong on it.
+          (!span.theatrical || r.platforms.includes('theatres')),
+      );
   }, [searching, route, catalogue, span, week, feed]);
   const facets = useMemo(() => facetsFor(releases, filters.region), [releases, filters.region]);
   /**
@@ -751,6 +759,9 @@ export default function App() {
                    attention rather than date — see inCinemas. Zero on a week
                    too thin to rank, and then the row says nothing about it. */
                 trending={cinemaRail.trending}
+                /* The count has somewhere to go now. 89 in cinemas, twenty in
+                   the row, and the rest were findable only by name. */
+                href="/in-cinemas"
               />
               <PosterRail
                 compact

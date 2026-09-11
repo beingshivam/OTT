@@ -88,6 +88,15 @@ interface Props {
    * which is why it is a count and not a boolean on the row.
    */
   trending?: number;
+  /**
+   * Where the rest of the row lives.
+   *
+   * A rail that prints "89 titles" and shows twenty is making a promise it has
+   * no way to keep — the other sixty-nine were reachable only by already
+   * knowing a title and searching for it. When there is a page holding all of
+   * them, the count becomes the link to it.
+   */
+  href?: string;
 }
 
 /** Headings need ids to be referenced, and two rows on one page cannot share
@@ -106,6 +115,7 @@ export function PosterRail({
   compact,
   showPlatform = true,
   trending = 0,
+  href,
 }: Props) {
   const track = useRef<HTMLUListElement>(null);
   const [atStart, setAtStart] = useState(true);
@@ -248,6 +258,11 @@ export function PosterRail({
               </button>
             ))}
           </div>
+        ) : href ? (
+          <a className="landed__sub landed__all" href={href}>
+            {subtitle}
+            <span aria-hidden="true"> →</span>
+          </a>
         ) : (
           <p className="landed__sub">{subtitle}</p>
         )}

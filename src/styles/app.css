@@ -1538,6 +1538,18 @@ a {
   }
 }
 
+/* The count, once it is a way through rather than a statement. Same size and
+   position as the plain subtitle it replaces, so the row does not grow a new
+   control — it is the number that was already there, now clickable. */
+.landed__all {
+  color: var(--text-2);
+  text-decoration: none;
+  flex: none;
+}
+.landed__all:hover {
+  color: var(--text);
+}
+
 .landed__none {
   margin: 0;
   padding: 24px 0 8px;

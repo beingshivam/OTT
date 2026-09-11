@@ -342,7 +342,9 @@ for (const [width, height] of [[360, 780], [390, 844], [1280, 900]]) {
     subs.join(' / '),
   );
   is(
-    subs.every((t) => /^\d+ titles$/.test(t)),
+    // The arrow is the "see all" affordance on the cinema row, decorative and
+    // aria-hidden — the claim being tested is that the row states a count.
+    subs.every((t) => /^\d+ titles(\s*→)?$/.test(t)),
     `${width}px: each row says how much it holds`,
     subs.join(' / '),
   );
@@ -1050,6 +1052,39 @@ console.log('\nTouch targets');
   is(!head.clipped, 'the week heading is not cut off', `heading reads "${head.text}" and is clipped`);
 
   /*
+    The rail's count is a promise, and /in-cinemas is where it is kept.
+
+    "In cinemas · 89 titles" above a row of twenty was the whole of the site's
+    answer to what is playing; the other sixty-nine were reachable only by
+    already knowing a title. The two numbers also have to be the same number —
+    the rail gated its total on having a poster while the page did not, so the
+    link said 89 and the page said 93.
+  */
+  const railCount = await page.evaluate(() => {
+    const a = document.querySelector('.landed__all');
+    return a ? { href: a.getAttribute('href'), text: a.textContent.trim() } : null;
+  });
+  is(railCount?.href === '/in-cinemas', 'the cinema count links to the full list',
+     railCount ? `it points at ${railCount.href}` : 'there is no link on the count');
+
+  await page.goto(`${BASE}/in-cinemas`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('.controls__heading');
+  const pageCount = await page.evaluate(
+    () => document.querySelector('.controls__heading')?.textContent?.trim() ?? '',
+  );
+  const n = (t) => Number((t || '').match(/\d+/)?.[0] ?? -1);
+  is(
+    n(railCount?.text) === n(pageCount) && n(pageCount) > 0,
+    'and promises the number that page actually holds',
+    `rail said "${railCount?.text}", page says "${pageCount}"`,
+  );
+
+  // Back to the homepage: the press check below needs a poster card, and
+  // /in-cinemas is a board with no rail on it.
+  await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('.landed__cell');
+
+  /*
     The header icons stay 34px on purpose — that row already spends 346 of 358
     available pixels at 390px, and growing them overflows the narrowest phones.
     They get the target through an invisible box instead, so the assertion has
@@ -1107,7 +1142,7 @@ console.log('\nTouch targets');
 // --- other pages still work -------------------------------------------------
 
 console.log('\nOther routes');
-for (const path of ['/streaming', '/upcoming', '/hindi', '/netflix']) {
+for (const path of ['/streaming', '/upcoming', '/in-cinemas', '/hindi', '/netflix']) {
   const { ctx, page, errors } = await newPage(browser, { width: 390, height: 844 });
   await page.goto(`${BASE}${path}`, { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(1200);

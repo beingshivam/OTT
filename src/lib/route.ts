@@ -82,7 +82,11 @@ export interface Span {
   to: string;
   /** What the page calls itself: "September 2026", "Coming soon". */
   label: string;
-  kind: 'month' | 'upcoming';
+  kind: 'month' | 'upcoming' | 'cinemas';
+  /** Narrows the span to films you can still buy a ticket for. A month and
+   *  "Coming soon" are date questions and take everything in range; "In
+   *  cinemas" is a date question *and* a platform one. */
+  theatrical?: true;
 }
 
 /** Full English month names, lowercased — the slug is the word people would
@@ -133,6 +137,32 @@ export function monthSpan(monthIndex: number, year: number): Span {
 export function upcomingSpan(today = new Date()): Span {
   const from = new Date(today.getTime() + 86_400_000).toISOString().slice(0, 10);
   return { from, to: '9999-12-31', label: 'Coming soon', kind: 'upcoming' };
+}
+
+/**
+ * Everything still playing in cinemas — the page the homepage rail could only
+ * gesture at.
+ *
+ * That rail names its own total, "In cinemas · 89 titles", and then shows
+ * twenty. The other sixty-nine were reachable only by knowing a title and
+ * searching for it, which is how a film still in its fifth week — Hanuman Ansh,
+ * five weeks in and still selling tickets — reads as missing from a site whose
+ * whole claim is that it knows what is on.
+ *
+ * Ordered by date on the page rather than by attention, because a reader who
+ * has arrived here has already been shown the big three on the homepage and is
+ * now looking for the long tail. The window matches the rail's exactly, so the
+ * count in the heading and the count on the page can never disagree.
+ */
+export function cinemasSpan(today = new Date()): Span {
+  const from = new Date(today.getTime() - 41 * 86_400_000).toISOString().slice(0, 10);
+  return {
+    from,
+    to: today.toISOString().slice(0, 10),
+    label: 'In cinemas',
+    kind: 'cinemas',
+    theatrical: true,
+  };
 }
 
 export type Route = Partial<Pick<Filters, 'platforms' | 'languages' | 'kinds' | 'genres' | 'weekId'>> & {
@@ -186,6 +216,7 @@ export function routeFilters(pathname: string): Route | null {
   if (title) return { titleSlug: title[1] };
 
   if (path === '/upcoming') return { span: upcomingSpan() };
+  if (path === '/in-cinemas') return { span: cinemasSpan() };
   if (path === '/streaming') return { catalogue: true };
 
   const month = MONTH_PATH.exec(path);

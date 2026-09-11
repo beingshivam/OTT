@@ -143,6 +143,25 @@ export function inCinemas(all: Release[], region: string, today: Date = new Date
     where: showing,
   });
 
+  /*
+   * The count is everything playing, not everything with artwork.
+   *
+   * chronicle() gates on a poster, correctly — a poster row cannot show a card
+   * with no poster. But it then reports that filtered number as the total, and
+   * the total is what the heading prints and what the link to /in-cinemas
+   * promises. The page has no poster gate because it is a text board, so the
+   * rail said 89 and the page it linked to said 93. Whichever number is right,
+   * two of them is wrong.
+   */
+  const playing = all.filter(
+    (r) =>
+      r.regions?.includes(region) &&
+      r.releaseDate >= row.from &&
+      r.releaseDate <= row.to &&
+      showing(r),
+  ).length;
+  row.total = playing;
+
   const ranked = interleaveByLanguage(
     all.filter(
       (r) =>

@@ -929,6 +929,63 @@ if (upcomingRows.length >= MIN_PAGE_ROWS) {
 }
 
 /**
+ * Everything still playing in cinemas.
+ *
+ * The homepage rail names its own total — "In cinemas · 89 titles" — and shows
+ * twenty. The other sixty-nine were reachable only by already knowing a title
+ * and searching for it, which is how a film five weeks into a healthy run reads
+ * as absent from a site whose whole claim is that it knows what is on.
+ *
+ * Six weeks back, matching lib/rails.ts. Both count every film playing rather
+ * than every film with artwork — the rail gates its *cards* on having a poster,
+ * as a poster row must, and for a while reported that filtered number as its
+ * total: the heading said 89 and the page it linked to said 93. Ordered newest-first by week like the
+ * month pages, because a reader who has arrived here has already been shown the
+ * big three and is now after the long tail.
+ *
+ * Worth a page of its own rather than a filter on a week: "movies in cinemas
+ * now" is a question with no good answer anywhere else in India, and it is the
+ * one this site can answer that a streaming-only competitor structurally
+ * cannot.
+ */
+const CINEMA_WINDOW_DAYS = 42;
+const cinemaFrom = new Date(Date.parse(`${TODAY}T00:00:00Z`) - (CINEMA_WINDOW_DAYS - 1) * 86_400_000)
+  .toISOString()
+  .slice(0, 10);
+const inCinemasRows = everything.filter(
+  (r) => r.platforms.includes('theatres') && r.releaseDate >= cinemaFrom && r.releaseDate <= TODAY,
+);
+if (inCinemasRows.length >= MIN_PAGE_ROWS) {
+  const langs = tally(inCinemasRows, (r) => r.languages).length;
+  pages.push({
+    path: 'in-cinemas',
+    group: 'month',
+    crumb: 'In cinemas',
+    linkText: 'In cinemas now',
+    rows: inCinemasRows,
+    title: 'Movies in cinemas now in India — every film currently running',
+    description:
+      `All ${inCinemasRows.length} films playing in Indian cinemas right now, across ${langs} languages — ` +
+      `release dates, runtimes, cast and where to book.`,
+    h1: 'Playing in cinemas now',
+    lede:
+      `${inCinemasRows.length} films are currently running in Indian cinemas, from this Friday's ` +
+      `openings back through the last six weeks.`,
+    facts: factsMarkup({
+      rows: inCinemasRows,
+      thisWeek: [],
+      cross: {
+        label: 'Mostly in',
+        items: tally(inCinemasRows, (r) => r.languages)
+          .slice(0, 4)
+          .map(([code, n]) => ({ text: lname(code), n })),
+      },
+    }),
+    body: sectionMarkup(sectionsBy(inCinemasRows, (r) => [r.weekId]), weekRangeOf),
+  });
+}
+
+/**
  * One page per calendar month, plus everything not out yet.
  *
  * A month is how people ask this question outside the industry. Nobody types
