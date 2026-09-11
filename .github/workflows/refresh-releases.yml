@@ -18,6 +18,18 @@ name: Refresh release calendar
 # Times are UTC and the comments give IST, because that is the audience.
 # Scheduled workflows only ever run on the repository's default branch — if the
 # default branch changes, this schedule moves with it.
+#
+# These times are the earliest a run can start, not when it will. GitHub queues
+# scheduled workflows behind everything else and drops them under load; on this
+# repository the one scheduled run on record started 2h16m late (run #6, the old
+# Thursday cron, due 19:30 UTC and begun at 21:46). So a run that has not
+# appeared an hour after its slot is normal and not yet worth investigating —
+# treat roughly three hours as the point where something is actually wrong, and
+# check `event: schedule` in the run list rather than assuming a missing run
+# means a broken cron. Nothing downstream depends on a run landing at its slot:
+# the calendar is a week's granularity and the rank baseline is pinned to the
+# week rather than to the run, so a late or skipped refresh costs freshness and
+# never correctness.
 on:
   schedule:
     - cron: '30 2 * * 5'  # Fri 02:30 UTC — Friday 08:00 IST, the week flips
