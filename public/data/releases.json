@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-11T09:15:48.192Z",
+  "generatedAt": "2026-09-11T09:21:17.715Z",
   "source": "tmdb",
   "weeks": [
     {
@@ -5157,7 +5157,7 @@
             "US"
           ],
           "rating": 8.1,
-          "votes": 744,
+          "votes": 746,
           "heat": 88,
           "synopsis": "Professor Se-jeong is thrust into a bloody nightmare when a rapidly mutating virus is released during a biotech conference causing authorities to seal the facility. Trapped inside with no escape, Se-jeong along with a small group of survivors must fight to stay alive while the infected undergo horrific transformations.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/tN799oUR0f1gUKDYdMNrDaY7I51.jpg",
@@ -19577,6 +19577,6 @@
       "backdropUrl": "https://image.tmdb.org/t/p/w780/i65y7cMae36K0giN0GRaMjAHUru.jpg"
     }
   ],
-  "enrichedAt": "2026-09-11T09:16:39.534Z",
-  "ratedAt": "2026-09-11T09:16:39.714Z"
+  "enrichedAt": "2026-09-11T09:21:56.248Z",
+  "ratedAt": "2026-09-11T09:21:56.503Z"
 }
