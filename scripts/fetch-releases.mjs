@@ -774,8 +774,23 @@ console.log(`Mapped ${index.size} TMDB providers across ${platforms.length} plat
 const previous = await readFile(OUT, 'utf8')
   .then((raw) => JSON.parse(raw))
   .catch(() => ({ weeks: [] }));
+/*
+ * Carried forward, and deduplicated on the way.
+ *
+ * Curated rows come from the previous build, so any duplicate in it is
+ * duplicated again on every run after — a defect that repairs itself only if
+ * the carry-forward refuses to carry two of anything. One slipped in before the
+ * hand-placed file matched on id, and matching on id alone would have updated
+ * the first copy and left the second in place for ever.
+ */
 const curatedByWeek = new Map(
-  previous.weeks.map((w) => [w.id, w.releases.filter((r) => r.sample)]),
+  previous.weeks.map((w) => {
+    const seen = new Set();
+    return [
+      w.id,
+      w.releases.filter((r) => r.sample && !seen.has(r.id) && (seen.add(r.id), true)),
+    ];
+  }),
 );
 
 /**

@@ -295,8 +295,16 @@ for (const [width, height] of [[360, 780], [390, 844], [1280, 900]]) {
         .filter(Boolean).length,
     })),
   );
-  is(pills[0].named === 0, `${width}px: the cinema row does not repeat "Theatres"`,
-     `${pills[0].named} pills on a row whose heading already says it`);
+  /* Not "no pills" — "no pill that repeats the heading". A cinema card that is
+     also streaming now names the service, which is the one fact "In cinemas"
+     does not already give. */
+  const saysTheatres = await page.evaluate(() =>
+    [...document.querySelectorAll('.landed--sub')[0].querySelectorAll('.landed__badgename')]
+      .map((e) => e.textContent.trim())
+      .filter((t) => /theatre/i.test(t)).length,
+  );
+  is(saysTheatres === 0, `${width}px: the cinema row does not repeat "Theatres"`,
+     `${saysTheatres} cards label a cinema row "Theatres"`);
   is(pills[1].named === pills[1].cells, `${width}px: every OTT card names its service`,
      `${pills[1].named} of ${pills[1].cells} named`);
 

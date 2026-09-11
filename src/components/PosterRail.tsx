@@ -295,7 +295,25 @@ export function PosterRail({
         data-back={!atStart || undefined}
       >
         {releases.map((r, i) => {
-          const p = platform(r.platforms[0]);
+          /*
+           * A film in cinemas can already be streaming, and the card should say
+           * so.
+           *
+           * Reported: "I see a lot of movies and shows in the cinema rail but
+           * those were supposed to be in their respective OTT platform." Seven
+           * of them were — still playing and on Netflix, Prime or Sun NXT at
+           * the same time. The row carries both platforms now; this is the half
+           * that makes it visible.
+           *
+           * The cinema rail suppresses the pill because naming "Theatres" on
+           * every card in a row headed "In cinemas" is a label repeated until it
+           * stops being read. That reasoning holds for the cards that are only
+           * in cinemas and not for these, where the pill is the one fact the
+           * heading does not already give.
+           */
+          const alsoStreaming = r.platforms.find((id) => id !== 'theatres');
+          const p = platform(showPlatform ? r.platforms[0] : (alsoStreaming ?? r.platforms[0]));
+          const namePlatform = showPlatform || Boolean(alsoStreaming);
           const score = scoreOf(r);
           const isTrending = i < trending;
           return (
@@ -327,7 +345,7 @@ export function PosterRail({
                       homepage, readers reasonably could not — and the poster
                       grid one screen down had been showing the name all along.
                       See .landed__badge. */}
-                  {showPlatform && (
+                  {namePlatform && (
                     <span className="landed__badge">
                       <PlatformLogo platformId={p.id} size={20} />
                       <span className="landed__badgename">{p.short}</span>

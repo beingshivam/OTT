@@ -11774,42 +11774,6 @@
           "origin": [
             "IN"
           ]
-        },
-        {
-          "id": "hand-lust-stories-3",
-          "title": "Lust Stories 3",
-          "kind": "film",
-          "platforms": [
-            "netflix"
-          ],
-          "languages": [
-            "hi"
-          ],
-          "genres": [
-            "Romance",
-            "Drama"
-          ],
-          "releaseDate": "2026-09-18",
-          "regions": [
-            "IN"
-          ],
-          "sample": true,
-          "posterUrl": "https://image.tmdb.org/t/p/w500/ixWYV97WTObTSvcnExYK9sMxzxb.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w1280/kgZFECKytirVvmIbWF6slEoWZng.jpg",
-          "synopsis": "Through four bite-sized yet emotionally resonant films, the anthology once again explores lust, love, relationships, and repressed desire, offering fresh perspectives on intimacy, longing, and human connection in all their complexity.",
-          "imdbId": "tt39667834",
-          "cast": [
-            "Radhika Apte",
-            "Konkona Sen Sharma",
-            "Vijay Varma",
-            "Abhishek Banerjee",
-            "Ali Fazal"
-          ],
-          "director": "Vikramaditya Motwane",
-          "certification": "A",
-          "origin": [
-            "IN"
-          ]
         }
       ]
     },
