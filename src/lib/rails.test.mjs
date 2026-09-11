@@ -37,6 +37,7 @@ const {
   WINDOW_DAYS,
   SOON_DAYS,
   MAX_ITEMS,
+  TRENDING_IN_CINEMAS,
 } = await import(join(dir, 'rails.mjs'));
 
 const TODAY = new Date('2026-09-07T12:00:00');
@@ -356,4 +357,69 @@ test('the shipped feed fills both sides', () => {
   assert.ok(ott.length > 0, 'no streaming titles in the real feed');
   assert.ok(cin.every((r) => r.platforms.includes('theatres')));
   assert.ok(ott.every((r) => r.platforms.some((p) => p !== 'theatres')));
+});
+
+/**
+ * The cinema row leads on attention, then reverts to date.
+ *
+ * The bug this encodes: a cinema run lasts six weeks, so strict date order
+ * buries the biggest film on the board behind everything that merely opened
+ * more recently. Mirzapur: The Movie was the highest-attention title in Indian
+ * cinemas and sat nineteenth in this row.
+ */
+test('the biggest film in cinemas leads, however old it is', () => {
+  const big = row({ releaseDate: iso(35), platforms: ['theatres'], heat: 95, title: 'Long runner' });
+  const recent = Array.from({ length: 8 }, (_, i) =>
+    row({ releaseDate: iso(i), platforms: ['theatres'], heat: 10 + i }),
+  );
+  const out = inCinemas([...recent, big], 'IN', TODAY);
+  assert.equal(out.releases[0].title, 'Long runner', 'five weeks old and still the biggest');
+  assert.equal(out.trending, TRENDING_IN_CINEMAS);
+});
+
+test('behind the promoted few, the row is chronological again', () => {
+  const rows = Array.from({ length: 10 }, (_, i) =>
+    row({ releaseDate: iso(i), platforms: ['theatres'], heat: 100 - i * 10 }),
+  );
+  const out = inCinemas(rows, 'IN', TODAY);
+  const tail = out.releases.slice(TRENDING_IN_CINEMAS).map((r) => r.releaseDate);
+  assert.deepEqual([...tail].sort().reverse(), tail, 'the tail lost its date order');
+});
+
+test('one language cannot take the whole shortlist', () => {
+  // Four loud Hindi films and one quieter Tamil one. A raw heat sort would give
+  // Hindi all three slots; interleaving is this site's spine and must hold here
+  // too, because popularity does not compare across languages.
+  const hindi = Array.from({ length: 4 }, (_, i) =>
+    row({ releaseDate: iso(i + 2), platforms: ['theatres'], languages: ['hi'], heat: 90 - i }),
+  );
+  const tamil = row({ releaseDate: iso(9), platforms: ['theatres'], languages: ['ta'], heat: 40 });
+  const out = inCinemas([...hindi, tamil], 'IN', TODAY);
+  const lead = out.releases.slice(0, TRENDING_IN_CINEMAS).map((r) => r.languages[0]);
+  assert.ok(lead.includes('ta'), `one language took the shortlist: ${lead.join(', ')}`);
+});
+
+test('a row too thin to rank says nothing rather than crowning everything', () => {
+  // Three cinema listings and a shortlist of three would be the whole row
+  // wearing a badge, which tells a reader nothing.
+  const rows = Array.from({ length: 3 }, (_, i) =>
+    row({ releaseDate: iso(i), platforms: ['theatres'], heat: 50 }),
+  );
+  assert.equal(inCinemas(rows, 'IN', TODAY).trending, undefined);
+});
+
+test('promotion never duplicates a title', () => {
+  const rows = Array.from({ length: 12 }, (_, i) =>
+    row({ releaseDate: iso(i), platforms: ['theatres'], heat: i * 7 }),
+  );
+  const out = inCinemas(rows, 'IN', TODAY).releases;
+  assert.equal(new Set(out.map((r) => r.id)).size, out.length, 'a title appears twice');
+});
+
+test('the shipped feed promotes the film that prompted this', () => {
+  const feed = JSON.parse(readFileSync('public/data/releases.json', 'utf8'));
+  const all = feed.weeks.flatMap((w) => w.releases);
+  const out = inCinemas(all, 'IN', new Date('2026-09-11T06:00:00Z'));
+  assert.equal(out.trending, TRENDING_IN_CINEMAS);
+  assert.equal(out.releases[0].title, 'Mirzapur: The Movie');
 });

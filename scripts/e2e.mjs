@@ -301,6 +301,34 @@ for (const [width, height] of [[360, 780], [390, 844], [1280, 900]]) {
      `${pills[1].named} of ${pills[1].cells} named`);
 
   /*
+    The cinema row leads on attention, and says so.
+
+    A cinema run lasts six weeks, so strict date order buried the biggest film
+    on the board: Mirzapur: The Movie was the highest-attention title in Indian
+    cinemas and sat nineteenth, behind eighteen that had merely opened later.
+    The promotion is only defensible if the reader can see it happened —
+    unmarked, three out-of-order cards at the front of a row sorted by date
+    read as a bug — so the chip is asserted, not just the ordering.
+  */
+  const hot = await page.evaluate(() => {
+    const row = document.querySelectorAll('.landed--sub')[0];
+    const cells = [...row.querySelectorAll('.landed__cell')];
+    return {
+      marked: cells.filter((c) => c.querySelector('.landed__hot')).length,
+      leading: cells.slice(0, 3).filter((c) => c.querySelector('.landed__hot')).length,
+      names: cells.slice(0, 1).map((c) => c.querySelector('.landed__name')?.textContent?.trim()),
+    };
+  });
+  is(hot.marked === 3, `${width}px: three cinema cards are marked trending`, `${hot.marked} marked`);
+  is(hot.leading === 3, `${width}px: and they are the three at the front`,
+     `${hot.leading} of the first three carry the chip`);
+  is(
+    hot.names[0] === 'Mirzapur: The Movie',
+    `${width}px: the biggest film in cinemas leads the row`,
+    `the row opens with "${hot.names[0]}"`,
+  );
+
+  /*
     No window in the subtitle. It said "last 6 weeks" under a tab that says
     "This week" — a contradiction the reader has to resolve before trusting
     either. Recency now lives on each card, where it is per title and true.

@@ -747,6 +747,10 @@ export default function App() {
                    theatrical, so naming the platform on each one printed
                    "Theatres" seven times across the posters. */
                 showPlatform={false}
+                /* Marks however many of the leading cards were promoted on
+                   attention rather than date — see inCinemas. Zero on a week
+                   too thin to rank, and then the row says nothing about it. */
+                trending={cinemaRail.trending}
               />
               <PosterRail
                 compact

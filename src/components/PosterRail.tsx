@@ -78,6 +78,16 @@ interface Props {
    * gets its corner back.
    */
   showPlatform?: boolean;
+  /**
+   * How many leading cards are there on attention rather than on date.
+   *
+   * The row is otherwise strictly chronological, so promoting a five-week-old
+   * film to the front without saying why reads as a sorting bug. The chip is
+   * the difference between "this row is broken" and "this is what is big right
+   * now" — and it is only honest on the cards that were actually promoted,
+   * which is why it is a count and not a boolean on the row.
+   */
+  trending?: number;
 }
 
 /** Headings need ids to be referenced, and two rows on one page cannot share
@@ -95,6 +105,7 @@ export function PosterRail({
   onSegment,
   compact,
   showPlatform = true,
+  trending = 0,
 }: Props) {
   const track = useRef<HTMLUListElement>(null);
   const [atStart, setAtStart] = useState(true);
@@ -271,12 +282,15 @@ export function PosterRail({
         {releases.map((r, i) => {
           const p = platform(r.platforms[0]);
           const score = scoreOf(r);
+          const isTrending = i < trending;
           return (
             <li className="landed__cell" key={r.id}>
               <button
                 className="landed__card"
                 onClick={() => onOpen(r)}
-                aria-label={`${r.title} — ${p.name}, ${caption(r)}`}
+                aria-label={`${r.title} — ${p.name}, ${caption(r)}${
+                  isTrending ? ', trending in cinemas' : ''
+                }`}
               >
                 <span className="landed__art">
                   <PosterArt
@@ -301,6 +315,7 @@ export function PosterRail({
                       <span className="landed__badgename">{p.short}</span>
                     </span>
                   )}
+                  {isTrending && <span className="landed__hot">TRENDING</span>}
                   {score && (
                     <span className="landed__score" data-strong={score.strong || undefined}>
                       ★ {score.value.toFixed(1)}

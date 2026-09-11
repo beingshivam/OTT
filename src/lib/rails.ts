@@ -40,6 +40,14 @@ export interface JustLanded {
   /** The first day in the window, so the caller can say what "recently" meant. */
   from: string;
   to: string;
+  /**
+   * How many of the leading releases are there on merit rather than on date.
+   *
+   * Zero on every row but the cinema one. The caller marks this many cards and
+   * says nothing otherwise, so a row that could not rank anything degrades to
+   * the plain chronological row it always was.
+   */
+  trending?: number;
 }
 
 /**
@@ -97,15 +105,74 @@ const streaming = (r: Release) => r.platforms.some((p) => p !== 'theatres');
  */
 export const CINEMA_DAYS = 42;
 
-/** What is playing now — the segment that had nowhere to live before, and the
- *  only question on this site no streaming-only competitor can answer. */
+/**
+ * How many cinema listings lead on attention rather than on date.
+ *
+ * Three, because the question this answers is "what is the big film on right
+ * now" and that question has about three answers in any given week. More and it
+ * stops being a shortlist; fewer and a reader whose language is not one of them
+ * gets nothing.
+ */
+export const TRENDING_IN_CINEMAS = 3;
+
+/**
+ * What is playing now — the segment that had nowhere to live before, and the
+ * only question on this site no streaming-only competitor can answer.
+ *
+ * Sorted newest-first like every other row, with one exception at the front: a
+ * cinema run lasts six weeks, so date order buries the biggest film on the
+ * board the moment a quieter Friday follows it. Mirzapur: The Movie was the
+ * highest-attention title in Indian cinemas — heat 95 against a field where
+ * second place was 85 — and sat nineteenth in this row, behind eighteen films
+ * that had merely opened more recently. A reader asking what is on right now
+ * was being answered with what opened last, which is a different question and
+ * the wrong one for a medium where a hit plays for a month.
+ *
+ * So the top few by attention are promoted to the front and the rest keep their
+ * chronology. Promoted through interleaveByLanguage rather than raw heat,
+ * because that is this site's spine: TMDB popularity is not comparable across
+ * languages, and a straight sort would let one language own the shortlist on a
+ * week when it happens to be loud. Interleaving takes the best of each language
+ * in turn, so three slots mean up to three languages.
+ */
 export function inCinemas(all: Release[], region: string, today: Date = new Date()): JustLanded {
-  return chronicle(all, region, {
+  const row = chronicle(all, region, {
     from: toISODate(new Date(today.getTime() - (CINEMA_DAYS - 1) * 86_400_000)),
     to: toISODate(today),
     newestFirst: true,
     where: showing,
   });
+
+  const ranked = interleaveByLanguage(
+    all.filter(
+      (r) =>
+        r.regions?.includes(region) &&
+        r.releaseDate >= row.from &&
+        r.releaseDate <= row.to &&
+        showing(r) &&
+        Boolean(r.posterUrl),
+    ),
+    (a, b) => (b.heat ?? 0) - (a.heat ?? 0),
+    // By best rather than by count: the default asks which language has the
+    // most films out, which is not the question a shortlist answers. See
+    // interleaveByLanguage.
+    'best',
+  ).slice(0, TRENDING_IN_CINEMAS);
+
+  // Nothing to promote is a real state — a week where the whole row opened on
+  // one day, or a region with three cinema listings — and it has to read as the
+  // ordinary row rather than as a shortlist of everything there is.
+  if (ranked.length < TRENDING_IN_CINEMAS || row.total <= TRENDING_IN_CINEMAS) return row;
+
+  const lead = new Set(ranked.map((r) => r.id));
+  return {
+    ...row,
+    trending: ranked.length,
+    // The tail keeps the date order it already had; only the front is re-cut.
+    // Re-sliced to MAX_ITEMS because promoting from deep in the window can pull
+    // in titles the cap had excluded.
+    releases: [...ranked, ...row.releases.filter((r) => !lead.has(r.id))].slice(0, MAX_ITEMS),
+  };
 }
 
 /** The same fortnight the mixed row always used, narrowed to things you can
