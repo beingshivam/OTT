@@ -145,18 +145,24 @@ test('a digital date with no service still reaches the calendar, before the date
   assert.ok(only.releaseDate > TODAY, 'the fixture no longer tests the pre-release case');
 });
 
-test('a date we cannot place is dropped once it has arrived', () => {
+test('a date that has arrived still ships, service named or not', () => {
   /*
-   * Reported: a film released today showing "Platform TBA" when its service
-   * had been public for weeks. It had been — known to everyone except TMDB,
-   * which of 142 unplaced digital rows had four as rent-or-buy and 138 with
-   * nothing in any bucket at all. Before the date, "platform to be announced"
-   * is plausible and useful. On or after it, it is our ignorance wearing the
-   * industry's clothes, which is the one thing a site called New on OTT
-   * cannot do.
+   * This asserted the opposite for about an hour, and the hour was expensive.
+   *
+   * The reasoning was that a released title nobody can place is an admission
+   * rather than news — true of the *label* beside it, and I applied it to the
+   * row. The current week emptied: seven titles dated 11 September vanished,
+   * one of them a Netflix release confirmed by hand, and the site said nothing
+   * was releasing that week at all.
+   *
+   * These rows are also the only cover for the window that matters most. TMDB
+   * attaches providers on or after release day, so the current week is always
+   * sparse on its own Friday and fills in behind itself — last Friday's
+   * seventeen drops arrived days late. Without them, Friday is an empty site.
    */
   const out = byId.get('m-5~ott');
-  assert.equal(out, undefined, 'a released title with no service is still being published');
+  assert.ok(out, 'a released title with no service named has been hidden again');
+  assert.deepEqual(out.platforms, ['ott']);
 });
 
 test('a streaming date is its own row, not the cinema listing wearing its id', () => {

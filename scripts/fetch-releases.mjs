@@ -539,32 +539,26 @@ async function buildWeek(weekId, platforms, index, cinemaOnly = false) {
           if (!known.length) unplaced.push({ title: item.title ?? item.name, region, offer });
 
           /*
-           * A date we cannot place is news before the date and an admission
-           * after it.
+           * The date ships whether or not anything can name a service.
            *
-           * Measured rather than assumed: of 142 digital rows without a
-           * service, TMDB had four as rent-or-buy and 138 with nothing in any
-           * bucket at all. So this is the normal state of release type 4, not
-           * an edge case — TMDB carries the date and, for most titles, never
-           * carries the platform until well after the film has landed.
+           * This dropped a row once its date had arrived, on the reasoning that
+           * "out now, somewhere" is an admission rather than news. The
+           * reasoning was about the *label*, and I applied it to the *row* —
+           * which emptied the current week. Seven titles dated 11 September
+           * vanished, one of them a Netflix release confirmed by hand, and the
+           * site was left saying nothing at all releases this week.
            *
-           * Before the date that is still worth printing: "on OTT from the
-           * 18th, platform to be announced" answers the question people
-           * actually arrive with, and no platform having been announced *to
-           * TMDB* is consistent with none having been announced at all.
+           * The label is fixed where labels live. A row with no service named
+           * groups under "Releasing on OTT", which claims only what is true,
+           * and no longer under anything asserting that nobody has announced
+           * one. Hiding the title was never what that fixed.
            *
-           * On or after it, the same row is a different claim. Reported from
-           * the site: a film released today showing "Platform TBA" when its
-           * service had been public for weeks. It had been — the platform was
-           * known to everyone except this dataset, and dressing our ignorance
-           * up as the industry's is the one thing a site called New on OTT
-           * cannot do. So the row waits until it can name somewhere.
-           *
-           * Self-healing: every refresh re-checks these, so the row appears
-           * with its real platform the moment TMDB has one, which is usually
-           * days after the drop.
+           * These rows are also the only cover for the window that matters
+           * most: TMDB attaches providers on or after release day, so the
+           * current week is always sparse on its own Friday and fills in
+           * behind itself. Last Friday's seventeen drops reached the feed
+           * days late. Without the dated rows, Friday shows an empty site.
            */
-          if (!known.length && item.release_date <= TODAY) continue;
 
           const key = `m-${item.id}`;
           const existing = byId.get(key);
