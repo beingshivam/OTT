@@ -23,7 +23,15 @@ export interface Platform {
   regions: string[];
   /** Theatrical is not a streamer, but it belongs in the same weekly view. */
   theatrical?: boolean;
-  homeUrl: string;
+  /**
+   * Where to send somebody, when there is anywhere to send them.
+   *
+   * Optional because `ott` — a digital release date whose service TMDB has not
+   * assigned yet — is a real platform on a row and has no destination. Callers
+   * have to decide what to show instead; DetailSheet says what it knows rather
+   * than offering a link to nowhere.
+   */
+  homeUrl?: string;
   /**
    * Template for a title search on the platform, with {q} replaced by the
    * URL-encoded title. These are https links on the platform's own domain, so
@@ -65,6 +73,22 @@ export interface Platform {
  */
 export const PLATFORMS: Platform[] = [
   { id: 'theatres',    name: 'In Theatres',  short: 'Theatres',  mark: '▶',  accent: '#FFC94A', accent2: '#FF8A3D', tmdb: [],           regions: ['IN', 'US'], theatrical: true, homeUrl: 'https://in.bookmyshow.com/', searchUrl: 'https://in.bookmyshow.com/explore/movies?q={q}' },
+  /**
+   * A digital release date with no service attached yet.
+   *
+   * TMDB assigns a watch provider on release day, so a title landing on OTT in
+   * three weeks has a date and no platform — which meant "Coming soon" carried
+   * cinema listings and almost nothing else, on a site called New on OTT. TMDB
+   * does carry the *date* ahead of time, under release type 4, and a reader
+   * asking "when does this come to OTT" is asking for the date far more than
+   * for the service. So the date ships with the service marked unknown rather
+   * than the row being dropped, and the next refresh after release replaces
+   * this with the real platform.
+   *
+   * Synthetic like `theatres`: no TMDB provider id, because it is not a
+   * provider. Nothing that maps providers will ever match it.
+   */
+  { id: 'ott',         name: 'Digital release', short: 'Digital',  mark: '▶',  accent: '#7C5CFF', accent2: '#3AA0FF', tmdb: [],        regions: ['IN', 'US'] },
   { id: 'netflix',     name: 'Netflix',      short: 'Netflix',   mark: 'N',    accent: '#E50914', accent2: '#FF3B30', tmdb: [8, 1796],    regions: ['IN', 'US'], homeUrl: 'https://www.netflix.com/', searchUrl: 'https://www.netflix.com/search?q={q}' },
   { id: 'prime',       name: 'Prime Video',  short: 'Prime',     mark: 'pv',   accent: '#00A8E1', accent2: '#48D2FF', tmdb: [9, 119],     regions: ['IN', 'US'], homeUrl: 'https://www.primevideo.com/', searchUrl: 'https://www.primevideo.com/search/ref=atv_nb_sr?phrase={q}' },
   { id: 'jiohotstar',  name: 'JioHotstar',   short: 'JioHotstar',mark: 'JH',   accent: '#7B5CFF', accent2: '#22B8FF', tmdb: [2336, 122, 970], regions: ['IN'],   homeUrl: 'https://www.hotstar.com/in', searchUrl: 'https://www.hotstar.com/in/search?q={q}' },

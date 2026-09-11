@@ -21,7 +21,12 @@ import { callCount, requireToken, tmdb } from './tmdb.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
-const OUT = resolve(ROOT, 'public/data/releases.json');
+/* Overridable so the pipeline can be exercised against a stubbed TMDB without
+ * writing over the real calendar — see scripts/fetch-releases.test.mjs. The
+ * default is the only path anything in production uses. */
+const OUT = process.env.FEED_OUT
+  ? resolve(process.env.FEED_OUT)
+  : resolve(ROOT, 'public/data/releases.json');
 const IMG = 'https://image.tmdb.org/t/p';
 
 const REGIONS = (process.env.REGIONS ?? 'IN,US').split(',').map((r) => r.trim()).filter(Boolean);
@@ -229,6 +234,46 @@ async function discoverTheatrical({ region, from, to, page }) {
   });
 }
 
+/**
+ * Titles with a digital release date announced but no service yet.
+ *
+ * The same gap the theatrical pass exists to close, on the other side. Discover
+ * is asked for titles that already carry a watch provider, and TMDB assigns
+ * those on release day — so a film landing on OTT in three weeks is invisible
+ * to it, and "Coming soon" came back as cinema listings and almost nothing
+ * else. On a site called New on OTT that is the wrong week to be empty.
+ *
+ * TMDB does carry the date ahead of time: release type 4 is Digital, keyed by
+ * region exactly like the theatrical types 2 and 3. What it will not tell us is
+ * *where* — that arrives with the provider on release day — so these rows ship
+ * with the date, which is the part people are actually searching for, and the
+ * service marked unknown. The next refresh after the title lands replaces it
+ * with the real platform, because the provider pass above runs first and wins.
+ *
+ * Movies only. There is no release-type filter for TV, and asking discover for
+ * every series with a first_air_date in a window would return the world.
+ */
+async function discoverDigital({ region, from, to, page }) {
+  return tmdb('/discover/movie', {
+    'release_date.gte': from,
+    'release_date.lte': to,
+    region,
+    with_release_type: '4',
+    sort_by: 'popularity.desc',
+    include_adult: false,
+    page,
+  });
+}
+
+/** The synthetic platform a date-without-a-service lands on. Must match the
+ *  registry entry in src/data/platforms.ts. */
+const DIGITAL_ID = 'ott';
+
+/** Two pages is sixty of the most popular digital releases in a week, which is
+ *  far more than any week actually has. The cap is a guard against a query that
+ *  comes back broader than expected, not a limit anything real will hit. */
+const DIGITAL_PAGES = 2;
+
 /** True when a cinema listing is a revival rather than this week's release. */
 function isRevival(releaseDate, weekStartIso) {
   if (!releaseDate) return false;
@@ -363,6 +408,75 @@ async function buildWeek(weekId, platforms, index, cinemaOnly = false) {
             regions: [region],
             rating: item.vote_count >= MIN_VOTES ? Number(item.vote_average?.toFixed(1)) : undefined,
         votes: item.vote_count || undefined,
+            heat: heatFrom(item.popularity, item.vote_average, item.vote_count),
+            synopsis: item.overview || undefined,
+            posterUrl: item.poster_path ? `${IMG}/w500${item.poster_path}` : undefined,
+            backdropUrl: item.backdrop_path ? `${IMG}/w780${item.backdrop_path}` : undefined,
+          });
+        }
+        if (page >= (data.total_pages ?? 1)) break;
+      }
+    }
+  }
+
+  /**
+   * Announced digital dates, for weeks the provider pass cannot reach.
+   *
+   * Only forward of today, and only onto rows that came back with no streaming
+   * service at all. A past week has real providers and they are strictly better
+   * than "somewhere, eventually"; a row that already names Netflix must not
+   * also claim an unknown service. So this adds a platform where there was
+   * none, and never replaces one.
+   *
+   * Runs after the cinema fold on purpose. A film that opens in cinemas this
+   * week and streams later is a cinema listing this week — and
+   * unreleasedCannotBeStreaming below strips a streaming claim off any future
+   * theatrical row anyway, which now covers this one too.
+   */
+  if (!cinemaOnly && to >= TODAY) {
+    for (const region of REGIONS) {
+      for (let page = 1; page <= DIGITAL_PAGES; page++) {
+        let data;
+        try {
+          data = await discoverDigital({ region, from, to, page });
+        } catch {
+          // As with cinema listings: one region failing costs that region, not
+          // the week already assembled above.
+          break;
+        }
+        if (!data.results?.length) break;
+
+        for (const item of data.results) {
+          // A digital date on a film from years ago is a re-release into a
+          // catalogue, not a drop. Same bar the cinema pass uses.
+          if (isRevival(item.release_date, from)) continue;
+
+          const key = `m-${item.id}`;
+          const existing = byId.get(key);
+          if (existing) {
+            // Anything real beats an unknown, including a cinema listing —
+            // a film in cinemas this week is not "coming to streaming".
+            if (existing.platforms.length) {
+              existing.regions = [...new Set([...existing.regions, region])];
+              continue;
+            }
+            existing.platforms = [DIGITAL_ID];
+            existing.regions = [...new Set([...existing.regions, region])];
+            continue;
+          }
+
+          const genres = await genreNames('movie', item.genre_ids);
+          byId.set(key, {
+            id: key,
+            title: item.title ?? item.name,
+            kind: classify(true, genres),
+            platforms: [DIGITAL_ID],
+            languages: [item.original_language].filter(Boolean),
+            genres,
+            releaseDate: withinWeek(item.release_date, from, to) ? item.release_date : from,
+            regions: [region],
+            rating: item.vote_count >= MIN_VOTES ? Number(item.vote_average?.toFixed(1)) : undefined,
+            votes: item.vote_count || undefined,
             heat: heatFrom(item.popularity, item.vote_average, item.vote_count),
             synopsis: item.overview || undefined,
             posterUrl: item.poster_path ? `${IMG}/w500${item.poster_path}` : undefined,

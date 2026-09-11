@@ -2476,6 +2476,18 @@ a {
   line-height: 1.65;
   max-width: 62ch;
 }
+/* Said where a button would be, in the shape of a fact rather than an action,
+   because there is no action to offer yet. */
+.sheet__pending {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: var(--radius-pill);
+  border: 1px dashed var(--line-strong);
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text-2);
+}
+
 .sheet__actions {
   display: flex;
   flex-wrap: wrap;

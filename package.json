@@ -33,6 +33,7 @@
     "eval": "node scripts/eval.mjs",
     "test:rail": "node --test src/lib/rails.test.mjs",
     "test:rank": "node --test scripts/rank-movement.test.mjs",
+    "test:fetch": "node --test scripts/fetch-releases.test.mjs",
     "e2e": "node scripts/e2e.mjs",
     "lookup": "node scripts/lookup.mjs",
     "test:affiliates": "node --test src/data/affiliates.test.mjs",

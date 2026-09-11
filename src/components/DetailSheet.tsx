@@ -137,6 +137,27 @@ export function DetailSheet({ release, onClose }: Props) {
                  returns the same URL it was given. rel carries "sponsored"
                  when it is paid, which is what Google asks of affiliate links
                  and what keeps a search-dependent site out of trouble. */
+              /**
+               * A platform with nowhere to send anybody.
+               *
+               * `ott` is a date without a service: TMDB publishes a digital
+               * release date weeks ahead but assigns the provider on release
+               * day, so the calendar can say when and not where. It has no
+               * homeUrl and no searchUrl by design, which left this rendering
+               * "Watch on Digital" pointing at undefined — a button that
+               * promises the one thing the row cannot deliver.
+               *
+               * The date is still the answer most people came for, so the row
+               * stays and says exactly what it knows.
+               */
+              if (!destination) {
+                return (
+                  <p key={id} className="sheet__pending">
+                    Streaming date confirmed — the service has not been announced yet.
+                  </p>
+                );
+              }
+
               const link = outbound(id, destination);
               return (
                 <a

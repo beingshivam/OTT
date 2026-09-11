@@ -76,10 +76,13 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
   /* The highest-intent click on the site: a cinema listing one step from a
      ticket. Wrapped for affiliate credit when a programme is live, untouched
      otherwise — see data/affiliates.ts. */
-  const book = outbound(
-    'theatres',
-    cinemas.searchUrl?.replace('{q}', encodeURIComponent(release.title)) ?? cinemas.homeUrl,
-  );
+  /* Null when the registry has nowhere to send anybody. `theatres` always
+     does, but homeUrl became optional the day a platform existed that has no
+     destination at all — a digital date whose service TMDB has not assigned
+     yet — and a button whose href is undefined is worse than no button. */
+  const bookHref =
+    cinemas.searchUrl?.replace('{q}', encodeURIComponent(release.title)) ?? cinemas.homeUrl;
+  const book = bookHref ? outbound('theatres', bookHref) : null;
 
   return (
     <article className="titlepage">
@@ -213,7 +216,7 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
                 Trailer
               </a>
             )}
-            {!streaming.length && (
+            {!streaming.length && book && (
               <a
                 className="btn btn--lg"
                 href={book.href}

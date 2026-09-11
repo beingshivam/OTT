@@ -1,0 +1,158 @@
+/**
+ * The digital-release pass, run against a TMDB that does what I say it does.
+ *
+ * Two different things could be wrong with this feature and only one of them is
+ * testable here. Whether TMDB's `with_release_type=4` actually returns useful
+ * Indian titles is a question about TMDB, and no local fixture settles it —
+ * that answer arrives with the first real refresh. What a fixture *can* settle
+ * is the part I control and would not notice being wrong: that the query asks
+ * for the right thing, and that the fold never overwrites a real platform with
+ * "somewhere, eventually".
+ *
+ * That second rule is the dangerous one. Get it backwards and every Netflix
+ * row in the calendar quietly turns into "Digital release" — a regression that
+ * looks like a data problem, arrives on a Friday, and reads as the site not
+ * knowing where anything is.
+ *
+ * Runs the real script with a stubbed global fetch and FEED_OUT pointed at a
+ * temp file, so the calendar it writes over is one this test made.
+ *
+ * Run: npm run test:fetch
+ */
+
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { execFileSync } from 'node:child_process';
+
+const ROOT = new URL('..', import.meta.url).pathname;
+
+/**
+ * One TMDB, faked. Keyed loosely on the path and the params that distinguish
+ * the three discovery passes from each other.
+ */
+const STUB = `
+const movie = (id, over = {}) => ({
+  id,
+  title: 'Title ' + id,
+  original_language: 'hi',
+  release_date: TODAY,
+  genre_ids: [],
+  popularity: 10,
+  vote_average: 7,
+  vote_count: 100,
+  overview: 'x',
+  poster_path: '/p.jpg',
+  ...over,
+});
+
+import fsSync from 'node:fs';
+globalThis.__calls = [];
+process.on('exit', () => {
+  try {
+    fsSync.writeFileSync(process.env.CALL_LOG, JSON.stringify(globalThis.__calls));
+  } catch {}
+});
+globalThis.fetch = async (url) => {
+  const u = new URL(String(url));
+  const p = u.pathname;
+  const q = Object.fromEntries(u.searchParams);
+  globalThis.__calls.push({ path: p, q });
+
+  const json = (body) => ({ ok: true, status: 200, json: async () => body });
+
+  if (p.endsWith('/genre/movie/list') || p.endsWith('/genre/tv/list')) return json({ genres: [] });
+
+  // Providers: title 1 is on Netflix (provider 8); nothing else is.
+  if (/\\/watch\\/providers$/.test(p)) {
+    const id = p.split('/')[3];
+    return json(id === '1' ? { results: { IN: { flatrate: [{ provider_id: 8 }] } } } : { results: {} });
+  }
+
+  if (p.endsWith('/discover/movie')) {
+    // The theatrical pass asks for types 2|3, the digital one for 4.
+    if (q.with_release_type === '2|3') return json({ results: [movie(2)], total_pages: 1 });
+    if (q.with_release_type === '4') {
+      // 1 is already on Netflix, 2 already in cinemas, 3 is digital-only.
+      return json({ results: [movie(1), movie(2), movie(3)], total_pages: 1 });
+    }
+    // The provider pass.
+    return json({ results: [movie(1)], total_pages: 1 });
+  }
+  if (p.endsWith('/discover/tv')) return json({ results: [], total_pages: 1 });
+  if (p.endsWith('/trending/all/week')) return json({ results: [] });
+  return json({ results: [], total_pages: 1 });
+};
+`;
+
+function run() {
+  const dir = mkdtempSync(join(tmpdir(), 'feed-'));
+  const out = join(dir, 'releases.json');
+  const today = new Date().toISOString().slice(0, 10);
+  const preload = join(dir, 'stub.mjs');
+  writeFileSync(preload, `const TODAY = ${JSON.stringify(today)};\n${STUB}`);
+
+  execFileSync(
+    process.execPath,
+    ['--import', `file://${preload}`, 'scripts/fetch-releases.mjs', '--weeks-back', '0', '--weeks-ahead', '1', '--theatre-weeks-back', '0'],
+    {
+      cwd: ROOT,
+      stdio: 'pipe',
+      env: {
+        ...process.env,
+        TMDB_TOKEN: 'test-key',
+        REGIONS: 'IN',
+        FEED_OUT: out,
+        CALL_LOG: join(dir, 'calls.json'),
+      },
+    },
+  );
+
+  const feed = JSON.parse(readFileSync(out, 'utf8'));
+  const calls = JSON.parse(readFileSync(join(dir, 'calls.json'), 'utf8'));
+  rmSync(dir, { recursive: true, force: true });
+  return { feed, calls };
+}
+
+const { feed, calls } = run();
+const rows = feed.weeks.flatMap((w) => w.releases);
+const byId = new Map(rows.map((r) => [r.id, r]));
+
+test('a digital date with no service still reaches the calendar', () => {
+  // Title 3 exists only in the release-type-4 response. Without this pass it
+  // would not be in the feed at all, which is why "Coming soon" was cinema and
+  // almost nothing else.
+  const only = byId.get('m-3');
+  assert.ok(only, 'the digital-only title is missing from the feed entirely');
+  assert.deepEqual(only.platforms, ['ott']);
+});
+
+test('a real provider is never overwritten by an unknown one', () => {
+  // Title 1 comes back from the provider pass on Netflix *and* from the digital
+  // pass. Netflix is a fact; "ott" is an absence of one.
+  const known = byId.get('m-1');
+  assert.ok(known, 'the Netflix title vanished');
+  assert.ok(!known.platforms.includes('ott'), `got ${known.platforms.join(', ')}`);
+  assert.ok(known.platforms.includes('netflix'));
+});
+
+test('a cinema listing is not also "coming to streaming"', () => {
+  // Title 2 is in cinemas this week and appears in the digital response too.
+  const cinema = byId.get('m-2');
+  assert.ok(cinema, 'the theatrical title vanished');
+  assert.ok(!cinema.platforms.includes('ott'), `got ${cinema.platforms.join(', ')}`);
+  assert.ok(cinema.platforms.includes('theatres'));
+});
+
+test('the digital query asks TMDB for digital dates, by region', () => {
+  // Cheap to get wrong and invisible when you do: the wrong release type
+  // returns plausible rows that are simply the wrong list.
+  const digital = calls.filter((c) => c.q.with_release_type === '4');
+  assert.ok(digital.length > 0, 'no digital query was ever made');
+  for (const c of digital) {
+    assert.equal(c.q.region, 'IN');
+    assert.ok(c.q['release_date.gte'] && c.q['release_date.lte'], 'the window was not bounded');
+  }
+});
