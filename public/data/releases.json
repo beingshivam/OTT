@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-11T09:48:51.966Z",
+  "generatedAt": "2026-09-11T10:05:10.451Z",
   "source": "tmdb",
   "weeks": [
     {
@@ -2320,7 +2320,7 @@
             "US"
           ],
           "rating": 6.3,
-          "votes": 469,
+          "votes": 470,
           "heat": 67,
           "synopsis": "After a mysterious cosmic event rips Oak Street from suburbia and transports their neighborhood to someplace unknown, the Platt family soon discovers that their very survival depends on them sticking together as they navigate their now unrecognizable surroundings.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/fYXqpgPmHMphSF2W30GbTeJVIa5.jpg",
@@ -2404,7 +2404,7 @@
             "IN"
           ],
           "rating": 7,
-          "votes": 11,
+          "votes": 12,
           "heat": 40,
           "synopsis": "Sanjay Vishwanath is an acclaimed professional handgunner in his 40s with a major stake in fame and wealth. When he comes across a woman named Maddy in her 20s, their dynamic poses many issues that they must come to terms with.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/mLsvCffzpxxDwC7yVLJSLLjgzoq.jpg",
@@ -3459,7 +3459,7 @@
             "US"
           ],
           "rating": 6.8,
-          "votes": 580,
+          "votes": 585,
           "heat": 71,
           "synopsis": "When his young son vanishes, a widower enlists help from his estranged father, a retired detective who put away the serial killer now linked to the case.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/6UqflU8Qqkz7Dq4swJPqs0ZJjY4.jpg",
@@ -7935,7 +7935,7 @@
             "US"
           ],
           "rating": 8.1,
-          "votes": 35,
+          "votes": 36,
           "heat": 49,
           "synopsis": "In the remote South Korean village of Hope Harbor, police chief Bum-seok and officer Sung-ae are called to investigate a mysterious creature wreaking havoc on the community. But all is not as it seems, and perceptions can be misleading. What begins as ignorance plants the seed of disaster, escalating through human conflict into a tragedy of cosmic proportions.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/bcK5naYzzfY0JBCgrPrsrbV6NO1.jpg",
@@ -8251,7 +8251,7 @@
             "IN",
             "US"
           ],
-          "votes": 3,
+          "votes": 5,
           "heat": 37,
           "synopsis": "Follow a brother and sister whose fun, messy lives in New York City are interrupted when their worst nightmare comes true: Their high-achieving older sister shows up and wants to hang out with them.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/wSDM4tIC5praLH9GxZisiIBIkz.jpg",
@@ -8262,7 +8262,8 @@
             "Andrew Law",
             "Poppy Liu"
           ],
-          "trailerUrl": "https://www.youtube.com/watch?v=utE1mDVY0cA"
+          "trailerUrl": "https://www.youtube.com/watch?v=utE1mDVY0cA",
+          "rating": 8.3
         },
         {
           "id": "t-331033",
@@ -11644,6 +11645,42 @@
           "trailerUrl": "https://www.youtube.com/watch?v=oegfFHcW7OE",
           "certification": "U/A 16+",
           "theatrical": "wide"
+        },
+        {
+          "id": "hand-lust-stories-3",
+          "title": "Lust Stories 3",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "hi"
+          ],
+          "genres": [
+            "Romance",
+            "Drama"
+          ],
+          "releaseDate": "2026-09-18",
+          "regions": [
+            "IN"
+          ],
+          "sample": true,
+          "posterUrl": "https://image.tmdb.org/t/p/w500/ixWYV97WTObTSvcnExYK9sMxzxb.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w1280/kgZFECKytirVvmIbWF6slEoWZng.jpg",
+          "synopsis": "Through four bite-sized yet emotionally resonant films, the anthology once again explores lust, love, relationships, and repressed desire, offering fresh perspectives on intimacy, longing, and human connection in all their complexity.",
+          "imdbId": "tt39667834",
+          "cast": [
+            "Radhika Apte",
+            "Konkona Sen Sharma",
+            "Vijay Varma",
+            "Abhishek Banerjee",
+            "Ali Fazal"
+          ],
+          "director": "Vikramaditya Motwane",
+          "certification": "A",
+          "origin": [
+            "IN"
+          ]
         },
         {
           "id": "hand-lust-stories-3",
@@ -15154,6 +15191,6 @@
       "backdropUrl": "https://image.tmdb.org/t/p/w780/3GmRS3efCTp6jumogKOxYBrV5mO.jpg"
     }
   ],
-  "enrichedAt": "2026-09-11T09:49:29.119Z",
-  "ratedAt": "2026-09-11T09:49:29.325Z"
+  "enrichedAt": "2026-09-11T10:06:01.585Z",
+  "ratedAt": "2026-09-11T10:06:01.819Z"
 }
