@@ -281,6 +281,9 @@ const DIGITAL_ID = 'ott';
  */
 const unplaced = [];
 
+/** Cinema listings that turned out to be streaming too, for the run report. */
+const landed = [];
+
 /** Two pages is sixty of the most popular digital releases in a week, which is
  *  far more than any week actually has. The cap is a guard against a query that
  *  comes back broader than expected, not a limit anything real will hit. */
@@ -617,6 +620,46 @@ async function buildWeek(weekId, platforms, index, cinemaOnly = false) {
     }
   }
 
+  /*
+   * Ask again about the films we already have.
+   *
+   * Every pass above asks "who has this" only about titles discover just
+   * returned for this week. Nothing ever re-asks about a row already in the
+   * feed — and a cinema listing from five weeks ago is the single most likely
+   * title in the whole calendar to have just landed on OTT.
+   *
+   * Reported from the site: "I see a lot of movies and shows in the cinema rail
+   * but those were supposed to be in their respective OTT platform." They were,
+   * and the calendar had no way of finding out. The provider discovery is keyed
+   * on primary release date, so a film that opened in August and reached
+   * streaming in September is never returned for the week it streams in, and
+   * its August row keeps saying "theatres" for as long as it is on the board.
+   *
+   * A film can be both, and the row says both — see the cinema and streaming
+   * rails, which are built to overlap. This adds a platform and never removes
+   * the cinema listing.
+   *
+   * Bounded to rows with nothing but a cinema listing, so it costs one call per
+   * film actually in question rather than one per row.
+   */
+  const stale = [...byId.values()].filter(
+    (r) => r.platforms.length === 1 && r.platforms[0] === theatricalId && r.releaseDate <= TODAY,
+  );
+  for (const row of stale) {
+    const m = /^m-(\d+)$/.exec(row.id);
+    if (!m) continue;
+    for (const region of row.regions ?? []) {
+      const found = [
+        ...new Set((await providersFor(true, Number(m[1]), region)).map((p) => index.get(p)).filter(Boolean)),
+      ];
+      if (found.length) {
+        row.platforms = [...new Set([...row.platforms, ...found])];
+        landed.push(`${row.title} → ${found.join(', ')}`);
+        break;
+      }
+    }
+  }
+
   const releases = [...byId.values()]
     .map(unreleasedCannotBeStreaming)
     .sort((a, b) => (b.heat ?? 0) - (a.heat ?? 0));
@@ -861,6 +904,13 @@ console.log(`Wrote ${total} releases across ${weeks.length} weeks to ${OUT} (${c
  * read another bucket or to stop claiming a date we cannot place, and guessing
  * between those two from the outside is how the last three hours went.
  */
+if (landed.length) {
+  console.log(
+    `\n${landed.length} cinema listing(s) turned out to be streaming as well, and now say so:`,
+  );
+  for (const line of landed.slice(0, 12)) console.log(`  ${line}`);
+}
+
 if (unplaced.length) {
   const rentable = unplaced.filter((u) => u.offer.rent.length || u.offer.buy.length);
   console.log(

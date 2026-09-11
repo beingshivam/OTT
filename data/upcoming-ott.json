@@ -37,8 +37,25 @@
       "releaseDate": "2026-09-18",
       "platform": "netflix",
       "kind": "film",
-      "languages": ["hi"],
-      "regions": ["IN"]
+      "languages": [
+        "hi"
+      ],
+      "regions": [
+        "IN"
+      ]
+    },
+    {
+      "title": "Vishwanath & Sons",
+      "releaseDate": "2026-09-11",
+      "platform": "netflix",
+      "kind": "film",
+      "languages": [
+        "ta"
+      ],
+      "regions": [
+        "IN"
+      ],
+      "_source": "reported by the site owner, who checked it directly"
     }
   ]
 }
