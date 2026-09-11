@@ -269,6 +269,18 @@ async function discoverDigital({ region, from, to, page }) {
  *  registry entry in src/data/platforms.ts. */
 const DIGITAL_ID = 'ott';
 
+/**
+ * Every digital row that came back without a service, and what TMDB did have.
+ *
+ * Reported from the site: films released on OTT today showing "Platform TBA"
+ * when their service was publicly announced. Adding the provider lookup did not
+ * clear a single one of 137 rows — including 120 US rows, where TMDB's coverage
+ * is not in doubt — and a result that clean is evidence about the question, not
+ * about the network. This records which bucket TMDB actually had them in so the
+ * next run answers it instead of me reasoning about it from here.
+ */
+const unplaced = [];
+
 /** Two pages is sixty of the most popular digital releases in a week, which is
  *  far more than any week actually has. The cap is a guard against a query that
  *  comes back broader than expected, not a limit anything real will hit. */
@@ -285,6 +297,39 @@ function withinWeek(releaseDate, from, to) {
   if (!releaseDate) return false;
   const t = Date.parse(releaseDate);
   return Number.isFinite(t) && t >= Date.parse(from) && t <= Date.parse(to);
+}
+
+/**
+ * Every way TMDB says a title can be watched here, kept apart by kind.
+ *
+ * providersFor answers the question the board asks — "is this on a service
+ * somebody subscribes to" — and throws away everything else, which is right for
+ * it and useless for working out *why* a title came back unplaced. TMDB's
+ * release type 4 is "Digital", and digital is not a synonym for streaming: for
+ * a great many titles it means a rental or purchase window opening on iTunes or
+ * Amazon, which lands in the rent and buy buckets this site deliberately
+ * ignores.
+ *
+ * So the digital pass reads all of them and records what it saw. A row showing
+ * "Platform TBA" is then either a title TMDB genuinely has nothing for, or a
+ * title it has only as a rental — and those are different problems with
+ * different answers, which is not something to guess at from the outside.
+ */
+async function offersFor(id, region) {
+  const empty = { subscription: [], rent: [], buy: [] };
+  try {
+    const data = await tmdb(`/movie/${id}/watch/providers`);
+    const scoped = data.results?.[region];
+    if (!scoped) return empty;
+    const ids = (list) => (list ?? []).map((p) => p.provider_id);
+    return {
+      subscription: [...ids(scoped.flatrate), ...ids(scoped.free), ...ids(scoped.ads)],
+      rent: ids(scoped.rent),
+      buy: ids(scoped.buy),
+    };
+  } catch {
+    return empty;
+  }
 }
 
 async function providersFor(isMovie, id, region) {
@@ -486,11 +531,9 @@ async function buildWeek(weekId, platforms, index, cinemaOnly = false) {
            * which is the real state for something weeks out — not a label for a
            * question nobody asked.
            */
-          const known = [
-            ...new Set(
-              (await providersFor(true, item.id, region)).map((p) => index.get(p)).filter(Boolean),
-            ),
-          ];
+          const offer = await offersFor(item.id, region);
+          const known = [...new Set(offer.subscription.map((p) => index.get(p)).filter(Boolean))];
+          if (!known.length) unplaced.push({ title: item.title ?? item.name, region, offer });
 
           const key = `m-${item.id}`;
           const existing = byId.get(key);
@@ -733,3 +776,26 @@ await writeFile(
   ) + '\n',
 );
 console.log(`Wrote ${total} releases across ${weeks.length} weeks to ${OUT} (${callCount()} API calls).`);
+
+/*
+ * Why anything is still wearing "Platform TBA".
+ *
+ * Printed rather than inferred. The question — is TMDB silent about these
+ * titles, or does it only have them as rentals — decides whether the fix is to
+ * read another bucket or to stop claiming a date we cannot place, and guessing
+ * between those two from the outside is how the last three hours went.
+ */
+if (unplaced.length) {
+  const rentable = unplaced.filter((u) => u.offer.rent.length || u.offer.buy.length);
+  console.log(
+    `\n${unplaced.length} digital row(s) came back without a subscription service. ` +
+      `${rentable.length} of them TMDB has as rent or buy only; ` +
+      `${unplaced.length - rentable.length} it has nothing at all for.`,
+  );
+  for (const u of unplaced.slice(0, 12)) {
+    const where = u.offer.rent.length || u.offer.buy.length
+      ? `rent ${JSON.stringify(u.offer.rent)} buy ${JSON.stringify(u.offer.buy)}`
+      : 'nothing in any bucket';
+    console.log(`  ${u.region}  ${u.title.slice(0, 42).padEnd(42)} ${where}`);
+  }
+}
