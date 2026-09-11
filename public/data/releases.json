@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-11T10:05:10.451Z",
+  "generatedAt": "2026-09-11T10:08:41.084Z",
   "source": "tmdb",
   "weeks": [
     {
@@ -214,7 +214,8 @@
           "title": "Korean Kanakaraju",
           "kind": "film",
           "platforms": [
-            "theatres"
+            "theatres",
+            "netflix"
           ],
           "languages": [
             "te"
@@ -572,7 +573,8 @@
           "title": "Newton's 3rd Law",
           "kind": "film",
           "platforms": [
-            "theatres"
+            "theatres",
+            "netflix"
           ],
           "languages": [
             "te"
@@ -1142,7 +1144,8 @@
           "title": "A Child of My Own",
           "kind": "documentary",
           "platforms": [
-            "theatres"
+            "theatres",
+            "netflix"
           ],
           "languages": [
             "es"
@@ -1263,7 +1266,8 @@
           "title": "DC",
           "kind": "film",
           "platforms": [
-            "theatres"
+            "theatres",
+            "sunnxt"
           ],
           "languages": [
             "ta"
@@ -1305,7 +1309,8 @@
           "title": "G.D.N",
           "kind": "film",
           "platforms": [
-            "theatres"
+            "theatres",
+            "netflix"
           ],
           "languages": [
             "ta"
@@ -1344,7 +1349,8 @@
           "title": "THE RIBBON HERO",
           "kind": "film",
           "platforms": [
-            "theatres"
+            "theatres",
+            "netflix"
           ],
           "languages": [
             "ja"
@@ -1379,6 +1385,48 @@
           "certification": "U/A 13+",
           "origin": [
             "JP"
+          ]
+        },
+        {
+          "id": "m-1423253",
+          "title": "Korean Kanakaraju",
+          "kind": "film",
+          "platforms": [
+            "theatres",
+            "netflix"
+          ],
+          "languages": [
+            "te"
+          ],
+          "genres": [
+            "Comedy",
+            "Horror",
+            "Action"
+          ],
+          "releaseDate": "2026-08-07",
+          "regions": [
+            "US"
+          ],
+          "votes": 4,
+          "heat": 25,
+          "synopsis": "Possessed by a Korean spirit, Kanakaraju must navigate his new supernatural identity to protect his family and solve the spirit's murder.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/vUEb8v8W5ANRXhydogbmjXfRfni.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/qMcVNK71eq1oWWbAt62ZLEkEQnO.jpg",
+          "imdbId": "tt32474264",
+          "runtimeMinutes": 165,
+          "cast": [
+            "Varun Tej",
+            "Ritika Nayak",
+            "Sunil Varma",
+            "Satya",
+            "VTV Ganesh"
+          ],
+          "director": "Merlapaka Gandhi",
+          "trailerUrl": "https://www.youtube.com/watch?v=kq0X2owCVKw",
+          "certification": "U/A 16+",
+          "theatrical": "wide",
+          "origin": [
+            "IN"
           ]
         },
         {
@@ -1733,7 +1781,8 @@
           "title": "KJQ",
           "kind": "film",
           "platforms": [
-            "theatres"
+            "theatres",
+            "prime"
           ],
           "languages": [
             "te"
@@ -1888,7 +1937,8 @@
           "title": "120 Bahadur",
           "kind": "film",
           "platforms": [
-            "theatres"
+            "theatres",
+            "prime"
           ],
           "languages": [
             "hi"
@@ -2673,7 +2723,8 @@
           "title": "Freefall: A Reckoning for Boeing",
           "kind": "documentary",
           "platforms": [
-            "theatres"
+            "theatres",
+            "netflix"
           ],
           "languages": [
             "en"
@@ -2846,7 +2897,8 @@
           "title": "Pallaburusu",
           "kind": "film",
           "platforms": [
-            "theatres"
+            "theatres",
+            "prime"
           ],
           "languages": [
             "te"
@@ -3459,7 +3511,7 @@
             "US"
           ],
           "rating": 6.8,
-          "votes": 585,
+          "votes": 580,
           "heat": 71,
           "synopsis": "When his young son vanishes, a widower enlists help from his estranged father, a retired detective who put away the serial killer now linked to the case.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/6UqflU8Qqkz7Dq4swJPqs0ZJjY4.jpg",
@@ -5240,7 +5292,7 @@
             "US"
           ],
           "rating": 6.7,
-          "votes": 369,
+          "votes": 375,
           "heat": 80,
           "synopsis": "Maia Marten, a brilliant London lawyer, has her life shattered by a single call on her morning run: her son has been taken. To get him back, she must keep running, obey every ruthless command, and trust no one-each second a test of how far a mother will go to save her child.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/uxCaBoYXsDC4A0SqTm3SISj0OwK.jpg",
@@ -10388,6 +10440,47 @@
           ]
         },
         {
+          "id": "hand-vishwanath-sons",
+          "title": "Vishwanath & Sons",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "ta"
+          ],
+          "genres": [
+            "Drama",
+            "Romance"
+          ],
+          "releaseDate": "2026-09-11",
+          "regions": [
+            "IN"
+          ],
+          "sample": true,
+          "posterUrl": "https://image.tmdb.org/t/p/w500/mLsvCffzpxxDwC7yVLJSLLjgzoq.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w1280/mHTkvCDHIazVnmO3FborbN2j9t5.jpg",
+          "synopsis": "Sanjay Vishwanath is an acclaimed professional handgunner in his 40s with a major stake in fame and wealth. When he comes across a woman named Maddy in her 20s, their dynamic poses many issues that they must come to terms with.",
+          "imdbId": "tt35836025",
+          "runtimeMinutes": 161,
+          "cast": [
+            "Suriya",
+            "Mamitha Baiju",
+            "Radhika Sarathkumar",
+            "Raveena Tandon",
+            "Sunil"
+          ],
+          "director": "Venky Atluri",
+          "trailerUrl": "https://www.youtube.com/watch?v=wjycKdvm8bE",
+          "certification": "U/A 16+",
+          "theatrical": "wide",
+          "origin": [
+            "IN"
+          ],
+          "rating": 7,
+          "votes": 12
+        },
+        {
           "id": "m-1767911",
           "title": "Ozhiyathe",
           "kind": "film",
@@ -15191,6 +15284,6 @@
       "backdropUrl": "https://image.tmdb.org/t/p/w780/3GmRS3efCTp6jumogKOxYBrV5mO.jpg"
     }
   ],
-  "enrichedAt": "2026-09-11T10:06:01.585Z",
-  "ratedAt": "2026-09-11T10:06:01.819Z"
+  "enrichedAt": "2026-09-11T10:09:32.911Z",
+  "ratedAt": "2026-09-11T10:09:33.132Z"
 }
