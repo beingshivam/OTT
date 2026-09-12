@@ -1360,6 +1360,37 @@ await writeFile(resolve(ROOT, 'dist/sitemap.xml'), sitemap);
 await writeFile(FEED, JSON.stringify(feed));
 
 /**
+ * And onto the archive, which is the only record a page can have.
+ *
+ * Exactly the drift the comment above warns about, arriving the first time two
+ * films shared a name. The collision rule gave the older Spark /spark-2026,
+ * this stamped that onto the feed, and the archive — where that row actually
+ * lives, its week having rolled out of the feed window — kept nothing. Anything
+ * reading the archive then slugified the title itself, got `spark`, and
+ * concluded the published page had no row behind it. The grader caught it and
+ * refused to publish, which is the system working, but the page was fine and
+ * the record was wrong.
+ *
+ * Only rows that gained or changed a slug are written, so a build that resolves
+ * nothing leaves the file untouched and the commit step has nothing to say.
+ */
+let restamped = 0;
+for (const r of archived) {
+  const slug = slugFor(r.id);
+  if (slug && r.slug !== slug) {
+    r.slug = slug;
+    restamped++;
+  }
+}
+if (restamped) {
+  const path = resolve(ROOT, 'data/archive.json');
+  const stored = JSON.parse(await readFile(path, 'utf8'));
+  stored.titles = archived;
+  await writeFile(path, JSON.stringify(stored));
+  console.log(`     stamped the published slug onto ${restamped} archive row(s)`);
+}
+
+/**
  * The same build id at a URL, because meta tags are unreachable on a phone.
  *
  * Confirming which build is live otherwise means view-source, which iOS Safari
