@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-12T05:50:06.417Z",
+  "generatedAt": "2026-09-12T06:04:33.946Z",
   "source": "tmdb",
   "weeks": [
     {
@@ -47,9 +47,7 @@
           "theatrical": "wide",
           "origin": [
             "US"
-          ],
-          "imdbRating": 8.1,
-          "imdbVotes": 183571
+          ]
         },
         {
           "id": "m-1288059",
@@ -87,9 +85,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=q5oWCPS3akw",
           "origin": [
             "US"
-          ],
-          "imdbRating": 6,
-          "imdbVotes": 4928
+          ]
         },
         {
           "id": "m-1477712",
@@ -132,9 +128,7 @@
             "GB",
             "FR",
             "JP"
-          ],
-          "imdbRating": 3.8,
-          "imdbVotes": 1832
+          ]
         },
         {
           "id": "m-1545486",
@@ -295,9 +289,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=0LB3yWX1R8Y",
           "origin": [
             "US"
-          ],
-          "imdbRating": 3.6,
-          "imdbVotes": 584
+          ]
         },
         {
           "id": "m-1741770",
@@ -1103,9 +1095,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=lDsAVq9lo9g",
           "origin": [
             "US"
-          ],
-          "imdbRating": 6.3,
-          "imdbVotes": 6744
+          ]
         },
         {
           "id": "m-1329016",
@@ -1147,9 +1137,7 @@
           "origin": [
             "US",
             "CA"
-          ],
-          "imdbRating": 7.7,
-          "imdbVotes": 156
+          ]
         },
         {
           "id": "m-1240889",
@@ -1190,9 +1178,7 @@
           "origin": [
             "GB",
             "US"
-          ],
-          "imdbRating": 7.1,
-          "imdbVotes": 912
+          ]
         },
         {
           "id": "m-1616131",
@@ -1522,9 +1508,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=cYFevn5frf0",
           "origin": [
             "US"
-          ],
-          "imdbRating": 6.2,
-          "imdbVotes": 687
+          ]
         },
         {
           "id": "m-1596318",
@@ -1820,9 +1804,7 @@
           "theatrical": "wide",
           "origin": [
             "JP"
-          ],
-          "imdbRating": 6.8,
-          "imdbVotes": 412
+          ]
         },
         {
           "id": "m-1437143",
@@ -1864,9 +1846,7 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 7.3,
-          "imdbVotes": 1097
+          ]
         },
         {
           "id": "m-1657464",
@@ -1982,9 +1962,7 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 7.1,
-          "imdbVotes": 4430
+          ]
         },
         {
           "id": "m-1740942",
@@ -2403,9 +2381,7 @@
           "theatrical": "wide",
           "origin": [
             "US"
-          ],
-          "imdbRating": 6.6,
-          "imdbVotes": 18446
+          ]
         },
         {
           "id": "m-1185806",
@@ -2448,9 +2424,7 @@
           "origin": [
             "CA",
             "US"
-          ],
-          "imdbRating": 6.2,
-          "imdbVotes": 1038
+          ]
         },
         {
           "id": "m-1408162",
@@ -2531,9 +2505,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=zrcg8YHSys8",
           "origin": [
             "US"
-          ],
-          "imdbRating": 5.4,
-          "imdbVotes": 1500
+          ]
         },
         {
           "id": "m-192139",
@@ -2572,9 +2544,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=a-T0TlMN-RE",
           "origin": [
             "US"
-          ],
-          "imdbRating": 6.3,
-          "imdbVotes": 2103
+          ]
         },
         {
           "id": "m-1036081",
@@ -2655,9 +2625,7 @@
           "origin": [
             "GB",
             "US"
-          ],
-          "imdbRating": 7.7,
-          "imdbVotes": 348
+          ]
         },
         {
           "id": "m-1444466",
@@ -2817,9 +2785,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=5mtbOhpqroo",
           "origin": [
             "US"
-          ],
-          "imdbRating": 7.7,
-          "imdbVotes": 147
+          ]
         },
         {
           "id": "m-1506833",
@@ -3037,9 +3003,7 @@
             "GB",
             "DE",
             "IT"
-          ],
-          "imdbRating": 5.2,
-          "imdbVotes": 196
+          ]
         },
         {
           "id": "m-1706696",
@@ -3391,9 +3355,7 @@
           "origin": [
             "GB",
             "US"
-          ],
-          "imdbRating": 5.7,
-          "imdbVotes": 17192
+          ]
         },
         {
           "id": "m-1621552",
@@ -3434,9 +3396,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=Rk0efhpa-5Y",
           "origin": [
             "MX"
-          ],
-          "imdbRating": 6.7,
-          "imdbVotes": 6577
+          ]
         },
         {
           "id": "m-1516698",
@@ -3604,9 +3564,7 @@
           "theatrical": "wide",
           "origin": [
             "US"
-          ],
-          "imdbRating": 6.2,
-          "imdbVotes": 13228
+          ]
         },
         {
           "id": "m-1729723",
@@ -3685,9 +3643,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=7JsnZ47CTDg",
           "origin": [
             "CN"
-          ],
-          "imdbRating": 8.4,
-          "imdbVotes": 366
+          ]
         },
         {
           "id": "m-1497463",
@@ -3770,9 +3726,7 @@
             "PL",
             "GR",
             "SE"
-          ],
-          "imdbRating": 4.6,
-          "imdbVotes": 303
+          ]
         },
         {
           "id": "m-1140521",
@@ -3813,9 +3767,7 @@
           "origin": [
             "GB",
             "US"
-          ],
-          "imdbRating": 6.2,
-          "imdbVotes": 4800
+          ]
         },
         {
           "id": "m-1000866",
@@ -3855,9 +3807,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=f9i2ImuGEVs",
           "origin": [
             "FR"
-          ],
-          "imdbRating": 7.4,
-          "imdbVotes": 5131
+          ]
         },
         {
           "id": "m-1235304",
@@ -3899,9 +3849,7 @@
           "origin": [
             "FR",
             "BE"
-          ],
-          "imdbRating": 7.5,
-          "imdbVotes": 774
+          ]
         },
         {
           "id": "t-275224",
@@ -3920,7 +3868,8 @@
           ],
           "releaseDate": "2026-08-26",
           "regions": [
-            "US"
+            "US",
+            "IN"
           ],
           "rating": 9.5,
           "votes": 34,
@@ -4199,7 +4148,8 @@
           ],
           "releaseDate": "2026-08-27",
           "regions": [
-            "US"
+            "US",
+            "IN"
           ],
           "heat": 26,
           "synopsis": "Billy, a former cameraman, encounters Dani on a Sydney Harbour ferry as their different worlds intersect.",
@@ -4256,9 +4206,7 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 8.9,
-          "imdbVotes": 1175
+          ]
         },
         {
           "id": "m-1422011",
@@ -4297,9 +4245,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=9k7jckaHeuA",
           "origin": [
             "US"
-          ],
-          "imdbRating": 5.7,
-          "imdbVotes": 4354
+          ]
         },
         {
           "id": "m-1316427",
@@ -4340,9 +4286,7 @@
           "origin": [
             "SA",
             "EG"
-          ],
-          "imdbRating": 5.6,
-          "imdbVotes": 4984
+          ]
         },
         {
           "id": "t-326879",
@@ -4515,9 +4459,7 @@
           ],
           "origin": [
             "BR"
-          ],
-          "imdbRating": 7.5,
-          "imdbVotes": 22
+          ]
         },
         {
           "id": "m-1307247",
@@ -4593,9 +4535,7 @@
             "LU",
             "IE",
             "CZ"
-          ],
-          "imdbRating": 6.8,
-          "imdbVotes": 222
+          ]
         },
         {
           "id": "t-330438",
@@ -4908,9 +4848,7 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 6.6,
-          "imdbVotes": 6203
+          ]
         },
         {
           "id": "m-1756456",
@@ -5041,9 +4979,7 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 10,
-          "imdbVotes": 1029
+          ]
         },
         {
           "id": "t-330667",
@@ -5207,9 +5143,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=kMsiD1Nky5I",
           "origin": [
             "US"
-          ],
-          "imdbRating": 7.6,
-          "imdbVotes": 18537
+          ]
         },
         {
           "id": "m-1375646",
@@ -5251,9 +5185,7 @@
           "theatrical": "wide",
           "origin": [
             "KR"
-          ],
-          "imdbRating": 6.5,
-          "imdbVotes": 10630
+          ]
         },
         {
           "id": "m-1137844",
@@ -5294,9 +5226,7 @@
           "certification": "U/A 16+",
           "origin": [
             "US"
-          ],
-          "imdbRating": 6.9,
-          "imdbVotes": 9404
+          ]
         },
         {
           "id": "m-1386315",
@@ -5337,9 +5267,7 @@
           "origin": [
             "US",
             "GB"
-          ],
-          "imdbRating": 4.1,
-          "imdbVotes": 13027
+          ]
         },
         {
           "id": "m-1506560",
@@ -5382,9 +5310,7 @@
           "origin": [
             "CA",
             "US"
-          ],
-          "imdbRating": 4.6,
-          "imdbVotes": 415
+          ]
         },
         {
           "id": "m-1514026",
@@ -5424,9 +5350,7 @@
           "origin": [
             "US",
             "IL"
-          ],
-          "imdbRating": 7.1,
-          "imdbVotes": 5019
+          ]
         },
         {
           "id": "m-1384216",
@@ -5465,9 +5389,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=-xSxaE1ClEE",
           "origin": [
             "US"
-          ],
-          "imdbRating": 6.5,
-          "imdbVotes": 13521
+          ]
         },
         {
           "id": "m-1471168",
@@ -5588,9 +5510,7 @@
           "origin": [
             "GB",
             "US"
-          ],
-          "imdbRating": 5.7,
-          "imdbVotes": 1565
+          ]
         },
         {
           "id": "m-1355228",
@@ -5632,9 +5552,7 @@
           "certification": "U/A 16+",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 5.3,
-          "imdbVotes": 8543
+          ]
         },
         {
           "id": "m-1365884",
@@ -5757,9 +5675,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=LlAajeOoFBo",
           "origin": [
             "GB"
-          ],
-          "imdbRating": 7.5,
-          "imdbVotes": 16
+          ]
         },
         {
           "id": "m-1339588",
@@ -5799,9 +5715,7 @@
           "origin": [
             "GB",
             "US"
-          ],
-          "imdbRating": 7.2,
-          "imdbVotes": 939
+          ]
         },
         {
           "id": "t-290193",
@@ -5842,9 +5756,7 @@
           "certification": "U/A 16+",
           "origin": [
             "KR"
-          ],
-          "imdbRating": 7,
-          "imdbVotes": 1258
+          ]
         },
         {
           "id": "t-290234",
@@ -5878,9 +5790,7 @@
             "Diana Bovio",
             "Iván Amozurrutia"
           ],
-          "trailerUrl": "https://www.youtube.com/watch?v=3-oqCwQd8Ec",
-          "imdbRating": 5.7,
-          "imdbVotes": 123
+          "trailerUrl": "https://www.youtube.com/watch?v=3-oqCwQd8Ec"
         },
         {
           "id": "t-305644",
@@ -5918,9 +5828,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=KapADxhCvvM",
           "origin": [
             "KR"
-          ],
-          "imdbRating": 8.7,
-          "imdbVotes": 241
+          ]
         },
         {
           "id": "m-1127625",
@@ -5958,9 +5866,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=TK5j6lQk7CE",
           "origin": [
             "GB"
-          ],
-          "imdbRating": 6.6,
-          "imdbVotes": 7077
+          ]
         },
         {
           "id": "m-1752159",
@@ -6153,9 +6059,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=UoAf0LNAn30",
           "origin": [
             "US"
-          ],
-          "imdbRating": 6.2,
-          "imdbVotes": 957
+          ]
         },
         {
           "id": "m-1739202",
@@ -6237,6 +6141,42 @@
           "certification": "U/A 16+",
           "origin": [
             "AR"
+          ]
+        },
+        {
+          "id": "t-331370",
+          "title": "Still Water",
+          "kind": "series",
+          "platforms": [
+            "disney"
+          ],
+          "languages": [
+            "th"
+          ],
+          "genres": [
+            "Drama",
+            "Mystery"
+          ],
+          "releaseDate": "2026-08-28",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "votes": 2,
+          "heat": 22,
+          "synopsis": "The small town of Wari Pasop appears peaceful, but beneath the calm exterior hides dark secrets. Years earlier, the unexplained disappearance of a woman set off a chain of events leading to a complex series of murders and a race to uncover a well-buried truth.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/migkgHHSC0kqSu1sztRekdxf679.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/wOjUiHUYoQsjQNUhQgzxHj0Kns3.jpg",
+          "imdbId": "tt43749537",
+          "cast": [
+            "Sutatta Udomsilp",
+            "Sirin Preediyanon",
+            "Kullanat Preeyawat",
+            "Ornjira Lamwilai",
+            "Artit Tangwiboonpanit"
+          ],
+          "origin": [
+            "TH"
           ]
         },
         {
@@ -6652,9 +6592,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=nTIfzXx8nJY",
           "origin": [
             "US"
-          ],
-          "imdbRating": 7.2,
-          "imdbVotes": 21
+          ]
         },
         {
           "id": "m-1748499",
@@ -6729,9 +6667,7 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 9.2,
-          "imdbVotes": 3189
+          ]
         },
         {
           "id": "m-1755667",
@@ -6802,9 +6738,7 @@
             "NL",
             "US",
             "KH"
-          ],
-          "imdbRating": 6.5,
-          "imdbVotes": 196
+          ]
         },
         {
           "id": "m-1294972",
@@ -6843,9 +6777,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=mfq5MFQ58wU",
           "origin": [
             "JP"
-          ],
-          "imdbRating": 7,
-          "imdbVotes": 205
+          ]
         },
         {
           "id": "m-1669281",
@@ -6884,9 +6816,7 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 6.7,
-          "imdbVotes": 18
+          ]
         },
         {
           "id": "m-1701716",
@@ -7043,9 +6973,7 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 9.6,
-          "imdbVotes": 430
+          ]
         },
         {
           "id": "m-1760508",
@@ -7598,9 +7526,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=OFaJzL83y0Q",
           "origin": [
             "KR"
-          ],
-          "imdbRating": 6.9,
-          "imdbVotes": 1504
+          ]
         },
         {
           "id": "th-jeevan-bheema-yojana",
@@ -7775,9 +7701,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=WlGzP8FvsfY",
           "origin": [
             "ES"
-          ],
-          "imdbRating": 5.6,
-          "imdbVotes": 325
+          ]
         },
         {
           "id": "hu-signal-one",
@@ -8075,9 +7999,44 @@
           "trailerUrl": "https://www.youtube.com/watch?v=abeSQSbNXSk",
           "origin": [
             "CN"
+          ]
+        },
+        {
+          "id": "t-300507",
+          "title": "Crew Girl",
+          "kind": "series",
+          "platforms": [
+            "netflix"
           ],
-          "imdbRating": 8.6,
-          "imdbVotes": 351
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Drama"
+          ],
+          "releaseDate": "2026-09-10",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "rating": 7.8,
+          "votes": 12,
+          "heat": 52,
+          "synopsis": "After a family scandal, teen rower Teagan Tao moves to a small town and joins an elite prep school's all-boys crew, sparking rivalry and attraction.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/jkPZW1iHNvlI6077NxSxwITa1tj.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/lmtTtOjsIBxwKD7LsAD5eeyhq1g.jpg",
+          "imdbId": "tt38218082",
+          "cast": [
+            "Miku Martineau",
+            "Jessica Paré",
+            "Samuel Braun",
+            "Kyle Clark",
+            "Thomas Cadrot"
+          ],
+          "trailerUrl": "https://www.youtube.com/watch?v=Xs5qsfqp-tA",
+          "origin": [
+            "CA"
+          ]
         },
         {
           "id": "t-258230",
@@ -8159,9 +8118,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=4280xkO7x0w",
           "origin": [
             "CN"
-          ],
-          "imdbRating": 3.7,
-          "imdbVotes": 447
+          ]
         },
         {
           "id": "m-1522689",
@@ -8281,9 +8238,7 @@
           "origin": [
             "US",
             "AU"
-          ],
-          "imdbRating": 6.6,
-          "imdbVotes": 493
+          ]
         },
         {
           "id": "t-304842",
@@ -8300,7 +8255,8 @@
           ],
           "releaseDate": "2026-09-08",
           "regions": [
-            "US"
+            "US",
+            "IN"
           ],
           "rating": 5.9,
           "votes": 9,
@@ -8358,9 +8314,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=WKPSSLbnh-E",
           "origin": [
             "US"
-          ],
-          "imdbRating": 4,
-          "imdbVotes": 193
+          ]
         },
         {
           "id": "m-1380417",
@@ -8488,7 +8442,8 @@
           ],
           "releaseDate": "2026-09-07",
           "regions": [
-            "US"
+            "US",
+            "IN"
           ],
           "votes": 2,
           "heat": 38,
@@ -8549,6 +8504,44 @@
           ]
         },
         {
+          "id": "t-313172",
+          "title": "Chumbak",
+          "kind": "series",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "hi"
+          ],
+          "genres": [
+            "Comedy",
+            "Family"
+          ],
+          "releaseDate": "2026-09-10",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 36,
+          "synopsis": "Five quirky families navigate life as neighbors in Chumbak Colony, where chaotic conflicts and hilarious antics turn each day into a new chapter.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/r2TJ9s9uhfxTssar1gBAWcxIXx7.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/2N1kH7314XUfMw80iLZh1d2UoHY.jpg",
+          "imdbId": "tt39640519",
+          "cast": [
+            "Deven Bhojani",
+            "Neena Gupta",
+            "Sumeet Vyas",
+            "Manasi Parekh",
+            "Sumeet Raghvan"
+          ],
+          "director": "Aatish Kapadia",
+          "trailerUrl": "https://www.youtube.com/watch?v=69auJ1F1EsE",
+          "certification": "U/A 13+",
+          "origin": [
+            "IN"
+          ]
+        },
+        {
           "id": "m-1284046",
           "title": "Onslaught",
           "kind": "film",
@@ -8586,9 +8579,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=AMLCbpM1fRQ",
           "origin": [
             "US"
-          ],
-          "imdbRating": 6.2,
-          "imdbVotes": 1404
+          ]
         },
         {
           "id": "m-1447853",
@@ -8741,9 +8732,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=Mrml6hR4XT4",
           "origin": [
             "US"
-          ],
-          "imdbRating": 4.9,
-          "imdbVotes": 185
+          ]
         },
         {
           "id": "m-1317872",
@@ -9556,6 +9545,77 @@
           ]
         },
         {
+          "id": "m-1558568~ott",
+          "title": "Go Team!",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "es"
+          ],
+          "genres": [
+            "Comedy"
+          ],
+          "releaseDate": "2026-09-11",
+          "regions": [
+            "US"
+          ],
+          "votes": 4,
+          "heat": 38,
+          "synopsis": "When their team-building event gets downgraded to a tiny village, a cheese company's staff think it can't get worse — then they learn about the layoffs.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/jM8LRvzYIqZqw6Si5xNECiHFDgM.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/24JmHBUaZVmZRoEMjzejLL3sJc5.jpg",
+          "imdbId": "tt38616652",
+          "cast": [
+            "Alexandra Jiménez",
+            "Maribel Verdú",
+            "Pedro Casablanc",
+            "Pepe Viyuela",
+            "Raúl Tejón"
+          ],
+          "director": "Diego Núñez Irigoyen",
+          "trailerUrl": "https://www.youtube.com/watch?v=VSN8YM6urHo",
+          "origin": [
+            "ES"
+          ]
+        },
+        {
+          "id": "t-260249",
+          "title": "The Trial",
+          "kind": "series",
+          "platforms": [
+            "prime"
+          ],
+          "languages": [
+            "es"
+          ],
+          "genres": [
+            "Drama"
+          ],
+          "releaseDate": "2026-09-11",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 31,
+          "synopsis": "A teenager and her father struggle for justice after she is sexually assaulted by the scion of a successful businessman. Not only will the father and daughter have to navigate a failed judicial system, but they must also contend with a wealthy adversary bent on using all his power to protect his son.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/bFg26U2rS3TmcYRPSYY7FRkVWHc.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/bLcF9mcinphgFlXEfk7RkCSfqCv.jpg",
+          "imdbId": "tt33023009",
+          "cast": [
+            "Eugenio Derbez",
+            "Pedro Alonso",
+            "Karla Gaytán",
+            "Íker Sánchez Solano",
+            "Sergio Gava"
+          ],
+          "origin": [
+            "MX",
+            "US"
+          ]
+        },
+        {
           "id": "t-249863",
           "title": "The Revolutionaries",
           "kind": "series",
@@ -9627,6 +9687,181 @@
           "trailerUrl": "https://www.youtube.com/watch?v=l5Luvr9TRRc",
           "origin": [
             "US"
+          ]
+        },
+        {
+          "id": "t-299939",
+          "title": "Monster: The Lizzie Borden Story",
+          "kind": "series",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Drama"
+          ],
+          "releaseDate": "2026-09-17",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 28,
+          "synopsis": "Trapped in a cruel Victorian-era household, Lizzie Borden kills her parents in a gory ax murder that shocks the nation.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/57XScX1aYtKi1LvHYFQLPUxVhTG.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/m97hzwX4ZmkMVB6Drky8fwg635n.jpg",
+          "imdbId": "tt13207736",
+          "cast": [
+            "Ella Beatty",
+            "Vicky Krieps",
+            "Sarah Paulson",
+            "Charlie Hunnam",
+            "Rebecca Hall"
+          ],
+          "trailerUrl": "https://www.youtube.com/watch?v=gYTzF1vna40",
+          "origin": [
+            "US"
+          ]
+        },
+        {
+          "id": "t-332863",
+          "title": "Stolen Heartbeats",
+          "kind": "series",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "es"
+          ],
+          "genres": [
+            "Drama",
+            "Mystery"
+          ],
+          "releaseDate": "2026-09-11",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "votes": 1,
+          "heat": 28,
+          "synopsis": "After an attack leaves a woman named Anabel comatose, she and Rafael—a nurse who has the unique ability to hear the dead—must work together to keep her alive while hiding from her enemies.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/3rnQOZr6yoVWYdy5BiSO4xItYi4.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/Aoz8YOuq0POpE7rDcYzpLdNMv70.jpg"
+        },
+        {
+          "id": "m-1542187~ott",
+          "title": "Varavu",
+          "kind": "film",
+          "platforms": [
+            "zee5"
+          ],
+          "languages": [
+            "ml"
+          ],
+          "genres": [
+            "Action",
+            "Thriller"
+          ],
+          "releaseDate": "2026-09-11",
+          "regions": [
+            "IN"
+          ],
+          "votes": 1,
+          "heat": 26,
+          "synopsis": "A family falls victim to the powerful elite in a small town. One man's return forces a confrontation that will expose decades of lies and corruption",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/6sjawSVPrR5liK2iy543k7J33G4.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/321ed6TvXWw5Y6SRcFF2DuAgpjC.jpg",
+          "imdbId": "tt37963237",
+          "runtimeMinutes": 143,
+          "cast": [
+            "Joju George",
+            "Vani Viswanath",
+            "Murali Gopy",
+            "Arjun Ashokan",
+            "Saniya Iyyappan"
+          ],
+          "director": "Shaji Kailas",
+          "trailerUrl": "https://www.youtube.com/watch?v=aQ7tTufi63s",
+          "theatrical": "wide",
+          "origin": [
+            "IN"
+          ]
+        },
+        {
+          "id": "t-273207",
+          "title": "Neagley",
+          "kind": "series",
+          "platforms": [
+            "prime"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Drama",
+            "Mystery",
+            "Crime"
+          ],
+          "releaseDate": "2026-09-16",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "votes": 2,
+          "heat": 26,
+          "synopsis": "Frances Neagley is a private investigator in Chicago. When she learns that a beloved friend from her past has been killed in a suspicious accident, she becomes hell bent on justice. Using everything she's learned from Jack Reacher and her time as a member of the 110 Special Investigators, Neagley puts herself on a dangerous path to uncover a menacing evil.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/1m6CxPAuGv2oHc1ahERrcVWnk2J.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/20ivBYm3H9MbGtRISGdhjydll9L.jpg",
+          "imdbId": "tt33539520",
+          "cast": [
+            "Maria Sten",
+            "Greyston Holt",
+            "Adeline Rudolph",
+            "Matthew Del Negro",
+            "Damon Herriman"
+          ],
+          "trailerUrl": "https://www.youtube.com/watch?v=BOzNaa_o9_g",
+          "origin": [
+            "US"
+          ]
+        },
+        {
+          "id": "m-1372059~ott",
+          "title": "Ghamasaan",
+          "kind": "film",
+          "platforms": [
+            "zee5"
+          ],
+          "languages": [
+            "hi"
+          ],
+          "genres": [
+            "Thriller",
+            "Action"
+          ],
+          "releaseDate": "2026-09-11",
+          "regions": [
+            "IN"
+          ],
+          "heat": 25,
+          "synopsis": "A cat-and-mouse tale set in the Hindi heartland, where male friendships and rivalries unveil homoerotic tensions. Men on both sides of the law traverse arid lands, creating a sense of place where unexplored histories reside.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/tiiCF0MkRRNooqO53Esu0jtTYMJ.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/7yCPyIQVyFkx0wtKnFbVMKccqUQ.jpg",
+          "imdbId": "tt33744610",
+          "runtimeMinutes": 142,
+          "cast": [
+            "Pratik Gandhi",
+            "Arshad Warsi",
+            "Ishita Dutta",
+            "Rajpal Yadav",
+            "Jatin Goswami"
+          ],
+          "director": "Tigmanshu Dhulia",
+          "trailerUrl": "https://www.youtube.com/watch?v=OEvaXgDTPmU",
+          "certification": "U/A 16+",
+          "origin": [
+            "IN"
           ]
         },
         {
@@ -9781,6 +10016,43 @@
           ]
         },
         {
+          "id": "t-252105",
+          "title": "Golden Axe",
+          "kind": "anime",
+          "platforms": [
+            "paramount"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Animation",
+            "Sci-Fi & Fantasy"
+          ],
+          "releaseDate": "2026-09-16",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 21,
+          "synopsis": "Legendary warriors Ax Battler, Tyris Flare, and Gilius Thunderhead reunite to save Yuria from the evil giant Death Adder, who just won't seem to stay dead. Their quest is complicated by Hampton Squib, an inexperienced and wildly underprepared adventurer whose dream of heroism far exceeds his abilities. Forced to work together despite their flaws, they must find a way to stop Death Adder once and for all.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/toEwR5VTFzHmxW1pX1HjtTXH6QH.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/zOcEo3oQf9KDPPxZueNhReN6TBr.jpg",
+          "imdbId": "tt32149571",
+          "cast": [
+            "Matthew Rhys",
+            "Danny Pudi",
+            "Lisa Gilroy",
+            "Liam McIntyre",
+            "Carl Tart"
+          ],
+          "trailerUrl": "https://www.youtube.com/watch?v=sStbBtfGaLA",
+          "origin": [
+            "JP",
+            "US"
+          ]
+        },
+        {
           "id": "m-1523553",
           "title": "Dark Horse",
           "kind": "film",
@@ -9815,6 +10087,147 @@
           "origin": [
             "US",
             "BR"
+          ]
+        },
+        {
+          "id": "t-332401",
+          "title": "City of Blood",
+          "kind": "series",
+          "platforms": [
+            "disney"
+          ],
+          "languages": [
+            "de"
+          ],
+          "genres": [
+            "Mystery"
+          ],
+          "releaseDate": "2026-09-16",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 20,
+          "synopsis": "Berlin — a city-state on the brink. While a privileged few live beneath a climate-controlled dome, those outside struggle to survive in a world ravaged by heat, corruption, and crime. After years apart, sisters Bea and Phoebe are reunited and uncover a dark secret: Vampires are determined to seize political power — and blood has become the city's new currency.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/uDrW8sRRkh8P7N0l19BNrCrG6CW.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/nAEIr2b9M9ya8SXOTA1bDDMjhCA.jpg",
+          "imdbId": "tt32642114",
+          "cast": [
+            "Lea Drinda",
+            "Soma Pysall",
+            "Franz Hartwig",
+            "David Schütter",
+            "Mouataz Alshaltouh"
+          ],
+          "trailerUrl": "https://www.youtube.com/watch?v=zzjxf3ExHc4",
+          "origin": [
+            "DE",
+            "ES"
+          ]
+        },
+        {
+          "id": "m-1753614~ott",
+          "title": "Tribeca 25",
+          "kind": "documentary",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Documentary"
+          ],
+          "releaseDate": "2026-09-11",
+          "regions": [
+            "US"
+          ],
+          "heat": 19,
+          "synopsis": "25 years after 9/11, discover how Robert De Niro and Jane Rosenthal transformed an ambitious effort to revive Lower Manhattan into one of the world's leading cultural institutions. Through rare archival footage, exclusive interviews and behind-the-scenes access, explore how art can foster community, confront injustice, and help shape culture.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/u2QerAAASBDxb4WwjfOglwdqtqO.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/Ao3j6UGri7f82XKsyNqRZXaA8Ep.jpg",
+          "imdbId": "tt43675910",
+          "runtimeMinutes": 52,
+          "cast": [
+            "Robert De Niro",
+            "Jane Rosenthal",
+            "Martin Scorsese",
+            "Francis Ford Coppola",
+            "Damien Chazelle"
+          ],
+          "director": "Matt Tyrnauer",
+          "trailerUrl": "https://www.youtube.com/watch?v=-3ybhlaI2Ac",
+          "origin": [
+            "US"
+          ]
+        },
+        {
+          "id": "t-320760",
+          "title": "Not a Stranger",
+          "kind": "series",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "tr"
+          ],
+          "genres": [
+            "Drama"
+          ],
+          "releaseDate": "2026-09-17",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 19,
+          "synopsis": "After giving birth, painter Funda put her career on hold to focus on her child. Ready to return to painting, she finally finds the nanny she has been searching for: Nazlı. But the mysterious and increasingly unsettling woman soon begins to disrupt the seemingly peaceful lives of Funda and her husband İlker. What begins as a simple employment arrangement develops into a dangerous psychological game in which desire, secrets and loyalty are put to the test.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/tgBRNtynz81e0DE4bWo8XwTbCw9.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/vPQ4Ctn8MS6NBP73duf0GHtbziU.jpg",
+          "imdbId": "tt39397536",
+          "cast": [
+            "Melis Sezen",
+            "Elçin Sangu",
+            "Ozan Dolunay",
+            "Cemal Hünal",
+            "Efe Taşdelen"
+          ],
+          "origin": [
+            "TR"
+          ]
+        },
+        {
+          "id": "t-299255",
+          "title": "Minimum Security",
+          "kind": "series",
+          "platforms": [
+            "disney"
+          ],
+          "languages": [
+            "fr"
+          ],
+          "genres": [
+            "Comedy"
+          ],
+          "releaseDate": "2026-09-16",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 19,
+          "synopsis": "Corinne runs Chénoise prison with her unlikely team: By-the-book Jeff, JP who's always been closer to inmates than colleagues, and rookie Stéphanie.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/c0vJ8YFq7mUwdA8z16OtW9peTWd.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/jWVY5p4GYSuk30emiS3VhPBNQ69.jpg",
+          "imdbId": "tt44924447",
+          "cast": [
+            "Audrey Lamy",
+            "Jean-Pascal Zadi",
+            "Benjamin Tranié",
+            "Eva Huault",
+            "Jérémy Nadeau"
+          ],
+          "director": "John Wax",
+          "origin": [
+            "FR"
           ]
         },
         {
@@ -9853,6 +10266,78 @@
           "director": "Karlijn Milder",
           "origin": [
             "NL"
+          ]
+        },
+        {
+          "id": "t-312663",
+          "title": "The Fixers",
+          "kind": "series",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "zh"
+          ],
+          "genres": [
+            "Action & Adventure",
+            "Comedy",
+            "Crime"
+          ],
+          "releaseDate": "2026-09-17",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "votes": 1,
+          "heat": 18,
+          "synopsis": "A washed-up gangster reluctantly teams up with an arrogant political heir to become \"fixers\", cleaning up dangerous secrets for both sides of the law.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/mZ0rPTMe9XfrWRUAeoJzr62cyIa.jpg",
+          "imdbId": "tt39495239",
+          "cast": [
+            "Christopher Lee",
+            "Shou Lou",
+            "Regina Lei",
+            "Fu Meng-po",
+            "Tou Tsung-hua"
+          ],
+          "director": "Hung Tzu-hsuan",
+          "origin": [
+            "TW"
+          ]
+        },
+        {
+          "id": "t-298008",
+          "title": "Plastic Beauty",
+          "kind": "series",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "ja"
+          ],
+          "genres": [
+            "Drama"
+          ],
+          "releaseDate": "2026-09-17",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 18,
+          "synopsis": "When a gifted ER surgeon is thrust into cosmetic medicine, her clash with a celebrity doctor exposes the greed and desire beneath the glamour.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/6HLl3jgLQmUO0mw2TspFf5jIU3M.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/mIjERiWlnDzQWHTcZdtucLmTCeO.jpg",
+          "imdbId": "tt37884325",
+          "cast": [
+            "Mayu Matsuoka",
+            "Riisa Naka",
+            "Shotaro Mamiya",
+            "Minami Tanaka",
+            "Hiromi Nagasaku"
+          ],
+          "trailerUrl": "https://www.youtube.com/watch?v=pnoF99qg46A",
+          "origin": [
+            "JP"
           ]
         },
         {
@@ -10288,6 +10773,43 @@
           ]
         },
         {
+          "id": "m-1731502~ott",
+          "title": "Vivaah",
+          "kind": "film",
+          "platforms": [
+            "sunnxt"
+          ],
+          "languages": [
+            "ml"
+          ],
+          "genres": [
+            "Romance",
+            "Drama",
+            "Family"
+          ],
+          "releaseDate": "2026-09-11",
+          "regions": [
+            "IN"
+          ],
+          "heat": 13,
+          "posterUrl": "https://image.tmdb.org/t/p/w500/x0U4ZSi740GBPCBGJvh2k2mA3W8.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/7re2w7c5TPdfOTyZQg6wYdDUVDj.jpg",
+          "imdbId": "tt43675327",
+          "runtimeMinutes": 101,
+          "cast": [
+            "Dhyan Sreenivasan",
+            "Nayana Elza",
+            "Aneesh Gopal",
+            "Sruthi Jayan",
+            "Dhruvan"
+          ],
+          "director": "Blessonn Elssa",
+          "trailerUrl": "https://www.youtube.com/watch?v=wP4lel40DEk",
+          "origin": [
+            "IN"
+          ]
+        },
+        {
           "id": "m-1513475",
           "title": "Aasha",
           "kind": "film",
@@ -10504,6 +11026,33 @@
           ]
         },
         {
+          "id": "m-1753880~ott",
+          "title": "Daughters of 9/11",
+          "kind": "documentary",
+          "platforms": [
+            "paramount"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Documentary"
+          ],
+          "releaseDate": "2026-09-12",
+          "regions": [
+            "US"
+          ],
+          "heat": 11,
+          "synopsis": "Twenty-five years after the deadliest terrorist attack on American soil, Elizabeth Miller, Jessica Trant and FBI special agent Frank Pellegrino confront whether the man accused of masterminding the attacks, Khalid Sheikh Mohammed (KSM), will ever face justice.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/aTtyDfXC2JGO1mBq37el05DEjxO.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/iImCDFmBeWH2yAEWCsR31Mpcu8N.jpg",
+          "runtimeMinutes": 97,
+          "director": "Marc Levin",
+          "origin": [
+            "US"
+          ]
+        },
+        {
           "id": "m-1049064",
           "title": "Mahendragiri Varahi",
           "kind": "film",
@@ -10574,6 +11123,32 @@
           "origin": [
             "CA"
           ]
+        },
+        {
+          "id": "m-1764166~ott",
+          "title": "Thomas & Friends: Really Helpful Engines",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Animation",
+            "TV Movie",
+            "Family"
+          ],
+          "releaseDate": "2026-09-17",
+          "regions": [
+            "US"
+          ],
+          "heat": 9,
+          "synopsis": "Around every bend on Sodor, there is someone who needs help and a problem to solve. And no one is more excited to help than Thomas! Join Thomas and his friends for exciting adventures, unexpected surprises, and songs you will be singing long after the journey ends. Because every delivery, every challenge, and every adventure is better when friends work together.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/eHBbY5UmnNyEWw1N2ZQ2MEeNuhn.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/7h3kuVVOtsBtEdTmL9hCBGQieiU.jpg",
+          "runtimeMinutes": 30,
+          "trailerUrl": "https://www.youtube.com/watch?v=gI2ddjpDaM4"
         },
         {
           "id": "m-1735403",
@@ -10681,6 +11256,44 @@
           "theatrical": "wide",
           "origin": [
             "IN"
+          ]
+        },
+        {
+          "id": "m-1702511~ott",
+          "title": "The Class: Online",
+          "kind": "film",
+          "platforms": [
+            "shudder"
+          ],
+          "languages": [
+            "id"
+          ],
+          "genres": [
+            "Horror",
+            "Mystery",
+            "Thriller"
+          ],
+          "releaseDate": "2026-09-17",
+          "regions": [
+            "US"
+          ],
+          "heat": 6,
+          "synopsis": "A group of college students reunite for a late-night online class after the events of The Class. What starts as a normal session begins to feel off when strange glitches and eerie occurrences appear on their screens.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/3O1mCt9FRyHtJERJd6zsUjGqEwF.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/utiff6xMjASbSJprikced6kblD0.jpg",
+          "imdbId": "tt43083548",
+          "runtimeMinutes": 52,
+          "cast": [
+            "Riyan Tsaqif",
+            "Anlim Simy",
+            "Irfan Fauzi",
+            "Sheren Malik Anastasia",
+            "Shaqila Sany"
+          ],
+          "director": "Riyan Tsaqif",
+          "trailerUrl": "https://www.youtube.com/watch?v=X5NdmR4zWvk",
+          "origin": [
+            "ID"
           ]
         },
         {
@@ -10941,6 +11554,43 @@
           ]
         },
         {
+          "id": "t-275102",
+          "title": "The Scandal",
+          "kind": "series",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "ko"
+          ],
+          "genres": [
+            "Drama"
+          ],
+          "releaseDate": "2026-09-18",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 40,
+          "synopsis": "In Joseon, a secret proposal ignites hidden desires in a gifted noblewoman, a famed lover and an unsuspecting lady caught in their dangerous game.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/4TU0PcHBIl0wPW5B6aVRGExOnHE.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/uc1p1PEbEMpdIHqnU9TESNC6Jhp.jpg",
+          "imdbId": "tt36347588",
+          "cast": [
+            "Son Ye-jin",
+            "Ji Chang-wook",
+            "Nana",
+            "Kang Chan-hee",
+            "Han Seon-hwa"
+          ],
+          "director": "Jung Ji-woo",
+          "trailerUrl": "https://www.youtube.com/watch?v=FeISX5E1uJc",
+          "certification": "A",
+          "origin": [
+            "KR"
+          ]
+        },
+        {
           "id": "m-586353",
           "title": "The Master and Margarita",
           "kind": "film",
@@ -11093,6 +11743,42 @@
           "trailerUrl": "https://www.youtube.com/watch?v=4nhu80EmVQE",
           "origin": [
             "GB",
+            "US"
+          ]
+        },
+        {
+          "id": "t-250203",
+          "title": "Brothers",
+          "kind": "series",
+          "platforms": [
+            "appletv"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Comedy"
+          ],
+          "releaseDate": "2026-09-22",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 28,
+          "synopsis": "Hollywood actors Matthew McConaughey and Woody Harrelson have been best friends for years—but a shocking family secret suggests their connection might be closer.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/jD7ZQpDEZzAVReJzkOtmuFoIl2m.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/8GPyELfTrAfi8yGCIWqjXXT8mUZ.jpg",
+          "imdbId": "tt6773088",
+          "cast": [
+            "Matthew McConaughey",
+            "Woody Harrelson",
+            "Holland Taylor",
+            "Natalie Martinez",
+            "Brittany Ishibashi"
+          ],
+          "trailerUrl": "https://www.youtube.com/watch?v=fIKFnzIcfcA",
+          "certification": "A",
+          "origin": [
             "US"
           ]
         },
@@ -11285,6 +11971,77 @@
           ]
         },
         {
+          "id": "t-285418",
+          "title": "Youth",
+          "kind": "series",
+          "platforms": [
+            "hbomax"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Comedy",
+            "Drama"
+          ],
+          "releaseDate": "2026-09-20",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 17,
+          "synopsis": "A 50-year-old divorcee searches for sex and love whilst juggling caring for her ailing parents and parenting her should-be grown up son.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/bk1zbzbu0xaYQuIANv4Pe8HHyAY.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/7pwybpJ2VSqqWgxZHTYqzRz01qH.jpg",
+          "imdbId": "tt35949226",
+          "cast": [
+            "Sharon Horgan",
+            "Rupert Friend",
+            "Sharlene Whyte",
+            "Aran Murphy",
+            "Robbie Gee"
+          ],
+          "trailerUrl": "https://www.youtube.com/watch?v=XwuDMSlErkk",
+          "origin": [
+            "US"
+          ]
+        },
+        {
+          "id": "t-312557",
+          "title": "Minerva Academy",
+          "kind": "series",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "it"
+          ],
+          "genres": [
+            "Drama",
+            "Mystery"
+          ],
+          "releaseDate": "2026-09-22",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 17,
+          "synopsis": "At Minerva Military High School, teens navigate discipline, rivalry and family pressure as a young cadet searches for answers about his missing friend.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/mVXUJjlOSiYMpApFoPyWTnqBhUm.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/zynoUI9kwDQKkGW5KqvxQp8Kj1Q.jpg",
+          "imdbId": "tt28765828",
+          "cast": [
+            "Ciro Minopoli",
+            "Nicole Malaj",
+            "Gaia Garavaglia",
+            "Michele Rosiello",
+            "Cristiana Capotondi"
+          ],
+          "origin": [
+            "IT"
+          ]
+        },
+        {
           "id": "m-1588472",
           "title": "Law & Order",
           "kind": "film",
@@ -11316,6 +12073,43 @@
           "theatrical": "wide",
           "origin": [
             "IN"
+          ]
+        },
+        {
+          "id": "t-312585",
+          "title": "The Crow Club",
+          "kind": "series",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "th"
+          ],
+          "genres": [
+            "Drama",
+            "Action & Adventure",
+            "Sci-Fi & Fantasy"
+          ],
+          "releaseDate": "2026-09-18",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 16,
+          "synopsis": "Four couples form part of the mysterious Crow Club, where supernatural cases and dangerous missions lead to unexpected romantic bonds.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/yjPlfO23INYLyMWr1yr7rhwJhKO.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/wPJYkh76gSEECGsN4KTKKLFBkPj.jpg",
+          "imdbId": "tt39443739",
+          "cast": [
+            "Natchanon Supravorawong",
+            "Nawaphat Thannamongkhonsawat",
+            "Hemmawich Kwanamphaiphan",
+            "Thanapon Aiemkumchai",
+            "Phachara Thanakulwuttiporn"
+          ],
+          "director": "Nopachai Jayanama",
+          "origin": [
+            "TH"
           ]
         },
         {
@@ -11388,6 +12182,73 @@
           "trailerUrl": "https://www.youtube.com/watch?v=YeVLfvn7cLk",
           "origin": [
             "US"
+          ]
+        },
+        {
+          "id": "t-310290",
+          "title": "My Sad Dead",
+          "kind": "series",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "es"
+          ],
+          "genres": [
+            "Drama"
+          ],
+          "releaseDate": "2026-09-24",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 15,
+          "synopsis": "Emma can see the dead. But when her niece arrives, thousands of lives are shaken.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/v1nptsuCFEMKb7s4JUtcIPsCF2J.jpg",
+          "imdbId": "tt37158600",
+          "cast": [
+            "Mercedes Morán",
+            "Dolores Fonzi",
+            "Alejandra Flechner",
+            "Carlos Portaluppi",
+            "Germán de Silva"
+          ],
+          "origin": [
+            "AR",
+            "CL"
+          ]
+        },
+        {
+          "id": "t-313699",
+          "title": "Balaraw: Blood Island",
+          "kind": "series",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "tl"
+          ],
+          "genres": [
+            "Mystery",
+            "Drama"
+          ],
+          "releaseDate": "2026-09-24",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 15,
+          "synopsis": "Years after her mother vanished, Sabina follows a mysterious clue to an uncharted island, where she confronts hidden dark secrets within her own family.",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/hmdREhKDHJaMXOk8y2nuLDldDbn.jpg",
+          "imdbId": "tt39751377",
+          "cast": [
+            "Janine Gutierrez",
+            "Charlie Dizon",
+            "Agot Isidro",
+            "Ronnie Lazaro"
+          ],
+          "origin": [
+            "PH"
           ]
         },
         {
@@ -11528,6 +12389,69 @@
           "director": "Alexander Bocchieri"
         },
         {
+          "id": "m-1472210~ott",
+          "title": "Goody Goody",
+          "kind": "film",
+          "platforms": [
+            "shudder"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Horror",
+            "Drama"
+          ],
+          "releaseDate": "2026-09-18",
+          "regions": [
+            "US"
+          ],
+          "heat": 14,
+          "synopsis": "Lulled into a necessary sense of comfort during a long home birth process, expecting parents and their midwife begin to realize that something may be horribly wrong. As labor complications ensue, a blizzard rages outside trapping the family in their home – sitting ducks for whatever sinister presence might be in there with them.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/9DyaSMQ6W3NvJ9BYTV2piiAXlCX.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/9OAXw7mjJNG4Ql981cc7ywNq1hH.jpg",
+          "imdbId": "tt27558029",
+          "runtimeMinutes": 80,
+          "cast": [
+            "Samantha Robinson",
+            "Colleen Foy",
+            "Zoë Renee",
+            "Colby Hollman"
+          ],
+          "director": "Raymond Creamer",
+          "origin": [
+            "US"
+          ]
+        },
+        {
+          "id": "t-286940",
+          "title": "Wonka's The Golden Ticket",
+          "kind": "reality",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Reality"
+          ],
+          "releaseDate": "2026-09-23",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 14,
+          "synopsis": "In this one-of-a-kind reality competition, lucky players step inside Wonka's Chocolate Factory to face unpredictable games, tests and temptations.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/3dy3AagnT9Rwv4yClkrYBGnN2W5.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/vlG9Kc5Y82CwafLceR9CUkTe7U0.jpg",
+          "imdbId": "tt36258621",
+          "trailerUrl": "https://www.youtube.com/watch?v=kGVuOT6h11c",
+          "origin": [
+            "US"
+          ]
+        },
+        {
           "id": "m-1215889",
           "title": "Daayra",
           "kind": "film",
@@ -11601,6 +12525,67 @@
           "origin": [
             "CA"
           ]
+        },
+        {
+          "id": "m-1761052~ott",
+          "title": "Judge Judy: Unfiltered, Unforgettable",
+          "kind": "documentary",
+          "platforms": [
+            "paramount"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Documentary"
+          ],
+          "releaseDate": "2026-09-22",
+          "regions": [
+            "US"
+          ],
+          "heat": 13,
+          "synopsis": "For three decades, JUDGE JUDY has been a fixture in homes across America and around the world, making Judge Judy one of the most recognizable and influential personalities in television history. Audiences worldwide know her razor-sharp wit, unwavering common sense and unmistakable courtroom authority, with an influence that extends far beyond television.",
+          "imdbId": "tt45080767",
+          "cast": [
+            "Sherry Lansing",
+            "Samuel L. Jackson",
+            "Steven Spielberg",
+            "RuPaul",
+            "Amy Poehler"
+          ]
+        },
+        {
+          "id": "t-305357",
+          "title": "A Different World",
+          "kind": "series",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Comedy",
+            "Drama"
+          ],
+          "releaseDate": "2026-09-24",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 13,
+          "synopsis": "Deborah Wayne enters her freshman year at her parents' HBCU alma mater and finds their shadow difficult to escape. She sets out to build her own legacy – while having the time of her life – alongside a whole new generation of Hillman’s best and brightest.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/lRpaIMIkBp5TL5J7L5B9A793oUc.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/6CpTZlJKSipDi9mz5khiSYGIkhO.jpg",
+          "imdbId": "tt33081352",
+          "cast": [
+            "Maleah Joi Moon",
+            "Alijah Kai",
+            "Chibuikem Uche",
+            "Cornell Young IV",
+            "Jordan Aaron Hall"
+          ],
+          "trailerUrl": "https://www.youtube.com/watch?v=W8jMEXwErvk"
         },
         {
           "id": "m-1654566",
@@ -12052,6 +13037,42 @@
           ]
         },
         {
+          "id": "m-1750432~ott",
+          "title": "Spidey and the Avengers: Halloween Team-Up!",
+          "kind": "film",
+          "platforms": [
+            "disney"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Animation",
+            "Adventure",
+            "Fantasy",
+            "Family"
+          ],
+          "releaseDate": "2026-09-24",
+          "regions": [
+            "US"
+          ],
+          "heat": 9,
+          "synopsis": "Spidey and the Avengers' Halloween plans are turned upside down by the mysterious Hallows' Eve, who plays magical tricks on trick or treaters and plans to ruin Halloween forever.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/hPucpn2pmszkcqRVHmrlUYK0PtG.jpg",
+          "imdbId": "tt44171293",
+          "cast": [
+            "Alkaio Thiele",
+            "Mason Blomberg",
+            "Armen Taylor",
+            "Hero Hunter",
+            "Patrick Stump"
+          ],
+          "origin": [
+            "US",
+            "CA"
+          ]
+        },
+        {
           "id": "m-1552433~ott",
           "title": "Siren: The Voices of Shelley Beattie",
           "kind": "documentary",
@@ -12085,6 +13106,106 @@
           "trailerUrl": "https://www.youtube.com/watch?v=W0Bs0wE2hig",
           "origin": [
             "US"
+          ]
+        },
+        {
+          "id": "m-1514863~ott",
+          "title": "Best of the Best",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Comedy"
+          ],
+          "releaseDate": "2026-09-18",
+          "regions": [
+            "US"
+          ],
+          "heat": 9,
+          "synopsis": "Two childhood best friends, Maya and Anjali, join their college’s competitive Bollywood dance team only to discover that the road to winning the national championship is far more raucous and cutthroat than they ever imagined.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/dGponwXx3sJrkTaIk6nbzOsfMR7.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/5m1j7Wibh3HnZq5QHm97v8dI3GH.jpg",
+          "imdbId": "tt16478058",
+          "cast": [
+            "Maitreyi Ramakrishnan",
+            "Priyanka Kedia",
+            "Hasan Minhaj",
+            "Chaneil Kular",
+            "Ankur Rathee"
+          ],
+          "director": "Lena Khan",
+          "trailerUrl": "https://www.youtube.com/watch?v=PuNATO-6a9U",
+          "origin": [
+            "US"
+          ]
+        },
+        {
+          "id": "m-1754053~ott",
+          "title": "Boundless: The Man Who Became Human",
+          "kind": "documentary",
+          "platforms": [
+            "appletv"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Documentary"
+          ],
+          "releaseDate": "2026-09-22",
+          "regions": [
+            "US"
+          ],
+          "heat": 9,
+          "synopsis": "Ben Greenfield taught millions how to master the body. This is the story of everything that mastery could not reach. What remains when a man can no longer outrun himself?",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/k226MD5iavkt71JLNoH2CYDwFcy.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/cQorXTH55truPTKAP2Lw7mpIRdM.jpg",
+          "imdbId": "tt43678381",
+          "cast": [
+            "Ben Greenfield",
+            "Jessa Greenfield",
+            "Pat Greenfield",
+            "River Greenfield",
+            "Terran Greenfield"
+          ],
+          "director": "Caleb Applegate",
+          "trailerUrl": "https://www.youtube.com/watch?v=-8Z8lW-wGb4",
+          "origin": [
+            "US"
+          ]
+        },
+        {
+          "id": "m-1760576~ott",
+          "title": "Zakir Khan: Papa Yaar",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "hi"
+          ],
+          "genres": [
+            "Comedy"
+          ],
+          "releaseDate": "2026-09-18",
+          "regions": [
+            "IN"
+          ],
+          "heat": 8,
+          "synopsis": "Zakir Khan reflects on his childhood and the special bond he shares with his father, turning personal memories and family experiences into heartfelt comedy. With his signature blend of observational humour, poetry and emotional storytelling, he explores the unspoken sides of fatherhood and the relationship between a father and son.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/layTkFN24JouxXQpYyMIn8WxBrB.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/tNBIV77HHlM7rJzmZE5VqA1ciEA.jpg",
+          "imdbId": "tt43679244",
+          "cast": [
+            "Zakir Khan"
+          ],
+          "director": "Karan Asnani",
+          "origin": [
+            "IN"
           ]
         },
         {
@@ -12192,6 +13313,37 @@
           "trailerUrl": "https://www.youtube.com/watch?v=oegfFHcW7OE",
           "certification": "U/A 16+",
           "theatrical": "wide"
+        },
+        {
+          "id": "m-1766609~ott",
+          "title": "Go Deep: The DeSean Jackson Story",
+          "kind": "documentary",
+          "platforms": [
+            "prime"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Documentary"
+          ],
+          "releaseDate": "2026-09-24",
+          "regions": [
+            "US"
+          ],
+          "heat": 4,
+          "synopsis": "Built from an extraordinary archive - thousands of hours of raw home video footage shot across 35 years by DeSean's older brother Byron - this is an intimate, unfiltered portrait of a father and his two sons - their bond, their sacrifices, their conflicts, and their shared pursuit of a better life.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/vijDQnbLhOOhHU1bNs5vE5qJOI0.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/5ghv53ICOZClWyL7sKgOr4jfZYl.jpg",
+          "imdbId": "tt38795524",
+          "cast": [
+            "DeSean Jackson"
+          ],
+          "director": "Mandon Lovett",
+          "trailerUrl": "https://www.youtube.com/watch?v=Z_7ZBFRGUEk",
+          "origin": [
+            "US"
+          ]
         },
         {
           "id": "hand-lust-stories-3",
@@ -12396,6 +13548,41 @@
           ]
         },
         {
+          "id": "t-258165",
+          "title": "East of Eden",
+          "kind": "series",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Drama"
+          ],
+          "releaseDate": "2026-10-01",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 22,
+          "synopsis": "In the early 1900s, a fiercely independent woman drives a rift between two brothers, igniting a saga that unfolds across two generations.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/axdUor6gLMTrrB1UF4Qfy0TTSyX.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/8WGq5Q0tmTe30YZetLnU2dkOJZf.jpg",
+          "imdbId": "tt21097264",
+          "cast": [
+            "Florence Pugh",
+            "Christopher Abbott",
+            "Mike Faist",
+            "Hoon Lee",
+            "Tracy Letts"
+          ],
+          "trailerUrl": "https://www.youtube.com/watch?v=M9NWvGZViCg",
+          "origin": [
+            "US"
+          ]
+        },
+        {
           "id": "m-1538457",
           "title": "Meesaya Murukku 2",
           "kind": "film",
@@ -12472,6 +13659,79 @@
           ]
         },
         {
+          "id": "m-1492640~ott",
+          "title": "UNABOMBER",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Thriller",
+            "Crime",
+            "History"
+          ],
+          "releaseDate": "2026-09-25",
+          "regions": [
+            "US"
+          ],
+          "heat": 20,
+          "synopsis": "Follow Ted Kaczynski's transformation from Harvard prodigy into the infamous Unabomber. Subjected to controversial psychological experiments by Professor Henry Murray, Kaczynski's troubled past resurfaces decades later when his manhunt, led by FBI agent Joanne Miller, brings to light the chilling consequences of ambition and isolation.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/pa7FRGX738X6jasMdUQTkkmGbfS.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/l9ZVNjEmjCliCKnBWtVJmuGFHMb.jpg",
+          "imdbId": "tt6933238",
+          "cast": [
+            "Jacob Tremblay",
+            "Russell Crowe",
+            "Shailene Woodley",
+            "Annabelle Wallis",
+            "Alexander Ludwig"
+          ],
+          "director": "Janus Metz",
+          "trailerUrl": "https://www.youtube.com/watch?v=B3tR6qQjbgI",
+          "origin": [
+            "US"
+          ]
+        },
+        {
+          "id": "m-1596303~ott",
+          "title": "The Last First: Winter K2",
+          "kind": "documentary",
+          "platforms": [
+            "appletv"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Documentary"
+          ],
+          "releaseDate": "2026-10-01",
+          "regions": [
+            "US"
+          ],
+          "heat": 19,
+          "synopsis": "A historic race to become the first to summit K2 in winter unravels into tragedy, exposing how ambition, ego, and the pursuit of glory can be as dangerous as the mountain itself.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/6pavyVdI2z7PlOUwB7nlnhLRSgl.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/qRrOatipy002uFn4pPKGSAFS8SG.jpg",
+          "imdbId": "tt39150288",
+          "runtimeMinutes": 98,
+          "cast": [
+            "John Snorri Sigurjónsson",
+            "Muhammad Ali Sadpara",
+            "Sajid Sadpara"
+          ],
+          "director": "Amir Bar-Lev",
+          "trailerUrl": "https://www.youtube.com/watch?v=zgGpyr5MFK8",
+          "certification": "A",
+          "origin": [
+            "US",
+            "GB"
+          ]
+        },
+        {
           "id": "m-1629051",
           "title": "Never After Dark",
           "kind": "film",
@@ -12507,6 +13767,65 @@
           "origin": [
             "JP"
           ]
+        },
+        {
+          "id": "t-298852",
+          "title": "War",
+          "kind": "series",
+          "platforms": [
+            "hbomax"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Drama"
+          ],
+          "releaseDate": "2026-10-01",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 18,
+          "synopsis": "An anthology series set in the elite world of London law following two rival firms, Cathcarts and Taylor & Byrne, as they face off in a different headline-making legal battle each season.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/qw9YVGyZaUpSmKHlPVhLn33lEPH.jpg",
+          "imdbId": "tt37972251",
+          "cast": [
+            "Dominic West",
+            "Sienna Miller",
+            "Phoebe Fox",
+            "James McArdle",
+            "Nina Sosanya"
+          ],
+          "trailerUrl": "https://www.youtube.com/watch?v=OsQA--B9rVk",
+          "origin": [
+            "GB"
+          ]
+        },
+        {
+          "id": "t-333016",
+          "title": "Outside",
+          "kind": "reality",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Reality"
+          ],
+          "releaseDate": "2026-09-28",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 17,
+          "synopsis": "Going beyond the four walls, Outside is the latest spin-off from the Sidemen's smash-hit series Inside. A new group of content creators are thrown into the forest to battle for a prize of up to £1 million. With every comfort eating into the prize pot, they'll face brutal decisions, unpredictable challenges and plenty of Sidemen mischief as they fight to keep hold of the cash.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/24D2wHB78bGXeHuDUNo2OdTQXjp.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/jO7ytK2xq1witeQ5DgU1p7fy0Q0.jpg",
+          "imdbId": "tt44877899",
+          "trailerUrl": "https://www.youtube.com/watch?v=9HFLEy-nSro"
         },
         {
           "id": "m-1363286",
@@ -12605,6 +13924,44 @@
           "director": "Mac Grant"
         },
         {
+          "id": "m-1322562~ott",
+          "title": "Mononoke the Movie: Chapter III - The Curse of the Serpent",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "ja"
+          ],
+          "genres": [
+            "Animation",
+            "Fantasy",
+            "Mystery"
+          ],
+          "releaseDate": "2026-09-29",
+          "regions": [
+            "US"
+          ],
+          "votes": 1,
+          "heat": 16,
+          "synopsis": "When tragedy strikes within the walls of the Ōoku, twisted human passions and festering grudges spawn the Medicine Seller's most fearsome opponent yet.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/nANxmUdcF2cyBNjBMeG1LaXnw0n.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/pbJ9sgqSxk1AypbZXt69iVAo2xQ.jpg",
+          "imdbId": "tt36282134",
+          "cast": [
+            "Hiroshi Kamiya",
+            "Atsumi Tanezaki",
+            "Miyu Irino",
+            "Kenjiro Tsuda",
+            "Yoshiko Sakakibara"
+          ],
+          "director": "Kenji Nakamura",
+          "trailerUrl": "https://www.youtube.com/watch?v=tekO9rGxAU4",
+          "origin": [
+            "JP"
+          ]
+        },
+        {
           "id": "m-1388805",
           "title": "LINKIN PARK: UNSHATTER",
           "kind": "documentary",
@@ -12681,6 +14038,40 @@
           ]
         },
         {
+          "id": "t-286712",
+          "title": "Private Eyes West Coast",
+          "kind": "series",
+          "platforms": [
+            "lionsgate"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Crime",
+            "Drama",
+            "Comedy"
+          ],
+          "releaseDate": "2026-09-30",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 15,
+          "synopsis": "Now leading different lives from their Toronto crime-fighting days, private investigators Matt Shade and Angie Everett encounter a world of different cases along with a new group of friends while solving cases in Victoria, British Columbia.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/6eulJ8STxOjTkIpBMAcJBOPuKOw.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/fVeKLAGmTjJA2RJ62lRvvWR5F67.jpg",
+          "imdbId": "tt36235895",
+          "cast": [
+            "Cindy Sampson",
+            "Jason Priestley"
+          ],
+          "trailerUrl": "https://www.youtube.com/watch?v=qubPMtip2xI",
+          "origin": [
+            "CA"
+          ]
+        },
+        {
           "id": "m-1713517",
           "title": "Invention 13",
           "kind": "film",
@@ -12712,6 +14103,120 @@
           "director": "Conor Oberst",
           "origin": [
             "US"
+          ]
+        },
+        {
+          "id": "t-318918",
+          "title": "LEGO ONE PIECE",
+          "kind": "anime",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Animation",
+            "Action & Adventure",
+            "Sci-Fi & Fantasy",
+            "Comedy",
+            "Family"
+          ],
+          "releaseDate": "2026-09-29",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 14,
+          "synopsis": "Usopp spins a tall tale about the Straw Hats' journey across the East Blue into the Grand Line before Chopper joined the crew.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/j3aJ4BtFC29nOdV7FsEYD8kQk35.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/1ftqNLph1CxcXxSXJsijjlw7ZkX.jpg",
+          "imdbId": "tt41538904",
+          "cast": [
+            "Iñaki Godoy",
+            "Emily Rudd",
+            "Mackenyu",
+            "Jacob Gibson",
+            "Taz Skylar"
+          ],
+          "trailerUrl": "https://www.youtube.com/watch?v=5Z8oBbmkgXo",
+          "origin": [
+            "US",
+            "JP",
+            "CA"
+          ]
+        },
+        {
+          "id": "t-290720",
+          "title": "The Final Problem",
+          "kind": "series",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "es"
+          ],
+          "genres": [
+            "Crime",
+            "Mystery"
+          ],
+          "releaseDate": "2026-09-25",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 14,
+          "synopsis": "In the spring of 1959, a retired actor who previously played Sherlock Holmes must investigate a murder at a small hotel on a tiny island near Mallorca.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/p7BqkUqCEMnxC92swfBkZ4GTQCV.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/m9QKL9smb61v1XSYJoHdl7p5yUd.jpg",
+          "imdbId": "tt36832679",
+          "cast": [
+            "Jose Coronado",
+            "María Valverde",
+            "Martiño Rivas",
+            "Maribel Verdú",
+            "Gonzalo de Castro"
+          ],
+          "trailerUrl": "https://www.youtube.com/watch?v=yLeja7kWgmU",
+          "origin": [
+            "ES"
+          ]
+        },
+        {
+          "id": "t-333483",
+          "title": "Hunkkaar: The Roar",
+          "kind": "series",
+          "platforms": [
+            "jiohotstar"
+          ],
+          "languages": [
+            "hi"
+          ],
+          "genres": [
+            "Crime",
+            "Drama"
+          ],
+          "releaseDate": "2026-09-25",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 14,
+          "synopsis": "A victim takes a courageous stand against a powerful godman accused of misconduct in an intense courtroom drama centered on her fight for justice.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/7tGavtmaMSu0D74uVt48A44mw4h.jpg",
+          "imdbId": "tt44934375",
+          "cast": [
+            "Aneet Padda",
+            "Fatima Sana Shaikh",
+            "Mohammed Zeeshan Ayyub",
+            "Raghubir Yadav",
+            "Zoya Hussain"
+          ],
+          "director": "Karan Kapadia",
+          "trailerUrl": "https://www.youtube.com/watch?v=k_P_O1zAVug",
+          "certification": "A",
+          "origin": [
+            "IN"
           ]
         },
         {
@@ -13037,6 +14542,40 @@
           ]
         },
         {
+          "id": "t-310133",
+          "title": "4 Blocks Zero",
+          "kind": "series",
+          "platforms": [
+            "hbomax"
+          ],
+          "languages": [
+            "de"
+          ],
+          "genres": [
+            "Drama"
+          ],
+          "releaseDate": "2026-09-25",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 12,
+          "synopsis": "Travel back to 1990s Berlin and discover the story of a family caught between bureaucracy, politics, and social exclusion, determined to build a new life in Germany.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/903ILCgMlIyC2QHGwhgSU8fJpr8.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/pE6lTAEaErbLzIZuGP7Ojg8uD0.jpg",
+          "imdbId": "tt39379365",
+          "cast": [
+            "Tariq Al Saies",
+            "Tareq Nassery",
+            "Rami Fadel Khalaf",
+            "Soufiane El Mesaudi"
+          ],
+          "trailerUrl": "https://www.youtube.com/watch?v=57M8SMRirBo",
+          "origin": [
+            "DE"
+          ]
+        },
+        {
           "id": "m-1588205",
           "title": "Without Looking Back",
           "kind": "film",
@@ -13103,6 +14642,70 @@
           "theatrical": "wide",
           "origin": [
             "IN"
+          ]
+        },
+        {
+          "id": "m-1529372~ott",
+          "title": "Don't Be Shy!",
+          "kind": "film",
+          "platforms": [
+            "prime"
+          ],
+          "languages": [
+            "hi"
+          ],
+          "genres": [
+            "Romance",
+            "Comedy"
+          ],
+          "releaseDate": "2026-09-25",
+          "regions": [
+            "IN"
+          ],
+          "heat": 11,
+          "synopsis": "Quintessential Mean Girl, Shyamili ‘Shy’ Das, finds herself suddenly relegated to Loser-ville when Mayank, her boyfriend of three years, suddenly dumps her. But Shy, all set to get her revenge, finds herself falling into friendship and compassion with someone unexpected… Mayank’s new girlfriend - Tara.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/e1TDT8nrck2aEwBx7JDGgrFCqUo.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/vXtFLVIMVx0SCnCHGociT88f4uU.jpg",
+          "imdbId": "tt39528902",
+          "cast": [
+            "Arushi Bajaj",
+            "Ansh Duggal",
+            "Bianca Arora",
+            "Piyush Khati",
+            "Kunaal Roy Kapur"
+          ],
+          "director": "Sreeti Mukerji",
+          "origin": [
+            "IN",
+            "US"
+          ]
+        },
+        {
+          "id": "m-1758536~ott",
+          "title": "The Widower: 'Til Death Do Us Part",
+          "kind": "documentary",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Documentary",
+            "Crime"
+          ],
+          "releaseDate": "2026-09-30",
+          "regions": [
+            "US"
+          ],
+          "heat": 11,
+          "synopsis": "A journalist and a detective uncover the truth about a killer whose charm masked a trail of failed marriages and suspicious deaths.",
+          "imdbId": "tt44568097",
+          "runtimeMinutes": 91,
+          "director": "Chris Smith",
+          "trailerUrl": "https://www.youtube.com/watch?v=2Xn881UkR3s",
+          "origin": [
+            "US"
           ]
         },
         {
@@ -13302,6 +14905,43 @@
           ]
         },
         {
+          "id": "m-1314122~ott",
+          "title": "Bloody Tennis",
+          "kind": "film",
+          "platforms": [
+            "shudder"
+          ],
+          "languages": [
+            "de"
+          ],
+          "genres": [
+            "Horror",
+            "Thriller"
+          ],
+          "releaseDate": "2026-09-25",
+          "regions": [
+            "US"
+          ],
+          "heat": 9,
+          "synopsis": "Sophie joins a prestigious tennis academy, where the brutality of competitive sports is taken to its extreme and only the hungriest survive.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/eFpTlgIDqnTeTHoHHuNvQjoi0Du.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/juKO2h7aa371poRvShNCTidInd9.jpg",
+          "imdbId": "tt34735922",
+          "runtimeMinutes": 94,
+          "cast": [
+            "Sandra Guldberg Kampp",
+            "Elina Löwensohn",
+            "Tracy Gotoas",
+            "Lily Taïeb",
+            "Juliana Vieira-Guerra"
+          ],
+          "director": "Nikias Chryssos",
+          "trailerUrl": "https://www.youtube.com/watch?v=lM0zVd8CSR4",
+          "origin": [
+            "DE"
+          ]
+        },
+        {
           "id": "m-1731954",
           "title": "Libera nos: Il trionfo sul male",
           "kind": "film",
@@ -13453,6 +15093,40 @@
           "origin": [
             "IN"
           ]
+        },
+        {
+          "id": "m-1757506~ott",
+          "title": "Crooked Miles",
+          "kind": "film",
+          "platforms": [
+            "prime"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Thriller",
+            "Horror"
+          ],
+          "releaseDate": "2026-09-29",
+          "regions": [
+            "US"
+          ],
+          "heat": 7,
+          "synopsis": "Desperate people receive a mystical gift that grants wishes, collects souls, and creates monsters.",
+          "imdbId": "tt31778026",
+          "cast": [
+            "Johnny Cicco",
+            "Ethan Boucher",
+            "Christèle Cervelle",
+            "William Galatis",
+            "Claire Kennedy"
+          ],
+          "director": "Robert Rotondo Jr.",
+          "trailerUrl": "https://www.youtube.com/watch?v=2F8UOu8_bZk",
+          "origin": [
+            "US"
+          ]
         }
       ]
     },
@@ -13542,6 +15216,42 @@
           ]
         },
         {
+          "id": "t-288673",
+          "title": "Carrie",
+          "kind": "series",
+          "platforms": [
+            "prime"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Mystery",
+            "Drama"
+          ],
+          "releaseDate": "2026-10-07",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 30,
+          "synopsis": "Misfit high-schooler Carrie White has spent her life in seclusion with her domineering mother. After her father's sudden death, Carrie finds herself contending with the challenges of attending public high school, a bullying scandal, and the emergence of mysterious telekinetic powers.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/b7aKxwPj3QM8YHZ8uDyqr50i96D.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/vVaNTaRHlL1i8JVsZsNtRHGBhPm.jpg",
+          "imdbId": "tt11540908",
+          "cast": [
+            "Summer H. Howell",
+            "Samantha Sloyan",
+            "Siena Agudong",
+            "Alison Thornton",
+            "Joel Oulette"
+          ],
+          "trailerUrl": "https://www.youtube.com/watch?v=jkUw2nh6fT0",
+          "origin": [
+            "US"
+          ]
+        },
+        {
           "id": "m-1283515",
           "title": "Verity",
           "kind": "film",
@@ -13576,6 +15286,41 @@
           "trailerUrl": "https://www.youtube.com/watch?v=xdPMKhjMSFs",
           "origin": [
             "US"
+          ]
+        },
+        {
+          "id": "t-285322",
+          "title": "Below",
+          "kind": "series",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Mystery"
+          ],
+          "releaseDate": "2026-10-08",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 29,
+          "synopsis": "When a mysterious sea creature terrorizes a small Newfoundland town, a hard-bitten fisherman and his family fight to protect their close-knit community.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/qadm9To9UfMVenVzGVLt0m0iuxv.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/hqtvsZf4IEr5u3IefUMDXNxgmu9.jpg",
+          "imdbId": "tt35934755",
+          "cast": [
+            "Josh Hartnett",
+            "Mackenzie Davis",
+            "Charlie Heaton",
+            "Ruby Stokes",
+            "Kaleb Horn"
+          ],
+          "trailerUrl": "https://www.youtube.com/watch?v=U57CNxSgoss",
+          "origin": [
+            "GB"
           ]
         },
         {
@@ -13616,6 +15361,45 @@
             "DE",
             "US",
             "CO"
+          ]
+        },
+        {
+          "id": "m-1148365~ott",
+          "title": "Matchbox the Movie",
+          "kind": "film",
+          "platforms": [
+            "appletv"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Action",
+            "Comedy",
+            "Adventure"
+          ],
+          "releaseDate": "2026-10-08",
+          "regions": [
+            "US"
+          ],
+          "heat": 25,
+          "synopsis": "When a group of former childhood friends reconnect, their reunion takes a wild turn as they stumble upon a dangerous international plot—and must save the world.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/lFKA4GMz36dImEy3DQPdPF7G4V9.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/jdJsnhHfkIi3J7jwfiCFT4gXNx5.jpg",
+          "imdbId": "tt28498219",
+          "runtimeMinutes": 127,
+          "cast": [
+            "John Cena",
+            "Jessica Biel",
+            "Sam Richardson",
+            "Arturo Castro",
+            "Teyonah Parris"
+          ],
+          "director": "Sam Hargrave",
+          "trailerUrl": "https://www.youtube.com/watch?v=7xfqITrMDcI",
+          "certification": "U/A 16+",
+          "origin": [
+            "US"
           ]
         },
         {
@@ -13774,7 +15558,8 @@
           ],
           "releaseDate": "2026-10-02",
           "regions": [
-            "US"
+            "US",
+            "IN"
           ],
           "heat": 19,
           "synopsis": "A historic race to become the first to summit K2 in winter unravels into tragedy, exposing how ambition, ego, and the pursuit of glory can be as dangerous as the mountain itself.",
@@ -13793,6 +15578,43 @@
           "origin": [
             "US",
             "GB"
+          ]
+        },
+        {
+          "id": "t-284558",
+          "title": "Kill Jackie",
+          "kind": "series",
+          "platforms": [
+            "prime"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Drama",
+            "Crime"
+          ],
+          "releaseDate": "2026-10-02",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 19,
+          "synopsis": "Jackie Price has been living a wealthy, luxurious life for the past 20 years after escaping a dangerous past as an international cocaine dealer. But just as life begins to feel a little boring, she discovers that The Seven Demons, a group of the world’s most terrifying hitmen, have been hired to kill her.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/xECrN4jpKMhTOxUbnCdiKo7QWdL.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/2VOcRepadY50B7mr3Vn8OOviRA3.jpg",
+          "imdbId": "tt35726020",
+          "cast": [
+            "Catherine Zeta-Jones",
+            "Daniel Ings",
+            "Sidse Babett Knudsen",
+            "Julian Rhind-Tutt",
+            "Raff Law"
+          ],
+          "trailerUrl": "https://www.youtube.com/watch?v=dKgTyq2-4w0",
+          "origin": [
+            "GB",
+            "AU"
           ]
         },
         {
@@ -13828,6 +15650,42 @@
           "theatrical": "wide",
           "origin": [
             "IN"
+          ]
+        },
+        {
+          "id": "m-1752355~ott",
+          "title": "Schumacher '94 - The Birth of a Legend",
+          "kind": "documentary",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "de"
+          ],
+          "genres": [
+            "Documentary"
+          ],
+          "releaseDate": "2026-10-02",
+          "regions": [
+            "US"
+          ],
+          "heat": 18,
+          "synopsis": "Michael Schumacher's first World Championship win roars to life through personal interviews and archival footage of the legendary 1994 Formula 1 season.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/1gA4V3WX865ZB9nidUhGId2SVTM.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/8ADvnUHcEyt2247A1EL9WK4IdMI.jpg",
+          "imdbId": "tt39453404",
+          "runtimeMinutes": 105,
+          "cast": [
+            "Michael Schumacher",
+            "Corinna Schumacher",
+            "Flavio Briatore",
+            "Bernie Ecclestone",
+            "David Coulthard"
+          ],
+          "director": "Christin Freitag",
+          "trailerUrl": "https://www.youtube.com/watch?v=7fDrlNje1iU",
+          "origin": [
+            "DE"
           ]
         },
         {
@@ -13895,6 +15753,43 @@
           "theatrical": "wide",
           "origin": [
             "IN"
+          ]
+        },
+        {
+          "id": "m-1620080~ott",
+          "title": "Less of a Stranger",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "pl"
+          ],
+          "genres": [
+            "Drama",
+            "History",
+            "Music"
+          ],
+          "releaseDate": "2026-10-07",
+          "regions": [
+            "US"
+          ],
+          "heat": 15,
+          "synopsis": "A film inspired by the life of Polish rock legend Jan Borysewicz. A story of music, rebellion, and freedom in a world where dreams often collide with a grim reality.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/5lxcAE2DLtK8bFfCXOV9TM13RDq.jpg",
+          "imdbId": "tt39384300",
+          "runtimeMinutes": 120,
+          "cast": [
+            "Mikołaj Bukrewicz",
+            "Patryk Pietrzak",
+            "Hubert Miłkowski",
+            "Krzysztof Oleksyn",
+            "Mikołaj Matczak"
+          ],
+          "director": "Kristoffer Rus",
+          "trailerUrl": "https://www.youtube.com/watch?v=jx0RiYbSuuc",
+          "origin": [
+            "PL"
           ]
         },
         {
@@ -14424,6 +16319,42 @@
           ]
         },
         {
+          "id": "m-1458857~ott",
+          "title": "Doing Life",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Drama"
+          ],
+          "releaseDate": "2026-10-02",
+          "regions": [
+            "US"
+          ],
+          "heat": 9,
+          "synopsis": "A single mother fighting for survival and a reformed ex-con with untapped talents forge an unexpected bond.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/7OAn1ZNkV8wxZ9pUz8WMzkUxilJ.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/jhlA7tXeynux7WktY4XGOiYNwCK.jpg",
+          "imdbId": "tt36429458",
+          "runtimeMinutes": 112,
+          "cast": [
+            "Naomi Baker",
+            "Jay Reeves",
+            "Tamberla Perry",
+            "Karen Obilom",
+            "Jasmine Sargent"
+          ],
+          "director": "Tyler Perry",
+          "trailerUrl": "https://www.youtube.com/watch?v=zrOtmDQawas",
+          "origin": [
+            "US"
+          ]
+        },
+        {
           "id": "m-1617234",
           "title": "The Actor",
           "kind": "film",
@@ -14453,6 +16384,44 @@
           "trailerUrl": "https://www.youtube.com/watch?v=Pus9h-qx0CM",
           "origin": [
             "US"
+          ]
+        },
+        {
+          "id": "m-1290062~ott",
+          "title": "Land of Shadows",
+          "kind": "film",
+          "platforms": [
+            "prime"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Mystery",
+            "Fantasy",
+            "Drama"
+          ],
+          "releaseDate": "2026-10-06",
+          "regions": [
+            "US"
+          ],
+          "heat": 8,
+          "synopsis": "Following a tragic event that shattered her life, renowned author Alice Chevalier struggles to find meaning in her existence. Searching for answers and a sign from destiny, she meets Thomas, a mysterious man who offers her an experience that defies the boundaries of reality. Driven by the hope of rebuilding herself, Alice embarks on a mystical journey, like an astronaut venturing into the far reaches of the unknown.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/jnKUmaR661bXpVDFh6xMFcs6LyA.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/iFYgthtJa8XusX3ZKZiRrolz5Im.jpg",
+          "imdbId": "tt37513740",
+          "runtimeMinutes": 95,
+          "cast": [
+            "Sandy Lakdar",
+            "Ryan Wardman",
+            "Willy Kazza",
+            "Thelma Roy",
+            "Anna Bozovic"
+          ],
+          "director": "Jonathan Dailler",
+          "trailerUrl": "https://www.youtube.com/watch?v=LNIoJG3BoRo",
+          "origin": [
+            "FR"
           ]
         },
         {
@@ -14606,6 +16575,76 @@
           ]
         },
         {
+          "id": "t-213375",
+          "title": "VisionQuest",
+          "kind": "series",
+          "platforms": [
+            "disney"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Sci-Fi & Fantasy"
+          ],
+          "releaseDate": "2026-10-14",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 29,
+          "synopsis": "With a bounty on his head, Vision must confront his nature and resist Ultron's influence to survive.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/xK27l5uwaVyZSlENWnmLlWwDQNS.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/v50p9hearMiu6BlYfp4O7FACmXl.jpg",
+          "imdbId": "tt23112594",
+          "cast": [
+            "Paul Bettany",
+            "James Spader",
+            "Ruaridh Mollica",
+            "Todd Stashwick",
+            "T'Nia Miller"
+          ],
+          "trailerUrl": "https://www.youtube.com/watch?v=oSVTAUKyrL8",
+          "origin": [
+            "US"
+          ]
+        },
+        {
+          "id": "t-289423",
+          "title": "Take Charge of My Heart",
+          "kind": "series",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "ko"
+          ],
+          "genres": [
+            "Sci-Fi & Fantasy",
+            "Comedy"
+          ],
+          "releaseDate": "2026-10-09",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 28,
+          "synopsis": "A corporate heir with an artificial heart meets a woman who's literally electric. They strike a deal that makes his heart beat — in more ways than one.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/qlszHCaXI1mq2rTC86vWAAbtgOc.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/3fCBU4IT091cSPiJTdu60FONeb2.jpg",
+          "cast": [
+            "Kim Young-kwang",
+            "Chae Soo-bin",
+            "Cha Woo-min",
+            "Jeong Jae-kwang",
+            "Shin Do-hyun"
+          ],
+          "trailerUrl": "https://www.youtube.com/watch?v=Hotu8dydii4",
+          "origin": [
+            "KR"
+          ]
+        },
+        {
           "id": "m-1281331",
           "title": "The Social Reckoning",
           "kind": "film",
@@ -14678,6 +16717,83 @@
           "theatrical": "wide",
           "origin": [
             "IN"
+          ]
+        },
+        {
+          "id": "m-1148365~ott",
+          "title": "Matchbox the Movie",
+          "kind": "film",
+          "platforms": [
+            "appletv"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Action",
+            "Comedy",
+            "Adventure"
+          ],
+          "releaseDate": "2026-10-09",
+          "regions": [
+            "IN"
+          ],
+          "heat": 25,
+          "synopsis": "When a group of former childhood friends reconnect, their reunion takes a wild turn as they stumble upon a dangerous international plot—and must save the world.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/lFKA4GMz36dImEy3DQPdPF7G4V9.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/jdJsnhHfkIi3J7jwfiCFT4gXNx5.jpg",
+          "imdbId": "tt28498219",
+          "runtimeMinutes": 127,
+          "cast": [
+            "John Cena",
+            "Jessica Biel",
+            "Sam Richardson",
+            "Arturo Castro",
+            "Teyonah Parris"
+          ],
+          "director": "Sam Hargrave",
+          "trailerUrl": "https://www.youtube.com/watch?v=7xfqITrMDcI",
+          "certification": "U/A 16+",
+          "origin": [
+            "US"
+          ]
+        },
+        {
+          "id": "t-284833",
+          "title": "Avatar: Seven Havens",
+          "kind": "anime",
+          "platforms": [
+            "paramount"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Animation",
+            "Action & Adventure",
+            "Sci-Fi & Fantasy",
+            "Family"
+          ],
+          "releaseDate": "2026-10-09",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 25,
+          "synopsis": "In a world shattered by a devastating cataclysm, a young Earthbender discovers she's the new Avatar after Korra. But in this dangerous era, that title marks her as humanity's destroyer, not its savior. Hunted by both human and spirit enemies, she and her long-lost twin must uncover their mysterious origins and save the Seven Havens before civilization's last strongholds collapse.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/vYNar1VtdNyQXXUt16uPbIT6wzr.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/pffbKZzIWKjA21XPKqECAKkSBEW.jpg",
+          "imdbId": "tt35854736",
+          "cast": [
+            "Saheli Khan",
+            "Aishwarya 'Aishu' Devan",
+            "Akshay Khanna",
+            "Major Curda",
+            "Sakina Jaffrey"
+          ],
+          "trailerUrl": "https://www.youtube.com/watch?v=nhdh962_ee0",
+          "origin": [
+            "US"
           ]
         },
         {
@@ -14832,6 +16948,74 @@
           ]
         },
         {
+          "id": "t-333101",
+          "title": "Treasure Island",
+          "kind": "series",
+          "platforms": [
+            "paramount"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Drama",
+            "Action & Adventure"
+          ],
+          "releaseDate": "2026-10-11",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 19,
+          "synopsis": "When Jim Hawkins gets his hands on a legendary treasure map, his mother Bess's clever and decisive actions leave him holding valuable knowledge that puts both of their lives in danger. Sailing aboard The Hispaniola, Jim and Bess are caught between the charming, terrifying pirate Long John Silver, and the debonair, duplicitous British agent Aaron Graham. Jim has to grow up fast as he and his mother fight for survival on a voyage where alliances shift, secrets multiply and peril closes in from all sides.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/6K9mXJ1H4DKmThmbJdjsqET4PIl.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/ouJvd38gAp5xSxao8oXBYpOcm3v.jpg",
+          "imdbId": "tt40385667",
+          "cast": [
+            "Hayley Atwell",
+            "David Oyelowo",
+            "Tomer Capone",
+            "Jack Huston",
+            "Tom Sweet"
+          ]
+        },
+        {
+          "id": "t-213562",
+          "title": "Crystal Lake",
+          "kind": "series",
+          "platforms": [
+            "peacock"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Mystery",
+            "Drama"
+          ],
+          "releaseDate": "2026-10-15",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 19,
+          "synopsis": "Single mother Pam Voorhees has been unable to shake her grief after her young, sickly son Jason tragically drowned in the town lake almost a year before. When two strangers arrive at Pam’s door digging into her past, a disturbing chain of events are set into motion, leaving the townspeople of Crystal Lake wondering: just who is Pam Voorhees?",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/rcL5PqnCMyDiuOHkaDcrCIxTsAD.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/w7yAQtTiIcGy4gcbCDtfXo9fcQZ.jpg",
+          "imdbId": "tt23148340",
+          "cast": [
+            "Linda Cardellini",
+            "William Catlett",
+            "Devin Kessler",
+            "Cameron Scoggins",
+            "Gwendolyn Sundstrom"
+          ],
+          "trailerUrl": "https://www.youtube.com/watch?v=3lZ2ZenuCGc",
+          "origin": [
+            "US"
+          ]
+        },
+        {
           "id": "m-1288069",
           "title": "Tenzing",
           "kind": "film",
@@ -14938,6 +17122,43 @@
           ]
         },
         {
+          "id": "t-286183",
+          "title": "Hollywood Arts",
+          "kind": "series",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Comedy",
+            "Drama",
+            "Family"
+          ],
+          "releaseDate": "2026-10-15",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 16,
+          "synopsis": "Struggling actress Trina Vega returns to her former high school, Hollywood Arts, as an unqualified substitute teacher, quickly finding herself both clashing with and unexpectedly inspiring a new generation of ambitious and talented students as they learn to find their true path at Hollywood's most elite performing arts school.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/nY83bjvJBoojKnSYowDdmECn4Y9.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/dW0ROyYQTABlWwII0zwVNnML2ik.jpg",
+          "imdbId": "tt35673115",
+          "cast": [
+            "Daniella Monet",
+            "Yvette Nicole Brown",
+            "Alyssa Miles",
+            "Emmy Liu-Wang",
+            "Peyton Jackson"
+          ],
+          "trailerUrl": "https://www.youtube.com/watch?v=3CpJfFl18e4",
+          "origin": [
+            "US"
+          ]
+        },
+        {
           "id": "m-1630237",
           "title": "Treasure Trekkers",
           "kind": "film",
@@ -14970,6 +17191,76 @@
           "director": "Kevin Munroe",
           "origin": [
             "CA"
+          ]
+        },
+        {
+          "id": "m-1742441~ott",
+          "title": "V/H/S/Mixtape",
+          "kind": "film",
+          "platforms": [
+            "shudder"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Horror",
+            "Music",
+            "Thriller"
+          ],
+          "releaseDate": "2026-10-09",
+          "regions": [
+            "US"
+          ],
+          "heat": 15,
+          "synopsis": "V/H/S/MIXTAPE cranks the volume on horror with a blood-soaked collection of cursed music videos, terrifying performances, and found footage. Press play. Pray it stops.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/3pJuzax2CvfQ3clT3QTjkl0i92U.jpg",
+          "imdbId": "tt43739386",
+          "runtimeMinutes": 98,
+          "cast": [
+            "GWAR",
+            "Mike Ferguson",
+            "Jihad Brent",
+            "Barbara Crampton",
+            "Neela Jolene"
+          ],
+          "director": "David Moreau",
+          "origin": [
+            "US",
+            "AE"
+          ]
+        },
+        {
+          "id": "m-1623256~ott",
+          "title": "The Storm",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "sv"
+          ],
+          "genres": [
+            "Comedy"
+          ],
+          "releaseDate": "2026-10-15",
+          "regions": [
+            "US"
+          ],
+          "heat": 15,
+          "synopsis": "Filip is turning 45, and has invited his closest friends for dinner at his and his wife's lavish and newly bought farm estate up north in Sweden. What they don't know is that a ferocious storm is on its way and that they'll be trapped together. Their polished acts fall, and an unfiltered meltdown starts. When the panic starts to creep in and they all realise the seriousness of the situation, the farm starts to shrink, secrets spill out, and unexpected feelings take shape.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/l8m2A55MJrTPAikyN1p2OPjSNg.jpg",
+          "imdbId": "tt37070354",
+          "cast": [
+            "Gustaf Skarsgård",
+            "Aliette Opheim",
+            "Filip Berg",
+            "Josephine Bornebusch",
+            "Jonas Karlsson"
+          ],
+          "director": "Josephine Bornebusch",
+          "origin": [
+            "SE"
           ]
         },
         {
@@ -15144,6 +17435,41 @@
           "trailerUrl": "https://www.youtube.com/watch?v=TdSRAb-GSu0",
           "origin": [
             "US"
+          ]
+        },
+        {
+          "id": "t-295684",
+          "title": "Aquel",
+          "kind": "series",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "es"
+          ],
+          "genres": [
+            "Drama"
+          ],
+          "releaseDate": "2026-10-09",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 13,
+          "synopsis": "A biographical series about Raphael, the iconic Spanish singer and actor widely recognized for his extensive vocal range and charismatic stage presence. His career has spanned more than six decades, leaving a lasting influence on Spanish-language popular music.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/8fEln7Xp26DXiuddBVb9diuFulJ.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/AR43ZBnzaZ12nwzBaF5vPJLW2g.jpg",
+          "imdbId": "tt37540577",
+          "cast": [
+            "Javier Morgade",
+            "Álvaro González",
+            "Carlos Santos",
+            "Francesco Carril",
+            "Natalia Varela"
+          ],
+          "origin": [
+            "CO",
+            "ES"
           ]
         },
         {
@@ -15472,6 +17798,26 @@
           ],
           "director": "Prarjun Majumder",
           "theatrical": "wide"
+        },
+        {
+          "id": "t-324693",
+          "title": "Marrakech Comedy Festival",
+          "kind": "series",
+          "platforms": [
+            "disney"
+          ],
+          "languages": [
+            "fr"
+          ],
+          "genres": [],
+          "releaseDate": "2026-10-09",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 8,
+          "posterUrl": "https://image.tmdb.org/t/p/w500/mj2RmNcB9IxPE6chk3K6ZEOAnQj.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/c4gbLRO6bop6RxVmKKlgO8r7SuB.jpg"
         },
         {
           "id": "m-1750042",
@@ -15906,6 +18252,6 @@
       "backdropUrl": "https://image.tmdb.org/t/p/w780/kgaQnDdDaPqvGN7i8LLz1aWJdjP.jpg"
     }
   ],
-  "enrichedAt": "2026-09-12T05:50:48.783Z",
-  "ratedAt": "2026-09-12T05:50:56.282Z"
+  "enrichedAt": "2026-09-12T06:05:53.608Z",
+  "ratedAt": "2026-09-12T06:05:53.832Z"
 }
