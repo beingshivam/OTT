@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-12T06:04:33.946Z",
+  "generatedAt": "2026-09-12T08:45:03.255Z",
   "source": "tmdb",
   "weeks": [
     {
@@ -1077,7 +1077,7 @@
             "US"
           ],
           "rating": 6.7,
-          "votes": 97,
+          "votes": 101,
           "heat": 69,
           "synopsis": "Two love-starved strangers crash into each other on the one night of the year when single people are allowed to have sex.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/46q8z1TbbVcF8uhRHsvt5s0h2SH.jpg",
@@ -3417,8 +3417,8 @@
             "IN",
             "US"
           ],
-          "rating": 6.6,
-          "votes": 146,
+          "rating": 6.7,
+          "votes": 151,
           "heat": 75,
           "synopsis": "Ry, a college student with a chronic illness, escapes to Mallorca for the summer with her mother, where she unexpectedly falls for a local and begins to embrace living in the moment. But as her condition worsens and long-hidden family secrets come to light, everything she has found before summer's end is threatened.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/3PWJqDfygN0YNNjWsDUOXclCp3h.jpg",
@@ -3460,7 +3460,7 @@
             "US"
           ],
           "rating": 6.8,
-          "votes": 592,
+          "votes": 599,
           "heat": 71,
           "synopsis": "When his young son vanishes, a widower enlists help from his estranged father, a retired detective who put away the serial killer now linked to the case.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/6UqflU8Qqkz7Dq4swJPqs0ZJjY4.jpg",
@@ -3995,8 +3995,8 @@
             "IN",
             "US"
           ],
-          "rating": 7.2,
-          "votes": 12,
+          "rating": 6.9,
+          "votes": 13,
           "heat": 30,
           "synopsis": "When a bride refuses to leave her family home after marriage, her husband must find out if he can adjust to life under his in-laws' roof.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/AjaNAeMXOrK9n0YqGqX0Lz5qxYu.jpg",
@@ -5165,7 +5165,7 @@
             "US"
           ],
           "rating": 8.1,
-          "votes": 754,
+          "votes": 759,
           "heat": 89,
           "synopsis": "Professor Se-jeong is thrust into a bloody nightmare when a rapidly mutating virus is released during a biotech conference causing authorities to seal the facility. Trapped inside with no escape, Se-jeong along with a small group of survivors must fight to stay alive while the infected undergo horrific transformations.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/tN799oUR0f1gUKDYdMNrDaY7I51.jpg",
@@ -5371,7 +5371,7 @@
             "US"
           ],
           "rating": 6.6,
-          "votes": 241,
+          "votes": 242,
           "heat": 63,
           "synopsis": "After the world's population has been ravaged by a pandemic, a man lives a lonesome existence in a Colorado airplane hangar with his dog and a dour gunman he has befriended. When a mysterious transmission comes through on the radio while he’s flying his old Cessna, it sparks a hunt for the provenance of the sound.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/A7i16oDi03qrKep5pBfuTWNUTb.jpg",
@@ -5490,8 +5490,8 @@
           "regions": [
             "US"
           ],
-          "rating": 6.8,
-          "votes": 25,
+          "rating": 6.7,
+          "votes": 26,
           "heat": 50,
           "synopsis": "On a perilous climb across Thailand's Mount Kwan, two climbers become trapped thousands of feet above the ground, where vertigo-inducing heights, sheer exposure, and impossible odds turn every moment into a fight for survival.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/fgSm5ylwiXbIHn8UbUXDjk9RRu4.jpg",
@@ -6150,6 +6150,7 @@
           "platforms": [
             "disney"
           ],
+          "namedBy": "network",
           "languages": [
             "th"
           ],
@@ -7176,7 +7177,7 @@
           ],
           "trailerUrl": "https://www.youtube.com/watch?v=8ZYhuvIv1pA",
           "certification": "A",
-          "votes": 2639,
+          "votes": 2641,
           "imdbId": "tt14688458",
           "imdbRating": 8.1,
           "imdbVotes": 218324,
@@ -8008,6 +8009,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "network",
           "languages": [
             "en"
           ],
@@ -8510,6 +8512,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "network",
           "languages": [
             "hi"
           ],
@@ -8560,8 +8563,8 @@
           "regions": [
             "US"
           ],
-          "rating": 6.4,
-          "votes": 17,
+          "rating": 6.1,
+          "votes": 18,
           "heat": 34,
           "synopsis": "When a rogue squad of genetically engineered super soldiers break loose in the desert, a badass Army sniper must unleash hell to protect her young daughter.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/cOGtvhc6Ij9KvzM6jZsfQyg0B0O.jpg",
@@ -9524,7 +9527,7 @@
             "US"
           ],
           "rating": 6.3,
-          "votes": 23,
+          "votes": 26,
           "heat": 51,
           "synopsis": "The Owens sisters must confront the dark curse that threatens to unravel their family once and for all.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/ogwQOLbCfncjvBhFb5l0OmQH8KC.jpg",
@@ -9551,6 +9554,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "note",
           "languages": [
             "es"
           ],
@@ -9561,12 +9565,13 @@
           "regions": [
             "US"
           ],
-          "votes": 4,
+          "votes": 5,
           "heat": 38,
           "synopsis": "When their team-building event gets downgraded to a tiny village, a cheese company's staff think it can't get worse — then they learn about the layoffs.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/jM8LRvzYIqZqw6Si5xNECiHFDgM.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/24JmHBUaZVmZRoEMjzejLL3sJc5.jpg",
           "imdbId": "tt38616652",
+          "runtimeMinutes": 93,
           "cast": [
             "Alexandra Jiménez",
             "Maribel Verdú",
@@ -9578,7 +9583,8 @@
           "trailerUrl": "https://www.youtube.com/watch?v=VSN8YM6urHo",
           "origin": [
             "ES"
-          ]
+          ],
+          "rating": 5.6
         },
         {
           "id": "t-260249",
@@ -9587,6 +9593,7 @@
           "platforms": [
             "prime"
           ],
+          "namedBy": "network",
           "languages": [
             "es"
           ],
@@ -9696,6 +9703,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "network",
           "languages": [
             "en"
           ],
@@ -9731,6 +9739,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "network",
           "languages": [
             "es"
           ],
@@ -9747,7 +9756,10 @@
           "heat": 28,
           "synopsis": "After an attack leaves a woman named Anabel comatose, she and Rafael—a nurse who has the unique ability to hear the dead—must work together to keep her alive while hiding from her enemies.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/3rnQOZr6yoVWYdy5BiSO4xItYi4.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/Aoz8YOuq0POpE7rDcYzpLdNMv70.jpg"
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/Aoz8YOuq0POpE7rDcYzpLdNMv70.jpg",
+          "origin": [
+            "CO"
+          ]
         },
         {
           "id": "m-1542187~ott",
@@ -9756,6 +9768,7 @@
           "platforms": [
             "zee5"
           ],
+          "namedBy": "note",
           "languages": [
             "ml"
           ],
@@ -9795,6 +9808,7 @@
           "platforms": [
             "prime"
           ],
+          "namedBy": "network",
           "languages": [
             "en"
           ],
@@ -9833,6 +9847,7 @@
           "platforms": [
             "zee5"
           ],
+          "namedBy": "note",
           "languages": [
             "hi"
           ],
@@ -10022,6 +10037,7 @@
           "platforms": [
             "paramount"
           ],
+          "namedBy": "network",
           "languages": [
             "en"
           ],
@@ -10096,6 +10112,7 @@
           "platforms": [
             "disney"
           ],
+          "namedBy": "network",
           "languages": [
             "de"
           ],
@@ -10132,6 +10149,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "note",
           "languages": [
             "en"
           ],
@@ -10168,6 +10186,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "network",
           "languages": [
             "tr"
           ],
@@ -10202,6 +10221,7 @@
           "platforms": [
             "disney"
           ],
+          "namedBy": "network",
           "languages": [
             "fr"
           ],
@@ -10275,6 +10295,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "network",
           "languages": [
             "zh"
           ],
@@ -10312,6 +10333,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "network",
           "languages": [
             "ja"
           ],
@@ -10779,6 +10801,7 @@
           "platforms": [
             "sunnxt"
           ],
+          "namedBy": "note",
           "languages": [
             "ml"
           ],
@@ -11032,6 +11055,7 @@
           "platforms": [
             "paramount"
           ],
+          "namedBy": "note",
           "languages": [
             "en"
           ],
@@ -11131,6 +11155,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "note",
           "languages": [
             "en"
           ],
@@ -11265,6 +11290,7 @@
           "platforms": [
             "shudder"
           ],
+          "namedBy": "note",
           "languages": [
             "id"
           ],
@@ -11428,6 +11454,7 @@
           "platforms": [
             "zee5"
           ],
+          "namedBy": "studio",
           "languages": [
             "mr"
           ],
@@ -11560,6 +11587,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "network",
           "languages": [
             "ko"
           ],
@@ -11636,6 +11664,7 @@
           "platforms": [
             "prime"
           ],
+          "namedBy": "note",
           "languages": [
             "en"
           ],
@@ -11753,6 +11782,7 @@
           "platforms": [
             "appletv"
           ],
+          "namedBy": "network",
           "languages": [
             "en"
           ],
@@ -11977,6 +12007,7 @@
           "platforms": [
             "hbomax"
           ],
+          "namedBy": "network",
           "languages": [
             "en"
           ],
@@ -12013,6 +12044,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "network",
           "languages": [
             "it"
           ],
@@ -12082,6 +12114,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "network",
           "languages": [
             "th"
           ],
@@ -12191,6 +12224,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "network",
           "languages": [
             "es"
           ],
@@ -12225,6 +12259,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "network",
           "languages": [
             "tl"
           ],
@@ -12395,6 +12430,7 @@
           "platforms": [
             "shudder"
           ],
+          "namedBy": "note",
           "languages": [
             "en"
           ],
@@ -12430,6 +12466,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "network",
           "languages": [
             "en"
           ],
@@ -12533,6 +12570,7 @@
           "platforms": [
             "paramount"
           ],
+          "namedBy": "note",
           "languages": [
             "en"
           ],
@@ -12561,6 +12599,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "network",
           "languages": [
             "en"
           ],
@@ -13043,6 +13082,7 @@
           "platforms": [
             "disney"
           ],
+          "namedBy": "note",
           "languages": [
             "en"
           ],
@@ -13079,6 +13119,7 @@
           "platforms": [
             "hbomax"
           ],
+          "namedBy": "note",
           "languages": [
             "en"
           ],
@@ -13115,6 +13156,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "note",
           "languages": [
             "en"
           ],
@@ -13150,6 +13192,7 @@
           "platforms": [
             "appletv"
           ],
+          "namedBy": "note",
           "languages": [
             "en"
           ],
@@ -13185,6 +13228,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "note",
           "languages": [
             "hi"
           ],
@@ -13321,6 +13365,7 @@
           "platforms": [
             "prime"
           ],
+          "namedBy": "note",
           "languages": [
             "en"
           ],
@@ -13554,6 +13599,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "network",
           "languages": [
             "en"
           ],
@@ -13665,6 +13711,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "note",
           "languages": [
             "en"
           ],
@@ -13702,6 +13749,7 @@
           "platforms": [
             "appletv"
           ],
+          "namedBy": "note",
           "languages": [
             "en"
           ],
@@ -13775,6 +13823,7 @@
           "platforms": [
             "hbomax"
           ],
+          "namedBy": "network",
           "languages": [
             "en"
           ],
@@ -13809,6 +13858,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "network",
           "languages": [
             "en"
           ],
@@ -13930,6 +13980,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "note",
           "languages": [
             "ja"
           ],
@@ -14044,6 +14095,7 @@
           "platforms": [
             "lionsgate"
           ],
+          "namedBy": "network",
           "languages": [
             "en"
           ],
@@ -14112,6 +14164,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "network",
           "languages": [
             "en"
           ],
@@ -14153,6 +14206,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "network",
           "languages": [
             "es"
           ],
@@ -14189,6 +14243,7 @@
           "platforms": [
             "jiohotstar"
           ],
+          "namedBy": "network",
           "languages": [
             "hi"
           ],
@@ -14548,6 +14603,7 @@
           "platforms": [
             "hbomax"
           ],
+          "namedBy": "network",
           "languages": [
             "de"
           ],
@@ -14651,6 +14707,7 @@
           "platforms": [
             "prime"
           ],
+          "namedBy": "note",
           "languages": [
             "hi"
           ],
@@ -14687,6 +14744,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "note",
           "languages": [
             "en"
           ],
@@ -14911,6 +14969,7 @@
           "platforms": [
             "shudder"
           ],
+          "namedBy": "note",
           "languages": [
             "de"
           ],
@@ -15101,6 +15160,7 @@
           "platforms": [
             "prime"
           ],
+          "namedBy": "note",
           "languages": [
             "en"
           ],
@@ -15222,6 +15282,7 @@
           "platforms": [
             "prime"
           ],
+          "namedBy": "network",
           "languages": [
             "en"
           ],
@@ -15295,6 +15356,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "network",
           "languages": [
             "en"
           ],
@@ -15370,6 +15432,7 @@
           "platforms": [
             "appletv"
           ],
+          "namedBy": "note",
           "languages": [
             "en"
           ],
@@ -15587,6 +15650,7 @@
           "platforms": [
             "prime"
           ],
+          "namedBy": "network",
           "languages": [
             "en"
           ],
@@ -15659,6 +15723,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "note",
           "languages": [
             "de"
           ],
@@ -15762,6 +15827,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "note",
           "languages": [
             "pl"
           ],
@@ -16325,6 +16391,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "note",
           "languages": [
             "en"
           ],
@@ -16393,6 +16460,7 @@
           "platforms": [
             "prime"
           ],
+          "namedBy": "note",
           "languages": [
             "en"
           ],
@@ -16581,6 +16649,7 @@
           "platforms": [
             "disney"
           ],
+          "namedBy": "network",
           "languages": [
             "en"
           ],
@@ -16616,6 +16685,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "network",
           "languages": [
             "ko"
           ],
@@ -16726,6 +16796,7 @@
           "platforms": [
             "appletv"
           ],
+          "namedBy": "note",
           "languages": [
             "en"
           ],
@@ -16765,6 +16836,7 @@
           "platforms": [
             "paramount"
           ],
+          "namedBy": "network",
           "languages": [
             "en"
           ],
@@ -16917,6 +16989,7 @@
           "platforms": [
             "prime"
           ],
+          "namedBy": "note",
           "languages": [
             "en"
           ],
@@ -16954,6 +17027,7 @@
           "platforms": [
             "paramount"
           ],
+          "namedBy": "network",
           "languages": [
             "en"
           ],
@@ -16986,6 +17060,7 @@
           "platforms": [
             "peacock"
           ],
+          "namedBy": "network",
           "languages": [
             "en"
           ],
@@ -17128,6 +17203,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "network",
           "languages": [
             "en"
           ],
@@ -17200,6 +17276,7 @@
           "platforms": [
             "shudder"
           ],
+          "namedBy": "note",
           "languages": [
             "en"
           ],
@@ -17237,6 +17314,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "note",
           "languages": [
             "sv"
           ],
@@ -17444,6 +17522,7 @@
           "platforms": [
             "netflix"
           ],
+          "namedBy": "network",
           "languages": [
             "es"
           ],
@@ -17806,6 +17885,7 @@
           "platforms": [
             "disney"
           ],
+          "namedBy": "network",
           "languages": [
             "fr"
           ],
@@ -18026,7 +18106,7 @@
         "US"
       ],
       "rating": 7.9,
-      "votes": 420,
+      "votes": 424,
       "heat": 83,
       "synopsis": "When a U.S. Navy pilot on a top-secret mission during the Cold War gets trapped behind enemy lines, his only chance at survival is to form an alliance with an eccentric ex-KGB agent.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/hVXjX1jLZ1ljFSNGXpjJfbTUOa7.jpg",
@@ -18053,10 +18133,10 @@
         "US"
       ],
       "rating": 7.9,
-      "votes": 905,
+      "votes": 906,
       "heat": 83,
       "synopsis": "When aristocratic Eddie inherits the family estate, he discovers that it's home to an enormous weed empire — and its proprietors aren't going anywhere.",
-      "posterUrl": "https://image.tmdb.org/t/p/w500/tw3tzfXaSpmUZIB8ZNqNEGzMBCy.jpg",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/2l0gBLpjcWo4ivmbHUhFIw3KGDn.jpg",
       "backdropUrl": "https://image.tmdb.org/t/p/w780/yG1wltFmkX5c5ocACKfpX0tp3SY.jpg"
     },
     {
@@ -18162,7 +18242,7 @@
         "US"
       ],
       "rating": 7.8,
-      "votes": 768,
+      "votes": 769,
       "heat": 70,
       "synopsis": "Jason Dessen is abducted into an alternate version of his life. To get back to his real family, he embarks on a harrowing journey to save them from the most terrifying foe imaginable: himself.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/2DPmTlv8F0V1TQBPmlsGOVOhtWk.jpg",
@@ -18252,6 +18332,6 @@
       "backdropUrl": "https://image.tmdb.org/t/p/w780/kgaQnDdDaPqvGN7i8LLz1aWJdjP.jpg"
     }
   ],
-  "enrichedAt": "2026-09-12T06:05:53.608Z",
-  "ratedAt": "2026-09-12T06:05:53.832Z"
+  "enrichedAt": "2026-09-12T08:45:49.390Z",
+  "ratedAt": "2026-09-12T08:45:49.644Z"
 }
