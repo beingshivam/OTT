@@ -139,6 +139,27 @@ jobs:
             sleep $((attempt * 15))
           done
 
+          # 1b. Can the last-resort alarm actually sound?
+          #
+          #     The daily watchdog in the Worker is the only monitor that
+          #     survives GitHub going quiet, and it alerts through Brevo — so an
+          #     unbound BREVO_API_KEY leaves it detecting staleness and telling
+          #     nobody. That is a smoke alarm with no battery, and it is worse
+          #     than none because it is counted on. Nothing outside the Worker
+          #     could see it, so the Worker now reports it and this asks.
+          watchdog=$(curl -fsS --max-time 20 "$SITE/api/watchdog" || true)
+          echo "  watchdog: ${watchdog:-<no response>}"
+          case "$watchdog" in
+            *'"armed":true'*) ;;
+            '')
+              echo "::warning title=Could not read the watchdog::$SITE/api/watchdog did not answer. If this persists the staleness alarm may be mute and nothing would say so."
+              ;;
+            *)
+              echo "::error title=The staleness alarm is mute::The Worker reports no BREVO_API_KEY binding, so the daily watchdog can detect that the refresh has stopped and has no way to tell anyone. It is the only monitor that still works when GitHub's scheduler is the thing that failed. Bind it: Cloudflare dashboard › Workers & Pages › the Worker › Settings › Variables and Secrets › add BREVO_API_KEY (secret) and ALERT_EMAIL (plain text, the inbox that should hear about it)."
+              exit 1
+              ;;
+          esac
+
           # 2. Does the app actually boot? Every page ships prerendered markup
           #    that React replaces on mount, so a broken bundle does not 404 —
           #    it renders the fallback, which looks like a plain unstyled list of

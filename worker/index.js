@@ -100,6 +100,33 @@ export default {
      */
     if (url.pathname.startsWith('/img/')) return proxyPoster(request, url);
 
+    /*
+     * Whether the last-resort alarm can actually make a sound.
+     *
+     * The daily watchdog below is the only thing that still works when GitHub
+     * itself goes quiet — a disabled schedule, a cron that never fires, an
+     * Actions outage. And it alerts through Brevo, so if BREVO_API_KEY is not
+     * bound to this Worker it detects the staleness, writes a line to a console
+     * log nobody reads, and returns. A silent smoke alarm is worse than none,
+     * because it is counted on.
+     *
+     * Nothing could see that from outside, so this says it. The deploy workflow
+     * reads it on every publish and fails if the alarm is mute, which turns an
+     * invisible gap into an email. No secret is exposed: it reports only
+     * whether the bindings exist, never what they are.
+     */
+    if (url.pathname === '/api/watchdog') {
+      return Response.json(
+        {
+          armed: Boolean(env.BREVO_API_KEY),
+          addressed: Boolean(env.ALERT_EMAIL),
+          slots: REFRESH_SLOTS.length,
+          graceHours: GRACE_HOURS,
+        },
+        { headers: { 'cache-control': 'no-store' } },
+      );
+    }
+
     /**
      * One casing per page — but page paths only, because anything with a file
      * extension keeps its capitals.
