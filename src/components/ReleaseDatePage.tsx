@@ -76,23 +76,25 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
    * OTT" with "not announced" while the feed three weeks along held the date —
    * on the one page whose entire purpose is that question.
    *
-   * Only the date. `ott` is the placeholder for a service TMDB has not assigned
-   * yet, and naming a platform we do not know would be exactly the invented
-   * answer this page refuses to give.
+   * It names its service, because every row in the feed does now — the
+   * placeholder that used to stand in for an unknown one is gone, and a
+   * streaming date that cannot say where is no longer written at all.
    */
   const dated = feed.weeks
     .flatMap((w) => w.releases)
     .find(
       (r) =>
         r.id === `${release.id}~ott` &&
-        r.platforms.includes('ott') &&
         // The film's date *here*. The End of Oak Street has a US digital date
         // and no Indian one, and printing an American release date to an Indian
         // reader is a worse answer than admitting we do not have theirs.
         r.regions.includes(region),
     );
+  /* Both halves or neither: an archive row written before the rule could still
+     carry a date with no service, and half an answer is the thing this page
+     refuses to print. */
   const streamsOn =
-    dated && Date.parse(`${dated.releaseDate}T00:00:00Z`) >= Date.now() - DAY
+    dated?.platforms.length && Date.parse(`${dated.releaseDate}T00:00:00Z`) >= Date.now() - DAY
       ? dated.releaseDate
       : null;
 
@@ -161,13 +163,15 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
                 .
               </>
             ) : streamsOn ? (
-              /* The date is the answer, and it is a better one than this page
-                 has ever been able to give at this stage. Saying the platform
-                 is unannounced in the same breath is what keeps it honest — a
-                 reader must not leave thinking we have named a service. */
+              /* Both halves of the answer somebody arrived for: when, and
+                 where. This used to be able to give only the date, because the
+                 row behind it wore a placeholder instead of a service. */
               <>
-                <strong>Streaming from {fmtDate(streamsOn)}</strong> — the date is confirmed, the
-                platform has not been announced yet. This page names it the day one is.
+                <strong>
+                  Streaming on {dated!.platforms.map((id) => platformById(id).name).join(', ')} from{' '}
+                  {fmtDate(streamsOn)}
+                </strong>
+                .
               </>
             ) : upcoming ? (
               /* Before a film opens, "not announced" is a true answer to the

@@ -39,6 +39,7 @@ const {
   SOON_DAYS,
   MAX_ITEMS,
   TRENDING_IN_CINEMAS,
+  NARROWED_DAYS,
 } = await import(join(dir, 'rails.mjs'));
 
 const TODAY = new Date('2026-09-07T12:00:00');
@@ -466,20 +467,28 @@ test('the streaming row leads on attention and then returns to its calendar', ()
 test('a date with no service yet stays out of the row that names services', () => {
   /*
    * Every card in "On OTT" carries a platform pill, because "which OTT is it
-   * on" is the commonest thing anyone has asked of this site. A placeholder
-   * reading "Platform TBA" answers it with the word streaming, which the
-   * heading already said — three of the first six cards were that. The titles
-   * keep their place in "Coming soon", on the board and on their own page.
+   * on" is the commonest thing anyone has asked of this site.
+   *
+   * There used to be a synthetic `ott` platform standing in for a service TMDB
+   * had not assigned, and it reached the site three ways at once: a pill
+   * reading "Platform TBA", then "Digital", then a filter chip saying "On OTT
+   * 6" next to a real "Netflix 1" — and selecting it emptied the rails,
+   * because a fake platform is neither a cinema listing nor a named service.
+   * It is gone; the fetcher no longer writes a streaming row it cannot place.
+   *
+   * What can still arrive is an archive row from before that rule with no
+   * platforms at all, so the rails have to be indifferent to it rather than
+   * merely unaware of it. It stays visible on the board and on its own page.
    */
   const rows = [
     ...Array.from({ length: 8 }, (_, i) =>
       row({ releaseDate: iso(i), platforms: ['netflix'], title: `Real ${i}` }),
     ),
-    row({ releaseDate: iso(0), platforms: ['ott'], title: 'Date only' }),
+    row({ releaseDate: iso(0), platforms: [], title: 'Date only' }),
   ];
   const out = landedOnOtt(rows, 'IN', TODAY);
   assert.ok(
-    !out.releases.some((r) => r.platforms.includes('ott')),
+    !out.releases.some((r) => r.title === 'Date only'),
     'a row that cannot name a service is in the row that exists to name services',
   );
   assert.equal(out.total, 8, 'and it is not counted there either');
@@ -562,4 +571,45 @@ test('the shipped feed ranks the films that prompted this', () => {
   // row owed it was a place on the row at all.
   const seat = out.releases.findIndex((r) => r.title === 'Hanuman Ansh');
   assert.ok(seat >= 0 && seat < MAX_ITEMS, `Hanuman Ansh is still off the row (${seat})`);
+});
+
+test('a narrowed streaming row reaches back until it has something to say', () => {
+  /*
+   * "When I select this filter the top rails are gone."
+   *
+   * Most of that was a synthetic platform belonging to neither row, fixed at
+   * the source. What was left is this: Shudder has one title in the whole feed
+   * and it landed months ago, so a fortnight-wide row filtered to Shudder is
+   * empty, the band collapses, and tapping a chip still makes two thirds of the
+   * page vanish.
+   *
+   * A film that reached Shudder in July is on Shudder right now — that is what
+   * a subscription is — so "On right now" over it is true and the row may
+   * widen. The cinema row may not, and does not: a film that opened in July is
+   * not still playing, which is the asymmetry this pair is built on.
+   */
+  const rows = [row({ releaseDate: iso(120), platforms: ['shudder'], title: 'Months ago' })];
+  assert.equal(landedOnOtt(rows, 'IN', TODAY).releases.length, 0, 'the fortnight moved');
+  const wide = landedOnOtt(rows, 'IN', TODAY, NARROWED_DAYS);
+  assert.equal(wide.releases.length, 1, 'a narrowed reader still gets nothing');
+  assert.equal(wide.releases[0].title, 'Months ago');
+});
+
+test('a widened row crowns nobody', () => {
+  // "Trending" is a claim about now. Across a year it would badge whatever
+  // happened to be the biggest thing of the year, on a row the reader reached
+  // by asking for one platform.
+  const rows = Array.from({ length: 8 }, (_, i) =>
+    row({ releaseDate: iso(30 + i), platforms: ['netflix'], heat: i * 5, languages: ['hi'] }),
+  );
+  assert.equal(landedOnOtt(rows, 'IN', TODAY, NARROWED_DAYS).trending, undefined);
+});
+
+test('the cinema row does not widen, whatever the reader asked for', () => {
+  // Only landedOnOtt takes the wider window, and this is the reason: a film
+  // that opened four months ago is not in cinemas, and a row headed "In
+  // cinemas" saying it is would be the Netflix-badge-in-the-cinema-rail defect
+  // wearing a date instead of a platform.
+  const rows = [row({ releaseDate: iso(120), platforms: ['theatres'], title: 'Long gone' })];
+  assert.equal(inCinemas(rows, 'IN', TODAY).releases.length, 0);
 });

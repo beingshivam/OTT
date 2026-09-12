@@ -606,10 +606,9 @@ const everything = stockedWeeks.flatMap((w) =>
 
 const TODAY = new Date().toISOString().slice(0, 10);
 
-/** The synthetic platform a title carries when its digital date is known and
- *  its service is not. Must match the registry entry in src/data/platforms.ts
- *  and DIGITAL_ID in scripts/fetch-releases.mjs. */
-const DIGITAL_PLATFORM = 'ott';
+/** The id suffix a streaming-date row carries, so it is a separate calendar
+ *  entry from the same film's cinema listing. See fetch-releases.mjs. */
+const DIGITAL_SUFFIX = 'ott';
 
 /**
  * Every title the feed has ever carried, not just the ones in it today.
@@ -676,10 +675,41 @@ const titlePages = titleCandidates
   // Newest first, so the sitemap leads with what people are searching now.
   .sort((a, b) => b.releaseDate.localeCompare(a.releaseDate));
 
+/*
+ * One URL per film, even when two films share a name.
+ *
+ * Two titles slugified to "spark" and the build threw — correctly, since a page
+ * that two rows both claim is a page one of them silently loses. It only threw
+ * on 12 September because that is the day TMDB happened to hand us the second
+ * one, which means every refresh from then on would have failed until somebody
+ * looked. A calendar that stops updating because two films share a word is not
+ * a calendar.
+ *
+ * So a collision is resolved rather than fatal. The first title to claim a slug
+ * keeps the bare one — titlePages is sorted newest-first, so that is the more
+ * recent film and the one people are more likely to be searching — and the next
+ * takes its year, then a counter if even that repeats. No existing URL moves,
+ * because the winner is unchanged; the loser gains a suffix instead of an
+ * exception.
+ */
 const slugById = new Map();
+const claimed = new Set();
+const collisions = [];
 for (const r of titlePages) {
-  const slug = slugify(r.title);
-  if (slug) slugById.set(r.id, slug);
+  const base = slugify(r.title);
+  if (!base) continue;
+  let slug = base;
+  if (claimed.has(slug)) {
+    const year = (r.releaseDate ?? '').slice(0, 4);
+    slug = year ? `${base}-${year}` : base;
+    for (let n = 2; claimed.has(slug); n++) slug = `${base}-${year || 'x'}-${n}`;
+    collisions.push(`${r.title} -> /${slug}`);
+  }
+  claimed.add(slug);
+  slugById.set(r.id, slug);
+}
+if (collisions.length) {
+  console.log(`     ${collisions.length} title(s) shared a slug and were given their own: ${collisions.join(', ')}`);
 }
 
 /**
@@ -1148,19 +1178,24 @@ for (const r of titlePages) {
    * The End of Oak Street, Thudakkam — and that is the one question this page
    * exists to answer.
    *
-   * `ott` is the placeholder for a date whose service TMDB has not assigned
-   * yet, so this is deliberately the date alone. Naming a platform we do not
-   * know would be the invented answer this page refuses to give.
+   * The suffix is an id namespace, not a platform — the row it finds names a
+   * real service, because a streaming date that cannot say where is no longer
+   * written at all. So this answers with both halves, where it used to be able
+   * to give only the date.
    */
   const dated = titleCandidates.find(
-    (x) => x.id === `${r.id}~${DIGITAL_PLATFORM}` && x.platforms.includes(DIGITAL_PLATFORM),
+    (x) => x.id === `${r.id}~${DIGITAL_SUFFIX}`,
   );
-  const streamsOn = dated && dated.releaseDate >= TODAY ? dated.releaseDate : null;
+  /* Both halves or neither: an archive row predating the rule could still
+     carry a date with no service, and half an answer is the thing this page
+     refuses to print. */
+  const streamsOn =
+    dated?.platforms?.length && dated.releaseDate >= TODAY ? dated.releaseDate : null;
 
   const answer = streaming.length
     ? `Streaming now on ${streaming.map(pname).join(', ')}.`
     : streamsOn
-      ? `Streaming from ${formatDate(streamsOn)} — the date is confirmed, the platform has not been announced yet. This page names it the day one is.`
+      ? `Streaming on ${dated.platforms.map(pname).join(', ')} from ${formatDate(streamsOn)}.`
       : upcoming
         ? `In cinemas from ${opensOn}. No streaming date yet — a film is normally picked up by a platform after its theatrical run, and this page updates automatically when one announces.`
         : `Not announced yet — no streaming date has been confirmed. This page updates automatically; every platform is re-checked twice a week.`;

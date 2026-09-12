@@ -75,10 +75,6 @@ function pick(candidates, release, isMovie) {
 
 const REGION = (process.env.REGIONS ?? 'IN').split(',')[0].trim() || 'IN';
 
-/** The marker a digital-date row wears until somebody can name the service.
- *  Nothing ships with it — see the sweep at the end of this file. */
-const PENDING = 'ott';
-
 /**
  * A discovered row already carries its TMDB id — `m-1240889` is movie 1240889.
  * Reading it back saves the search call entirely and removes any chance of the
@@ -333,8 +329,13 @@ for (const week of feed.weeks) {
        * A watch provider is where the title actually is; a studio is where it
        * came from, which is strong evidence and not the same fact. So this
        * fills the gap and never argues with the pass that knows.
+       *
+       * A backstop rather than the main route. The fetcher runs the same rule
+       * on a digital row before deciding whether to write it at all, because a
+       * row it drops never reaches this pass to be rescued. What is left for
+       * this to catch is a curated or archived row that arrived without one.
        */
-      if (release.platforms?.length === 1 && release.platforms[0] === PENDING) {
+      if (!release.platforms?.length) {
         const service = serviceFrom(detail);
         if (service.length) {
           release.platforms = service;
@@ -358,39 +359,23 @@ for (const week of feed.weeks) {
 }
 
 /*
- * The title stays. Only the false claim goes.
+ * Nothing here counts rows with no service any more, because none reach here.
  *
- * I dropped these rows entirely, and that was the wrong call — corrected the
- * moment it was measured. The week of 11 September went to a single streaming
- * row against the previous week's twenty-six, and the question came back:
- * "so nothing is released between 11–17 Sep on any OTT platform?" Of course
- * something is. Seven of them were in this feed with dates TMDB had supplied,
- * and one was confirmed on Netflix by hand, so they are real releases and not
- * noise. The site was hiding titles it knew about.
+ * There were three attempts at labelling that state and all three were wrong in
+ * the same direction. "Platform not announced" reported our ignorance as the
+ * industry's, on titles whose service had been public for weeks. "Digital" and
+ * "Releasing on OTT" repeated the heading. The last report settled it — "there
+ * should be exact OTT names rather than this ambiguous thing" — so the row is
+ * no longer written at all, and the decision belongs upstream in
+ * scripts/fetch-releases.mjs, where the title is still in hand and the provider
+ * and studio lookups can both be spent on it before anything is discarded.
  *
- * What was actually wrong was never the row — it was the words "Platform not
- * announced" printed beside it, which reported our ignorance as the industry's
- * on a title whose service had been public for weeks. That claim is gone: the
- * group names what is true, that the title is reaching OTT this week, and the
- * cards inside it say nothing further. Same pattern as the cinema rail, where
- * the heading carries the medium and no card repeats it.
- *
- * A real platform still supersedes this the moment anything can name one — the
- * provider lookup, the studio, or the hand-placed file.
+ * The cost is coverage in the current week, and the answers to that are the
+ * re-check pass, data/upcoming-ott.json, and a feed that rebuilds daily.
  */
-let pending = 0;
-for (const week of feed.weeks) {
-  for (const r of week.releases) {
-    if (r.platforms?.length === 1 && r.platforms[0] === PENDING) pending++;
-  }
-}
-
 feed.enrichedAt = new Date().toISOString();
 await writeFile(FEED, JSON.stringify(feed, null, 2) + '\n');
 console.log(
   `\nEnriched ${matched} title(s); ${skipped} left with generated art. ${callCount()} API calls.`,
 );
-console.log(
-  `Named ${placed} streaming date(s) from the studio; ${pending} still carry a date ` +
-    'with no service named.',
-);
+console.log(`Named ${placed} streaming date(s) from the studio.`);

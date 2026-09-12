@@ -79,22 +79,6 @@ export const PLATFORMS: Platform[] = [
      for browse links, which is the shape of a problem patched at one surface
      instead of at its source. */
   { id: 'theatres',    name: 'In cinemas',   short: 'Cinemas',   mark: '▶',  accent: '#FFC94A', accent2: '#FF8A3D', tmdb: [],           regions: ['IN', 'US'], theatrical: true, homeUrl: 'https://in.bookmyshow.com/', searchUrl: 'https://in.bookmyshow.com/explore/movies?q={q}' },
-  /**
-   * A digital release date with no service attached yet.
-   *
-   * TMDB assigns a watch provider on release day, so a title landing on OTT in
-   * three weeks has a date and no platform — which meant "Coming soon" carried
-   * cinema listings and almost nothing else, on a site called New on OTT. TMDB
-   * does carry the *date* ahead of time, under release type 4, and a reader
-   * asking "when does this come to OTT" is asking for the date far more than
-   * for the service. So the date ships with the service marked unknown rather
-   * than the row being dropped, and the next refresh after release replaces
-   * this with the real platform.
-   *
-   * Synthetic like `theatres`: no TMDB provider id, because it is not a
-   * provider. Nothing that maps providers will ever match it.
-   */
-  { id: 'ott',         name: 'Releasing on OTT', short: 'On OTT',  mark: '▶',  accent: '#7C5CFF', accent2: '#3AA0FF', tmdb: [],        regions: ['IN', 'US'] },
   { id: 'netflix',     name: 'Netflix',      short: 'Netflix',   mark: 'N',    accent: '#E50914', accent2: '#FF3B30', tmdb: [8, 1796],    regions: ['IN', 'US'], homeUrl: 'https://www.netflix.com/', searchUrl: 'https://www.netflix.com/search?q={q}' },
   { id: 'prime',       name: 'Prime Video',  short: 'Prime',     mark: 'pv',   accent: '#00A8E1', accent2: '#48D2FF', tmdb: [9, 119],     regions: ['IN', 'US'], homeUrl: 'https://www.primevideo.com/', searchUrl: 'https://www.primevideo.com/search/ref=atv_nb_sr?phrase={q}' },
   { id: 'jiohotstar',  name: 'JioHotstar',   short: 'JioHotstar',mark: 'JH',   accent: '#7B5CFF', accent2: '#22B8FF', tmdb: [2336, 122, 970], regions: ['IN'],   homeUrl: 'https://www.hotstar.com/in', searchUrl: 'https://www.hotstar.com/in/search?q={q}' },

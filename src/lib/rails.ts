@@ -90,10 +90,6 @@ function chronicle(
   return { releases, from, to, total: rows.length };
 }
 
-/** The placeholder a title wears when its streaming date is known and its
- *  service is not. Not a platform — see src/data/platforms.ts. */
-export const DIGITAL = 'ott';
-
 /**
  * True when a film is something you can still only see in a cinema.
  *
@@ -120,17 +116,11 @@ const showing = (r: Release) =>
 /**
  * True when we can tell someone where to watch it.
  *
- * The placeholder does not count, and that distinction is the whole point of
- * the "On OTT" row. Every card there carries a service pill because "which OTT
- * is it on" was the single commonest piece of feedback this site has had — and
- * a row of cards reading "Digital" answers it with the word "streaming", which
- * is what the heading already said. Three of the first six cards were that.
- *
- * Those titles are not lost: they keep their place in "Coming soon", on the
- * week board and on their own page, where a date with no service yet is a
- * useful thing to know rather than a pill that fails to name anything.
+ * Every platform in the feed is now a real service, so this is simply "not a
+ * cinema listing". It used to have to exclude a placeholder as well — see the
+ * digital pass in scripts/fetch-releases.mjs for why that no longer exists.
  */
-const streaming = (r: Release) => r.platforms.some((p) => p !== 'theatres' && p !== DIGITAL);
+const streaming = (r: Release) => r.platforms.some((p) => p !== 'theatres');
 
 /**
  * Whose audience the attention number describes.
@@ -259,6 +249,26 @@ export function inCinemas(all: Release[], region: string, today: Date = new Date
 }
 
 /**
+ * How far back this row reaches when the reader has narrowed the page.
+ *
+ * "When I select this filter the top rails are gone." Mostly that was a fake
+ * platform belonging to neither row, and that is fixed at the source. What was
+ * left is smaller and real: Shudder has one title in the feed and it landed in
+ * July, so a fortnight-wide row filtered to Shudder is empty, the band collapses
+ * and tapping a chip still makes two thirds of the page disappear.
+ *
+ * Widening is honest here and would not be on the cinema row. "On right now" is
+ * a claim about the present, and a film that reached Shudder in July is on
+ * Shudder right now — that is what a subscription is. A film that opened in
+ * cinemas in July is not still playing, which is why that row keeps its six
+ * weeks and this one does not have to.
+ *
+ * Only when the reader asked. Unfiltered, a fortnight is the news and a row
+ * reaching back a year would bury it.
+ */
+export const NARROWED_DAYS = 365;
+
+/**
  * The same fortnight the mixed row always used, narrowed to things you can
  * actually stream tonight.
  *
@@ -275,14 +285,23 @@ export function inCinemas(all: Release[], region: string, today: Date = new Date
  * lead on attention and wear the same badge, and everything behind them is the
  * chronology it always was.
  */
-export function landedOnOtt(all: Release[], region: string, today: Date = new Date()): JustLanded {
+export function landedOnOtt(
+  all: Release[],
+  region: string,
+  today: Date = new Date(),
+  days: number = WINDOW_DAYS,
+): JustLanded {
   const row = chronicle(all, region, {
-    from: toISODate(new Date(today.getTime() - (WINDOW_DAYS - 1) * 86_400_000)),
+    from: toISODate(new Date(today.getTime() - (days - 1) * 86_400_000)),
     to: toISODate(today),
     newestFirst: true,
     where: streaming,
   });
 
+  /* The badge says "Trending", which is a claim about now. Across a widened
+     window it would be crowning whatever happened to be the year's biggest,
+     so the widened row is a plain chronology. */
+  if (days !== WINDOW_DAYS) return row;
   if (row.releases.length <= TRENDING_IN_CINEMAS || row.total <= TRENDING_IN_CINEMAS) return row;
 
   /*

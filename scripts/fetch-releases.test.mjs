@@ -74,15 +74,33 @@ globalThis.fetch = async (url) => {
     return json({ results: {} });
   }
 
+  // Detail. 6 was made by Netflix and nobody is listed as carrying it — the
+  // studio is the only thing that can place it.
+  if (/^\\/3\\/movie\\/\\d+$/.test(p)) {
+    const id = p.split('/')[3];
+    return json({
+      id: Number(id),
+      production_companies: id === '6' ? [{ name: 'Netflix' }] : [{ name: 'Some Films Pvt Ltd' }],
+    });
+  }
+
   if (p.endsWith('/discover/movie')) {
     // The theatrical pass asks for types 2|3, the digital one for 4.
     if (q.with_release_type === '2|3') return json({ results: [movie(2)], total_pages: 1 });
     if (q.with_release_type === '4') {
       // 1 is already on Netflix, 2 already in cinemas, 3 is digital-only and
-      // still ahead, 4 is a digital date TMDB has already named, and 5 has
-      // arrived with nobody attached — the case that must not ship.
+      // still ahead, 4 is a digital date TMDB has already named, 5 has arrived
+      // with nobody attached — the case that must not ship — and 6 has nobody
+      // carrying it but Netflix as its studio.
       return json({
-        results: [movie(1), movie(2), movie(3), movie(4), movie(5, { release_date: TODAY })],
+        results: [
+          movie(1),
+          movie(2),
+          movie(3),
+          movie(4),
+          movie(5, { release_date: TODAY }),
+          movie(6),
+        ],
         total_pages: 1,
       });
     }
@@ -108,12 +126,13 @@ function run() {
     `const TODAY = ${JSON.stringify(today)};\nconst SOON = ${JSON.stringify(soon)};\n${STUB}`,
   );
 
-  execFileSync(
+  const log = execFileSync(
     process.execPath,
     ['--import', `file://${preload}`, 'scripts/fetch-releases.mjs', '--weeks-back', '0', '--weeks-ahead', '1', '--theatre-weeks-back', '0'],
     {
       cwd: ROOT,
-      stdio: 'pipe',
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'inherit'],
       env: {
         ...process.env,
         TMDB_TOKEN: 'test-key',
@@ -127,42 +146,70 @@ function run() {
   const feed = JSON.parse(readFileSync(out, 'utf8'));
   const calls = JSON.parse(readFileSync(join(dir, 'calls.json'), 'utf8'));
   rmSync(dir, { recursive: true, force: true });
-  return { feed, calls };
+  return { feed, calls, log };
 }
 
-const TODAY = new Date().toISOString().slice(0, 10);
-const { feed, calls } = run();
+const { feed, calls, log } = run();
 const rows = feed.weeks.flatMap((w) => w.releases);
 const byId = new Map(rows.map((r) => [r.id, r]));
 
-test('a digital date with no service still reaches the calendar, before the date', () => {
-  // Title 3 exists only in the release-type-4 response. Without this pass it
-  // would not be in the feed at all, which is why "Coming soon" was cinema and
-  // almost nothing else. Dated ahead, so it is a promise rather than a shrug.
-  const only = byId.get('m-3~ott');
-  assert.ok(only, 'the digital-only title is missing from the feed entirely');
-  assert.deepEqual(only.platforms, ['ott']);
-  assert.ok(only.releaseDate > TODAY, 'the fixture no longer tests the pre-release case');
+test('a digital date with no service is not written at all', () => {
+  /*
+   * Titles 3 and 5 exist only in the release-type-4 response and TMDB has
+   * nobody for either — 3 still ahead of its date, 5 already arrived.
+   *
+   * This shipped a synthetic `ott` platform for them and it was rejected under
+   * all three names it was given: "Digital", then "Platform TBA", then
+   * "Releasing on OTT". The clearest report — "only 1 in Netflix rest all in
+   * OTT, there should be exact OTT names rather than this ambiguous thing" —
+   * is right: a bucket labelled with the category is the question repeated
+   * back, not an answer to it.
+   *
+   * It was load-bearing for a second defect too. A row on a platform that is
+   * not a platform belongs to neither rail, so filtering to it emptied the
+   * band above the board.
+   *
+   * The cost is coverage, and it is paid deliberately. What covers the window
+   * instead is the re-check pass, data/upcoming-ott.json, and the fact that
+   * the feed rebuilds daily rather than once on Friday.
+   */
+  for (const id of ['m-3~ott', 'm-5~ott']) {
+    const ghost = byId.get(id);
+    assert.ok(!ghost, `${id} shipped as ${ghost && JSON.stringify(ghost.platforms)}`);
+  }
 });
 
-test('a date that has arrived still ships, service named or not', () => {
+test('who made it answers when who is carrying it will not', () => {
   /*
-   * This asserted the opposite for about an hour, and the hour was expensive.
+   * Title 6 has a digital date, nobody listed as carrying it, and Netflix as
+   * its production company. A platform that commissioned a film is where that
+   * film lands, and TMDB knows the studio long before it knows the provider —
+   * on a real run this is the difference between dropping two titles and
+   * listing them, which is small and is not nothing when the alternative is
+   * the current week going almost empty.
    *
-   * The reasoning was that a released title nobody can place is an admission
-   * rather than news — true of the *label* beside it, and I applied it to the
-   * row. The current week emptied: seven titles dated 11 September vanished,
-   * one of them a Netflix release confirmed by hand, and the site said nothing
-   * was releasing that week at all.
-   *
-   * These rows are also the only cover for the window that matters most. TMDB
-   * attaches providers on or after release day, so the current week is always
-   * sparse on its own Friday and fills in behind itself — last Friday's
-   * seventeen drops arrived days late. Without them, Friday is an empty site.
+   * It has to happen here rather than in enrichment, where the same rule
+   * already lived: the row it rescues is dropped before enrichment sees it.
    */
-  const out = byId.get('m-5~ott');
-  assert.ok(out, 'a released title with no service named has been hidden again');
-  assert.deepEqual(out.platforms, ['ott']);
+  const saved = byId.get('m-6~ott');
+  assert.ok(saved, 'a row the studio could place was dropped anyway');
+  assert.deepEqual(saved.platforms, ['netflix'], `got ${saved.platforms.join(', ')}`);
+});
+
+test('a studio nobody has heard of does not become a platform', () => {
+  // Title 3's producer matches nothing in the registry, so the studio lookup
+  // adds nothing and the drop stands. A pill reading "Some Films Pvt Ltd" is
+  // the placeholder problem again wearing a different name.
+  assert.ok(!byId.get('m-3~ott'), 'an unrecognised studio placed a row');
+});
+
+test('no row anywhere in the feed is missing a platform', () => {
+  // The rule above stated at the feed level, so a second route to the same
+  // half-written row — a curated entry, an archive merge — fails here too.
+  // A row that cannot say where you watch it has nothing to tell anybody.
+  for (const r of rows) {
+    assert.ok(r.platforms.length, `${r.id} (${r.title}) has no platform`);
+  }
 });
 
 test('a streaming date is its own row, not the cinema listing wearing its id', () => {
@@ -184,16 +231,15 @@ test('a streaming date is its own row, not the cinema listing wearing its id', (
     );
   }
   /*
-   * One direction only. The suffix says "this row is the film's streaming
-   * date", not "this row has no platform" — a digital row whose service TMDB
-   * already knows carries that service and keeps its suffix, because it is
-   * still a separate calendar entry from the cinema listing. What must never
-   * happen is the reverse: the placeholder appearing on a row that is not a
-   * streaming date, which would be a cinema listing claiming to be an OTT one.
+   * The suffix is an id namespace and nothing else. It says "this row is the
+   * film's streaming date", so every row wearing it names a service and none
+   * of them is in cinemas — a suffixed row claiming a cinema listing would be
+   * the "why the hell are these in cinemas" defect from the other direction.
    */
   for (const r of rows) {
-    if (!r.platforms.includes('ott')) continue;
-    assert.ok(r.id.endsWith('~ott'), `${r.id} wears the placeholder without being a streaming date`);
+    if (!r.id.endsWith('~ott')) continue;
+    assert.ok(r.platforms.length, `${r.id} is a streaming date that names no service`);
+    assert.ok(!r.platforms.includes('theatres'), `${r.id} is a streaming date shown in cinemas`);
   }
 });
 
@@ -213,21 +259,26 @@ test('a date outside the week is not dragged into it', () => {
   }
 });
 
-test('a real provider is never overwritten by an unknown one', () => {
+test('a real provider is never overwritten by a second pass', () => {
   // Title 1 comes back from the provider pass on Netflix *and* from the digital
-  // pass. Netflix is a fact; "ott" is an absence of one.
+  // pass. Whatever the second pass thinks, Netflix is the fact already held.
   const known = byId.get('m-1');
   assert.ok(known, 'the Netflix title vanished');
-  assert.ok(!known.platforms.includes('ott'), `got ${known.platforms.join(', ')}`);
-  assert.ok(known.platforms.includes('netflix'));
+  assert.deepEqual(known.platforms, ['netflix'], `got ${known.platforms.join(', ')}`);
 });
 
 test('a cinema listing is not also "coming to streaming"', () => {
-  // Title 2 is in cinemas this week and appears in the digital response too.
+  /*
+   * Title 2 is in cinemas this week and appears in the digital response too.
+   *
+   * Reported as "why the hell are these in cinemas - they are OTT release
+   * man!" when the re-check attached a service *alongside* theatres and the
+   * card wore a Netflix badge in the cinema rail. A film is in cinemas or it
+   * is streaming; the two states are two rows, never one.
+   */
   const cinema = byId.get('m-2');
   assert.ok(cinema, 'the theatrical title vanished');
-  assert.ok(!cinema.platforms.includes('ott'), `got ${cinema.platforms.join(', ')}`);
-  assert.ok(cinema.platforms.includes('theatres'));
+  assert.deepEqual(cinema.platforms, ['theatres'], `got ${cinema.platforms.join(', ')}`);
 });
 
 test('a digital date asks who has it before saying nobody knows', () => {
@@ -249,13 +300,19 @@ test('a digital date asks who has it before saying nobody knows', () => {
   );
 });
 
-test('the placeholder is what is left when TMDB really has nobody', () => {
-  // Title 3 has a date and no provider anywhere. That is the state the
-  // placeholder exists for, and it has to survive — the fix above must not
-  // turn "no service yet" into no row.
-  const pending = byId.get('m-3~ott');
-  assert.ok(pending, 'the unplaced digital title vanished');
-  assert.deepEqual(pending.platforms, ['ott']);
+test('a dropped title is named in the run report, not silently discarded', () => {
+  /*
+   * Dropping the unplaceable rows is only defensible if somebody can see what
+   * was dropped: data/upcoming-ott.json is how these titles get listed, and a
+   * hand file nobody knows to update is a hand file that stays empty.
+   *
+   * Titles 3 and 5 are the two the fixture cannot place.
+   */
+  assert.match(log, /digital row\(s\) came back without a subscription service and were dropped/);
+  assert.match(log, /upcoming-ott\.json/);
+  for (const t of ['Title 3', 'Title 5']) {
+    assert.ok(log.includes(t), `${t} was dropped without being reported`);
+  }
 });
 
 test('the digital query asks TMDB for digital dates, by region', () => {

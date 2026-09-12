@@ -29,6 +29,7 @@ import {
   inCinemas,
   landedOnOtt,
   MIN_ITEMS,
+  NARROWED_DAYS,
   SOON_DAYS,
 } from './lib/rails';
 import {
@@ -433,17 +434,23 @@ export default function App() {
    * is the whole reason they exist — so narrowing them to the open week would
    * make them a second copy of the board.
    */
+  const narrowed = activeFilterCount(filters) > 0;
   const railRows = useMemo(
-    () => (activeFilterCount(filters) > 0 ? applyFilters(allRows, filters) : allRows),
-    [allRows, filters],
+    () => (narrowed ? applyFilters(allRows, filters) : allRows),
+    [allRows, filters, narrowed],
   );
   const cinemaRail = useMemo(
     () => inCinemas(railRows, filters.region, today),
     [railRows, filters.region, today],
   );
+  /* Reaching back a year once the reader has narrowed the page. Shudder has one
+     title in the whole feed and it landed in July, so a fortnight-wide row
+     filtered to Shudder is empty and the band collapses — which is the same
+     "the top rails are gone" from a different cause. See NARROWED_DAYS for why
+     this row may widen and the cinema row above may not. */
   const ottRail = useMemo(
-    () => landedOnOtt(railRows, filters.region, today),
-    [railRows, filters.region, today],
+    () => landedOnOtt(railRows, filters.region, today, narrowed ? NARROWED_DAYS : undefined),
+    [railRows, filters.region, today, narrowed],
   );
 
   /** The same fortnight, pointed the other way, for the Coming soon lens. */
@@ -518,9 +525,6 @@ export default function App() {
     blocked: selected !== null || searching || Boolean(span) || Boolean(route?.catalogue),
   });
 
-  /** Trending is a browse aid; once the reader has narrowed the week it is noise. */
-  const userNarrowed = activeFilterCount(filters) > 0;
-
   /**
    * Whether the band above the board has anything honest to say.
    *
@@ -534,9 +538,15 @@ export default function App() {
    * to the trending strip. That strip is drawn from the whole feed, so under an
    * active filter it would put unrelated titles above a board the reader has just
    * narrowed — which is the objection that started this, in a smaller form.
+   *
+   * That last case is now rare rather than routine. It used to fire on any
+   * platform whose titles happened to fall outside a fortnight — five of the
+   * sixteen in the feed — and the streaming row reaching back a year under a
+   * filter covers those. What is left is a genuinely empty selection, where
+   * there is nothing to put in a row and saying so quietly is right.
    */
   const railTotal = cinemaRail.releases.length + ottRail.releases.length;
-  const showRails = userNarrowed ? railTotal > 0 : true;
+  const showRails = narrowed ? railTotal > 0 : true;
 
   /**
    * One row per lens, each ranking what its own page is about.
@@ -552,7 +562,7 @@ export default function App() {
    * answering a different one.
    */
   const lensRail =
-    userNarrowed ? null
+    narrowed ? null
     : span?.kind === 'upcoming' && soon.length >= MIN_ITEMS ? (
         <PosterRail
           title="Landing soon"
@@ -764,7 +774,7 @@ export default function App() {
       */}
       {!isTitlePage && feed && !error && facets.total > 0 && !span && !route?.catalogue && showRails && (
         <div className="shell">
-          {railTotal >= (userNarrowed ? 1 : MIN_ITEMS) ? (
+          {railTotal >= (narrowed ? 1 : MIN_ITEMS) ? (
             /*
               Both rows, both on screen, rather than a toggle over one.
 

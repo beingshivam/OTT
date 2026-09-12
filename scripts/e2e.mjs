@@ -1039,18 +1039,60 @@ for (const width of [360, 1280]) {
   const chips = await page.locator('.chip--logo').count();
   is(chips > 0, `${width}px: the poster view offers platform chips`, `${chips} chips`);
 
-  if (chips > 0) {
-    await page.locator('.chip--logo').first().click();
-    await page.waitForTimeout(800);
+  /*
+   * Every chip, not just the first one.
+   *
+   * Reported twice, the second time after this check was already passing:
+   * "when I select this filter on clicking on either theatre, OTT or Netflix
+   * magically the top rails go away". Clicking one chip proved nothing, because
+   * the chip that emptied the band was a *particular* one — the synthetic `ott`
+   * platform, which belongs to neither rail, so filtering to it left both with
+   * nothing while Netflix and Cinemas both looked fine.
+   *
+   * The placeholder is gone, and the way to keep it gone is to click all of
+   * them. Each is a filter a reader can actually apply, so each has to leave a
+   * page behind.
+   */
+  const labels = await page.locator('.chip--logo').allInnerTexts();
+  for (let i = 0; i < chips; i++) {
+    const name = (labels[i] ?? `chip ${i}`).replace(/\s+/g, ' ').trim();
+    await page.locator('.chip--logo').nth(i).click();
+    await page.waitForTimeout(650);
     const after = await page.evaluate(() => ({
       rails: document.querySelectorAll('.landed--sub').length,
       cards: document.querySelectorAll('.card').length,
       chips: document.querySelectorAll('.chip--logo').length,
     }));
-    is(after.cards > 0, `${width}px: a filter leaves a board`, `${after.cards} cards`);
-    is(after.rails > 0, `${width}px: and leaves the rail that still has something`, `${after.rails} rails`);
-    is(after.chips > 0, `${width}px: and a way back out`, 'the chips vanished with the filter');
+    is(after.cards > 0, `${width}px: "${name}" leaves a board`, `${after.cards} cards`);
+    is(after.rails > 0, `${width}px: "${name}" leaves a rail`, 'the band above the board emptied');
+    is(after.chips > 0, `${width}px: "${name}" leaves a way back out`, 'the chips vanished with the filter');
+    /* Back to everything before the next one. Not by clicking the chip again:
+       the counts recompute under an active filter, so the list re-renders and
+       nth(i) is no longer the chip just pressed. A reload is the only way to
+       be sure each chip is tested as a single filter rather than as an
+       intersection of two that legitimately holds nothing. */
+    await page.reload({ waitUntil: 'networkidle' });
+    await page.locator('.viewtoggle button').nth(1).click();
+    await page.waitForTimeout(500);
   }
+
+  /*
+   * A chip that says what a platform is called, not what its id is.
+   *
+   * platform() falls back to the raw id when the registry has no entry, so a
+   * row referring to a platform that no longer exists renders a pill reading,
+   * literally, "ott" — quieter than a crash and worse to look at. Any all
+   * lower-case single word is that fallback showing through: every real name
+   * in the registry is capitalised.
+   */
+  const rawIds = (await page.locator('.chip--logo').allInnerTexts())
+    .map((t) => t.replace(/\s+/g, ' ').trim().split(' ')[0])
+    .filter((t) => /^[a-z][a-z0-9]*$/.test(t));
+  is(
+    rawIds.length === 0,
+    `${width}px: every chip names a platform rather than an id`,
+    `raw ids on screen: ${rawIds.join(', ')}`,
+  );
   is(errors.length === 0, `${width}px: filtering raises no console errors`, errors[0]);
   await ctx.close();
 }

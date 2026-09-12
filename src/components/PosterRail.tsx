@@ -313,10 +313,7 @@ export function PosterRail({
            */
           const alsoStreaming = r.platforms.find((id) => id !== 'theatres');
           const p = platform(showPlatform ? r.platforms[0] : (alsoStreaming ?? r.platforms[0]));
-          /* A pill naming the placeholder says "On OTT" on a row already headed
-             "On OTT" — the same repetition the cinema rail suppresses. The
-             group says it; the card does not say it twice. */
-          const namePlatform = (showPlatform || Boolean(alsoStreaming)) && p.id !== 'ott';
+          const namePlatform = showPlatform || Boolean(alsoStreaming);
           const score = scoreOf(r);
           const isTrending = i < trending;
           return (

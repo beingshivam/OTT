@@ -265,9 +265,18 @@ async function discoverDigital({ region, from, to, page }) {
   });
 }
 
-/** The synthetic platform a date-without-a-service lands on. Must match the
- *  registry entry in src/data/platforms.ts. */
-const DIGITAL_ID = 'ott';
+/**
+ * What marks a streaming row's id apart from the cinema row of the same film.
+ *
+ * A title that opens in cinemas and later streams is two rows in two different
+ * weeks, and both derive their id from the same TMDB number — so without this
+ * the second silently overwrote the first when the archive merged, and 146
+ * cinema listings went missing. It is an id namespace, not a platform: the row
+ * itself always names a real service, or it is not written at all.
+ *
+ * scripts/build-seo.mjs pairs the two rows on this exact suffix.
+ */
+const DIGITAL_SUFFIX = 'ott';
 
 /**
  * Every digital row that came back without a service, and what TMDB did have.
@@ -335,6 +344,55 @@ async function offersFor(id, region) {
   }
 }
 
+/**
+ * Who made it, when nobody will say who is carrying it.
+ *
+ * A platform that commissioned a film is where that film lands, and TMDB knows
+ * the production company long before it knows the provider. This is weaker
+ * evidence than a watch provider — a studio is where a title came from, not
+ * where it is — so it only ever runs after the provider lookup has come back
+ * empty, and it never argues with a pass that knows.
+ *
+ * Measured on a real run it recovers 2 rows out of 142, which is small and is
+ * the difference between dropping a title and listing it. Duplicated from
+ * scripts/enrich-releases.mjs, where the same rule already ran, because by the
+ * time enrichment sees the feed the row it would have rescued is not in it: the
+ * drop happens here.
+ */
+const STUDIOS = [
+  [/netflix/i, 'netflix'],
+  [/amazon|prime video/i, 'prime'],
+  [/hotstar|disney\+ hotstar|jiohotstar|jio ?cinema/i, 'jiohotstar'],
+  [/sony ?liv/i, 'sonyliv'],
+  [/zee ?5|zee5/i, 'zee5'],
+  [/aha video|^aha$/i, 'aha'],
+  [/sun ?nxt/i, 'sunnxt'],
+  [/apple (tv|studios)/i, 'appletv'],
+  [/hbo|max originals/i, 'hbomax'],
+  [/hulu/i, 'hulu'],
+  [/disney\+/i, 'disney'],
+  [/paramount\+/i, 'paramount'],
+  [/peacock/i, 'peacock'],
+];
+
+async function studioFor(id, known) {
+  try {
+    const detail = await tmdb(`/movie/${id}`);
+    const names = [
+      ...(detail.networks ?? []).map((n) => n.name),
+      ...(detail.production_companies ?? []).map((c) => c.name),
+    ].filter(Boolean);
+    const hits = new Set();
+    for (const name of names) {
+      for (const [pattern, service] of STUDIOS) if (pattern.test(name)) hits.add(service);
+    }
+    // Only services this build actually has a registry entry for.
+    return [...hits].filter((s) => known.has(s));
+  } catch {
+    return [];
+  }
+}
+
 async function providersFor(isMovie, id, region) {
   try {
     const data = await tmdb(`/${isMovie ? 'movie' : 'tv'}/${id}/watch/providers`);
@@ -362,6 +420,9 @@ async function buildWeek(weekId, platforms, index, cinemaOnly = false) {
   const cinema = platforms.find((p) => p.theatrical);
   const theatricalId = cinema?.id;
   const theatricalRegions = cinema?.regions ?? [];
+  /* Only services the site can actually render a pill for. A studio match on a
+     platform the registry has never heard of is a row nobody can click. */
+  const registered = new Set(platforms.map((p) => p.id));
 
   const from = weekId;
   const to = iso(new Date(new Date(`${weekId}T00:00:00Z`).getTime() + 6 * DAY));
@@ -530,34 +591,63 @@ async function buildWeek(weekId, platforms, index, cinemaOnly = false) {
            * actually lands in. This row is the only place that lookup can
            * happen, and it was the one place not doing it.
            *
-           * The placeholder is what is left when TMDB genuinely has nobody yet,
-           * which is the real state for something weeks out — not a label for a
-           * question nobody asked.
+           * What this lookup finds is the only thing that puts a row here now.
+           * A digital date TMDB cannot place is dropped rather than labelled —
+           * see below.
            */
           const offer = await offersFor(item.id, region);
-          const known = [...new Set(offer.subscription.map((p) => index.get(p)).filter(Boolean))];
-          if (!known.length) unplaced.push({ title: item.title ?? item.name, region, offer });
+          let known = [...new Set(offer.subscription.map((p) => index.get(p)).filter(Boolean))];
+          /* Nobody is carrying it on record, so ask who made it. Weaker
+             evidence, so it never runs against a provider that answered. */
+          if (!known.length) known = await studioFor(item.id, registered);
+          if (!known.length) {
+            /*
+             * No service, no row. Not a placeholder — nothing.
+             *
+             * This shipped a synthetic platform for these rows and it was
+             * rejected under all three names it was given: "Digital", then
+             * "Platform TBA", then "Releasing on OTT". The last report is the
+             * clearest — "only 1 in Netflix rest all in OTT, there should be
+             * exact OTT names rather than this ambiguous thing" — and it is
+             * right. A bucket labelled with the category is not an answer to
+             * "where do I watch this"; it is the question repeated back.
+             *
+             * It was also load-bearing for a second defect. A row on a platform
+             * that is not a platform belongs to neither rail — not the cinema
+             * one, which is cinema listings, and not the streaming one, which
+             * promises a service it can name — so filtering to it emptied the
+             * band above the board. One fake platform, two complaints.
+             *
+             * Measured before deciding: TMDB names a service for 4 digital rows
+             * out of 142, and the studio lookup above recovers 2 more. Both are
+             * now spent by the time a row reaches this line, so this is not a
+             * gap a better query closes. What names the rest is
+             * data/upcoming-ott.json, by hand, for the handful of titles a week
+             * anyone is actually waiting for — agreed with the owner that
+             * smaller regional titles nothing can place are left out.
+             *
+             * Dropping them does cost the current week, which is always the
+             * sparsest: providers are attached on or after release day, so a
+             * Friday fills in behind itself over the following days. The feed
+             * rebuilds every morning, so a title arrives late rather than never.
+             */
+            unplaced.push({ title: item.title ?? item.name, region, offer });
+            continue;
+          }
 
           /*
-           * The date ships whether or not anything can name a service.
+           * Past here the row names a real service, so what follows is only
+           * about which row it belongs to.
            *
-           * This dropped a row once its date had arrived, on the reasoning that
-           * "out now, somewhere" is an admission rather than news. The
-           * reasoning was about the *label*, and I applied it to the *row* —
-           * which emptied the current week. Seven titles dated 11 September
-           * vanished, one of them a Netflix release confirmed by hand, and the
-           * site was left saying nothing at all releases this week.
-           *
-           * The label is fixed where labels live. A row with no service named
-           * groups under "Releasing on OTT", which claims only what is true,
-           * and no longer under anything asserting that nobody has announced
-           * one. Hiding the title was never what that fixed.
-           *
-           * These rows are also the only cover for the window that matters
-           * most: TMDB attaches providers on or after release day, so the
-           * current week is always sparse on its own Friday and fills in
-           * behind itself. Last Friday's seventeen drops reached the feed
-           * days late. Without the dated rows, Friday shows an empty site.
+           * Dropping the unplaceable ones does cost coverage in the week that
+           * matters most: TMDB attaches providers on or after release day, so
+           * the current week is always sparse on its own Friday and fills in
+           * behind itself. Three things carry that window instead, and none of
+           * them is a label that says nothing — the re-check pass below, which
+           * revisits cinema-only rows whose date has passed and moves them the
+           * moment a service appears; data/upcoming-ott.json, for the titles a
+           * person actually cares about; and the next daily run, since the feed
+           * rebuilds every morning rather than once on Friday.
            */
 
           const key = `m-${item.id}`;
@@ -569,7 +659,7 @@ async function buildWeek(weekId, platforms, index, cinemaOnly = false) {
               existing.regions = [...new Set([...existing.regions, region])];
               continue;
             }
-            existing.platforms = known.length ? known : [DIGITAL_ID];
+            existing.platforms = known;
             existing.regions = [...new Set([...existing.regions, region])];
             continue;
           }
@@ -592,10 +682,10 @@ async function buildWeek(weekId, platforms, index, cinemaOnly = false) {
              * the TMDB id readable so enrichment still resolves it — see
              * tmdbRef in scripts/enrich-releases.mjs, which parses past it.
              */
-            id: `${key}~ott`,
+            id: `${key}~${DIGITAL_SUFFIX}`,
             title: item.title ?? item.name,
             kind: classify(true, genres),
-            platforms: known.length ? known : [DIGITAL_ID],
+            platforms: known,
             languages: [item.original_language].filter(Boolean),
             genres,
             // Guarded above: a row only reaches here when its date is in the week.
@@ -938,10 +1028,13 @@ if (landed.length) {
 if (unplaced.length) {
   const rentable = unplaced.filter((u) => u.offer.rent.length || u.offer.buy.length);
   console.log(
-    `\n${unplaced.length} digital row(s) came back without a subscription service. ` +
-      `${rentable.length} of them TMDB has as rent or buy only; ` +
-      `${unplaced.length - rentable.length} it has nothing at all for.`,
+    `\n${unplaced.length} digital row(s) came back without a subscription service and were ` +
+      `dropped. ${rentable.length} of them TMDB has as rent or buy only; ` +
+      `${unplaced.length - rentable.length} it has nothing at all for. ` +
+      `Anything here worth listing goes in data/upcoming-ott.json by hand.`,
   );
+  // Indian rows first: those are the ones worth the owner's time to place.
+  unplaced.sort((a, b) => (a.region === 'IN' ? 0 : 1) - (b.region === 'IN' ? 0 : 1));
   for (const u of unplaced.slice(0, 12)) {
     const where = u.offer.rent.length || u.offer.buy.length
       ? `rent ${JSON.stringify(u.offer.rent)} buy ${JSON.stringify(u.offer.buy)}`
