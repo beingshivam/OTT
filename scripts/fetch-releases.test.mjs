@@ -74,8 +74,33 @@ globalThis.fetch = async (url) => {
     return json({ results: {} });
   }
 
-  // Detail. 6 was made by Netflix and nobody is listed as carrying it — the
-  // studio is the only thing that can place it.
+  // Release dates. 7 has the platform written on the digital date itself, the
+  // way a distributor types it when the date is announced.
+  if (/\\/release_dates$/.test(p)) {
+    const id = p.split('/')[3];
+    if (id === '7') {
+      return json({
+        results: [
+          { iso_3166_1: 'IN', release_dates: [{ type: 4, note: 'Prime Video' }] },
+        ],
+      });
+    }
+    return json({ results: [] });
+  }
+
+  // Series detail: 100 is an Apple TV+ show, 101 is on a channel this site does
+  // not carry. Both are announced; only one can be named.
+  if (/^\\/3\\/tv\\/\\d+$/.test(p)) {
+    const id = p.split('/')[3];
+    return json({
+      id: Number(id),
+      networks: id === '100' ? [{ name: 'Apple TV+' }] : [{ name: 'Doordarshan Regional' }],
+      production_companies: [],
+    });
+  }
+
+  // Movie detail. 6 was made by Netflix and nobody is listed as carrying it —
+  // the studio is the only thing that can place it.
   if (/^\\/3\\/movie\\/\\d+$/.test(p)) {
     const id = p.split('/')[3];
     return json({
@@ -90,8 +115,9 @@ globalThis.fetch = async (url) => {
     if (q.with_release_type === '4') {
       // 1 is already on Netflix, 2 already in cinemas, 3 is digital-only and
       // still ahead, 4 is a digital date TMDB has already named, 5 has arrived
-      // with nobody attached — the case that must not ship — and 6 has nobody
-      // carrying it but Netflix as its studio.
+      // with nobody attached — the case that must not ship — 6 has nobody
+      // carrying it but Netflix as its studio, and 7 has nobody and no studio
+      // but names Prime Video on the release date itself.
       return json({
         results: [
           movie(1),
@@ -100,6 +126,7 @@ globalThis.fetch = async (url) => {
           movie(4),
           movie(5, { release_date: TODAY }),
           movie(6),
+          movie(7),
         ],
         total_pages: 1,
       });
@@ -107,7 +134,25 @@ globalThis.fetch = async (url) => {
     // The provider pass.
     return json({ results: [movie(1)], total_pages: 1 });
   }
-  if (p.endsWith('/discover/tv')) return json({ results: [], total_pages: 1 });
+  // The series pass asks by first_air_date and no monetization filter; the
+  // provider pass asks with one. Only the former returns the new shows, which
+  // is the whole point — a series with no provider yet is invisible to the other.
+  if (p.endsWith('/discover/tv')) {
+    if (q['first_air_date.gte'] && !q.with_watch_monetization_types) {
+      return json({
+        results: [
+          { id: 100, name: 'Series 100', original_language: 'en', first_air_date: SOON,
+            genre_ids: [], popularity: 10, vote_average: 7, vote_count: 100,
+            overview: 'x', poster_path: '/p.jpg' },
+          { id: 101, name: 'Series 101', original_language: 'hi', first_air_date: SOON,
+            genre_ids: [], popularity: 9, vote_average: 7, vote_count: 100,
+            overview: 'x', poster_path: '/p.jpg' },
+        ],
+        total_pages: 1,
+      });
+    }
+    return json({ results: [], total_pages: 1 });
+  }
   if (p.endsWith('/trending/all/week')) return json({ results: [] });
   return json({ results: [], total_pages: 1 });
 };
@@ -323,5 +368,84 @@ test('the digital query asks TMDB for digital dates, by region', () => {
   for (const c of digital) {
     assert.equal(c.q.region, 'IN');
     assert.ok(c.q['release_date.gte'] && c.q['release_date.lte'], 'the window was not bounded');
+  }
+});
+
+test('the platform written on the release date is read', () => {
+  /*
+   * Title 7 has a digital date, nobody carrying it, and no studio that means
+   * anything — but "Prime Video" typed onto the release date itself.
+   *
+   * TMDB's per-country release dates each carry a free-text note, and it is the
+   * only field on any endpoint that can name a service *before* the title is
+   * available: a distributor types it in when the date is announced, rather
+   * than a robot deriving it from availability on the day. The digital pass
+   * asked discover for the date and watch/providers for the service and never
+   * looked at the note sitting on the same record as the date, while dropping
+   * 140 rows a run for having no service.
+   */
+  const noted = byId.get('m-7~ott');
+  assert.ok(noted, 'a row the release note could place was dropped anyway');
+  assert.deepEqual(noted.platforms, ['prime'], `got ${noted.platforms.join(', ')}`);
+  assert.ok(
+    calls.some((c) => /\/movie\/7\/release_dates$/.test(c.path)),
+    'the release note was never read',
+  );
+});
+
+test('a series starting this week arrives, named by its network', () => {
+  /*
+   * The hole the owner photographed: 4–10 September carried Netflix 13 and
+   * Apple TV+ 4, and 11–17 September carried Netflix 1 with nothing beyond it.
+   *
+   * Series were most of the difference and had no route into a future week at
+   * all. Every TV query went through discover with a monetization filter, which
+   * is a filter on already having a provider, which is a filter on already
+   * being out. A network is known from announcement — Silo is Apple TV+ months
+   * before it airs — so this asks by first_air_date instead and reads it.
+   */
+  const show = byId.get('t-100');
+  assert.ok(show, 'a series starting this week is missing from the feed');
+  assert.deepEqual(show.platforms, ['appletv'], `got ${show.platforms.join(', ')}`);
+  assert.equal(show.kind, 'series');
+});
+
+test('a series on a channel the site does not carry is dropped, not guessed', () => {
+  // Series 101 airs the same week on a network with no registry entry. The
+  // same rule as everywhere else: name a real service or do not ship the row.
+  assert.ok(!byId.get('t-101'), 'a series was placed on a platform the site has no page for');
+});
+
+test('each source reports what it actually placed', () => {
+  /*
+   * I told the owner the studio lookup recovers about two rows in 142. It
+   * recovered none, and that only surfaced because the run happened to print
+   * enough to check by hand. A pass whose value nobody measures outlives its
+   * usefulness silently, so every one of them counts out loud.
+   */
+  assert.match(log, /Named by: provider \d+, release note \d+, studio \d+, network \d+\./);
+});
+
+test('every platform in the registry can be named from free text', () => {
+  /*
+   * Three passes now read a platform out of free text — a release note, a TV
+   * network, a production company — and each matches against an alias table.
+   * A registry platform missing from that table is invisible to all three: its
+   * titles name their service, match nothing, and are dropped exactly like
+   * titles nobody can place.
+   *
+   * ZEE5 was missing from the first version and nothing would have said so.
+   * The site would simply never have mentioned ZEE5 again.
+   *
+   * Asserted against the registry itself rather than a copied list, since a
+   * copied list is the thing that went out of date.
+   */
+  const registry = readFileSync(join(ROOT, 'src/data/platforms.ts'), 'utf8');
+  const ids = [...registry.matchAll(/\{\s*id:\s*'([^']+)'/g)].map((m) => m[1]);
+  const src = readFileSync(join(ROOT, 'scripts/fetch-releases.mjs'), 'utf8');
+  const table = src.slice(src.indexOf('const SERVICE_NAMES'), src.indexOf('assertEveryServiceNamed'));
+  for (const id of ids) {
+    if (id === 'theatres') continue; // Not a streaming service.
+    assert.ok(table.includes(`'${id}'`), `SERVICE_NAMES has no pattern for ${id}`);
   }
 });

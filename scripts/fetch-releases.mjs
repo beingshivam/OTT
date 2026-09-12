@@ -250,8 +250,9 @@ async function discoverTheatrical({ region, from, to, page }) {
  * service marked unknown. The next refresh after the title lands replaces it
  * with the real platform, because the provider pass above runs first and wins.
  *
- * Movies only. There is no release-type filter for TV, and asking discover for
- * every series with a first_air_date in a window would return the world.
+ * Movies only — there is no release-type filter for TV. Series come in through
+ * discoverSeries below instead, which is a different question with a different
+ * answer.
  */
 async function discoverDigital({ region, from, to, page }) {
   return tmdb('/discover/movie', {
@@ -264,6 +265,39 @@ async function discoverDigital({ region, from, to, page }) {
     page,
   });
 }
+
+/**
+ * Series starting that week, whether or not anyone is streaming them yet.
+ *
+ * Every other TV query here goes through discover with a monetization filter,
+ * which is a filter on *having a provider* — so it returns only what is already
+ * out, and a future week had no series in it at all. That is most of what the
+ * site was missing: 4–10 September carried Netflix 13 and Apple TV+ 4, and
+ * 11–17 September carried Netflix 1.
+ *
+ * The worry about this query was that it "would return the world". It would,
+ * unfiltered — so it is sorted by popularity, bounded to one page, and every
+ * row must have a network the registry knows before it is written. A daytime
+ * serial on a channel this site does not carry drops out at that gate rather
+ * than at a page limit.
+ *
+ * `first_air_date` means brand-new series only. A returning season keeps its
+ * original first-air date, so it is not in here; those are already on a
+ * platform the reader knows and the provider pass picks them up once they land.
+ */
+async function discoverSeries({ region, from, to, page }) {
+  return tmdb('/discover/tv', {
+    'first_air_date.gte': from,
+    'first_air_date.lte': to,
+    watch_region: region,
+    sort_by: 'popularity.desc',
+    include_adult: false,
+    page,
+  });
+}
+
+/** One page: popularity-sorted, and the network gate below is the real bound. */
+const SERIES_PAGES = 1;
 
 /**
  * What marks a streaming row's id apart from the cinema row of the same film.
@@ -292,6 +326,19 @@ const unplaced = [];
 
 /** Cinema listings that turned out to be streaming too, for the run report. */
 const landed = [];
+
+/**
+ * Which source actually named each row, counted rather than assumed.
+ *
+ * I told the owner the studio lookup recovers about two rows in 142. It
+ * recovered none, and I only found that out because the run happened to print
+ * enough to check. A pass whose value nobody measures is a pass that stays in
+ * the code long after it stopped earning its calls, so each one reports.
+ */
+const placedBy = { provider: 0, note: 0, studio: 0, network: 0 };
+
+/** Series that reached a week but named no network, for the run report. */
+const unplacedSeries = [];
 
 /** Two pages is sixty of the most popular digital releases in a week, which is
  *  far more than any week actually has. The cap is a guard against a query that
@@ -345,52 +392,175 @@ async function offersFor(id, region) {
 }
 
 /**
+ * A service's name, in all the forms TMDB writes it.
+ *
+ * Three different fields carry a platform as free text — a production company,
+ * a TV network, and the note attached to a release date — and none of them uses
+ * the tidy label a watch provider does. "Disney+ Hotstar", "JioHotstar" and
+ * "Jio Cinema" are one service; "Amazon MGM Studios" and "Prime Video" are
+ * another.
+ *
+ * Order matters. "Disney+ Hotstar" contains both a Hotstar and a Disney+, and
+ * it is Hotstar — so the more specific pattern is listed first and the first
+ * match wins. Every result is then filtered against the registry, so a pattern
+ * for a service the site does not carry can never put a row on it.
+ */
+const SERVICE_NAMES = [
+  [/jio\s*hotstar|disney\+?\s*hotstar|hotstar|jio\s*cinema/i, 'jiohotstar'],
+  [/netflix/i, 'netflix'],
+  [/prime\s*video|amazon\s*(mgm\s*)?studios|amazon\s*original|^amazon$/i, 'prime'],
+  [/sony\s*liv/i, 'sonyliv'],
+  [/zee\s*5|zee\s*studios|zee\s*entertainment/i, 'zee5'],
+  [/sun\s*nxt|sun\s*pictures/i, 'sunnxt'],
+  [/apple\s*(tv\+?|studios|original)/i, 'appletv'],
+  [/hbo|max\s*original/i, 'hbomax'],
+  [/crunchyroll/i, 'crunchyroll'],
+  [/hoichoi/i, 'hoichoi'],
+  [/shudder/i, 'shudder'],
+  [/lions\s*gate|lionsgate/i, 'lionsgate'],
+  [/paramount\+/i, 'paramount'],
+  [/peacock/i, 'peacock'],
+  [/disney\+|disney\s*plus/i, 'disney'],
+  [/hulu/i, 'hulu'],
+  [/\baha\b/i, 'aha'],
+];
+
+/**
+ * Every registry platform has a pattern here, checked at startup.
+ *
+ * ZEE5 was missing from the first version of this table, which would have gone
+ * unnoticed: a ZEE5 title names its service in a note, matches nothing, and is
+ * dropped exactly like a title nobody can place. Silent under-coverage of one
+ * platform is the hardest kind of gap to see from the outside — the site simply
+ * never mentions ZEE5 and nothing anywhere says why.
+ *
+ * A missing pattern is a bug in this file rather than a data problem, so it
+ * fails the run rather than warning into a log nobody reads.
+ */
+function assertEveryServiceNamed(platforms) {
+  const covered = new Set(SERVICE_NAMES.map(([, id]) => id));
+  const missing = platforms
+    .filter((p) => !p.theatrical && !covered.has(p.id))
+    .map((p) => p.id);
+  if (missing.length) {
+    throw new Error(
+      `SERVICE_NAMES has no pattern for: ${missing.join(', ')}. ` +
+        'A platform with no pattern can never be named from a note, a network ' +
+        'or a studio, so its titles would be dropped without a trace.',
+    );
+  }
+}
+
+/** The services named in a piece of free text, keeping only ones the site has. */
+function servicesIn(texts, known) {
+  const hits = new Set();
+  for (const text of texts) {
+    if (!text) continue;
+    for (const [pattern, service] of SERVICE_NAMES) {
+      if (pattern.test(text)) {
+        hits.add(service);
+        break; // First match wins — see the ordering note above.
+      }
+    }
+  }
+  return [...hits].filter((s) => known.has(s));
+}
+
+/**
+ * One detail call per title for the whole run, not one per week per region.
+ *
+ * A series runs across several weeks and both regions, and the film passes ask
+ * about the same title from more than one place. Without this the network
+ * lookup below would triple the run's call count on its own.
+ */
+const detailCache = new Map();
+async function detailFor(kind, id) {
+  const key = `${kind}-${id}`;
+  if (!detailCache.has(key)) {
+    detailCache.set(
+      key,
+      tmdb(`/${kind}/${id}`).catch(() => null),
+    );
+  }
+  return detailCache.get(key);
+}
+
+/**
  * Who made it, when nobody will say who is carrying it.
  *
  * A platform that commissioned a film is where that film lands, and TMDB knows
- * the production company long before it knows the provider. This is weaker
- * evidence than a watch provider — a studio is where a title came from, not
- * where it is — so it only ever runs after the provider lookup has come back
- * empty, and it never argues with a pass that knows.
+ * the production company long before it knows the provider. Weaker evidence
+ * than a watch provider — a studio is where a title came from, not where it is
+ * — so it only runs after the provider lookup has come back empty.
  *
- * Measured on a real run it recovers 2 rows out of 142, which is small and is
- * the difference between dropping a title and listing it. Duplicated from
- * scripts/enrich-releases.mjs, where the same rule already ran, because by the
- * time enrichment sees the feed the row it would have rescued is not in it: the
- * drop happens here.
+ * I claimed this recovers about two rows in 142. That number came from the same
+ * rule running inside enrichment and I carried it over without re-measuring; on
+ * the first real run here it recovered *nothing*. It is kept because it is one
+ * cached call and occasionally right, not because it is load-bearing. The two
+ * passes below are the ones that had to be added.
  */
-const STUDIOS = [
-  [/netflix/i, 'netflix'],
-  [/amazon|prime video/i, 'prime'],
-  [/hotstar|disney\+ hotstar|jiohotstar|jio ?cinema/i, 'jiohotstar'],
-  [/sony ?liv/i, 'sonyliv'],
-  [/zee ?5|zee5/i, 'zee5'],
-  [/aha video|^aha$/i, 'aha'],
-  [/sun ?nxt/i, 'sunnxt'],
-  [/apple (tv|studios)/i, 'appletv'],
-  [/hbo|max originals/i, 'hbomax'],
-  [/hulu/i, 'hulu'],
-  [/disney\+/i, 'disney'],
-  [/paramount\+/i, 'paramount'],
-  [/peacock/i, 'peacock'],
-];
-
 async function studioFor(id, known) {
+  const detail = await detailFor('movie', id);
+  if (!detail) return [];
+  return servicesIn(
+    (detail.production_companies ?? []).map((c) => c.name),
+    known,
+  );
+}
+
+/**
+ * The platform, written on the release date itself.
+ *
+ * TMDB's per-country release dates each carry a free-text `note`, and for a
+ * digital release that is very often exactly the thing nobody else will say:
+ * "Netflix", "Prime Video", "JioHotstar". It is the only field on any endpoint
+ * that names a service *before* the title is available, because a distributor
+ * types it in when the date is announced rather than a robot deriving it from
+ * availability.
+ *
+ * This was never read. The digital pass asked discover for the date and
+ * watch/providers for the service, and the note sitting on the same record as
+ * the date went unlooked-at while 140 rows a run were dropped for having no
+ * service. Whatever it turns out to be worth, not reading it was not a
+ * defensible place to give up.
+ */
+async function noteFor(id, region, known) {
   try {
-    const detail = await tmdb(`/movie/${id}`);
-    const names = [
-      ...(detail.networks ?? []).map((n) => n.name),
-      ...(detail.production_companies ?? []).map((c) => c.name),
-    ].filter(Boolean);
-    const hits = new Set();
-    for (const name of names) {
-      for (const [pattern, service] of STUDIOS) if (pattern.test(name)) hits.add(service);
-    }
-    // Only services this build actually has a registry entry for.
-    return [...hits].filter((s) => known.has(s));
+    const data = await tmdb(`/movie/${id}/release_dates`);
+    const scoped = data.results?.find((r) => r.iso_3166_1 === region);
+    if (!scoped) return [];
+    // Digital first; a note on the theatrical row is about a cinema chain.
+    const notes = (scoped.release_dates ?? [])
+      .filter((d) => d.type === 4)
+      .map((d) => d.note);
+    return servicesIn(notes, known);
   } catch {
     return [];
   }
+}
+
+/**
+ * A series' network, which is known the day it is announced.
+ *
+ * The hole this fills is the one that showed up on screen: the week of 4
+ * September carried Netflix 13 and Apple TV+ 4, and the week of 11 September
+ * carried Netflix 1, with nothing at all beyond it. Series were the difference,
+ * and they had no route into a future week at all — the provider pass asks
+ * discover for titles with a monetization type, which means a title that
+ * already has a provider, which means a title already out.
+ *
+ * A network is not a guess and does not wait for release day. Silo is Apple
+ * TV+ from announcement; an Indian series on JioHotstar says so months ahead.
+ * TMDB carries it on the series detail, and it is the same rule as everywhere
+ * else here: it names a real service or the row is not written.
+ */
+async function networksFor(id, known) {
+  const detail = await detailFor('tv', id);
+  if (!detail) return [];
+  return servicesIn(
+    [...(detail.networks ?? []).map((n) => n.name), ...(detail.production_companies ?? []).map((c) => c.name)],
+    known,
+  );
 }
 
 async function providersFor(isMovie, id, region) {
@@ -595,11 +765,28 @@ async function buildWeek(weekId, platforms, index, cinemaOnly = false) {
            * A digital date TMDB cannot place is dropped rather than labelled —
            * see below.
            */
+          /*
+           * Three sources, weakest last, each only asked when the one before
+           * it came back empty.
+           *
+           * A watch provider is where the title is. A release note is where the
+           * distributor said it would be, typed in when the date was announced
+           * — the only one of the three that can answer before release day, and
+           * the one this pass was not reading at all. A production company is
+           * where it came from, which is the weakest of the three and is a
+           * guess often enough to be last.
+           */
           const offer = await offersFor(item.id, region);
           let known = [...new Set(offer.subscription.map((p) => index.get(p)).filter(Boolean))];
-          /* Nobody is carrying it on record, so ask who made it. Weaker
-             evidence, so it never runs against a provider that answered. */
-          if (!known.length) known = await studioFor(item.id, registered);
+          if (known.length) placedBy.provider++;
+          if (!known.length) {
+            known = await noteFor(item.id, region, registered);
+            if (known.length) placedBy.note++;
+          }
+          if (!known.length) {
+            known = await studioFor(item.id, registered);
+            if (known.length) placedBy.studio++;
+          }
           if (!known.length) {
             /*
              * No service, no row. Not a placeholder — nothing.
@@ -701,6 +888,65 @@ async function buildWeek(weekId, platforms, index, cinemaOnly = false) {
         }
         if (page >= (data.total_pages ?? 1)) break;
       }
+    }
+  }
+
+  /*
+   * Series starting this week, named by their network.
+   *
+   * See discoverSeries. This is the pass that was missing rather than broken:
+   * nothing anywhere asked TMDB for a series that has not started streaming
+   * yet, so every future week held films and no television whatsoever.
+   */
+  for (const region of cinemaOnly ? [] : REGIONS) {
+    for (let page = 1; page <= SERIES_PAGES; page++) {
+      const data = await discoverSeries({ region, from, to, page });
+      if (!data.results?.length) break;
+
+      for (const item of data.results) {
+        if (!withinWeek(item.first_air_date, from, to)) continue;
+
+        const key = `t-${item.id}`;
+        const existing = byId.get(key);
+        /* The provider pass already found it and knows where it actually is,
+           which beats knowing who commissioned it. */
+        if (existing?.platforms.length) {
+          existing.regions = [...new Set([...existing.regions, region])];
+          continue;
+        }
+
+        const nets = await networksFor(item.id, registered);
+        if (!nets.length) {
+          unplacedSeries.push({ title: item.name, region });
+          continue;
+        }
+        placedBy.network++;
+
+        if (existing) {
+          existing.platforms = nets;
+          existing.regions = [...new Set([...existing.regions, region])];
+          continue;
+        }
+
+        const genres = await genreNames('tv', item.genre_ids);
+        byId.set(key, {
+          id: key,
+          title: item.name,
+          kind: classify(false, genres),
+          platforms: nets,
+          languages: [item.original_language].filter(Boolean),
+          genres,
+          releaseDate: item.first_air_date,
+          regions: [region],
+          rating: item.vote_count >= MIN_VOTES ? Number(item.vote_average?.toFixed(1)) : undefined,
+          votes: item.vote_count || undefined,
+          heat: heatFrom(item.popularity, item.vote_average, item.vote_count),
+          synopsis: item.overview || undefined,
+          posterUrl: item.poster_path ? `${IMG}/w500${item.poster_path}` : undefined,
+          backdropUrl: item.backdrop_path ? `${IMG}/w780${item.backdrop_path}` : undefined,
+        });
+      }
+      if (page >= (data.total_pages ?? 1)) break;
     }
   }
 
@@ -849,6 +1095,7 @@ async function buildTrending(index) {
 // --------------------------------------------------------------------- main --
 
 const platforms = await loadPlatforms();
+assertEveryServiceNamed(platforms);
 const index = providerIndex(platforms);
 const theatricalId = platforms.find((p) => p.theatrical)?.id;
 console.log(`Mapped ${index.size} TMDB providers across ${platforms.length} platforms.`);
@@ -1023,6 +1270,18 @@ if (landed.length) {
     `\n${landed.length} cinema listing(s) turned out to be streaming as well, and now say so:`,
   );
   for (const line of landed.slice(0, 12)) console.log(`  ${line}`);
+}
+
+console.log(
+  `\nNamed by: provider ${placedBy.provider}, release note ${placedBy.note}, ` +
+    `studio ${placedBy.studio}, network ${placedBy.network}.`,
+);
+
+if (unplacedSeries.length) {
+  console.log(
+    `${unplacedSeries.length} series had no network the registry carries and were dropped.`,
+  );
+  for (const s of unplacedSeries.slice(0, 6)) console.log(`  ${s.region}  ${s.title}`);
 }
 
 if (unplaced.length) {
