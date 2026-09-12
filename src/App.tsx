@@ -460,6 +460,27 @@ export default function App() {
   );
 
   /**
+   * The band's last resort under a filter: what this selection has coming.
+   *
+   * Both rows above look backwards — one at a cinema run, one at what has
+   * landed — so a platform whose only title in the feed is still ahead of its
+   * date empties the band, and tapping its chip makes two thirds of the page
+   * vanish. That is the reported bug in a third costume, and the passes that
+   * now read release notes and TV networks made it far more common by filling
+   * the future weeks up: Peacock has exactly one Indian title and it is in
+   * October, Lionsgate one American title at the end of September.
+   *
+   * Reaching a year forward rather than the usual three weeks, for the same
+   * reason the streaming row reaches a year back — the reader asked for this
+   * platform, so the honest answer is the whole of what it has, not the part
+   * that happens to fall inside a browsing window they never chose.
+   */
+  const soonRail = useMemo(
+    () => (narrowed ? landingSoon(railRows, filters.region, today, NARROWED_DAYS) : null),
+    [narrowed, railRows, filters.region, today],
+  );
+
+  /**
    * And the catalogue's own row, which is not a date at all.
    *
    * Reads `catalogue` rather than the feed: that lens renders a different
@@ -539,14 +560,18 @@ export default function App() {
    * active filter it would put unrelated titles above a board the reader has just
    * narrowed — which is the objection that started this, in a smaller form.
    *
-   * That last case is now rare rather than routine. It used to fire on any
-   * platform whose titles happened to fall outside a fortnight — five of the
-   * sixteen in the feed — and the streaming row reaching back a year under a
-   * filter covers those. What is left is a genuinely empty selection, where
-   * there is nothing to put in a row and saying so quietly is right.
+   * That last case is now genuinely rare. It used to fire on any platform whose
+   * titles fell outside a fortnight, and then on any platform whose titles were
+   * all still ahead of their dates — the first fixed by the streaming row
+   * reaching a year back, the second by soonRail reaching a year forward. What
+   * is left is a selection with nothing in it at all, where saying so quietly
+   * is right.
    */
   const railTotal = cinemaRail.releases.length + ottRail.releases.length;
-  const showRails = narrowed ? railTotal > 0 : true;
+  /** Only when both backward rows came up empty — never alongside them, which
+   *  would put a future date under a heading that says "on right now". */
+  const showSoon = narrowed && railTotal === 0 && (soonRail?.releases.length ?? 0) > 0;
+  const showRails = narrowed ? railTotal > 0 || showSoon : true;
 
   /**
    * One row per lens, each ranking what its own page is about.
@@ -774,7 +799,31 @@ export default function App() {
       */}
       {!isTitlePage && feed && !error && facets.total > 0 && !span && !route?.catalogue && showRails && (
         <div className="shell">
-          {railTotal >= (narrowed ? 1 : MIN_ITEMS) ? (
+          {showSoon ? (
+            /*
+              Nothing from this selection is out yet, so the band says what it
+              has coming instead of disappearing.
+
+              A reader who taps Peacock and watches two thirds of the page
+              vanish reads that as breakage, not as an answer — which is the
+              report this whole thread started from. The heading changes with
+              the content rather than the content being bent to fit a heading
+              that claims the present tense.
+            */
+            <section className="landedpair" aria-labelledby="landedpair-heading">
+              <h2 className="landedpair__title" id="landedpair-heading">
+                Coming soon
+              </h2>
+              <PosterRail
+                compact
+                title="Not out yet"
+                subtitle={`${soonRail!.total} titles`}
+                releases={soonRail!.releases}
+                onOpen={setSelected}
+                caption={(r) => relativeDay(r.releaseDate, today)}
+              />
+            </section>
+          ) : railTotal >= (narrowed ? 1 : MIN_ITEMS) ? (
             /*
               Both rows, both on screen, rather than a toggle over one.
 

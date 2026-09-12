@@ -778,14 +778,21 @@ async function buildWeek(weekId, platforms, index, cinemaOnly = false) {
            */
           const offer = await offersFor(item.id, region);
           let known = [...new Set(offer.subscription.map((p) => index.get(p)).filter(Boolean))];
+          let namedBy = known.length ? 'provider' : null;
           if (known.length) placedBy.provider++;
           if (!known.length) {
             known = await noteFor(item.id, region, registered);
-            if (known.length) placedBy.note++;
+            if (known.length) {
+              placedBy.note++;
+              namedBy = 'note';
+            }
           }
           if (!known.length) {
             known = await studioFor(item.id, registered);
-            if (known.length) placedBy.studio++;
+            if (known.length) {
+              placedBy.studio++;
+              namedBy = 'studio';
+            }
           }
           if (!known.length) {
             /*
@@ -847,6 +854,7 @@ async function buildWeek(weekId, platforms, index, cinemaOnly = false) {
               continue;
             }
             existing.platforms = known;
+            if (namedBy !== 'provider') existing.namedBy = namedBy;
             existing.regions = [...new Set([...existing.regions, region])];
             continue;
           }
@@ -873,6 +881,20 @@ async function buildWeek(weekId, platforms, index, cinemaOnly = false) {
             title: item.title ?? item.name,
             kind: classify(true, genres),
             platforms: known,
+            /*
+             * Where the platform on this row came from, when it did not come
+             * from a watch provider.
+             *
+             * A provider is TMDB reporting availability. A release note is free
+             * text a contributor typed, and a studio is an inference — both can
+             * be wrong in a way a provider cannot, and being wrong here sends
+             * somebody to a subscription they do not need. That is the exact
+             * harm data/upcoming-ott.json refuses to risk by guessing, so a row
+             * carrying a guess should say which guess it is rather than looking
+             * identical to a fact. Absent on provider rows, which are the
+             * default and need no note.
+             */
+            namedBy: namedBy === 'provider' ? undefined : namedBy,
             languages: [item.original_language].filter(Boolean),
             genres,
             // Guarded above: a row only reaches here when its date is in the week.
@@ -924,6 +946,7 @@ async function buildWeek(weekId, platforms, index, cinemaOnly = false) {
 
         if (existing) {
           existing.platforms = nets;
+          existing.namedBy = 'network';
           existing.regions = [...new Set([...existing.regions, region])];
           continue;
         }
@@ -934,6 +957,8 @@ async function buildWeek(weekId, platforms, index, cinemaOnly = false) {
           title: item.name,
           kind: classify(false, genres),
           platforms: nets,
+          // A network is an inference like the others — see namedBy above.
+          namedBy: 'network',
           languages: [item.original_language].filter(Boolean),
           genres,
           releaseDate: item.first_air_date,
@@ -1276,6 +1301,39 @@ console.log(
   `\nNamed by: provider ${placedBy.provider}, release note ${placedBy.note}, ` +
     `studio ${placedBy.studio}, network ${placedBy.network}.`,
 );
+
+/*
+ * The Indian rows resting on a guess, listed so somebody can look.
+ *
+ * A watch provider is TMDB reporting availability. A release note is free text
+ * a contributor typed and a studio is an inference — both can be wrong, and
+ * wrong here sends a reader to a subscription they do not need. That is the
+ * precise harm data/upcoming-ott.json refuses to risk, so the same standard
+ * applies to a guess this script makes: it goes where it can be checked rather
+ * than sitting in the feed looking like a fact.
+ *
+ * Indian rows only, and only the ones still ahead of their date. Those are the
+ * ones a reader here acts on, and the ones no provider will confirm for weeks.
+ */
+{
+  const TODAY_ISO = new Date().toISOString().slice(0, 10);
+  const guessed = [];
+  for (const w of weeks) {
+    for (const r of w.releases) {
+      if (!r.namedBy || r.namedBy === 'provider') continue;
+      if (!r.regions?.includes('IN') || r.releaseDate < TODAY_ISO) continue;
+      guessed.push(`${r.releaseDate}  ${r.platforms.join(',').padEnd(11)} ${r.namedBy.padEnd(8)} ${r.title}`);
+    }
+  }
+  if (guessed.length) {
+    console.log(
+      `\n${guessed.length} upcoming Indian row(s) name a platform from a note, a studio or a ` +
+        'network rather than a confirmed provider. Worth a glance — a wrong one sends somebody ' +
+        'to a subscription they do not need:',
+    );
+    for (const g of guessed.slice(0, 20)) console.log(`  ${g}`);
+  }
+}
 
 if (unplacedSeries.length) {
   console.log(

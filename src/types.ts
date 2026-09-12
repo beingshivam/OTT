@@ -37,6 +37,22 @@ export interface Release {
    * path the build wrote and the path the app resolves cannot drift.
    */
   slug?: string;
+  /**
+   * Where this row's platform came from, when it did not come from a watch
+   * provider. Absent on provider rows, which are the default.
+   *
+   * A provider is TMDB reporting that a title is available somewhere. The other
+   * three are weaker: `note` is free text a contributor typed onto the release
+   * date, `studio` is inferred from the production company, `network` from a
+   * series' broadcaster. They exist because a provider cannot answer about a
+   * title that is not out yet, and on the current feed they name almost every
+   * upcoming row — but each can be wrong in a way a provider cannot, and being
+   * wrong here sends a reader to a subscription they do not need.
+   *
+   * Carried so that a platform someone reports as wrong can be traced to the
+   * source that claimed it, instead of the row looking identical to a fact.
+   */
+  namedBy?: 'note' | 'studio' | 'network';
   /** Regions this release applies to (ISO-3166-1). Used by the region switcher. */
   regions: string[];
   drop?: DropInfo;

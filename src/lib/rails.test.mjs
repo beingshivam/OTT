@@ -613,3 +613,39 @@ test('the cinema row does not widen, whatever the reader asked for', () => {
   const rows = [row({ releaseDate: iso(120), platforms: ['theatres'], title: 'Long gone' })];
   assert.equal(inCinemas(rows, 'IN', TODAY).releases.length, 0);
 });
+
+test('a selection whose titles are all still ahead still fills the band', () => {
+  /*
+   * The third costume of "the top rails are gone", and one I created.
+   *
+   * Both rows above look backwards — a cinema run, and what has landed — so a
+   * platform whose only title is still ahead of its date empties the band. That
+   * was rare while the future weeks were empty. Then the release-note and
+   * network passes filled those weeks up, and it became ordinary: Peacock has
+   * exactly one Indian title and it is in October, Lionsgate one American title
+   * at the end of September. Tapping either chip made two thirds of the page
+   * disappear.
+   *
+   * So the band falls back to what the selection has coming, reaching as far
+   * forward as the streaming row reaches back, under a heading that says so
+   * rather than claiming the present tense.
+   */
+  const rows = [row({ releaseDate: iso(-40), platforms: ['peacock'], title: 'Out in October' })];
+  assert.equal(landedOnOtt(rows, 'IN', TODAY, NARROWED_DAYS).releases.length, 0, 'it is not out yet');
+  assert.equal(inCinemas(rows, 'IN', TODAY).releases.length, 0, 'and it is not in cinemas');
+  assert.equal(landingSoon(rows, 'IN', TODAY).releases.length, 0, 'the usual horizon is three weeks');
+  const wide = landingSoon(rows, 'IN', TODAY, NARROWED_DAYS);
+  assert.equal(wide.releases.length, 1, 'a narrowed reader still gets an empty band');
+  assert.equal(wide.releases[0].title, 'Out in October');
+});
+
+test('the forward row keeps nearest-first, however far it reaches', () => {
+  // The point of the row is what is closest. Widening the horizon must not
+  // quietly turn it into the same newest-first ordering as everything else.
+  const rows = [
+    row({ releaseDate: iso(-200), platforms: ['netflix'], title: 'Far' }),
+    row({ releaseDate: iso(-5), platforms: ['netflix'], title: 'Near' }),
+  ];
+  const out = landingSoon(rows, 'IN', TODAY, NARROWED_DAYS).releases;
+  assert.equal(out[0].title, 'Near');
+});

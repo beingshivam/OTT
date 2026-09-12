@@ -372,10 +372,15 @@ export const SOON_DAYS = 21;
  * three weeks. Same rule underneath: days sort against each other directly,
  * languages interleave only within a day.
  */
-export function landingSoon(all: Release[], region: string, today: Date = new Date()): JustLanded {
+export function landingSoon(
+  all: Release[],
+  region: string,
+  today: Date = new Date(),
+  days: number = SOON_DAYS,
+): JustLanded {
   return chronicle(all, region, {
     from: toISODate(new Date(today.getTime() + 86_400_000)),
-    to: toISODate(new Date(today.getTime() + SOON_DAYS * 86_400_000)),
+    to: toISODate(new Date(today.getTime() + days * 86_400_000)),
     // Nearest-first, the opposite of every other row: the thing coming on
     // Friday matters more than the thing coming in three weeks.
     newestFirst: false,
