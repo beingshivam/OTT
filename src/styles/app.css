@@ -2208,9 +2208,28 @@ a {
 }
 
 /* Real artwork fills its frame; the generated fallback paints its own. */
+/*
+ * Real artwork fills its frame. The generated fallback does not.
+ *
+ * `.art` carries `padding: 12% 10%` so the fallback's typographic title sits
+ * inside the tile instead of touching its edges, and `.art--photo` is applied
+ * *alongside* it on the <img>. Padding on a replaced element shrinks the
+ * picture itself, and with border-box sizing a 443×190 sheet hero was painting
+ * its backdrop into a 354×84 slot — a 4.2:1 sliver that object-fit then cropped
+ * a 16:9 image into. Reported as "the poster is buggy, getting cropped in all",
+ * and it was: every board card and every detail sheet, since the day real
+ * artwork was added. The rails escaped only because `.landed__img` is a class
+ * of its own that never inherited `.art`.
+ *
+ * So the padding is the fallback's, not the frame's, and an image cancels it.
+ * `display: block` for the same reason: `.art` sets `display: grid` to centre
+ * that title, which an <img> has no use for.
+ */
 .art--photo {
   width: 100%;
   height: 100%;
+  padding: 0;
+  display: block;
   object-fit: cover;
   background: var(--bg-2);
 }
@@ -2376,8 +2395,22 @@ a {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
+/*
+ * The width has to be stated, or the aspect ratio decides it.
+ *
+ * `aspect-ratio` with `min-height` and no definite width is a trap: on a 390px
+ * phone the ratio wants 166px of height, min-height raises that to 190, and
+ * then the ratio runs *backwards* and widens the box to 190 × 21/9 = 443. The
+ * hero was 53px wider than the sheet holding it, so every detail sheet scrolled
+ * sideways — invisible to the viewport check in the browser suite, because the
+ * overflow is inside a scroll container and the document itself is fine.
+ *
+ * With the width fixed at 100% the ratio can only choose the height, and
+ * min-height stays what it is meant to be: a floor, not an input.
+ */
 .sheet__hero {
   position: relative;
+  width: 100%;
   aspect-ratio: 21 / 9;
   min-height: 190px;
 }

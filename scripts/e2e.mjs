@@ -593,6 +593,50 @@ for (const width of [390, 1440]) {
     `tapped "${name}", opened "${heading}"`,
   );
 
+  /*
+   * The artwork fills its frame, and the sheet does not scroll sideways.
+   *
+   * Reported as "the poster is buggy, getting cropped in all", and there were
+   * two faults under it, neither visible to any check here.
+   *
+   * The <img> carried `.art`'s `padding: 12% 10%`, which exists to keep the
+   * generated fallback's title off the tile edges. On a replaced element that
+   * shrinks the picture: a 443×190 hero painted its backdrop into 354×84, and
+   * object-fit then cropped a 16:9 image into a 4.2:1 sliver. Measured rather
+   * than eyeballed, because "looks a bit tight" is not a bug report a fix can
+   * be checked against.
+   *
+   * And `aspect-ratio` with `min-height` and no stated width ran backwards —
+   * 190px of floor became 443px of width inside a 390px sheet. The existing
+   * viewport check could never see it: the overflow is inside a scroll
+   * container, so the document is perfectly well behaved.
+   */
+  const frame = await page.evaluate(() => {
+    const hero = document.querySelector('.sheet__hero');
+    const img = document.querySelector('.sheet__hero .art--photo');
+    const scroll = document.querySelector('.sheet__scroll');
+    return {
+      overflow: scroll ? scroll.scrollWidth - scroll.clientWidth : 0,
+      // Null when the fallback is showing rather than a photo — a network the
+      // suite does not control, so its absence is not a failure.
+      fill:
+        hero && img
+          ? Math.round(img.getBoundingClientRect().width) -
+            Math.round(hero.getBoundingClientRect().width)
+          : null,
+      padded: img ? getComputedStyle(img).padding !== '0px' : false,
+    };
+  });
+  is(
+    frame.overflow <= 0,
+    `${width}px: the sheet does not scroll sideways`,
+    `${frame.overflow}px wider than its own frame`,
+  );
+  is(!frame.padded, `${width}px: artwork is not inset by the fallback's padding`, 'the image is padded');
+  if (frame.fill !== null) {
+    is(frame.fill === 0, `${width}px: the artwork fills its frame`, `${frame.fill}px narrower than the hero`);
+  }
+
   await page.keyboard.press('Escape');
   await page.waitForTimeout(400);
   is(!(await sheet.isVisible()), `${width}px: Escape closes it`, 'the sheet stayed open');
