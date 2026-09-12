@@ -1084,6 +1084,36 @@ for (const width of [360, 1280]) {
   is(chips > 0, `${width}px: the poster view offers platform chips`, `${chips} chips`);
 
   /*
+   * A poster on the board is never cropped. The opened sheet is.
+   *
+   * Stated by the owner as a rule, after a fix for a padded <img> was read as
+   * cropping: "don't crop the main screen poster, I asked you to crop the
+   * poster when the user clicks on it and it opens as separate". The two
+   * surfaces want opposite things — the board is a wall of complete artwork you
+   * scan, the sheet is one title with a cinematic backdrop — and the difference
+   * is entirely in the frame each uses.
+   *
+   * So this checks the frame, not the picture. TMDB posters are 2:3, and a
+   * container at any other ratio must crop or letterbox whatever is put in it,
+   * whichever object-fit is chosen. Checking the ratio catches the mistake
+   * before an image is even involved, and works with no network.
+   */
+  const frames = await page.evaluate(() =>
+    [...document.querySelectorAll('.card__poster, .landed__art')].slice(0, 8).map((el) => {
+      const r = el.getBoundingClientRect();
+      return { cls: el.className, ratio: r.width / r.height };
+    }),
+  );
+  const offRatio = frames.filter((f) => Math.abs(f.ratio - 2 / 3) > 0.02);
+  is(
+    frames.length > 0 && offRatio.length === 0,
+    `${width}px: poster frames are 2:3, so nothing on the board is cropped`,
+    frames.length === 0
+      ? 'no poster frames found'
+      : offRatio.map((f) => `${f.cls} at ${f.ratio.toFixed(3)}`).join('; '),
+  );
+
+  /*
    * Every chip, not just the first one.
    *
    * Reported twice, the second time after this check was already passing:
