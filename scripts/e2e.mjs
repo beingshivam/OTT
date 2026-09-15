@@ -1155,17 +1155,39 @@ for (const width of [360, 1280]) {
    *
    * platform() falls back to the raw id when the registry has no entry, so a
    * row referring to a platform that no longer exists renders a pill reading,
-   * literally, "ott" — quieter than a crash and worse to look at. Any all
-   * lower-case single word is that fallback showing through: every real name
-   * in the registry is capitalised.
+   * literally, "ott" — quieter than a crash and worse to look at.
+   *
+   * The first version of this guessed from casing: an all-lower-case word was
+   * taken to be the fallback showing through, "because every real name in the
+   * registry is capitalised". That was asserted without reading the registry
+   * and it is false — aha and hoichoi both style themselves lower-case, and
+   * both are real. It passed for three days only because neither had a title
+   * in the open week; the Monday refresh added one and the suite went red over
+   * a correctly-rendered chip.
+   *
+   * So it asks the registry instead of inferring from shape. That is also the
+   * stronger test: an unknown id fails it whatever its casing, where the old
+   * rule would have waved through a capitalised one.
    */
-  const rawIds = (await page.locator('.chip--logo').allInnerTexts())
-    .map((t) => t.replace(/\s+/g, ' ').trim().split(' ')[0])
-    .filter((t) => /^[a-z][a-z0-9]*$/.test(t));
+  const knownNames = new Set(
+    [...(await readFile(join(ROOT, 'src/data/platforms.ts'), 'utf8')).matchAll(
+      /\bshort:\s*'([^']+)'/g,
+    )].map((m) => m[1].toLowerCase()),
+  );
+  const unknown = (await page.locator('.chip--logo').allInnerTexts())
+    .map((t) =>
+      t
+        .replace(/\s+/g, ' ')
+        .replace(/\s*\d+\s*$/, '') // the count the chip carries
+        .replace(/^[^\p{L}]+/u, '') // the monogram shown before a logo loads
+        .trim()
+        .toLowerCase(),
+    )
+    .filter((name) => name && !knownNames.has(name));
   is(
-    rawIds.length === 0,
+    unknown.length === 0,
     `${width}px: every chip names a platform rather than an id`,
-    `raw ids on screen: ${rawIds.join(', ')}`,
+    `not in the registry: ${unknown.join(', ')}`,
   );
   is(errors.length === 0, `${width}px: filtering raises no console errors`, errors[0]);
   await ctx.close();
