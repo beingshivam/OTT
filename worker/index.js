@@ -274,6 +274,7 @@ export default {
  * because that is exactly how the workflow states them.
  */
 const REFRESH_SLOTS = [
+  { day: 5, hour: 0, minute: 0 }, // Fri 00:00 UTC — the early run, fresh by 10:00 IST
   { day: 5, hour: 8, minute: 30 }, // Fri 08:30 UTC — the week flips, drops included
   { day: 6, hour: 4, minute: 30 }, // Sat 04:30 UTC — anything that landed late
   { day: 1, hour: 13, minute: 30 }, // Mon 13:30 UTC — the weekend and the week ahead
@@ -282,10 +283,17 @@ const REFRESH_SLOTS = [
 /**
  * How long after a slot a run is still considered merely late.
  *
- * Three hours, from the evidence: the one scheduled run on record was 2h16m
- * late and completed fine. Alerting sooner would page on GitHub being GitHub.
+ * Was three hours, from a single sample: the one scheduled run on record then
+ * was 2h16m late and completed fine. Three more have since been measured — Fri
+ * 11 Sep 4h24m, Sat 12 Sep 4h13m, Mon 14 Sep 5h19m — so every real run since
+ * has been outside that window, and the watchdog was primed to report a healthy
+ * pipeline as broken. An alarm that cries wolf is deleted unread, which is the
+ * exact silence this was built to end.
+ *
+ * Six hours clears the worst measured lateness with room, and still catches a
+ * genuinely dead scheduler inside the same day.
  */
-const GRACE_HOURS = 3;
+const GRACE_HOURS = 6;
 
 /**
  * The most recent slot that is far enough in the past that a run should have

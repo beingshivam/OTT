@@ -126,6 +126,21 @@ const PLATFORM_ROWS = [
 }));
 
 /**
+ * Where a platform actually is, for the WatchAction target.
+ *
+ * A watch action pointing at this site would be a circular claim — "watch it
+ * here" about a page that only tells you where to watch it. It has to name the
+ * service's own destination or say nothing, so a platform without a homeUrl
+ * (cinemas, which is not a service) simply contributes no action.
+ */
+const PLATFORM_HOME = new Map(
+  [...registry.matchAll(/\{\s*id:\s*'([^']+)'[\s\S]*?homeUrl:\s*'([^']+)'/g)].map(
+    ([, id, url]) => [id, url],
+  ),
+);
+const platformHome = (id) => PLATFORM_HOME.get(id);
+
+/**
  * Language collections (src/data/collections.ts) — groups people search for as
  * one thing. Parsed rather than duplicated so adding a row there is the whole
  * job of adding a page.
@@ -384,6 +399,58 @@ const FALLBACK_CSS = `    <style>
  * dist/netflix/index.html, and the app reads the path on mount (lib/route.ts)
  * so what renders matches what the page promised.
  */
+/**
+ * One title, as the thing it is, for a crawler.
+ *
+ * Search Console showed the whole site's demand arriving as "which OTT is
+ * <film> on", and a page answering that is far more useful to Google when the
+ * film is a named entity with a cast, a runtime and a place to watch it than
+ * when it is a description string inside a list. Every field here is one the
+ * page already prints, so the markup and the visible page cannot disagree —
+ * which is both the honest arrangement and the one Google's guidelines ask for.
+ *
+ * `potentialAction` is the part that matters for the query. It says, in the
+ * vocabulary Google reads for watch intent, that this title can be watched on
+ * this service in India — the machine-readable form of the sentence the page
+ * leads with.
+ */
+function movieNode(r, canonical) {
+  const streamingOn = (r.platforms ?? []).filter((p) => p !== 'theatres');
+  return {
+    '@type': r.kind === 'series' || r.kind === 'anime' ? 'TVSeries' : 'Movie',
+    '@id': `${canonical}#title`,
+    name: r.title,
+    url: canonical,
+    datePublished: r.releaseDate,
+    ...(r.synopsis ? { description: r.synopsis } : {}),
+    ...(r.posterUrl ? { image: r.posterUrl } : {}),
+    ...(r.genres?.length ? { genre: r.genres } : {}),
+    ...(r.languages?.length ? { inLanguage: r.languages } : {}),
+    ...(r.certification ? { contentRating: r.certification } : {}),
+    // ISO 8601, which is the only duration format schema.org accepts.
+    ...(r.runtimeMinutes ? { duration: `PT${r.runtimeMinutes}M` } : {}),
+    ...(r.cast?.length
+      ? { actor: r.cast.map((name) => ({ '@type': 'Person', name })) }
+      : {}),
+    ...(r.director ? { director: { '@type': 'Person', name: r.director } } : {}),
+    ...(r.trailerUrl ? { trailer: { '@type': 'VideoObject', name: `${r.title} trailer`, url: r.trailerUrl } } : {}),
+    ...(streamingOn.length
+      ? {
+          potentialAction: streamingOn.filter(platformHome).map((id) => ({
+            '@type': 'WatchAction',
+            target: platformHome(id),
+            expectsAcceptanceOf: {
+              '@type': 'Offer',
+              category: 'subscription',
+              availableDeliveryMethod: 'http://schema.org/OnDemand',
+              eligibleRegion: { '@type': 'Country', name: 'IN' },
+            },
+          })),
+        }
+      : {}),
+  };
+}
+
 async function renderPage(page, pages) {
   const canonical = `${SITE_URL}/${page.path}`;
 
@@ -412,7 +479,25 @@ async function renderPage(page, pages) {
               itemListElement: [
                 { '@type': 'ListItem', position: 1, name: BRAND, item: `${SITE_URL}/` },
                 ...(page.group === 'title'
-                  ? [{ '@type': 'ListItem', position: 2, name: 'In cinemas', item: `${SITE_URL}/theatres` }]
+                  ? [
+                      /* The trail the page actually renders. It hardcoded
+                         /theatres, which was right while every title page was a
+                         cinema listing and became a claim the page does not keep
+                         the day streaming-only titles got pages. */
+                      page.rows[0]?.platforms?.includes('theatres')
+                        ? {
+                            '@type': 'ListItem',
+                            position: 2,
+                            name: 'In cinemas',
+                            item: `${SITE_URL}/theatres`,
+                          }
+                        : {
+                            '@type': 'ListItem',
+                            position: 2,
+                            name: 'Streaming',
+                            item: `${SITE_URL}/streaming`,
+                          },
+                    ]
                   : []),
                 {
                   '@type': 'ListItem',
@@ -423,6 +508,27 @@ async function renderPage(page, pages) {
               ],
             },
           ]
+        : []),
+      /**
+       * A page about one film describes the film, not a list containing it.
+       *
+       * Every page emitted an ItemList, which is right for /theatres and the
+       * week pages and wrong for a title page: the entity a crawler should come
+       * away with is the Movie, and burying it one level inside a list of one
+       * asks Google to guess that. So a title page emits the work itself, with
+       * everything the page already knows about it.
+       *
+       * Deliberately absent: aggregateRating. The data carries a TMDB score and
+       * it would render stars in the result, which is exactly why it is
+       * tempting — and Google's review-snippet policy requires ratings a site
+       * collected itself. Publishing somebody else's score as this site's
+       * aggregate is the kind of thing that earns a manual action, and a manual
+       * action costs more than the stars are worth. The rating stays visible on
+       * the page, where it is attributed, and out of the markup, where it would
+       * not be.
+       */
+      ...(page.group === 'title' && page.rows[0]
+        ? [movieNode(page.rows[0], canonical)]
         : []),
       {
         '@type': 'ItemList',

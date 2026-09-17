@@ -47,6 +47,17 @@ name: Refresh release calendar
 # never correctness.
 on:
   schedule:
+    # Asked for: the calendar fresh by Friday 10:00 IST. This fires at 05:30
+    # IST, deliberately early, because GitHub runs this repo's schedules four to
+    # five hours behind the slot — 4h24m, 4h13m and 5h19m on the three runs
+    # measured. Aiming at 10:00 would land at 14:00; aiming here lands near 10:00
+    # and, on the day GitHub is punctual, merely early. There is no way to make
+    # a hosted cron arrive on time; the only honest control is which side of the
+    # target to miss on.
+    - cron: '0 0 * * 5'   # Fri 00:00 UTC — Friday 05:30 IST, arrives ~10:00 IST
+    # And the original Friday slot stays. Indian OTT drops land through Friday
+    # morning and midday, so a run that beats 10:00 IST necessarily misses some
+    # of them; this one sweeps up what the early run was too early to see.
     - cron: '30 8 * * 5'  # Fri 08:30 UTC — Friday 14:00 IST, the week flips and its drops exist
     - cron: '30 4 * * 6'  # Sat 04:30 UTC — Saturday 10:00 IST, anything that landed late
     - cron: '30 13 * * 1' # Mon 13:30 UTC — Monday 19:00 IST, the weekend and the week ahead

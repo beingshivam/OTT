@@ -524,16 +524,29 @@ await test('the query string is not forwarded', async () => {
 const at = (iso) => new Date(iso);
 
 await test('a slot inside its grace period is late, not missing', async () => {
-  // Friday's 08:30 slot, an hour old. Still within the 3h grace, so the most
-  // recent *due* slot is the previous Monday — GitHub running late is not a
-  // reason to email anybody.
+  /*
+   * Friday 09:30. The 08:30 slot is an hour old and well inside the grace, so
+   * it is not the one to measure against — GitHub running late is not a reason
+   * to email anybody, and on this repo it always runs late: 4h13m, 4h24m and
+   * 5h19m on the three scheduled runs measured, which is why the grace is six
+   * hours rather than the three a single early sample suggested.
+   *
+   * The 00:00 slot is nine and a half hours old, so that is the one a missing
+   * build would be measured against.
+   */
   const due = lastDueSlot(at('2026-09-11T09:30:00Z'));
-  assert.equal(due.toISOString(), '2026-09-07T13:30:00.000Z');
+  assert.equal(due.toISOString(), '2026-09-11T00:00:00.000Z');
 });
 
 await test('past its grace period, the slot is the one to measure against', async () => {
-  // The hour the watchdog actually runs, 12:00 UTC, chosen so this is true.
-  const due = lastDueSlot(at('2026-09-11T12:00:00Z'));
+  /*
+   * Friday 15:00, by which point the 08:30 slot is six and a half hours old and
+   * has run out of excuses. Deliberately a different hour from the test above:
+   * the two together pin both sides of the grace boundary, and with two Friday
+   * slots now they would otherwise both land on the same answer and test one
+   * thing twice.
+   */
+  const due = lastDueSlot(at('2026-09-11T15:00:00Z'));
   assert.equal(due.toISOString(), '2026-09-11T08:30:00.000Z');
 });
 
