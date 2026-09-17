@@ -375,6 +375,11 @@ else {
       // American release date to Indian readers — which is the page being
       // right.
       if ((r.regions ?? [REGION]).includes(REGION)) datedBySlug.set(key, r);
+      /* A streaming row is the film's date sibling AND, when the film has no
+         cinema row, the owner of its page — Ghamasaan exists on ZEE5 and
+         nowhere else. Registering it as an owner only when nothing else claims
+         the slug keeps the cinema row winning wherever both exist. */
+      if (!bySlug.has(key)) bySlug.set(key, r);
       continue;
     }
     bySlug.set(key, r);
@@ -401,9 +406,15 @@ else {
     // answer, and holding an answer back is as much a failure as inventing one.
     if (!streams && dated && dated.releaseDate >= TODAY && !saysDated)
       wrong.push(`${slug} — streams ${dated.releaseDate} and the page does not say so`);
-    // And a date must never be dressed up as a platform.
-    if (saysDated && saysStreaming)
-      wrong.push(`${slug} — claims both a streaming date and a platform`);
+    /*
+     * A date and a platform together used to be a contradiction, because every
+     * page was a cinema listing and its streaming sibling carried no service.
+     * A streaming row dated in the future now says both on purpose — "streaming
+     * on Netflix from 18 Sep" is one fact, not two competing ones. What must
+     * still never happen is a future date described as already available.
+     */
+    if (saysStreaming && row.releaseDate > TODAY)
+      wrong.push(`${slug} — releases ${row.releaseDate} but says "Streaming now"`);
   }
   wrong.length
     ? fail(S5, 'streaming status matches the data', `${wrong.length} pages contradict their row`, wrong.slice(0, 5))
@@ -412,13 +423,23 @@ else {
     ? fail(S5, 'every title page has a row behind it', `${orphan.length} orphaned`, orphan.slice(0, 5))
     : pass(S5, 'every title page has a row behind it');
 
+  /*
+   * Thin means thin, which is a question about the body text rather than about
+   * the cast list. Requiring both fields kept 137 streaming titles off the site
+   * while Search Console showed people searching for them by name — so the bar
+   * is now the one build-seo publishes against: a synopsis long enough to read
+   * as a page, twelve words beside a cast list and twenty-five without one.
+   */
+  const words = (t) => (t ?? '').trim().split(/\s+/).filter(Boolean).length;
   const thinPages = titlePages.filter(([path]) => {
     const row = bySlug.get(path.split('/').pop());
-    return row && (!row.synopsis || !row.cast?.length);
+    if (!row) return false;
+    if (!row.synopsis) return true;
+    return row.cast?.length ? words(row.synopsis) < 12 : words(row.synopsis) < 25;
   });
   thinPages.length
-    ? fail(S5, 'no title page is published without a synopsis and cast', `${thinPages.length} thin`, thinPages.slice(0, 5).map(([p]) => p))
-    : pass(S5, 'no title page is published without a synopsis and cast');
+    ? fail(S5, 'no title page is published thin', `${thinPages.length} thin`, thinPages.slice(0, 5).map(([p]) => p))
+    : pass(S5, 'no title page is published thin', `${titlePages.length} pages meet the content bar`);
 }
 
 // --- report ------------------------------------------------------------------

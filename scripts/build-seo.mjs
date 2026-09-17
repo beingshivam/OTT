@@ -670,8 +670,62 @@ const titleCandidates = [
  * date, and those two fields are what make 88 pages 88 documents rather than
  * one template repeated.
  */
-const titlePages = titleCandidates
-  .filter((r) => r.platforms.includes('theatres') && r.synopsis && r.cast?.length)
+/**
+ * Which titles get a page of their own.
+ *
+ * This required a cinema listing, and that was the largest self-inflicted gap
+ * on the site. Search Console for 4–14 September: every query with real volume
+ * is "which OTT is <film> on" or "<film> ott release date" — kuttakkar movie
+ * ott at 46 impressions, the yellow elephant (2026) ott at 16, mahendragiri
+ * varahi ott platform at 14 — and 151 of the 330 Indian titles in the data are
+ * streaming-only, so not one of them could have a page to rank with. A title
+ * already on Netflix is the *easiest* version of that question to answer, and
+ * it was the one version excluded by rule.
+ *
+ * The medium was never what made a page worth publishing; the content is. So
+ * the gate is substance instead, and deliberately not lower than before:
+ *
+ *   - a poster, because the card and the share image both need one;
+ *   - a synopsis, since it is the page's only real body text;
+ *   - and enough of it — twelve words alongside a cast list, twenty-five
+ *     without one, because a page carrying five words of plot and no names is
+ *     a thin page, and a few hundred of those cost more in Google's eyes than
+ *     they can possibly earn.
+ *
+ * That trades 27 of the thinnest rows for 137 new streaming pages: 142 to 268.
+ * The Yellow Elephant is one of the 27 and it is one of the searched titles —
+ * a five-word synopsis and no cast is simply not a page yet, and it becomes
+ * one the day TMDB fills either field in.
+ */
+const wordsIn = (s) => (s ?? '').trim().split(/\s+/).filter(Boolean).length;
+const substantial = (r) =>
+  r.synopsis &&
+  r.posterUrl &&
+  (r.cast?.length ? wordsIn(r.synopsis) >= 12 : wordsIn(r.synopsis) >= 25);
+
+/**
+ * One film, one page — even though one film can be two rows.
+ *
+ * A title that opens in cinemas and later streams is deliberately two calendar
+ * entries, `m-123` and `m-123~ott`. Both can now clear the bar above, and two
+ * pages about one film competing for one query is the textbook way to rank for
+ * neither: Google picks one, splits the signals, and the slug resolver quietly
+ * names the loser something like `the-last-first-winter-k2-2026`.
+ *
+ * It did not happen on this build, and only by luck — the streaming row of the
+ * one affected film happened to fall short on content. Luck is not a rule, so
+ * the cinema row wins and the streaming row stands down. A `~ott` row still
+ * gets the page when it is the film's only row, which is most of them:
+ * Ghamasaan exists on ZEE5 and nowhere else, and it has earned a page.
+ */
+const eligible = titleCandidates.filter(substantial);
+const eligibleIds = new Set(eligible.map((r) => String(r.id)));
+const titlePages = eligible
+  .filter((r) => {
+    const id = String(r.id);
+    if (!id.endsWith('~ott')) return true;
+    return !eligibleIds.has(id.replace(/~ott$/, ''));
+  })
   // Newest first, so the sitemap leads with what people are searching now.
   .sort((a, b) => b.releaseDate.localeCompare(a.releaseDate));
 
@@ -1192,7 +1246,12 @@ for (const r of titlePages) {
   const streamsOn =
     dated?.platforms?.length && dated.releaseDate >= TODAY ? dated.releaseDate : null;
 
-  const answer = streaming.length
+  /* Upcoming first, for the reason given at the title tag below: a streaming
+     row dated in the future is not available, and "Streaming now" about it is
+     the one sentence on this page that would be a lie. */
+  const answer = streaming.length && upcoming
+    ? `Streaming on ${streaming.map(pname).join(', ')} from ${opensOn}.`
+    : streaming.length
     ? `Streaming now on ${streaming.map(pname).join(', ')}.`
     : streamsOn
       ? `Streaming on ${dated.platforms.map(pname).join(', ')} from ${formatDate(streamsOn)}.`
@@ -1244,8 +1303,17 @@ for (const r of titlePages) {
   const on = streaming.length ? streaming.map(pname).join(', ') : '';
   // From the archive too, so a page whose week has rolled out of the window
   // keeps its context instead of quietly losing a section as it ages.
+  /* Same medium as the page it sits on: cinema listings beside a cinema
+     release, streaming beside a streaming one. The old rule was theatres-only,
+     which on a Netflix page would have offered six unrelated cinema tickets. */
+  const inCinemas = r.platforms.includes('theatres');
   const alsoThatWeek = titleCandidates
-    .filter((x) => x.weekId === r.weekId && x.id !== r.id && x.platforms.includes('theatres'))
+    .filter(
+      (x) =>
+        x.weekId === r.weekId &&
+        x.id !== r.id &&
+        x.platforms.includes('theatres') === inCinemas,
+    )
     .slice(0, 6);
 
   pages.push({
@@ -1269,33 +1337,81 @@ for (const r of titlePages) {
      * sixty characters, and the half that survives should be the half carrying
      * the title, the language and the intent.
      */
-    title: streaming.length
-      ? `Watch ${qualified} online — streaming on ${on}`
-      : upcoming
-        ? `${qualified} release date — in cinemas ${opensOn}`
-        : `${qualified} OTT release date — where to watch online`,
-    description: streaming.length
-      ? `${r.title}${langs.length ? ` (${langs.join(', ')})` : ''} is streaming now on ${on} in India. ` +
-        `Cast, runtime, certificate and trailer, plus every other new release this week.`
-      : upcoming
-        ? `${r.title}${langs.length ? ` (${langs.join(', ')})` : ''} opens in Indian cinemas on ${opensOn}. ` +
-          `Cast, runtime, certificate and trailer — plus the OTT date, tracked twice a week from the day it lands.`
-        : `${r.title}${langs.length ? ` (${langs.join(', ')})` : ''} released in cinemas on ${opensOn}. ` +
-          `No OTT platform has dated it yet — we re-check every platform twice a week and this page says so the day that changes.`,
+    /*
+     * Four states, not three, and the order matters.
+     *
+     * This asked "does it have a streaming platform" first, which was safe
+     * while every page was a cinema listing: a platform on one of those meant
+     * the film had already landed. Opening pages to streaming-only titles
+     * breaks that, because 30 of the 137 are dated in the future — and they
+     * would have been published claiming "streaming now on Netflix" about
+     * something nobody can watch for another fortnight. Upcoming is asked
+     * first now, so a date in the future can never read as available.
+     */
+    title:
+      streaming.length && !upcoming
+        ? `Watch ${qualified} online — streaming on ${on}`
+        : streaming.length
+          ? `${qualified} — streaming on ${on} from ${opensOn}`
+          : upcoming
+            ? `${qualified} release date — in cinemas ${opensOn}`
+            : `${qualified} OTT release date — where to watch online`,
+    /*
+     * The description is the click, and the last one was arguing against it.
+     *
+     * Search Console, 4-14 September: 372 impressions and zero clicks over the
+     * last four days, at a steady position of 8.6 — and "winkle twinkle ott
+     * release" ranking 3.6 with seven impressions and nothing. Position three
+     * with no clicks is never a ranking problem. The snippet those searchers
+     * were reading opened "No OTT platform has dated it yet", which answers
+     * the question in the result and removes the reason to arrive.
+     *
+     * It was true, and it stays true — what changes is that it no longer
+     * leads. The page really does carry the cinema date, the cast, the runtime
+     * and the trailer, and it really does re-check twice a week, so the
+     * description opens with those and closes on the honest part. No invented
+     * date, no implied platform: a reader who clicks finds exactly what the
+     * snippet promised.
+     */
+    description:
+      streaming.length && !upcoming
+        ? `${r.title}${langs.length ? ` (${langs.join(', ')})` : ''} is streaming now on ${on} in India. ` +
+          `Cast, runtime, certificate and trailer, plus every other new release this week.`
+        : streaming.length
+          ? `${r.title}${langs.length ? ` (${langs.join(', ')})` : ''} lands on ${on} in India on ${opensOn}. ` +
+            `Cast, runtime, certificate and trailer, plus everything else arriving that week.`
+          : upcoming
+            ? `${r.title}${langs.length ? ` (${langs.join(', ')})` : ''} opens in Indian cinemas on ${opensOn}. ` +
+              `Cast, runtime, certificate and trailer — plus the OTT date, tracked twice a week from the day it lands.`
+            : `Where to watch ${r.title}${langs.length ? ` (${langs.join(', ')})` : ''}: cinema release ${opensOn}, ` +
+              `full cast, runtime, certificate and trailer. We check every OTT platform twice a week and post the ` +
+              `streaming date here the day it is announced.`,
     /**
      * The heading asked "When is X coming to OTT?" even when the answer block
      * directly beneath it said "Streaming now on Netflix" — the page
      * contradicting itself in its own h1, on the one state where the reader
      * has already found what they came for.
      */
-    h1: streaming.length
-      ? `Where to watch ${r.title}`
-      : upcoming
-        ? `When does ${r.title} release?`
-        : `When is ${r.title} coming to OTT?`,
+    h1:
+      streaming.length && !upcoming
+        ? `Where to watch ${r.title}`
+        : streaming.length
+          ? `When does ${r.title} start streaming?`
+          : upcoming
+            ? `When does ${r.title} release?`
+            : `When is ${r.title} coming to OTT?`,
     lede: answer,
     facts:
-      `<p><strong>${upcoming ? 'In cinemas from' : 'In cinemas'}:</strong> ${esc(opensOn)}</p>` +
+      `<p><strong>${
+        inCinemas
+          ? upcoming
+            ? 'In cinemas from'
+            : 'In cinemas'
+          : upcoming
+            ? 'Streaming from'
+            : 'Streaming since'
+      }:</strong> ${esc(opensOn)}</p>` +
+      (inCinemas ? '' : `<p><strong>Watch on:</strong> ${esc(on || 'streaming')}</p>`) +
       (langs.length ? `<p><strong>Language:</strong> ${esc(langs.join(', '))}</p>` : '') +
       (r.genres?.length ? `<p><strong>Genre:</strong> ${esc(r.genres.join(', '))}</p>` : '') +
       (r.certification ? `<p><strong>Certificate:</strong> ${esc(r.certification)}</p>` : '') +
@@ -1303,9 +1419,15 @@ for (const r of titlePages) {
       (r.rating != null ? `<p><strong>Rating:</strong> ${esc(r.rating.toFixed(1))}</p>` : ''),
     body:
       `<section><h2>What it's about</h2><p>${esc(r.synopsis)}</p></section>` +
-      `<section><h2>Cast</h2><p>${esc(r.cast.join(' · '))}</p></section>` +
+      (r.cast?.length ? `<section><h2>Cast</h2><p>${esc(r.cast.join(' · '))}</p></section>` : '') +
       (alsoThatWeek.length
-        ? `<section><h2>${upcoming ? 'Also opening that week' : 'Also in cinemas that week'}</h2><ul>` +
+        ? `<section><h2>${
+            inCinemas
+              ? upcoming
+                ? 'Also opening that week'
+                : 'Also in cinemas that week'
+              : 'Also landing that week'
+          }</h2><ul>` +
           alsoThatWeek.map((x) => `<li>${esc(x.title)}</li>`).join('') +
           `</ul></section>`
         : ''),

@@ -100,9 +100,18 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
 
   const week = feed.weeks.find((w) => w.releases.some((r) => r.id === release.id));
   const alsoThatWeek = (week?.releases ?? [])
-    .filter((r) => r.regions.includes(region) && r.id !== release.id && r.platforms.includes('theatres'))
+    .filter(
+      (r) =>
+        r.regions.includes(region) &&
+        r.id !== release.id &&
+        r.platforms.includes('theatres') === release.platforms.includes('theatres'),
+    )
     .slice(0, 6);
 
+  /* Whether this page is about a cinema release at all. It always was until
+     streaming-only titles got pages, and three things below still assumed it:
+     the breadcrumb, the ticket button and the sibling list. */
+  const inCinemas = release.platforms.includes('theatres');
   const cinemas = platformById('theatres');
   /* The highest-intent click on the site: a cinema listing one step from a
      ticket. Wrapped for affiliate credit when a programme is live, untouched
@@ -120,7 +129,11 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
       <nav className="crumbs" aria-label="Breadcrumb">
         <a href="/">{BRAND}</a>
         <span aria-hidden="true">›</span>
-        <a href="/theatres">In cinemas</a>
+        {inCinemas ? (
+          <a href="/theatres">In cinemas</a>
+        ) : (
+          <a href={`/${streaming[0]}`}>{platformById(streaming[0]).name}</a>
+        )}
         <span aria-hidden="true">›</span>
         <span>{release.title}</span>
       </nav>
@@ -137,11 +150,13 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
               in the heading reads as though the page has not noticed — and
               "where to watch" is what someone at this stage actually typed. */}
           <h1>
-            {streaming.length
+            {streaming.length && !upcoming
               ? `Where to watch ${release.title}`
-              : upcoming
-                ? `When does ${release.title} release?`
-                : `When is ${release.title} coming to OTT?`}
+              : streaming.length
+                ? `When does ${release.title} start streaming?`
+                : upcoming
+                  ? `When does ${release.title} release?`
+                  : `When is ${release.title} coming to OTT?`}
             {/* The heading keeps asking the question even when the answer is
                 a date rather than a platform — that is still what someone
                 typed, and the line below answers it outright. */}
@@ -152,15 +167,26 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
               able to leave after one line. */}
           <div className={streaming.length || streamsOn ? 'answer answer--yes' : 'answer'}>
             {streaming.length ? (
+              /*
+               * "Now" only when it is now.
+               *
+               * A title page used to exist only for cinema releases, where a
+               * streaming platform on the row meant the film had already
+               * landed. Streaming-only titles have their own pages since the
+               * Search Console read of 17 September, and 31 of them are dated
+               * in the future — so this said "Streaming now on Netflix" about
+               * something nobody could watch for another fortnight. The date
+               * decides the tense; the platform only decides the name.
+               */
               <>
-                <strong>Streaming now</strong> on{' '}
+                <strong>{upcoming ? 'Streaming' : 'Streaming now'}</strong> on{' '}
                 {streaming.map((id, i) => (
                   <span key={id}>
                     {i > 0 && ', '}
                     <a href={`/${id}`}>{platformById(id).name}</a>
                   </span>
                 ))}
-                .
+                {upcoming ? ` from ${fmtDate(release.releaseDate)}` : ''}.
               </>
             ) : streamsOn ? (
               /* Both halves of the answer somebody arrived for: when, and
@@ -261,7 +287,7 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
                 Trailer
               </a>
             )}
-            {!streaming.length && book && (
+            {inCinemas && !streaming.length && book && (
               <a
                 className="btn btn--lg"
                 href={book.href}
@@ -297,7 +323,13 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
 
       {alsoThatWeek.length > 0 && week && (
         <section className="titlepage__block">
-          <h2>{upcoming ? 'Also opening that week' : 'Also in cinemas that week'}</h2>
+          <h2>
+            {!inCinemas
+              ? 'Also landing that week'
+              : upcoming
+                ? 'Also opening that week'
+                : 'Also in cinemas that week'}
+          </h2>
           <ul className="titlepage__also">
             {alsoThatWeek.map((r) => (
               <li key={r.id}>
@@ -307,7 +339,11 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
           </ul>
           <p className="titlepage__more">
             <a href={`/w/${week.id}`}>Everything released {formatWeekRange(week.id)}</a> ·{' '}
-            <a href="/theatres">All new cinema releases</a>
+            {inCinemas ? (
+              <a href="/theatres">All new cinema releases</a>
+            ) : (
+              <a href="/streaming">Everything streaming in India</a>
+            )}
           </p>
         </section>
       )}
