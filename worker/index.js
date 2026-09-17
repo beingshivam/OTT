@@ -148,6 +148,26 @@ export default {
       return Response.redirect(url.toString(), 301);
     }
 
+    /**
+     * One path per page, without a trailing slash.
+     *
+     * The asset server answers /theatres and /theatres/ with the same file, so
+     * Google indexed both and split their signals between them: Search Console
+     * for 4-14 September lists them as separate rows, 39 impressions against 21,
+     * for one page. The canonical already said /theatres and was being ignored,
+     * which is what canonicals do when two URLs both return 200 — they are a
+     * hint, and a redirect is not.
+     *
+     * Every one of the 314 URLs in the sitemap is slashless except the root, so
+     * the slashed form is never the address of anything. The root is excluded
+     * because "" is not a path, and dotted paths are left alone for the same
+     * reason as the casing rule above: a file's name belongs to whoever made it.
+     */
+    if (url.pathname.length > 1 && url.pathname.endsWith('/') && !/\.[a-z0-9]+\/$/i.test(url.pathname)) {
+      url.pathname = url.pathname.replace(/\/+$/, '');
+      return Response.redirect(url.toString(), 301);
+    }
+
     if (url.pathname !== '/api/subscribe') return env.ASSETS.fetch(request);
 
     if (request.method !== 'POST') {

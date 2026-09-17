@@ -510,8 +510,6 @@ await test('the query string is not forwarded', async () => {
   }
 });
 
-
-
 /**
  * The watchdog's clock.
  *
@@ -570,6 +568,48 @@ await test('a quiet midweek still measures against the last real slot', async ()
   // Thursday. Nothing is scheduled between Monday and Friday, so a feed built
   // on Monday is correct and must not alert.
   assert.equal(lastDueSlot(at('2026-09-17T12:00:00Z')).toISOString(), '2026-09-14T13:30:00.000Z');
+});
+
+/*
+ * One path per page, without a trailing slash.
+ *
+ * Search Console, 4-14 September, listed /theatres and /theatres/ as separate
+ * rows — 39 impressions against 21 — for one page, because the asset server
+ * answers both with the same file and Google indexed each. The canonical said
+ * /theatres throughout and was ignored, which is what canonicals do when both
+ * URLs return 200: a hint loses to two live pages, a redirect does not.
+ */
+await test('a trailing slash redirects to the one canonical path', async () => {
+  const assets = { ...fakeAssets, fetched: [] };
+  const res = await worker.fetch(new Request(`${ORIGIN}/theatres/`), { ASSETS: assets });
+  assert.equal(res.status, 301);
+  assert.equal(res.headers.get('location'), `${ORIGIN}/theatres`);
+  assert.deepEqual(assets.fetched, [], 'the asset server should not have been asked');
+});
+
+await test('the query string survives a trailing-slash redirect', async () => {
+  const res = await worker.fetch(new Request(`${ORIGIN}/netflix/?r=IN`), { ASSETS: fakeAssets });
+  assert.equal(res.headers.get('location'), `${ORIGIN}/netflix?r=IN`);
+});
+
+await test('the root keeps its slash, being the one path that is only a slash', async () => {
+  const assets = { ...fakeAssets, fetched: [] };
+  const res = await worker.fetch(new Request(`${ORIGIN}/`), { ASSETS: assets });
+  assert.notEqual(res.status, 301, 'the homepage must not redirect to the empty path');
+  assert.equal(assets.fetched.length, 1, 'it should be served, not bounced');
+});
+
+await test('a capitalised path with a trailing slash ends up lowercase and slashless', async () => {
+  // Two rules in a row: the casing redirect fires first and the next request
+  // hits the slash rule. Worth pinning, because a rule that redirects to
+  // something the other rule also redirects is how a loop starts.
+  const first = await worker.fetch(new Request(`${ORIGIN}/Theatres/`), { ASSETS: fakeAssets });
+  assert.equal(first.status, 301);
+  const second = await worker.fetch(new Request(first.headers.get('location')), { ASSETS: fakeAssets });
+  assert.equal(second.status, 301);
+  assert.equal(second.headers.get('location'), `${ORIGIN}/theatres`);
+  const third = await worker.fetch(new Request(second.headers.get('location')), { ASSETS: fakeAssets });
+  assert.notEqual(third.status, 301, 'three hops means a loop');
 });
 
 console.log(results.join('\n'));
