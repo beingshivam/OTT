@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { IconCalendar, IconClose, IconExternal, IconShare, IconCheck } from './icons';
+import { IconCalendar, IconClose, IconDoc, IconExternal, IconShare, IconCheck } from './icons';
 import { PosterArt } from './PosterArt';
 import { dropLabel } from './ReleaseCard';
 import { KIND_LABEL, languageName, platform } from '../data/platforms';
@@ -24,6 +24,46 @@ export function DetailSheet({ release, onClose }: Props) {
   /* Same call the card behind this sheet makes, so opening a title never shows
      a different number than the row you tapped. */
   const score = scoreOf(release);
+
+  /**
+   * What the link to the title page is actually offering.
+   *
+   * It said "OTT release date" on everything with a slug, which is a promise
+   * only one of the four states can keep. Reported on Zakir Khan: Papa Yaar —
+   * a Netflix special that came out this morning, where the sheet offered
+   * "Watch on Netflix" and, directly beside it, a calendar icon promising a
+   * date that had already happened. The page itself was right the whole time;
+   * its heading reads "Where to watch Zakir Khan: Papa Yaar" and its first
+   * line says "Streaming now on Netflix". Only the button lied.
+   *
+   * The URL does not change with the state and must not: one document earning
+   * its age across a title's whole lifecycle is the entire design of these
+   * pages, and /ott-release-date/<slug> is where Google already has them. What
+   * a reader is promised on the way in is a different thing from where they
+   * land, and that is the half that has to move.
+   *
+   * So the four states, in the order the page itself asks them — is it out,
+   * and does it stream:
+   *
+   *   streaming, out        the OTT date is not news any more; what the page
+   *                         adds is the cast, the runtime and the trailer
+   *   streaming, upcoming   the date is the answer, and it is a streaming one
+   *   cinema, upcoming      the date is the answer, and it is an opening
+   *   cinema, out           the genuine article: out of cinemas, no OTT date
+   *                         yet, and that question is what the page exists for
+   */
+  const streams = release.platforms.some((id) => id !== 'theatres');
+  /* Derived the same way as the page's own heading (ReleaseDatePage), so the
+     button and the page it opens can never disagree about the tense. */
+  const upcoming =
+    Math.floor((Date.now() - Date.parse(`${release.releaseDate}T00:00:00Z`)) / 86_400_000) < 0;
+  const detail = streams
+    ? upcoming
+      ? { label: 'Streaming date', icon: <IconCalendar /> }
+      : { label: 'Full details', icon: <IconDoc /> }
+    : upcoming
+      ? { label: 'Release date', icon: <IconCalendar /> }
+      : { label: 'OTT release date', icon: <IconCalendar /> };
 
   useEffect(() => {
     // Remember what opened the sheet so focus can go back there on close.
@@ -190,8 +230,8 @@ export function DetailSheet({ release, onClose }: Props) {
                 the cloaking problem the whole set is built to avoid. */}
             {release.slug && (
               <a className="btn btn--lg" href={`/ott-release-date/${release.slug}`}>
-                <IconCalendar />
-                OTT release date
+                {detail.icon}
+                {detail.label}
               </a>
             )}
             <button className="btn btn--lg" onClick={share}>

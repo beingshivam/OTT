@@ -222,7 +222,22 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
 
           <dl className="titlepage__facts">
             <div>
-              <dt>{upcoming ? 'In cinemas from' : 'In cinemas'}</dt>
+              {/* This row said "In cinemas" whatever the title was, because
+                  every page here used to be a cinema listing. Zakir Khan: Papa
+                  Yaar is a Netflix special and its own page told a reader it
+                  was in cinemas — under a heading that had just said where to
+                  stream it. The prerendered copy learned the distinction when
+                  streaming titles got pages (build-seo.mjs); this one, which is
+                  what a reader actually sees once the app hydrates, did not. */}
+              <dt>
+                {inCinemas
+                  ? upcoming
+                    ? 'In cinemas from'
+                    : 'In cinemas'
+                  : upcoming
+                    ? 'Streaming from'
+                    : 'Streaming since'}
+              </dt>
               <dd>
                 {fmtDate(release.releaseDate)}
                 {daysOut > 0 && (
