@@ -48,6 +48,17 @@ const maybe = async (p) => readJson(p).catch(() => null);
 // --- inputs ------------------------------------------------------------------
 
 const TODAY = new Date().toISOString().slice(0, 10);
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+/** A date as the pages spell it — mirrors formatDate in build-seo.mjs. Two
+ *  copies of one format is the cost of build-seo being a script that fetches
+ *  and writes on import; a page that changes the spelling fails here, loudly,
+ *  which is the right way round for a gate. */
+const spokenDate = (iso) => {
+  const d = new Date(`${iso}T00:00:00Z`);
+  return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+};
+
 const feed = await maybe(resolve(DIST, 'data/releases.json'));
 const catalogue = await maybe(resolve(ROOT, 'public/data/catalogue.json'));
 const archive = await maybe(resolve(ROOT, 'data/archive.json'));
@@ -399,7 +410,18 @@ else {
     const dated = datedBySlug.get(slug);
     const saysStreaming = /Streaming now on/.test(html);
     const saysUnannounced = /Not announced yet/.test(html);
-    const saysDated = /Streaming from/.test(html);
+    /*
+     * The date, not the sentence that carries it.
+     *
+     * This looked for the literal words "Streaming from", which is what the
+     * page said until 7d7b29c taught it to name the service — the lede now
+     * reads "Streaming on Netflix from 18 Sep 2026", the words moved apart,
+     * and on 18 September this failed two pages that were telling the truth
+     * and blocked the whole Friday publish. The rule is about a known date
+     * reaching the reader, so that is what it looks for; the page can go on
+     * rewording itself without the gate calling it a liar.
+     */
+    const saysDated = dated ? html.includes(spokenDate(dated.releaseDate)) : false;
     if (streams && saysUnannounced) wrong.push(`${slug} — on ${row.platforms.join(',')} but says "Not announced yet"`);
     if (!streams && saysStreaming) wrong.push(`${slug} — no streaming platform but says "Streaming now"`);
     // A known date must be on the page. This is the question the page exists to

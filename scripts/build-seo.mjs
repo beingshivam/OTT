@@ -99,6 +99,23 @@ const html = (await readFile(HTML, 'utf8')).replace(
   /(<(?:script|link)\b[^>]*?)\s+crossorigin(?:="[^"]*")?/g,
   '$1',
 );
+/*
+ * The template has to be Vite's output, not this script's.
+ *
+ * Every page below is `html` with its own head and its own body swapped into
+ * an empty `<div id="root"></div>` — and dist/index.html is both the template
+ * this reads and the home page it writes. Run twice without a rebuild in
+ * between and the second run finds a root that is already full, the body swap
+ * silently matches nothing, and 269 title pages go out wearing the right head
+ * over the home page's content. Nothing fails; the pages just quietly stop
+ * being about their film, which cost an hour of debugging a page that was
+ * fine in CI. Rebuild first.
+ */
+if (!html.includes('<div id="root"></div>')) {
+  console.error('dist/index.html has already been through this script. Run `npm run build`.');
+  process.exit(1);
+}
+
 const feed = JSON.parse(await readFile(FEED, 'utf8'));
 
 /**
@@ -1351,6 +1368,13 @@ for (const r of titlePages) {
      refuses to print. */
   const streamsOn =
     dated?.platforms?.length && dated.releaseDate >= TODAY ? dated.releaseDate : null;
+  /* The digital half of a cinema listing, named and dated. Held in variables
+     because the lede, the title tag and the description all have to agree
+     about it — the lede alone knew, so a film whose OTT date had just been
+     announced still went to Google under "where to watch online", under a
+     snippet promising to post the date the day it was announced. */
+  const landsOn = streamsOn ? dated.platforms.map(pname).join(', ') : '';
+  const landsDate = streamsOn ? formatDate(streamsOn) : '';
 
   /* Upcoming first, for the reason given at the title tag below: a streaming
      row dated in the future is not available, and "Streaming now" about it is
@@ -1360,7 +1384,7 @@ for (const r of titlePages) {
     : streaming.length
     ? `Streaming now on ${streaming.map(pname).join(', ')}.`
     : streamsOn
-      ? `Streaming on ${dated.platforms.map(pname).join(', ')} from ${formatDate(streamsOn)}.`
+      ? `Streaming on ${landsOn} from ${landsDate}.`
       : upcoming
         ? `In cinemas from ${opensOn}. No streaming date yet — a film is normally picked up by a platform after its theatrical run, and this page updates automatically when one announces.`
         : `Not announced yet — no streaming date has been confirmed. This page updates automatically; every platform is re-checked twice a week.`;
@@ -1459,9 +1483,11 @@ for (const r of titlePages) {
         ? `Watch ${qualified} online — streaming on ${on}`
         : streaming.length
           ? `${qualified} — streaming on ${on} from ${opensOn}`
-          : upcoming
-            ? `${qualified} release date — in cinemas ${opensOn}`
-            : `${qualified} OTT release date — where to watch online`,
+          : streamsOn
+            ? `${qualified} OTT release date — ${landsOn} from ${landsDate}`
+            : upcoming
+              ? `${qualified} release date — in cinemas ${opensOn}`
+              : `${qualified} OTT release date — where to watch online`,
     /*
      * The description is the click, and the last one was arguing against it.
      *
@@ -1486,7 +1512,10 @@ for (const r of titlePages) {
         : streaming.length
           ? `${r.title}${langs.length ? ` (${langs.join(', ')})` : ''} lands on ${on} in India on ${opensOn}. ` +
             `Cast, runtime, certificate and trailer, plus everything else arriving that week.`
-          : upcoming
+          : streamsOn
+            ? `${r.title}${langs.length ? ` (${langs.join(', ')})` : ''} starts streaming on ${landsOn} in India on ${landsDate}, ` +
+              `after its cinema release on ${opensOn}. Cast, runtime, certificate and trailer, plus everything else landing that week.`
+            : upcoming
             ? `${r.title}${langs.length ? ` (${langs.join(', ')})` : ''} opens in Indian cinemas on ${opensOn}. ` +
               `Cast, runtime, certificate and trailer — plus the OTT date, tracked twice a week from the day it lands.`
             : `Where to watch ${r.title}${langs.length ? ` (${langs.join(', ')})` : ''}: cinema release ${opensOn}, ` +
