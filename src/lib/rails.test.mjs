@@ -39,6 +39,7 @@ const {
   SOON_DAYS,
   MAX_ITEMS,
   TRENDING_IN_CINEMAS,
+  TODAY_IN_CINEMAS,
   NARROWED_DAYS,
 } = await import(join(dir, 'rails.mjs'));
 
@@ -648,4 +649,88 @@ test('the forward row keeps nearest-first, however far it reaches', () => {
   ];
   const out = landingSoon(rows, 'IN', TODAY, NARROWED_DAYS).releases;
   assert.equal(out[0].title, 'Near');
+});
+
+test("today's openings are on the row, not behind the whole ranking", () => {
+  /*
+   * The reported defect, in miniature.
+   *
+   * Attention is earned after a film opens, so a title released this morning
+   * has none and sorts below every film still playing from last month. On 18
+   * September that put sixteen of the day's openings off a twenty-card row and
+   * the seventeenth at card seventeen — on a release calendar, on release day.
+   */
+  const old = Array.from({ length: 20 }, (_, i) =>
+    row({ releaseDate: iso(20), platforms: ['theatres'], heat: 100 - i, title: `Old ${i}` }),
+  );
+  const opened = row({ releaseDate: iso(0), platforms: ['theatres'], heat: 0, title: 'Opened today' });
+  const out = inCinemas([...old, opened], 'IN', TODAY).releases;
+  const at = out.findIndex((r) => r.title === 'Opened today');
+  assert.ok(at >= 0, 'it is on the row at all');
+  assert.equal(at, TRENDING_IN_CINEMAS, 'and directly behind the badged films');
+});
+
+test('the allowance is an allowance, not the whole row', () => {
+  // The other half of the trade. Date order was tried and filled the row with
+  // small openings while the big film of the month sat seventieth; today gets
+  // a fixed number of places, and the ranking keeps the rest.
+  const old = Array.from({ length: 20 }, (_, i) =>
+    row({ releaseDate: iso(20), platforms: ['theatres'], heat: 100 - i, title: `Old ${i}` }),
+  );
+  const fresh = Array.from({ length: 12 }, (_, i) =>
+    row({ releaseDate: iso(0), platforms: ['theatres'], heat: 0, title: `Fresh ${i}` }),
+  );
+  const out = inCinemas([...old, ...fresh], 'IN', TODAY).releases;
+  const today = out.filter((r) => r.title.startsWith('Fresh'));
+  assert.equal(today.length, TODAY_IN_CINEMAS, 'six of the twelve, not all twelve');
+  assert.equal(out[0].title, 'Old 0', 'and the biggest film still leads the row');
+});
+
+test("today's allowance spreads across languages", () => {
+  /*
+   * None of these titles has any attention yet — that is what makes them
+   * today's — so ranking them against each other is ranking noise. A Friday
+   * that opens across seven languages should look like one.
+   */
+  const fresh = [
+    ...Array.from({ length: 6 }, (_, i) =>
+      row({ releaseDate: iso(0), platforms: ['theatres'], languages: ['ta'], heat: 6 - i, title: `Tamil ${i}` }),
+    ),
+    row({ releaseDate: iso(0), platforms: ['theatres'], languages: ['ml'], heat: 1, title: 'Malayalam' }),
+  ];
+  const old = Array.from({ length: 10 }, (_, i) =>
+    row({ releaseDate: iso(20), platforms: ['theatres'], heat: 100 - i, title: `Old ${i}` }),
+  );
+  const out = inCinemas([...old, ...fresh], 'IN', TODAY).releases;
+  assert.ok(
+    out.some((r) => r.title === 'Malayalam'),
+    'the one Malayalam opening is not buried under six Tamil ones',
+  );
+});
+
+test('the badge still counts only the films it was made about', () => {
+  // The allowance sits behind the badged cards and must never be mistaken for
+  // them: a film with no attention yet is not "trending".
+  const rows = [
+    ...Array.from({ length: 5 }, (_, i) =>
+      row({ releaseDate: iso(20), platforms: ['theatres'], heat: 100 - i, title: `Old ${i}` }),
+    ),
+    row({ releaseDate: iso(0), platforms: ['theatres'], heat: 0, title: 'Opened today' }),
+  ];
+  const out = inCinemas(rows, 'IN', TODAY);
+  assert.equal(out.trending, TRENDING_IN_CINEMAS);
+  assert.ok(
+    out.releases.slice(0, out.trending).every((r) => r.title !== 'Opened today'),
+    'the badged cards are the ranked ones',
+  );
+});
+
+test('a day with no openings changes nothing', () => {
+  // The allowance is only spent when there is something to spend it on. On a
+  // Tuesday the row is the ranking it always was.
+  const rows = Array.from({ length: 8 }, (_, i) =>
+    row({ releaseDate: iso(20 + i), platforms: ['theatres'], heat: 100 - i, title: `Old ${i}` }),
+  );
+  const out = inCinemas(rows, 'IN', TODAY).releases.map((r) => r.title);
+  assert.deepEqual(out, rows.map((r) => r.title));
 });

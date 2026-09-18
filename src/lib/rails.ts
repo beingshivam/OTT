@@ -164,6 +164,15 @@ export const CINEMA_DAYS = 42;
 export const TRENDING_IN_CINEMAS = 3;
 
 /**
+ * How many of today's openings are guaranteed a place in that row.
+ *
+ * Six: enough to carry a Friday across several languages, few enough that the
+ * ranking still owns most of the row. See inCinemas for why this allowance has
+ * to exist at all.
+ */
+export const TODAY_IN_CINEMAS = 6;
+
+/**
  * What is playing now — the segment that had nowhere to live before, and the
  * only question on this site no streaming-only competitor can answer.
  *
@@ -211,20 +220,19 @@ export function inCinemas(all: Release[], region: string, today: Date = new Date
     (r) => r.regions?.includes(region) && r.releaseDate >= from && r.releaseDate <= to && showing(r),
   );
 
-  const releases = playing
+  const ranked = playing
     .filter((r) => Boolean(r.posterUrl))
     // Ties break to the newer film: two titles drawing equal attention, the one
     // that opened this week is the more useful answer to "what is on".
     .sort(
       (a, b) => (b.heat ?? 0) - (a.heat ?? 0) || b.releaseDate.localeCompare(a.releaseDate),
-    )
-    .slice(0, MAX_ITEMS);
+    );
 
-  const row: JustLanded = { releases, from, to, total: playing.length };
+  const row: JustLanded = { releases: ranked.slice(0, MAX_ITEMS), from, to, total: playing.length };
 
   // A row with nothing but standouts is the whole row wearing a badge, which
   // tells a reader nothing. Then it is simply a short ranked row, unmarked.
-  if (releases.length <= TRENDING_IN_CINEMAS) return row;
+  if (ranked.length <= TRENDING_IN_CINEMAS) return row;
 
   /*
    * The badged few are the ones the claim can be made about.
@@ -237,15 +245,54 @@ export function inCinemas(all: Release[], region: string, today: Date = new Date
    * they sit: badges landing on cards one, three and four read as a bug, and
    * the row's first three cards are the ones anyone actually sees.
    */
-  const lead = releases.filter((r) => !imported(r)).slice(0, TRENDING_IN_CINEMAS);
-  if (lead.length < TRENDING_IN_CINEMAS) return { ...row, trending: 0 };
-
+  const lead = ranked.filter((r) => !imported(r)).slice(0, TRENDING_IN_CINEMAS);
   const crowned = new Set(lead.map((r) => r.id));
-  return {
-    ...row,
-    trending: TRENDING_IN_CINEMAS,
-    releases: [...lead, ...releases.filter((r) => !crowned.has(r.id))],
-  };
+
+  /*
+   * And then today's openings, before the rest of the ranking.
+   *
+   * Reported as "can't see what films released today in rail", and measured on
+   * 18 September: sixteen films opened in Indian cinemas that morning with
+   * artwork, and exactly one of them was on the row — at card seventeen of
+   * twenty. That is not the ranking failing, it is the ranking working. TMDB
+   * attention is earned *after* a film opens, so a title released this morning
+   * scores near zero by construction and sorts below everything still playing
+   * from August. Release day is invisible on a release calendar.
+   *
+   * Date order is not the way back — that was tried, and it filled the row with
+   * two days of small openings while a film rated 8.6 and five weeks into its
+   * run sat seventieth. What was wrong there was the whole row, not the idea
+   * that today belongs in it. So the ranking keeps the row and today gets a
+   * fixed allowance inside it: the big films first, then what opened this
+   * morning, then everything else still playing.
+   *
+   * Six, because that is what fits before a reader starts swiping on a phone
+   * and it leaves half the row to the ranking that earns the heading. Spread
+   * across languages rather than ranked flat — the flat exception below belongs
+   * to the row as a whole, where the job is naming the one big film; a Friday
+   * that opens sixteen films across seven languages is exactly the field the
+   * interleave was built to spread, and heat cannot order it because none of
+   * these titles has any yet.
+   *
+   * No badge. The cards say "Today" in their own caption, which is the reason
+   * they are there and reads as news rather than as a ranking nobody made.
+   */
+  const fresh = interleaveByLanguage(
+    ranked.filter((r) => r.releaseDate === to && !crowned.has(r.id)),
+    (a, b) => (b.heat ?? 0) - (a.heat ?? 0),
+  ).slice(0, TODAY_IN_CINEMAS);
+
+  const placed = new Set([...crowned, ...fresh.map((r) => r.id)]);
+  const releases = [...lead, ...fresh, ...ranked.filter((r) => !placed.has(r.id))].slice(
+    0,
+    MAX_ITEMS,
+  );
+
+  /* Fewer than three eligible leads means nothing is badged — but today still
+     opened, and the row still has to show it. Only the badge stands down. */
+  if (lead.length < TRENDING_IN_CINEMAS) return { ...row, releases, trending: 0 };
+
+  return { ...row, releases, trending: TRENDING_IN_CINEMAS };
 }
 
 /**
