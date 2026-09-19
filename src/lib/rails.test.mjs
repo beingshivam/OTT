@@ -39,7 +39,7 @@ const {
   SOON_DAYS,
   MAX_ITEMS,
   TRENDING_IN_CINEMAS,
-  TODAY_IN_CINEMAS,
+  NEW_IN_CINEMAS,
   NARROWED_DAYS,
 } = await import(join(dir, 'rails.mjs'));
 
@@ -682,7 +682,7 @@ test('the allowance is an allowance, not the whole row', () => {
   );
   const out = inCinemas([...old, ...fresh], 'IN', TODAY).releases;
   const today = out.filter((r) => r.title.startsWith('Fresh'));
-  assert.equal(today.length, TODAY_IN_CINEMAS, 'six of the twelve, not all twelve');
+  assert.equal(today.length, NEW_IN_CINEMAS, 'six of the twelve, not all twelve');
   assert.equal(out[0].title, 'Old 0', 'and the biggest film still leads the row');
 });
 
@@ -733,4 +733,72 @@ test('a day with no openings changes nothing', () => {
   );
   const out = inCinemas(rows, 'IN', TODAY).releases.map((r) => r.title);
   assert.deepEqual(out, rows.map((r) => r.title));
+});
+
+test('a Friday opening is still new on Saturday', () => {
+  /*
+   * The first version of the allowance reserved places for films dated exactly
+   * today, and it lasted one day. Same feed, one turn of the clock: the
+   * sixteen films that opened on Friday the 18th fell out of cards four to
+   * nine and back to a single card at seventeen, and it was reported on the
+   * Saturday morning.
+   *
+   * TODAY here is a Monday, so this is three days after the week opened — the
+   * case the day-shaped rule could not survive.
+   */
+  const old = Array.from({ length: 20 }, (_, i) =>
+    row({ releaseDate: iso(20), platforms: ['theatres'], heat: 100 - i, title: `Old ${i}` }),
+  );
+  const friday = row({
+    releaseDate: iso(3),
+    platforms: ['theatres'],
+    heat: 0,
+    title: 'Opened Friday',
+  });
+  const out = inCinemas([...old, friday], 'IN', TODAY).releases;
+  assert.equal(
+    out.findIndex((r) => r.title === 'Opened Friday'),
+    TRENDING_IN_CINEMAS,
+    'still directly behind the badged films, days after it opened',
+  );
+});
+
+test('last week’s openings age out when this week’s arrive', () => {
+  // The other side of it. The allowance is the current release week, so a film
+  // stops being new when the next Friday's crop lands — not overnight, and not
+  // never.
+  // Ten, not twenty: the point is where it lands, so the row has to be short
+  // enough that it lands anywhere at all rather than falling off the cap.
+  const old = Array.from({ length: 10 }, (_, i) =>
+    row({ releaseDate: iso(20), platforms: ['theatres'], heat: 100 - i, title: `Old ${i}` }),
+  );
+  // iso(4) is the Thursday before this week's Friday — last week's crop.
+  const lastWeek = row({
+    releaseDate: iso(4),
+    platforms: ['theatres'],
+    heat: 0,
+    title: 'Last week',
+  });
+  const out = inCinemas([...old, lastWeek], 'IN', TODAY).releases;
+  assert.equal(
+    out.findIndex((r) => r.title === 'Last week'),
+    out.length - 1,
+    'it takes its place in the ranking like everything else — last, on no attention',
+  );
+});
+
+test('the newest day leads the allowance', () => {
+  // Within the week the allowance is still a calendar: Saturday's openings sit
+  // in front of Friday's, the same ordering every other dated row uses.
+  const old = Array.from({ length: 20 }, (_, i) =>
+    row({ releaseDate: iso(20), platforms: ['theatres'], heat: 100 - i, title: `Old ${i}` }),
+  );
+  const friday = row({ releaseDate: iso(3), platforms: ['theatres'], heat: 50, title: 'Friday' });
+  const sunday = row({ releaseDate: iso(1), platforms: ['theatres'], heat: 0, title: 'Sunday' });
+  const out = inCinemas([...old, friday, sunday], 'IN', TODAY).releases;
+  assert.ok(
+    out.indexOf(out.find((r) => r.title === 'Sunday')) <
+      out.indexOf(out.find((r) => r.title === 'Friday')),
+    'the later opening comes first, whatever the attention numbers say',
+  );
 });

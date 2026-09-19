@@ -1,5 +1,5 @@
 import { interleaveByLanguage } from './rank';
-import { toISODate } from './week';
+import { toISODate, weekIdFor } from './week';
 import type { Release } from '../types';
 
 /**
@@ -164,13 +164,13 @@ export const CINEMA_DAYS = 42;
 export const TRENDING_IN_CINEMAS = 3;
 
 /**
- * How many of today's openings are guaranteed a place in that row.
+ * How many of this week's openings are guaranteed a place in that row.
  *
  * Six: enough to carry a Friday across several languages, few enough that the
  * ranking still owns most of the row. See inCinemas for why this allowance has
- * to exist at all.
+ * to exist at all, and why it is the week rather than the day.
  */
-export const TODAY_IN_CINEMAS = 6;
+export const NEW_IN_CINEMAS = 6;
 
 /**
  * What is playing now — the segment that had nowhere to live before, and the
@@ -249,7 +249,7 @@ export function inCinemas(all: Release[], region: string, today: Date = new Date
   const crowned = new Set(lead.map((r) => r.id));
 
   /*
-   * And then today's openings, before the rest of the ranking.
+   * And then this week's openings, before the rest of the ranking.
    *
    * Reported as "can't see what films released today in rail", and measured on
    * 18 September: sixteen films opened in Indian cinemas that morning with
@@ -262,9 +262,23 @@ export function inCinemas(all: Release[], region: string, today: Date = new Date
    * Date order is not the way back — that was tried, and it filled the row with
    * two days of small openings while a film rated 8.6 and five weeks into its
    * run sat seventieth. What was wrong there was the whole row, not the idea
-   * that today belongs in it. So the ranking keeps the row and today gets a
-   * fixed allowance inside it: the big films first, then what opened this
-   * morning, then everything else still playing.
+   * that the new films belong in it. So the ranking keeps the row and the new
+   * films get a fixed allowance inside it: the big ones first, then what has
+   * just opened, then everything else still playing.
+   *
+   * The allowance is the release week, not the calendar day, and the first
+   * version of this got that wrong. It reserved places for films dated exactly
+   * today, which fixed Friday and broke on Saturday: same data, one day later,
+   * the same sixteen openings fell out of cards four to nine and back to a
+   * single card at seventeen. Reported the next morning, which is exactly how
+   * long the fix lasted. A one-day cliff is not a rule, it is an accident —
+   * and nothing about a film stops being new when the clock passes midnight.
+   * The site's week runs Friday to Thursday and so does this: on Friday it is
+   * the morning's openings, by Thursday it is the week's, and a film ages out
+   * when the next week's crop arrives rather than overnight.
+   *
+   * Newest day first, languages interleaved within a day — the same ordering
+   * every calendar row on this site uses, for the same reason.
    *
    * Six, because that is what fits before a reader starts swiping on a phone
    * and it leaves half the row to the ranking that earns the heading. Spread
@@ -274,13 +288,22 @@ export function inCinemas(all: Release[], region: string, today: Date = new Date
    * interleave was built to spread, and heat cannot order it because none of
    * these titles has any yet.
    *
-   * No badge. The cards say "Today" in their own caption, which is the reason
-   * they are there and reads as news rather than as a ranking nobody made.
+   * No badge. The cards carry their own "Today" or "2 days ago", which is the
+   * reason they are there and reads as news rather than a ranking nobody made.
    */
-  const fresh = interleaveByLanguage(
-    ranked.filter((r) => r.releaseDate === to && !crowned.has(r.id)),
-    (a, b) => (b.heat ?? 0) - (a.heat ?? 0),
-  ).slice(0, TODAY_IN_CINEMAS);
+  const opened = weekIdFor(today);
+  const byDay = new Map<string, Release[]>();
+  for (const r of ranked) {
+    if (r.releaseDate < opened || crowned.has(r.id)) continue;
+    if (!byDay.has(r.releaseDate)) byDay.set(r.releaseDate, []);
+    byDay.get(r.releaseDate)!.push(r);
+  }
+  const fresh = [...byDay.keys()]
+    .sort((a, b) => b.localeCompare(a))
+    .flatMap((day) =>
+      interleaveByLanguage(byDay.get(day)!, (a, b) => (b.heat ?? 0) - (a.heat ?? 0)),
+    )
+    .slice(0, NEW_IN_CINEMAS);
 
   const placed = new Set([...crowned, ...fresh.map((r) => r.id)]);
   const releases = [...lead, ...fresh, ...ranked.filter((r) => !placed.has(r.id))].slice(
@@ -288,8 +311,9 @@ export function inCinemas(all: Release[], region: string, today: Date = new Date
     MAX_ITEMS,
   );
 
-  /* Fewer than three eligible leads means nothing is badged — but today still
-     opened, and the row still has to show it. Only the badge stands down. */
+  /* Fewer than three eligible leads means nothing is badged — but films still
+     opened this week, and the row still has to show them. Only the badge
+     stands down. */
   if (lead.length < TRENDING_IN_CINEMAS) return { ...row, releases, trending: 0 };
 
   return { ...row, releases, trending: TRENDING_IN_CINEMAS };
