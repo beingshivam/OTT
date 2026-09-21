@@ -150,18 +150,20 @@ export function DetailSheet({ release, onClose }: Props) {
           * backdrop for every title, and a small Malayalam release is exactly
           * the kind that goes without. There is always a poster.
           *
-          * A portrait poster in a 21:9 frame cannot be cropped to fit — cover
-          * would leave a band across somebody's chest. So it is shown whole,
-          * over a blurred, enlarged copy of itself, which fills the frame with
-          * the film's own colour instead of a gradient belonging to nothing.
-          * A second <img> rather than a CSS background: same URL, so the
-          * browser serves it from cache, and no third-party string ends up
-          * inside a style attribute.
+          * It fills the frame, the way a backdrop does on a title that has
+          * one. The first attempt showed the poster whole over a blurred copy
+          * of itself, on the reasoning that cropping a 2:3 portrait to 21:9
+          * costs most of the picture — true, and it read as a small panel
+          * floating in a wide frame rather than as the hero the sheet has
+          * everywhere else. Consistency wins: one shape for every title,
+          * whichever artwork is behind it.
+          *
+          * Cropped high rather than centred, which is the one thing the crop
+          * gets to choose. A poster's faces and title sit in its upper half
+          * and its lower third is the billing block, so a centred band lands
+          * on somebody's chest.
           */}
         <div className={`sheet__hero${heroIsPoster ? ' sheet__hero--poster' : ''}`}>
-          {heroIsPoster && (
-            <img className="sheet__hero-blur" src={release.posterUrl} alt="" aria-hidden="true" />
-          )}
           <PosterArt
             className="art"
             title={release.title}

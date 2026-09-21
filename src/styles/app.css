@@ -2418,27 +2418,18 @@ a {
  * A poster standing in for a missing backdrop.
  *
  * See DetailSheet: the back catalogue has no backdrops at all, so every title
- * on Now streaming opened onto a generated gradient. A portrait poster cannot
- * be cropped into a 21:9 frame without becoming a band across somebody's
- * chest, so it is shown whole over an enlarged, blurred copy of itself — the
- * frame fills with the film's own colour rather than one belonging to nothing.
+ * on Now streaming opened onto a generated gradient. The poster fills the
+ * frame instead, the same shape a real backdrop takes — the alternative,
+ * showing the portrait whole over a blurred copy of itself, keeps more of the
+ * picture and reads as a small panel adrift in a wide frame.
  *
- * The scale is what hides the blur's soft edge: a blurred image is transparent
- * at its own border, and at 1:1 that leaves a pale halo inside the frame.
+ * All the crop gets to choose is where to take its band from. Centred lands on
+ * somebody's chest: a poster carries its faces and its title in the upper
+ * half and its billing block along the bottom. A third of the way down is
+ * where the subject usually is.
  */
-.sheet__hero-blur {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transform: scale(1.25);
-  filter: blur(26px) saturate(1.15) brightness(0.5);
-}
 .sheet__hero--poster .art--photo {
-  /* Over the blur, not over the flat panel colour .art--photo normally sits on. */
-  background: transparent;
-  object-fit: contain;
+  object-position: center 30%;
 }
 .sheet__hero .art__text {
   font-size: clamp(24px, 6cqw, 52px);
