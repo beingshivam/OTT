@@ -355,6 +355,32 @@ else {
     missing.length
       ? fail(S4, 'every sitemap entry exists', `${missing.length} of ${locs.length} are missing or noindex`, missing.slice(0, 5))
       : pass(S4, 'every sitemap entry exists', `${locs.length} entries`);
+
+    /*
+     * A date per URL, not one date on every URL.
+     *
+     * Every entry used to carry the build date, and once the refresh went
+     * daily that became "all 354 pages changed today, every day" — a field
+     * carrying no information, which Google says it discounts, and which
+     * spends the crawl budget evenly across pages that did not move. The
+     * dates now come from the archive's changedAt.
+     *
+     * The check is deliberately loose. It does not assert a distribution, only
+     * that the file distinguishes its pages at all: two distinct dates, and
+     * not everything stamped with the build. A quiet week where genuinely most
+     * pages moved together should not fail a build, and the failure this
+     * guards against is the regression to one date, which is unmistakable.
+     */
+    const stamps = [...sitemap.matchAll(/<lastmod>([^<]+)<\/lastmod>/g)].map((m) => m[1]);
+    const distinct = new Set(stamps);
+    const allBuilt = feed && stamps.every((d) => d === feed.generatedAt.slice(0, 10));
+    !stamps.length
+      ? fail(S4, 'sitemap dates tell the pages apart', 'no lastmod at all')
+      : distinct.size > 1 && !allBuilt
+        ? pass(S4, 'sitemap dates tell the pages apart',
+            `${distinct.size} distinct dates across ${stamps.length} URLs`)
+        : fail(S4, 'sitemap dates tell the pages apart',
+            allBuilt ? 'every URL carries the build date' : `all ${stamps.length} share one date`);
   }
 }
 

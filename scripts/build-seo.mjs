@@ -1673,14 +1673,51 @@ for (const pg of pages) await renderPage(pg, pages);
  * six entries' worth of reason to trust the file less. Each entry here has its
  * own path, its own prerendered content and its own canonical.
  */
-const lastmod = feed.generatedAt.slice(0, 10);
+/**
+ * One date per URL, and the date that URL last changed.
+ *
+ * Every entry used to carry the build date, so all 354 claimed to have changed
+ * today — and then the refresh went daily and they would have claimed it every
+ * day. That is the sitemap a crawler learns to discount: if everything always
+ * changed, the field carries no information, and Google says as much. Worse,
+ * it wastes the budget on the 300 pages that did not move and spends nothing
+ * extra on the four that did.
+ *
+ * `changedAt` comes from the archive, which compares each row against its last
+ * version on the fields a reader would notice — see SIGNIFICANT in
+ * archive.mjs. A title page takes its own row's date. A list page takes the
+ * newest date among the rows it lists, because that is when the list it prints
+ * last changed: /netflix is stale until a Netflix title moves.
+ *
+ * The build date is the floor, not the answer. A page with no dated rows
+ * behind it — or a build running before the archive has ever been written —
+ * gets the feed's own date rather than nothing, which is what the whole file
+ * used to be.
+ */
+const built = feed.generatedAt.slice(0, 10);
+const changedAt = new Map(
+  (archived ?? []).filter((t) => t.changedAt).map((t) => [t.id, t.changedAt]),
+);
+const lastmodFor = (pg) => {
+  const dates = (pg.rows ?? []).map((r) => changedAt.get(r.id)).filter(Boolean);
+  if (!dates.length) return built;
+  const newest = dates.reduce((a, b) => (a > b ? a : b));
+  /* Never ahead of the build that published it: a clock skew or a hand-edited
+     archive should not produce a sitemap claiming tomorrow. */
+  return newest > built ? built : newest;
+};
+
 const sitemap =
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
   pages
     .map(
       (pg) =>
-        `  <url><loc>${esc(`${SITE_URL}/${pg.path}`)}</loc><lastmod>${lastmod}</lastmod>` +
-        `<changefreq>weekly</changefreq><priority>${pg.path === '' ? '1.0' : pg.group === 'week' ? '0.5' : '0.8'}</priority></url>`,
+        `  <url><loc>${esc(`${SITE_URL}/${pg.path}`)}</loc><lastmod>${lastmodFor(pg)}</lastmod>` +
+        /* The calendar pages really do turn over daily now; a title page waits
+           for its film to do something. Google ignores this field either way,
+           so the only thing at stake is whether the file tells the truth. */
+        `<changefreq>${pg.group === 'root' || pg.group === 'week' ? 'daily' : 'weekly'}</changefreq>` +
+        `<priority>${pg.path === '' ? '1.0' : pg.group === 'week' ? '0.5' : '0.8'}</priority></url>`,
     )
     .join('\n') +
   `\n</urlset>\n`;

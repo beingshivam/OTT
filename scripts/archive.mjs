@@ -70,8 +70,42 @@ const before = byId.size;
 const defined = (row) =>
   Object.fromEntries(Object.entries(row).filter(([, v]) => v !== undefined && v !== null));
 
+/**
+ * The fields a change to which is worth telling a crawler about.
+ *
+ * This list is what drives <lastmod> in the sitemap, so what it leaves out
+ * matters more than what it includes. `heat`, `popularity`, `votes` and
+ * `rating` are all live TMDB numbers that drift every single run — include
+ * them and every one of the 354 URLs claims to have changed today, every day,
+ * which is precisely the sitemap Google learns to ignore. A film's score
+ * moving 6.8 to 6.9 is not a reason to recrawl its page.
+ *
+ * `lastSeen` and `weekId` are bookkeeping. Everything else here is something a
+ * reader would see: the platform it landed on, the date it moved to, the
+ * synopsis that arrived with enrichment, the poster that replaced a gradient.
+ */
+const SIGNIFICANT = [
+  'title',
+  'slug',
+  'kind',
+  'releaseDate',
+  'platforms',
+  'languages',
+  'genres',
+  'certification',
+  'runtimeMinutes',
+  'synopsis',
+  'cast',
+  'director',
+  'posterUrl',
+  'backdropUrl',
+  'trailerUrl',
+];
+const signature = (row) => JSON.stringify(SIGNIFICANT.map((k) => row[k] ?? null));
+
 let added = 0;
 let updated = 0;
+let restamped = 0;
 
 for (const week of feed.weeks) {
   for (const row of week.releases) {
@@ -83,6 +117,22 @@ for (const week of feed.weeks) {
       firstSeen: existing?.firstSeen ?? TODAY,
       lastSeen: TODAY,
     };
+    /*
+     * When this row last said something new, which is what <lastmod> means.
+     *
+     * Not when it was last written: every row is rewritten on every run, and a
+     * sitemap where all 354 URLs changed today is a sitemap a crawler stops
+     * believing. Google's own guidance is that lastmod should reflect a
+     * significant change, so this compares only the fields above and otherwise
+     * carries the old date forward untouched.
+     *
+     * A row with no changedAt yet is one written before this existed, not one
+     * that changed today — it inherits firstSeen, which is the last honest
+     * thing known about it.
+     */
+    const moved = !existing || signature(existing) !== signature(merged);
+    merged.changedAt = moved ? TODAY : (existing.changedAt ?? existing.firstSeen ?? TODAY);
+    if (moved && existing) restamped++;
     if (existing) {
       // Compared before writing so the counts describe real changes rather than
       // "every row, every run" — a diff of 300 touched rows twice a week is a
@@ -93,6 +143,28 @@ for (const week of feed.weeks) {
     }
     byId.set(row.id, merged);
   }
+}
+
+/*
+ * And the rows this run never saw.
+ *
+ * The feed is a rolling window, so most of the archive is not in it — 190 of
+ * 695 on the day this was written. The loop above only reaches rows the feed
+ * still carries, which left every older title without a changedAt, and a page
+ * with no date falls back to the build's own. That is the defect this whole
+ * change exists to remove, reappearing on exactly the pages it matters most
+ * for: the ones that have been answering the same question for months and
+ * genuinely have not moved.
+ *
+ * A row the feed has dropped is frozen — nothing can change it until it comes
+ * back — so the last day it was seen is the last day it could have changed.
+ * Written once and then carried, so this is a backfill that runs dry.
+ */
+let backfilled = 0;
+for (const row of byId.values()) {
+  if (row.changedAt) continue;
+  row.changedAt = row.lastSeen ?? row.firstSeen ?? TODAY;
+  backfilled++;
 }
 
 /**
@@ -115,5 +187,7 @@ const withPages = titles.filter(
 
 console.log(
   `archive: ${titles.length} titles (${before} before, +${added} new, ${updated} updated)\n` +
+    `         ${restamped} changed something a reader would see, and moved their lastmod\n` +
+    (backfilled ? `         ${backfilled} older rows dated from when the feed last carried them\n` : '') +
     `         ${withPages} carry enough metadata for a title page`,
 );
