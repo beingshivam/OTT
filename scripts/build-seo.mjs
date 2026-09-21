@@ -272,7 +272,13 @@ const platforms = [...new Set(rows.flatMap((r) => r.platforms))];
 // brand — as the old "… — OTT & theatres | New on OTT" did — spends characters
 // Google truncates on a word already in the sentence.
 const title = `${BRAND} this week (${range}) — every platform, plus cinemas`;
-const topPlatforms = [...new Set(rows.flatMap((r) => r.platforms))].map(pname).slice(0, 5);
+/* Services only. `theatres` is a platform in the registry and reads as one in
+   a list, so this printed "…on Netflix, Prime Video, In cinemas and more, plus
+   cinemas" — cinemas named twice in one sentence. */
+const topPlatforms = [...new Set(rows.flatMap((r) => r.platforms))]
+  .filter((id) => id !== 'theatres')
+  .map(pname)
+  .slice(0, 5);
 /**
  * Says where to watch, not just what is out.
  *
@@ -282,11 +288,19 @@ const topPlatforms = [...new Set(rows.flatMap((r) => r.platforms))].map(pname).s
  * Google result, so it is where the misunderstanding starts for anyone who
  * arrives from search.
  */
+/*
+ * Trimmed to what a result actually shows.
+ *
+ * This ran to 248 characters. Google displays around 155 and cuts the rest,
+ * so a third of it — "See which platform each one is on and open it there.
+ * Updated twice a week. No login." — was written for a reader who never saw
+ * it, and the sentence that answered "can I watch things here" was in the
+ * half that got cut. What survives now leads with the week, names the
+ * platforms, and says what the site does, inside the budget.
+ */
 const description =
-  `Every new film, series and show released this week — ${range}. ` +
-  `${rows.length} releases across ${platforms.length} platforms including ` +
-  `${topPlatforms.join(', ')}. See which platform each one is on and open it there. ` +
-  `Updated twice a week. No login.`;
+  `${BRAND}: every new film, series and show out this week in India — ${range}. ` +
+  `${rows.length} releases on ${topPlatforms.slice(0, 3).join(', ')} and more, plus cinemas.`;
 
 // --- what every page is built from ------------------------------------------
 
@@ -468,8 +482,51 @@ function movieNode(r, canonical) {
   };
 }
 
+/**
+ * The brand, on every title and every description.
+ *
+ * Asked for directly, and the audit backed it: the name was in 3 of 355 title
+ * tags and 0 of 355 descriptions. "New on OTT" is the site's own name and the
+ * query someone types when they are looking for it by name — a result that
+ * never says it cannot win that search, and a reader who saw the site last
+ * week has nothing to recognise in the listing.
+ *
+ * Applied here rather than in the eight places titles are written, because the
+ * ninth page type will be added by someone who does not know this rule exists.
+ * scripts/eval.mjs now fails a build where any page is missing it.
+ *
+ * Only where it is not already there, and never twice: the homepage leads with
+ * the brand and "New on OTT this week … | New on OTT" would spend the budget
+ * saying it again. `/theatres` already ends with it.
+ */
+const withBrand = (s) => (s.includes(BRAND) ? s : `${s} | ${BRAND}`);
+
+/**
+ * The same for a description, where the budget is real and the limit is
+ * different from the title's.
+ *
+ * Google shows about 155 characters and drops the rest, so a sentence past
+ * that is written for nobody. Where the brand will not fit, the description is
+ * already long enough to have said something — the title carries the name and
+ * this leaves the prose alone rather than truncating a sentence mid-word to
+ * make room. Nothing here is padded to reach a length; short is fine.
+ */
+const DESC_BUDGET = 158;
+const brandDescription = (s) => {
+  if (s.includes(BRAND)) return s;
+  /* Just the name. The first version appended "— New on OTT, updated every
+     Friday", which on the collection pages produced "…updated daily. —
+     New on OTT, updated daily." A description that repeats its own
+     clause reads as generated, which is the one impression a snippet cannot
+     afford. */
+  const suffixed = `${s} | ${BRAND}`;
+  return suffixed.length <= DESC_BUDGET ? suffixed : s;
+};
+
 async function renderPage(page, pages) {
   const canonical = `${SITE_URL}/${page.path}`;
+  const title = withBrand(page.title);
+  const description = brandDescription(page.description);
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -480,6 +537,31 @@ async function renderPage(page, pages) {
         url: `${SITE_URL}/`,
         description: 'Every new release, every platform, one page.',
         sameAs: [INSTAGRAM_URL],
+        /**
+         * The site's own search, described.
+         *
+         * One caveat worth recording rather than discovering later: this does
+         * not put a search box in a Google result any more. Google retired the
+         * sitelinks searchbox in 2024 and ignores the markup for that purpose.
+         * It stays because it is true, because it is part of how the site
+         * describes itself to anything reading the graph, and because Bing and
+         * other consumers still read it — not because it will draw a box.
+         *
+         * The target is a URL that works. /search is not a route this site
+         * defines, but every unrouted path falls through to the app and the
+         * query is read from ?q= whatever the path is, so /search?q=mirzapur
+         * lands on the results for Mirzapur. Verified in a browser, and
+         * scripts/eval.mjs now asserts it, because a structured-data promise
+         * pointing at a dead URL is worse than no promise.
+         */
+        potentialAction: {
+          '@type': 'SearchAction',
+          target: {
+            '@type': 'EntryPoint',
+            urlTemplate: `${SITE_URL}/search?q={search_term_string}`,
+          },
+          'query-input': 'required name=search_term_string',
+        },
       },
       // Breadcrumbs on the child pages only. A crumb trail on the homepage is
       // a trail of one, which tells a crawler nothing it did not have.
@@ -625,10 +707,10 @@ async function renderPage(page, pages) {
     `</main>`;
 
   const out = html
-    .replace(/<title>[\s\S]*?<\/title>/, `<title>${esc(page.title)}</title>`)
-    .replace(/<meta\s+name="description"[\s\S]*?\/>/, `<meta name="description" content="${esc(page.description)}" />`)
-    .replace(/<meta\s+property="og:title"[\s\S]*?\/>/, `<meta property="og:title" content="${esc(page.title)}" />`)
-    .replace(/<meta\s+property="og:description"[\s\S]*?\/>/, `<meta property="og:description" content="${esc(page.description)}" />`)
+    .replace(/<title>[\s\S]*?<\/title>/, `<title>${esc(title)}</title>`)
+    .replace(/<meta\s+name="description"[\s\S]*?\/>/, `<meta name="description" content="${esc(description)}" />`)
+    .replace(/<meta\s+property="og:title"[\s\S]*?\/>/, `<meta property="og:title" content="${esc(title)}" />`)
+    .replace(/<meta\s+property="og:description"[\s\S]*?\/>/, `<meta property="og:description" content="${esc(description)}" />`)
     .replace('</head>', `${head}  </head>`)
     .replace('<div id="root"></div>', `<div id="root">${prerendered}</div>`);
 
@@ -954,12 +1036,12 @@ for (const p of platformsPresent) {
     rows: list,
     title: theatres
       ? `New movies in cinemas this week in India — ${BRAND}`
-      : `New on ${p.name} India — every new release, updated weekly`,
+      : `New on ${p.name} India — every new release, updated daily`,
     description: theatres
-      ? `Every film opening in Indian cinemas this week and the weeks around it. ${list.length} titles, updated every Friday. No login.`
-      : `Everything new on ${p.name} in India — ${list.length} films, series and shows across ${stockedWeeks.length} weeks, updated every Friday. No app, no login.`,
+      ? `Every film opening in Indian cinemas this week and the weeks around it. ${list.length} titles, updated daily. No login.`
+      : `Everything new on ${p.name} in India — ${list.length} films, series and shows across ${stockedWeeks.length} weeks, updated daily. No app, no login.`,
     h1: theatres ? 'New in cinemas' : `New on ${p.name}`,
-    lede: `${list.length} releases across ${stockedWeeks.length} weeks, updated every Friday.`,
+    lede: `${list.length} releases across ${stockedWeeks.length} weeks, updated daily.`,
     facts: factsMarkup({
       rows: list,
       thisWeek: list.filter((r) => r.weekId === week.id),
@@ -1005,7 +1087,7 @@ for (const c of COLLECTIONS) {
     title: c.title,
     description: c.description.replace('{n}', String(list.length)),
     h1: c.label,
-    lede: `${list.length} titles across ${stockedWeeks.length} weeks, updated every Friday.`,
+    lede: `${list.length} titles across ${stockedWeeks.length} weeks, updated daily.`,
     facts: factsMarkup({
       rows: list,
       thisWeek: list.filter((r) => r.weekId === week.id),
@@ -1024,10 +1106,10 @@ for (const [code, name] of languagesPresent) {
     crumb: name,
     linkText: name,
     rows: list,
-    title: `New ${name} movies and series — every OTT platform, updated weekly`,
-    description: `Every new ${name} film, series and show across streaming platforms and cinemas — ${list.length} titles, updated every Friday. No app, no login.`,
+    title: `New ${name} movies and series — every OTT platform, updated daily`,
+    description: `Every new ${name} film, series and show across streaming platforms and cinemas — ${list.length} titles, updated daily. No app, no login.`,
     h1: `New ${name} releases`,
-    lede: `${list.length} ${name} titles across every platform and cinemas, updated every Friday.`,
+    lede: `${list.length} ${name} titles across every platform and cinemas, updated daily.`,
     facts: factsMarkup({
       rows: list,
       thisWeek: list.filter((r) => r.weekId === week.id),
@@ -1099,8 +1181,8 @@ if (catalogue.length >= MIN_PAGE_ROWS) {
     rows: catalogue,
     title: 'Best movies and shows streaming in India right now — every platform',
     description:
-      `${catalogue.length} well-rated films and series you can watch right now in India, ` +
-      `across ${platformCount} streaming services — grouped by language, and every one included with a subscription rather than rented.`,
+      `${catalogue.length} well-rated films and series streaming in India right now, ` +
+      `across ${platformCount} services — grouped by language, all included with a subscription.`,
     h1: 'Good things streaming right now',
     lede:
       `${catalogue.length} titles across ${platformCount} platforms, ranked within each language ` +
@@ -1265,7 +1347,7 @@ for (const { ym, list } of monthsPresent) {
     title: `${full} OTT and movie releases in India — every platform, plus cinemas`,
     description:
       `Everything releasing in ${full}: ${list.length} films, series and shows across ` +
-      `${new Set(list.flatMap((r) => r.platforms)).size} streaming platforms and Indian cinemas. Updated every Friday.`,
+      `${new Set(list.flatMap((r) => r.platforms)).size} streaming platforms and Indian cinemas. Updated daily.`,
     h1: `Releases in ${full}`,
     lede:
       `${list.length} releases in ${full} — ${cinema} in cinemas, ${list.length - cinema} straight to streaming.`,
@@ -1314,7 +1396,7 @@ for (const w of [...stockedWeeks].sort((a, b) => b.id.localeCompare(a.id))) {
  *
  * The highest-volume recurring pattern in Indian entertainment search, and the
  * one this site can answer better than anyone: it already knows what opened in
- * cinemas and it re-checks streaming providers twice a week, so the page flips
+ * cinemas and it re-checks streaming providers every day, so the page flips
  * from "not announced" to the answer within days of the actual drop.
  *
  * Published the week the film opens, not the week it streams. A page indexed
@@ -1387,9 +1469,13 @@ for (const r of titlePages) {
       ? `Streaming on ${landsOn} from ${landsDate}.`
       : upcoming
         ? `In cinemas from ${opensOn}. No streaming date yet — a film is normally picked up by a platform after its theatrical run, and this page updates automatically when one announces.`
-        : `Not announced yet — no streaming date has been confirmed. This page updates automatically; every platform is re-checked twice a week.`;
+        : `Not announced yet — no streaming date has been confirmed. This page updates automatically; every platform is re-checked every day.`;
 
   const langs = (r.languages ?? []).map(lname);
+  /* "Aasha (Malayalam)" — written once because all five description states
+     open with it, and repeating the ternary five times is where a difference
+     creeps in that nobody meant. */
+  const named = `${r.title}${langs.length ? ` (${langs.join(', ')})` : ''}`;
 
   /**
    * How a person would name this thing out loud: "Telugu movie", "Hindi series".
@@ -1500,27 +1586,21 @@ for (const r of titlePages) {
      *
      * It was true, and it stays true — what changes is that it no longer
      * leads. The page really does carry the cinema date, the cast, the runtime
-     * and the trailer, and it really does re-check twice a week, so the
+     * and the trailer, and it really does re-check every day, so the
      * description opens with those and closes on the honest part. No invented
      * date, no implied platform: a reader who clicks finds exactly what the
      * snippet promised.
      */
     description:
       streaming.length && !upcoming
-        ? `${r.title}${langs.length ? ` (${langs.join(', ')})` : ''} is streaming now on ${on} in India. ` +
-          `Cast, runtime, certificate and trailer, plus every other new release this week.`
+        ? `${named} is streaming now on ${on} in India — cast, runtime, certificate and trailer. ${BRAND}.`
         : streaming.length
-          ? `${r.title}${langs.length ? ` (${langs.join(', ')})` : ''} lands on ${on} in India on ${opensOn}. ` +
-            `Cast, runtime, certificate and trailer, plus everything else arriving that week.`
+          ? `${named} lands on ${on} in India on ${opensOn} — cast, runtime, certificate and trailer. ${BRAND}.`
           : streamsOn
-            ? `${r.title}${langs.length ? ` (${langs.join(', ')})` : ''} starts streaming on ${landsOn} in India on ${landsDate}, ` +
-              `after its cinema release on ${opensOn}. Cast, runtime, certificate and trailer, plus everything else landing that week.`
+            ? `${named} starts streaming on ${landsOn} from ${landsDate}, after cinemas on ${opensOn}. Cast, runtime and trailer. ${BRAND}.`
             : upcoming
-            ? `${r.title}${langs.length ? ` (${langs.join(', ')})` : ''} opens in Indian cinemas on ${opensOn}. ` +
-              `Cast, runtime, certificate and trailer — plus the OTT date, tracked twice a week from the day it lands.`
-            : `Where to watch ${r.title}${langs.length ? ` (${langs.join(', ')})` : ''}: cinema release ${opensOn}, ` +
-              `full cast, runtime, certificate and trailer. We check every OTT platform twice a week and post the ` +
-              `streaming date here the day it is announced.`,
+            ? `${named} opens in Indian cinemas on ${opensOn} — cast, runtime, certificate and trailer, plus its OTT date the day it lands. ${BRAND}.`
+            : `${named} — in cinemas ${opensOn}. Cast, runtime, certificate and trailer, and the OTT release date here the day it is announced. ${BRAND}.`,
     /**
      * The heading asked "When is X coming to OTT?" even when the answer block
      * directly beneath it said "Streaming now on Netflix" — the page

@@ -63,6 +63,12 @@ const feed = await maybe(resolve(DIST, 'data/releases.json'));
 const catalogue = await maybe(resolve(ROOT, 'public/data/catalogue.json'));
 const archive = await maybe(resolve(ROOT, 'data/archive.json'));
 const registrySrc = await readFile(resolve(ROOT, 'src/data/platforms.ts'), 'utf8').catch(() => '');
+const workerCfg = await readFile(resolve(ROOT, 'wrangler.jsonc'), 'utf8').catch(() => '');
+/** Read from the app's own source rather than repeated here, so a rename of the
+ *  site cannot leave this grader asserting the old one. */
+const BRAND =
+  (await readFile(resolve(ROOT, 'src/data/brand.ts'), 'utf8').catch(() => ''))
+    .match(/BRAND\s*=\s*'([^']+)'/)?.[1] ?? 'New on OTT';
 const PLATFORM_IDS = new Set([...registrySrc.matchAll(/\{\s*id:\s*'([^']+)'/g)].map((m) => m[1]));
 
 /** Every generated page on disk, as path → html. */
@@ -245,6 +251,76 @@ else {
         badH1.slice(0, 5).map(([p, html]) => `${p} — ${(html.match(/<h1[\s>]/g) ?? []).length} h1s`))
     : pass(S4, 'every page has exactly one h1');
 
+  /*
+   * The brand, on every title and every description.
+   *
+   * Asked for, and the audit that prompted it found the name in 3 of 355 title
+   * tags and none of the descriptions. The generator now adds it centrally
+   * (withBrand in build-seo.mjs), which is exactly the kind of rule that holds
+   * until someone adds a ninth page type — so it is checked rather than
+   * trusted. Noindex pages are already out of `pages` above; /diag is not a
+   * result anybody will ever see.
+   */
+  const noBrandTitle = [...pages].filter(
+    ([, html]) => !(html.match(/<title>([^<]*)<\/title>/)?.[1] ?? '').includes(BRAND),
+  );
+  noBrandTitle.length
+    ? fail(S4, 'every title names the site', `${noBrandTitle.length} do not`,
+        noBrandTitle.slice(0, 5).map(([p]) => p))
+    : pass(S4, 'every title names the site', `${pages.size} pages`);
+
+  const descOf = (html) => html.match(/name="description" content="([^"]*)"/)?.[1] ?? '';
+  const noBrandDesc = [...pages].filter(([, html]) => !descOf(html).includes(BRAND));
+  noBrandDesc.length
+    ? fail(S4, 'every description names the site', `${noBrandDesc.length} do not`,
+        noBrandDesc.slice(0, 5).map(([p]) => p))
+    : pass(S4, 'every description names the site');
+
+  /*
+   * Long enough to say something, short enough to be read.
+   *
+   * Google shows about 155 characters. Over that is not a penalty, it is
+   * waste — the tail is written for nobody — and this caught the homepage at
+   * 248 and every title page at 205. The ceiling is loose because a long film
+   * name is worth more than a tidy length, and it is the film's name that
+   * pushes the last forty over.
+   */
+  const badLen = [...pages].filter(([, html]) => {
+    const d = descOf(html);
+    return d.length < 70 || d.length > 210;
+  });
+  badLen.length
+    ? fail(S4, 'descriptions fit a search result', `${badLen.length} outside 70-210 chars`,
+        badLen.slice(0, 5).map(([p, html]) => `${p} — ${descOf(html).length}`))
+    : pass(S4, 'descriptions fit a search result');
+
+  /*
+   * The search URL the structured data promises.
+   *
+   * The WebSite node carries a SearchAction pointing at /search?q=. That path
+   * is not a route this site defines — it works because unrouted paths fall
+   * through to the app, which reads ?q= whatever the path is. That is a real
+   * behaviour and a fragile one, so it is asserted: a published promise
+   * pointing at a dead URL is worse than no promise.
+   */
+  const home = pages.get('/') ?? '';
+  const action = home.match(/"urlTemplate":"([^"]+)"/)?.[1] ?? '';
+  const searchPath = action.replace(/^https?:\/\/[^/]+/, '').split('?')[0];
+  /* Either the path is a page we generated, or the SPA fallback answers it —
+     and that fallback is a line in wrangler.jsonc, not an assumption, so it is
+     read rather than believed. The first version of this check accepted
+     '/search' by name, which made it pass because it was written to. */
+  const spaFallback = /"not_found_handling"\s*:\s*"single-page-application"/.test(workerCfg);
+  const servedByApp = spaFallback && searchPath.startsWith('/') && !/\.[a-z0-9]+$/i.test(searchPath);
+  const ok =
+    action.includes('{search_term_string}') &&
+    (onDisk.has(searchPath) || onDisk.has(`${searchPath}/`) || servedByApp);
+  ok
+    ? pass(S4, 'the searchbox action points somewhere real',
+        `${action}${onDisk.has(searchPath) ? '' : ' (via the SPA fallback)'}`)
+    : fail(S4, 'the searchbox action points somewhere real',
+        action ? `${action} — nothing serves ${searchPath}` : 'no SearchAction found');
+
   const badCanon = [...pages].filter(([path, html]) => {
     const m = html.match(/rel="canonical" href="([^"]+)"/);
     if (!m) return true;
@@ -331,8 +407,15 @@ const S6 = 'Refresh schedule';
   if (!workflow || !freshness) skip(S6, 'the footer promises the schedule that runs', 'file missing');
   else {
     const DAY = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-    const cron = [...workflow.matchAll(/cron:\s*'(\d+)\s+(\d+)\s+\*\s+\*\s+(\d)'/g)]
-      .map(([, minute, hour, day]) => `${day}:${hour}:${minute}`)
+    /* A day field can be a list. `30 4 * * 0,2,3,4` is one line and four runs,
+       and the first version of this read only a single digit — so adding the
+       daily schedule made the cron look like four runs against freshness's
+       eight, and this check failed the build rather than the schedule. It was
+       right to fail: it could not see what it was comparing. */
+    const cron = [...workflow.matchAll(/cron:\s*'(\d+)\s+(\d+)\s+\*\s+\*\s+([\d,]+)'/g)]
+      .flatMap(([, minute, hour, days]) =>
+        days.split(',').map((day) => `${day}:${hour}:${minute}`),
+      )
       .sort();
     const copy = [...freshness.matchAll(/\{\s*day:\s*(\d+),\s*hour:\s*(\d+),\s*minute:\s*(\d+)\s*\}/g)]
       .map(([, day, hour, minute]) => `${day}:${hour}:${minute}`)

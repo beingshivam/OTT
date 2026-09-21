@@ -58,7 +58,7 @@ export const COLLECTIONS: Collection[] = [
      */
     title: 'New South Indian movies and shows — Tamil, Telugu, Malayalam, Kannada',
     description:
-      'Every new South Indian release — {n} Tamil, Telugu, Malayalam and Kannada films and series across streaming platforms and cinemas. Updated every Friday. No app, no login.',
+      'Every new South Indian release — {n} Tamil, Telugu, Malayalam and Kannada films and series, on streaming and in cinemas. Updated daily.',
   },
   {
     slug: 'web-series',
@@ -67,7 +67,7 @@ export const COLLECTIONS: Collection[] = [
     kinds: ['series'],
     title: 'New web series this week — every OTT platform in India',
     description:
-      '{n} new web series across Netflix, Prime Video, JioHotstar, SonyLIV, ZEE5 and more. Updated every Friday. No app, no login.',
+      '{n} new web series across Netflix, Prime Video, JioHotstar, SonyLIV, ZEE5 and more. Updated daily. No app, no login.',
   },
   {
     slug: 'documentaries',
@@ -76,7 +76,7 @@ export const COLLECTIONS: Collection[] = [
     kinds: ['documentary'],
     title: 'New documentaries on OTT in India — every platform',
     description:
-      '{n} new documentaries and docuseries across every Indian streaming platform, updated every Friday. No app, no login.',
+      '{n} new documentaries and docuseries across every Indian streaming platform, updated daily. No app, no login.',
   },
   {
     slug: 'thriller',
@@ -85,7 +85,7 @@ export const COLLECTIONS: Collection[] = [
     genres: ['Thriller'],
     title: 'New thriller movies and series on OTT in India',
     description:
-      '{n} new thrillers across streaming platforms and cinemas in India, updated every Friday. No app, no login.',
+      '{n} new thrillers across streaming platforms and cinemas in India, updated daily. No app, no login.',
   },
   {
     slug: 'comedy',
@@ -94,7 +94,7 @@ export const COLLECTIONS: Collection[] = [
     genres: ['Comedy'],
     title: 'New comedy movies and series on OTT in India',
     description:
-      '{n} new comedies across streaming platforms and cinemas in India, updated every Friday. No app, no login.',
+      '{n} new comedies across streaming platforms and cinemas in India, updated daily. No app, no login.',
   },
   {
     slug: 'action',
@@ -103,7 +103,7 @@ export const COLLECTIONS: Collection[] = [
     genres: ['Action'],
     title: 'New action movies and series on OTT in India',
     description:
-      '{n} new action films and series across streaming platforms and cinemas in India, updated every Friday.',
+      '{n} new action films and series across streaming platforms and cinemas in India, updated daily.',
   },
   {
     slug: 'romance',
@@ -112,7 +112,7 @@ export const COLLECTIONS: Collection[] = [
     genres: ['Romance'],
     title: 'New romantic movies and series on OTT in India',
     description:
-      '{n} new romantic films and series across streaming platforms and cinemas in India, updated every Friday.',
+      '{n} new romantic films and series across streaming platforms and cinemas in India, updated daily.',
   },
   {
     slug: 'crime',
@@ -121,7 +121,7 @@ export const COLLECTIONS: Collection[] = [
     genres: ['Crime'],
     title: 'New crime movies and series on OTT in India',
     description:
-      '{n} new crime films and series across streaming platforms and cinemas in India, updated every Friday.',
+      '{n} new crime films and series across streaming platforms and cinemas in India, updated daily.',
   },
   {
     slug: 'horror',
@@ -130,7 +130,7 @@ export const COLLECTIONS: Collection[] = [
     genres: ['Horror'],
     title: 'New horror movies and series on OTT in India',
     description:
-      '{n} new horror films and series across streaming platforms and cinemas in India, updated every Friday.',
+      '{n} new horror films and series across streaming platforms and cinemas in India, updated daily.',
   },
   {
     slug: 'international',
@@ -139,7 +139,7 @@ export const COLLECTIONS: Collection[] = [
     languages: ['ko', 'ja', 'es', 'fr', 'de', 'zh'],
     title: 'New Korean, Japanese and international shows on OTT in India',
     description:
-      '{n} new Korean, Japanese, Spanish and other international films and series streaming in India, updated every Friday.',
+      '{n} new Korean, Japanese, Spanish and other international films and series streaming in India, updated daily.',
   },
   /**
    * Deliberately absent, and worth writing down so nobody adds them back:

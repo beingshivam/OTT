@@ -14,7 +14,7 @@ import { BRAND } from '../data/brand';
  *
  * The highest-volume recurring pattern in Indian entertainment search, and the
  * one question this site is uniquely placed to answer: it already tracks what
- * opened in cinemas and it already re-checks streaming providers twice a week,
+ * opened in cinemas and it already re-checks streaming providers every day,
  * so the moment a theatrical title gains one, this page has the answer while
  * everyone else is still guessing.
  *
@@ -215,7 +215,7 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
               <>
                 <strong>Not announced yet.</strong> {release.title} has not been dated for any
                 streaming platform. This page updates automatically — we re-check every platform
-                twice a week, so it will say so here the day that changes.
+                every day, so it will say so here the day that changes.
               </>
             )}
           </div>

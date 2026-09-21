@@ -298,6 +298,12 @@ const REFRESH_SLOTS = [
   { day: 5, hour: 8, minute: 30 }, // Fri 08:30 UTC — the week flips, drops included
   { day: 6, hour: 4, minute: 30 }, // Sat 04:30 UTC — anything that landed late
   { day: 1, hour: 13, minute: 30 }, // Mon 13:30 UTC — the weekend and the week ahead
+  // The four days the three above do not cover, so the calendar is never more
+  // than a day old. See the cron block in refresh-releases.yml.
+  { day: 0, hour: 4, minute: 30 }, // Sun 04:30 UTC
+  { day: 2, hour: 4, minute: 30 }, // Tue 04:30 UTC
+  { day: 3, hour: 4, minute: 30 }, // Wed 04:30 UTC
+  { day: 4, hour: 4, minute: 30 }, // Thu 04:30 UTC
 ];
 
 /**

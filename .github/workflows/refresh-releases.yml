@@ -1,6 +1,6 @@
 name: Refresh release calendar
 
-# Three runs a week, and when Friday runs is the point.
+# One run a day, and when Friday runs is the point.
 #
 # TMDB assigns a streaming provider *after* a title is available — the reason
 # scripts/fetch-releases.mjs has to ask for theatrical dates separately. So a
@@ -9,9 +9,10 @@ name: Refresh release calendar
 # ahead, and leaves that day's streaming arrivals unplaced. A Friday-morning run
 # is therefore freshest exactly when it knows least about the day it describes.
 #
-# One run per day, three days. Friday flips the week and reports its drops;
+# One run per day, every day. Friday flips the week and reports its drops;
 # Saturday catches anything that landed late; Monday evening picks up the
-# weekend's corrections and the week taking shape.
+# weekend's corrections and the week taking shape; the rest keep the calendar
+# from ever being more than a day behind what has actually landed.
 #
 # Friday is at 14:00 IST rather than 08:00, which is the whole lesson here and
 # was arrived at the expensive way. TMDB assigns a title its watch provider on
@@ -61,6 +62,21 @@ on:
     - cron: '30 8 * * 5'  # Fri 08:30 UTC — Friday 14:00 IST, the week flips and its drops exist
     - cron: '30 4 * * 6'  # Sat 04:30 UTC — Saturday 10:00 IST, anything that landed late
     - cron: '30 13 * * 1' # Mon 13:30 UTC — Monday 19:00 IST, the weekend and the week ahead
+    # And the rest of the week, so the calendar is never more than a day old.
+    #
+    # Asked for as "update the homepage daily for content freshness", and the
+    # usual version of that request is worthless — republishing an unchanged
+    # page daily is a thing Google detects and discounts. This is not that. The
+    # feed genuinely changes every day: titles land on OTT on a Tuesday, TMDB
+    # attaches a provider the day a film becomes available, and the "opened
+    # this week" band on the cinema rail turns over as the week fills. A run on
+    # a Wednesday has new facts to publish, and before this the site sat on
+    # them until Friday.
+    #
+    # Sunday, Tuesday, Wednesday and Thursday only: the other three days
+    # already have a run, and a second one would queue behind it on the
+    # concurrency group and commit the same calendar twice.
+    - cron: '30 4 * * 0,2,3,4' # 04:30 UTC — 10:00 IST, the four days not covered above
   workflow_dispatch:
     inputs:
       weeks_back:

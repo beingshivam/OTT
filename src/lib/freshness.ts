@@ -34,6 +34,10 @@ const SCHEDULE = [
   { day: 5, hour: 8, minute: 30 }, // Fri 08:30 UTC — Friday 14:00 IST
   { day: 6, hour: 4, minute: 30 }, // Sat 04:30 UTC — Saturday 10:00 IST
   { day: 1, hour: 13, minute: 30 }, // Mon 13:30 UTC — Monday 19:00 IST
+  { day: 0, hour: 4, minute: 30 }, // Sun 04:30 UTC — 10:00 IST
+  { day: 2, hour: 4, minute: 30 }, // Tue 04:30 UTC — 10:00 IST
+  { day: 3, hour: 4, minute: 30 }, // Wed 04:30 UTC — 10:00 IST
+  { day: 4, hour: 4, minute: 30 }, // Thu 04:30 UTC — 10:00 IST
 ];
 
 /** The next runs after `now`, soonest first. */
@@ -64,7 +68,14 @@ export function nextRefreshLabel(now = new Date()): string {
 /**
  * e.g. "Fridays, Saturdays & Mondays" in India — the same runs, named in the
  * reader's own timezone, which is why this is derived rather than written down.
- * A reader in London gets the same three runs on the days they land there.
+ * A reader in London gets the same runs on the days they land there.
+ *
+ * "Daily" once every day has one, which it now does. Naming all seven —
+ * "Refreshes Sundays, Mondays, Tuesdays, Wednesdays, Thursdays, Fridays &
+ * Saturdays" — is a list nobody reads to the end and a worse way of saying a
+ * simpler thing. Derived rather than hardcoded for the same reason the list
+ * is: whoever thins the schedule back out should get the day names back
+ * without having to remember this line exists.
  */
 export function refreshDaysLabel(now = new Date()): string {
   const names = [
@@ -75,6 +86,7 @@ export function refreshDaysLabel(now = new Date()): string {
         .map((d) => `${d.toLocaleDateString(undefined, { weekday: 'long' })}s`),
     ),
   ];
+  if (names.length >= 7) return 'daily';
   if (names.length <= 1) return names.join('');
   // "A & B" for two, "A, B & C" for more — an ampersand only before the last.
   return `${names.slice(0, -1).join(', ')} & ${names[names.length - 1]}`;
