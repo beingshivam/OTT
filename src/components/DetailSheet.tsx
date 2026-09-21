@@ -52,6 +52,10 @@ export function DetailSheet({ release, onClose }: Props) {
    *   cinema, out           the genuine article: out of cinemas, no OTT date
    *                         yet, and that question is what the page exists for
    */
+  /* Artwork for the hero, and whether it is standing in — see the frame below. */
+  const hero = release.backdropUrl ?? release.posterUrl;
+  const heroIsPoster = !release.backdropUrl && Boolean(release.posterUrl);
+
   const streams = release.platforms.some((id) => id !== 'theatres');
   /* Derived the same way as the page's own heading (ReleaseDatePage), so the
      button and the page it opens can never disagree about the tense. */
@@ -130,12 +134,39 @@ export function DetailSheet({ release, onClose }: Props) {
           <IconClose />
         </button>
         <div className="sheet__scroll">
-        <div className="sheet__hero">
+        {/*
+          * The poster stands in when there is no backdrop.
+          *
+          * Reported on Now streaming: open anything there and the artwork is
+          * missing. The hero reads backdropUrl and the back catalogue has
+          * none — zero of 664 rows — because fetch-catalogue never carried
+          * backdrop_path, so every title on that lens opened onto the
+          * generated gradient. The same gap hits the calendar more quietly:
+          * 105 of its 495 rows have a poster and no backdrop.
+          *
+          * The catalogue now collects backdrops (fetch-catalogue.mjs) and
+          * will have them after the next Monday pass. This is the other half,
+          * and it is worth having on its own: TMDB simply does not have a
+          * backdrop for every title, and a small Malayalam release is exactly
+          * the kind that goes without. There is always a poster.
+          *
+          * A portrait poster in a 21:9 frame cannot be cropped to fit — cover
+          * would leave a band across somebody's chest. So it is shown whole,
+          * over a blurred, enlarged copy of itself, which fills the frame with
+          * the film's own colour instead of a gradient belonging to nothing.
+          * A second <img> rather than a CSS background: same URL, so the
+          * browser serves it from cache, and no third-party string ends up
+          * inside a style attribute.
+          */}
+        <div className={`sheet__hero${heroIsPoster ? ' sheet__hero--poster' : ''}`}>
+          {heroIsPoster && (
+            <img className="sheet__hero-blur" src={release.posterUrl} alt="" aria-hidden="true" />
+          )}
           <PosterArt
             className="art"
             title={release.title}
             platformId={p.id}
-            imageUrl={release.backdropUrl}
+            imageUrl={hero}
             quiet
           />
           <span className="sheet__hero-scrim" />

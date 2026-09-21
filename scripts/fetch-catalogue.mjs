@@ -360,6 +360,7 @@ outer: for (const lang of LANGUAGES) {
           genreIds: item.genre_ids ?? [],
           synopsis: item.overview || undefined,
           posterUrl: item.poster_path ? `${IMG}/w500${item.poster_path}` : undefined,
+          backdropUrl: item.backdrop_path ? `${IMG}/w1280${item.backdrop_path}` : undefined,
           regions: [REGION],
         });
         found++;
@@ -422,6 +423,7 @@ if (!stopped) {
             genreIds: item.genre_ids ?? [],
             synopsis: item.overview || undefined,
             posterUrl: item.poster_path ? `${IMG}/w500${item.poster_path}` : undefined,
+            backdropUrl: item.backdrop_path ? `${IMG}/w1280${item.backdrop_path}` : undefined,
             regions: [REGION],
           });
         }
