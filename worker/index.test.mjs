@@ -628,5 +628,171 @@ await test('a capitalised path with a trailing slash ends up lowercase and slash
   assert.notEqual(third.status, 301, 'three hops means a loop');
 });
 
-console.log(results.join('\n'));
-console.log(process.exitCode ? '\nsome checks failed' : `\n${results.length} checks passed`);
+/*
+ * Printed on exit rather than here, because "here" has been wrong twice.
+ *
+ * This was a pair of console.logs at the end of the file, and twice now a
+ * batch of tests has been appended below them — passing, uncounted, invisible.
+ * The first time it printed 41 lines under a tally of 45 and the fix was to
+ * move the printer. It was the same fix as moving a deckchair: the next person
+ * to append tests hit it again, which is this comment's whole reason for
+ * existing.
+ *
+ * An exit handler cannot be appended past. The trap is gone rather than
+ * relocated.
+ */
+process.on('exit', () => {
+  console.log(results.join('\n'));
+  console.log(process.exitCode ? '\nsome checks failed' : `\n${results.length} checks passed`);
+});
+
+/*
+ * Search, which is the first thing this Worker answers that it is allowed to
+ * cache and the first that reaches a third party on a reader's behalf.
+ *
+ * The cases that matter are the dishonest ones: claiming a corpus it cannot
+ * reach, and turning a TMDB outage into a broken search box rather than a
+ * smaller one.
+ */
+const ctx = { waitUntil() {} };
+
+/** caches.default does not exist outside Workers; this is enough of it. */
+function fakeCache() {
+  const store = new Map();
+  globalThis.caches = {
+    default: {
+      async match(req) {
+        const hit = store.get(req.url);
+        return hit ? hit.clone() : undefined;
+      },
+      async put(req, res) {
+        store.set(req.url, res.clone());
+      },
+    },
+  };
+  return store;
+}
+
+await test('with no token, search says so rather than pretending', async () => {
+  // The front end reads `remote` to decide whether it may print "1M+ titles".
+  // A placeholder promising a million over a search of nine hundred is the
+  // lie this flag exists to prevent.
+  fakeCache();
+  const res = await worker.fetch(new Request(`${ORIGIN}/api/search?q=rajini`), {}, ctx);
+  const body = await res.json();
+  assert.equal(res.status, 200);
+  assert.equal(body.remote, false);
+  assert.deepEqual(body.results, []);
+});
+
+await test('an empty query is a capability probe, and costs no upstream call', async () => {
+  fakeCache();
+  let called = 0;
+  globalThis.fetch = async () => {
+    called++;
+    return { ok: true, json: async () => ({ results: [] }) };
+  };
+  const res = await worker.fetch(new Request(`${ORIGIN}/api/search?q=`), { TMDB_TOKEN: 't' }, ctx);
+  const body = await res.json();
+  assert.equal(body.remote, true, 'it reports the capability');
+  assert.equal(called, 0, 'and asks TMDB nothing');
+});
+
+await test('results are trimmed to what a row draws', async () => {
+  fakeCache();
+  globalThis.fetch = async () => ({
+    ok: true,
+    json: async () => ({
+      total_results: 1240,
+      results: [
+        { media_type: 'movie', id: 11, title: 'Coolie', release_date: '2026-08-14',
+          poster_path: '/a.jpg', original_language: 'ta', overview: 'x'.repeat(900), popularity: 9 },
+        { media_type: 'person', id: 22, name: 'Rajinikanth', profile_path: '/p.jpg',
+          known_for_department: 'Acting', known_for: [{ title: 'Muthu' }, { name: 'Enthiran' }] },
+        { media_type: 'collection', id: 33, name: 'Ignore me' },
+      ],
+    }),
+  });
+  const res = await worker.fetch(new Request(`${ORIGIN}/api/search?q=coolie`), { TMDB_TOKEN: 't' }, ctx);
+  const body = await res.json();
+
+  assert.equal(body.total, 1240);
+  assert.equal(body.results.length, 2, 'a collection is neither a title nor a person');
+  const [film, person] = body.results;
+  assert.deepEqual(film, {
+    kind: 'film', id: 'm-11', title: 'Coolie', year: '2026', image: '/img/w185/a.jpg', lang: 'ta',
+  });
+  assert.equal(JSON.stringify(film).includes('overview'), false, 'the 900-byte synopsis is dropped');
+  assert.equal(person.kind, 'person');
+  assert.equal(person.id, 'p-22');
+  assert.deepEqual(person.knownFor, ['Muthu', 'Enthiran']);
+});
+
+await test('the id shape matches the feed, so a remote hit can be matched to a local row', async () => {
+  // Without this the same film appears twice — once from the calendar and once
+  // from TMDB — which reads as a bug and wastes the row that could have said
+  // where to watch it.
+  fakeCache();
+  globalThis.fetch = async () => ({
+    ok: true,
+    json: async () => ({ results: [{ media_type: 'tv', id: 77, name: 'Show', first_air_date: '2026-01-02' }] }),
+  });
+  const res = await worker.fetch(new Request(`${ORIGIN}/api/search?q=show`), { TMDB_TOKEN: 't' }, ctx);
+  const [row] = (await res.json()).results;
+  assert.equal(row.id, 't-77');
+  assert.equal(row.kind, 'series');
+});
+
+await test('a TMDB outage shrinks the search instead of breaking it', async () => {
+  // The local half has already rendered by the time this returns. An error
+  // here would replace useful results with a message nobody can act on.
+  fakeCache();
+  globalThis.fetch = async () => {
+    throw new Error('network');
+  };
+  const res = await worker.fetch(new Request(`${ORIGIN}/api/search?q=x`), { TMDB_TOKEN: 't' }, ctx);
+  assert.equal(res.status, 200);
+  const body = await res.json();
+  assert.equal(body.degraded, true);
+  assert.deepEqual(body.results, []);
+});
+
+await test('a repeated query is served from the edge, not from TMDB', async () => {
+  fakeCache();
+  let calls = 0;
+  globalThis.fetch = async () => {
+    calls++;
+    return { ok: true, json: async () => ({ results: [{ media_type: 'movie', id: 1, title: 'A' }] }) };
+  };
+  const env = { TMDB_TOKEN: 't' };
+  await worker.fetch(new Request(`${ORIGIN}/api/search?q=Kantara`), env, ctx);
+  await worker.fetch(new Request(`${ORIGIN}/api/search?q=kantara`), env, ctx);
+  assert.equal(calls, 1, 'case differs, the query does not');
+});
+
+await test('the watchdog says whether search has a credential, without saying what it is', async () => {
+  /*
+   * The one way to find out. Search degrades quietly by design — a Worker with
+   * no TMDB binding returns an honest empty half and the box drops its "1M+"
+   * claim — so a secret that was never added looks exactly like a search that
+   * found nothing. The token is bound to Actions for the refresh and has to be
+   * bound here separately, which is precisely the step that gets missed.
+   */
+  const withToken = await (
+    await worker.fetch(new Request(`${ORIGIN}/api/watchdog`), { TMDB_TOKEN: 'secret-value' }, ctx)
+  ).json();
+  const without = await (await worker.fetch(new Request(`${ORIGIN}/api/watchdog`), {}, ctx)).json();
+
+  assert.equal(withToken.searchable, true);
+  assert.equal(without.searchable, false);
+  assert.ok(
+    !JSON.stringify(withToken).includes('secret-value'),
+    'it reports that the binding exists, never its contents',
+  );
+});
+
+await test('search is a GET', async () => {
+  fakeCache();
+  const res = await worker.fetch(new Request(`${ORIGIN}/api/search?q=a`, { method: 'POST' }), {}, ctx);
+  assert.equal(res.status, 405);
+});

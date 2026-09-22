@@ -29,12 +29,22 @@ import type { Filters, Release } from '../types';
 interface Props {
   releases: Release[];
   filters: Filters;
+  /**
+   * Rendered as a section of the header menu rather than as a popover of its
+   * own: no trigger, no dismissal, just the two items.
+   *
+   * It used to be one of two popovers sitting side by side in the header, which
+   * meant both could be open at once and overlapping. Now that everything but
+   * search lives behind one menu, a popover inside a popover would be the same
+   * bug wearing a different hat.
+   */
+  inline?: boolean;
 }
 
 type Kind = 'board' | 'posters';
 type State = 'idle' | 'working' | 'done' | 'error';
 
-export function ShareWeek({ releases, filters }: Props) {
+export function ShareWeek({ releases, filters, inline }: Props) {
   const [open, setOpen] = useState(false);
   const [state, setState] = useState<State>('idle');
   const [busy, setBusy] = useState<Kind | null>(null);
@@ -91,6 +101,48 @@ export function ShareWeek({ releases, filters }: Props) {
 
   const disabled = releases.length === 0;
 
+  /*
+    No explainer above the two items.
+    There was one — "Saves a picture of this week with newonott.in on it" —
+    and it was the largest text in the menu, at the top, read by somebody
+    who had already decided to share. The items say what they do, and that
+    the card carries the address is the reason this feature exists rather
+    than something a reader needs told.
+  */
+  const items = (
+    <>
+      <button
+        className={inline ? 'hmenu__item' : 'share__item'}
+        role="menuitem"
+        onClick={() => make('board')}
+        disabled={disabled || state === 'working'}
+      >
+        <IconRows />
+        <span>
+          <strong>Board image</strong>
+          <small>Every title, grouped by platform</small>
+        </span>
+        {busy === 'board' && <span className="share__spin" aria-hidden="true" />}
+      </button>
+      <button
+        className={inline ? 'hmenu__item' : 'share__item'}
+        role="menuitem"
+        onClick={() => make('posters')}
+        disabled={disabled || state === 'working'}
+      >
+        <IconGrid />
+        <span>
+          <strong>Poster image</strong>
+          <small>The week as artwork</small>
+        </span>
+        {busy === 'posters' && <span className="share__spin" aria-hidden="true" />}
+      </button>
+      {state === 'error' && <p className="share__error">That didn't render. Try again?</p>}
+    </>
+  );
+
+  if (inline) return items;
+
   return (
     <div className="share" ref={wrap}>
       <button
@@ -105,43 +157,9 @@ export function ShareWeek({ releases, filters }: Props) {
         {state === 'done' ? <IconCheck /> : <IconShare />}
       </button>
 
-      {/*
-        No explainer above the two items.
-        There was one — "Saves a picture of this week with newonott.in on it" —
-        and it was the largest text in the menu, at the top, read by somebody
-        who had already decided to share. The items say what they do, and that
-        the card carries the address is the reason this feature exists rather
-        than something a reader needs told.
-      */}
       {open && (
         <div className="share__menu" role="menu">
-          <button
-            className="share__item"
-            role="menuitem"
-            onClick={() => make('board')}
-            disabled={state === 'working'}
-          >
-            <IconRows />
-            <span>
-              <strong>Board image</strong>
-              <small>Every title, grouped by platform</small>
-            </span>
-            {busy === 'board' && <span className="share__spin" aria-hidden="true" />}
-          </button>
-          <button
-            className="share__item"
-            role="menuitem"
-            onClick={() => make('posters')}
-            disabled={state === 'working'}
-          >
-            <IconGrid />
-            <span>
-              <strong>Poster image</strong>
-              <small>The week as artwork</small>
-            </span>
-            {busy === 'posters' && <span className="share__spin" aria-hidden="true" />}
-          </button>
-          {state === 'error' && <p className="share__error">That didn't render. Try again?</p>}
+          {items}
         </div>
       )}
     </div>

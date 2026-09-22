@@ -182,7 +182,10 @@ a {
   font-weight: 700;
   letter-spacing: -0.03em;
   font-size: 17px;
-  margin-right: auto;
+  /* No `margin-right: auto` any more — the search field is the flexible item
+     in this row, and two things claiming the slack made the field collapse to
+     its minimum on every width above 900px. */
+  flex: none;
   /* It is an anchor now; keep it looking like a wordmark rather than a link,
      but let it dim on hover so it reads as clickable. */
   color: var(--text);
@@ -774,6 +777,9 @@ a {
   gap: 10px 16px;
   padding-top: 14px;
   padding-bottom: 12px;
+  /* The containing block the search results hang from on a phone, where the
+     panel spans the whole band rather than the width of the field. */
+  position: relative;
 }
 
 /* Three groups that sit on one line when there's room and stack cleanly when
@@ -786,15 +792,13 @@ a {
   min-width: 0;
 }
 
+/* One row, and the field takes what the logo and the two icons do not.
+   It used to be a group of controls sized to their contents with a divider
+   after them, sitting against the left edge of a 1440px header — which is why
+   search, the thing most people came to use, was 34px wide on a 1200px band. */
 .weekbar__brand {
+  flex: 1 1 auto;
   gap: 12px;
-}
-
-.weekbar__brand::after {
-  content: '';
-  width: 1px;
-  height: 22px;
-  background: var(--line);
 }
 
 .weekbar__region {
@@ -1201,51 +1205,374 @@ a {
 
 /* ------------------------------------------------- header search ---- */
 
-.searchbox {
+/*
+ * The field is the header.
+ *
+ * It used to be one of six controls sharing the row with a wordmark, and the
+ * smallest of them. It now takes every pixel between the logo and the two
+ * icons on the right, because a search box that reads as the point of the
+ * header is the difference between a reader typing a second title and a reader
+ * leaving.
+ */
+.gsearch {
+  position: relative;
   display: flex;
   align-items: center;
   min-width: 0;
+  /* Capped here rather than on the input, so the results panel — which is
+     positioned against this box — comes out the width of the field. Pinned to
+     the flex row's edges it was 1100px of dropdown under a 460px field.
+     `margin-right: auto` keeps the two icons against the right edge. */
+  flex: 1 1 460px;
+  max-width: 460px;
+  margin-right: auto;
 }
-.searchbox[data-open] {
-  flex: 1 1 220px;
-  max-width: 340px;
-}
-.searchbox__toggle {
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  border: 1px solid var(--line);
-  background: var(--surface);
-  color: var(--text-2);
-}
-.searchbox__toggle:hover {
-  background: var(--surface-2);
-  color: var(--text);
-}
-.searchbox__toggle svg {
-  width: 16px;
-  height: 16px;
-}
-.searchbox .search {
+.gsearch .search {
   flex: 1 1 auto;
   max-width: none;
+}
+
+/* ------------------------------------------------ search results ---- */
+
+.gsearch__panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  z-index: 60;
+  /* Tall enough that the third section's first row is on screen without
+     scrolling on a laptop and on a phone. It is the section that justifies the
+     whole change, and one nobody scrolls to is one nobody knows exists. */
+  max-height: min(78vh, 620px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 6px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line-strong);
+  /* Solid, not the translucent surface the rest of the header uses: poster
+     thumbnails behind a blur over a scrolling board is unreadable. */
+  background: var(--surface-solid);
+  box-shadow: var(--shadow-pop);
+  animation: sharein 0.16s var(--ease);
+}
+
+.gsearch__section + .gsearch__section {
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px solid var(--line);
+}
+
+.gsearch__label {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  padding: 7px 10px 5px;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+/* The caveat rides on the heading rather than sitting under the rows, so a
+   reader knows what they are looking at before they read one. */
+.gsearch__label span {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text-3);
+  opacity: 0.85;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gsearch__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 7px 10px;
+  border-radius: var(--radius-sm);
+  text-align: left;
+  color: var(--text);
+  transition: background 0.14s var(--ease);
+}
+.gsearch__row:hover,
+.gsearch__row[data-active] {
+  background: var(--surface-2);
+}
+/* A row with nowhere to go must not look like one that has somewhere to go. */
+.gsearch__row--flat {
+  cursor: default;
+}
+.gsearch__row--flat:hover {
+  background: transparent;
+}
+
+.gsearch__art {
+  flex: none;
+  width: 32px;
+  height: 46px;
+  border-radius: 5px;
+  overflow: hidden;
+  background: var(--surface-2);
+}
+.gsearch__art--round {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+.gsearch__art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.gsearch__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.gsearch__text strong {
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gsearch__text small {
+  font-size: 11.5px;
+  color: var(--text-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gsearch__none {
+  margin: 0;
+  padding: 16px 12px;
+  font-size: 13px;
+  color: var(--text-3);
 }
 
 /*
  * The wordmark stands down while the field is open on a phone.
  *
- * At 390px the header holds a mark, a wordmark, three round buttons and — once
- * someone taps search — an input. Something has to give, and left to itself it
- * was the wordmark, which wrapped "New on OTT." onto three lines and pushed the
- * whole header to 150px tall. The mark stays, so the way home does too; the
- * name is not what anybody is reading mid-search, and it comes straight back
- * when the field closes.
+ * At 390px the header holds a mark, a wordmark, two round buttons and an
+ * input. Something has to give, and left to itself it was the wordmark, which
+ * wrapped "New on OTT." onto three lines and pushed the whole header to 150px
+ * tall. The mark stays, so the way home does too.
  */
-@media (max-width: 719px) {
-  .weekbar__brand:has(.searchbox[data-open]) .logo__word {
+/*
+ * The wordmark stands down before the field does.
+ *
+ * At 480px the header wants 16px of gutter, a 24px mark, a 95px wordmark, two
+ * 34px icons and a field — and the field loses, which is how it ended up as an
+ * icon in the first place. The mark stays and is still the link home; the name
+ * is on every tab title, every share card and the page the reader came from.
+ */
+@media (max-width: 519px) {
+  .logo__word {
     display: none;
+  }
+}
+
+@media (max-width: 719px) {
+  /*
+   * Full width on a phone.
+   *
+   * The dropdown is the page at that size, and pinning it to a field that ends
+   * 100px short of the right edge wastes the only room there is. Dropping the
+   * containing block back to .weekbar is what widens it — offsetting by a hand-
+   * measured number of pixels would be wrong the moment the logo or an icon
+   * changes size.
+   */
+  .gsearch {
+    position: static;
+  }
+  .gsearch__panel {
+    left: 0;
+    right: 0;
+    top: calc(100% - 2px);
+  }
+  /* Side by side the caveat truncates to "not in the In…", which is worse than
+     no caveat. Its own line. */
+  .gsearch__label {
+    display: block;
+  }
+  .gsearch__label span {
+    display: block;
+    margin-top: 3px;
+    white-space: normal;
+  }
+}
+
+/* -------------------------------------------------------- hmenu ---- */
+
+.hmenu {
+  position: relative;
+  flex: none;
+}
+.hmenu__toggle {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text-2);
+  transition:
+    background 0.2s var(--ease),
+    border-color 0.2s var(--ease),
+    color 0.2s var(--ease);
+}
+.hmenu__toggle:hover {
+  background: var(--surface-2);
+  border-color: var(--line-strong);
+  color: var(--text);
+}
+.hmenu__toggle svg {
+  width: 17px;
+  height: 17px;
+}
+/* Above its own scrim.
+   The button becomes an ✕ when the sheet is up, and on a phone the scrim was
+   laid straight over it — so the one control that looks like it closes the
+   menu was the one control that could not. Caught by the e2e run, which could
+   not tap it either. */
+.hmenu[data-open] .hmenu__toggle {
+  position: relative;
+  z-index: 61;
+}
+
+/* Only on a phone, where the panel is a sheet and the board behind it needs
+   dimming. On a desktop it is a small dropdown and a full-page scrim over one
+   is theatre. */
+.hmenu__scrim {
+  display: none;
+}
+
+.hmenu__panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 60;
+  width: 300px;
+  max-height: min(78vh, 640px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 6px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line-strong);
+  background: var(--surface-solid);
+  box-shadow: var(--shadow-pop);
+  animation: sharein 0.16s var(--ease);
+}
+.hmenu__panel:focus {
+  outline: none;
+}
+
+.hmenu__group + .hmenu__group {
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px solid var(--line);
+}
+
+.hmenu__label {
+  margin: 0;
+  padding: 8px 10px 4px;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.hmenu__pitch {
+  margin: 0 0 8px;
+  padding: 0 10px;
+  font-size: 12.5px;
+  color: var(--text-2);
+}
+
+.hmenu__item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 9px 10px;
+  border-radius: var(--radius-sm);
+  text-align: left;
+  color: var(--text);
+  /* Half these items are anchors and half are buttons; the underline was the
+     only thing telling them apart, and it told the reader nothing useful while
+     making four rows look like a bibliography. */
+  text-decoration: none;
+  transition: background 0.14s var(--ease);
+}
+.hmenu__item:hover {
+  background: var(--surface-2);
+}
+.hmenu__item[disabled] {
+  opacity: 0.45;
+  pointer-events: none;
+}
+.hmenu__item svg {
+  flex: none;
+  width: 17px;
+  height: 17px;
+  color: var(--text-3);
+}
+.hmenu__item span {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.hmenu__item strong {
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.hmenu__item small {
+  font-size: 11.5px;
+  color: var(--text-3);
+  line-height: 1.35;
+}
+/* The signup field inherits its own styling; it only needs the gutter the
+   items have. */
+.hmenu__group .signup {
+  padding: 0 10px 8px;
+}
+
+@media (max-width: 719px) {
+  .hmenu__scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 55;
+    background: rgba(2, 3, 6, 0.6);
+    backdrop-filter: blur(2px);
+  }
+  /* A sheet anchored to the bottom, where a thumb is. A 300px dropdown hanging
+     off the top-right corner of a phone is a desktop menu shrunk. */
+  .hmenu__panel {
+    position: fixed;
+    inset: auto 0 0 0;
+    width: auto;
+    max-height: 82vh;
+    padding: 8px 8px calc(10px + env(safe-area-inset-bottom));
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    border-bottom: none;
+  }
+  .hmenu__item {
+    padding: 11px 12px;
   }
 }
 
@@ -1301,7 +1628,9 @@ a {
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .share__menu {
+  .share__menu,
+  .hmenu__panel,
+  .gsearch__panel {
     animation: none;
   }
 }
@@ -3222,7 +3551,7 @@ select,
 .btn,
 .btn--lg,
 .iconbtn,
-.searchbox__toggle,
+.hmenu__toggle,
 .weeknav__btn,
 .lens,
 .chip,
@@ -3246,7 +3575,7 @@ select,
 .btn:active,
 .btn--lg:active,
 .iconbtn:active,
-.searchbox__toggle:active,
+.hmenu__toggle:active,
 .weeknav__btn:active:not(:disabled),
 .lens:active,
 .chip:active,
@@ -3271,7 +3600,7 @@ select,
   .btn,
   .btn--lg,
   .iconbtn,
-  .searchbox__toggle,
+  .hmenu__toggle,
   .weeknav__btn,
   .lens,
   .chip,
@@ -3287,7 +3616,7 @@ select,
   .btn:active,
   .btn--lg:active,
   .iconbtn:active,
-  .searchbox__toggle:active,
+  .hmenu__toggle:active,
   .weeknav__btn:active:not(:disabled),
   .lens:active,
   .chip:active,
@@ -3366,21 +3695,23 @@ select,
   /*
    * The header icons, given a fingertip without being given more room.
    *
-   * Instagram, share, subscribe and search are 34px circles in a row that
-   * already spends 346 of 358 available pixels at 390px — growing them would
-   * overflow the narrowest phones the e2e covers. So the visible circle stays
-   * and an invisible box extends the hit area to 44px, which is what a thumb
-   * actually lands on. Same trick for the week arrows, whose row is tighter
-   * still.
+   * Instagram and the menu are 34px circles in a row that already spends most
+   * of the 358 available pixels at 390px on the search field — growing them
+   * would push the field back towards the icon it used to be. So the visible
+   * circle stays and an invisible box extends the hit area to 44px, which is
+   * what a thumb actually lands on. Same trick for the week arrows, whose row
+   * is tighter still.
    */
   .iconbtn,
-  .searchbox__toggle,
+  .iglink,
+  .hmenu__toggle,
   .weeknav__btn,
   .signup__dismiss {
     position: relative;
   }
   .iconbtn::after,
-  .searchbox__toggle::after,
+  .iglink::after,
+  .hmenu__toggle::after,
   .weeknav__btn::after,
   .signup__dismiss::after {
     content: '';

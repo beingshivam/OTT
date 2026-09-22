@@ -34,10 +34,21 @@ const LOOKS_LIKE_EMAIL = /^[^\s@]+@[^\s@.]+\.[^\s@]{2,}$/;
  *  attacker cannot make us buffer a stream of arbitrary length. */
 const MAX_BODY = 2048;
 
-const json = (status, body) =>
+/**
+ * `no-store` by default, and that default is the safe one.
+ *
+ * Everything this file answered until now was a subscription result or a
+ * diagnostic — responses that must never be reused for the next person.
+ * Search is the first cacheable answer here, so the exception is opt-in and
+ * per-call rather than a new default nobody would notice changing.
+ */
+const json = (status, body, maxAge) =>
   new Response(JSON.stringify(body), {
     status,
-    headers: { 'content-type': 'application/json', 'cache-control': 'no-store' },
+    headers: {
+      'content-type': 'application/json',
+      'cache-control': maxAge ? `public, max-age=${maxAge}` : 'no-store',
+    },
   });
 
 /**
@@ -87,6 +98,138 @@ async function proxyPoster(request, url) {
   return new Response(upstream.body, { status: 200, headers });
 }
 
+/**
+ * Search, over everything TMDB has rather than everything we ship.
+ *
+ * The site's own search reads what the browser has already loaded — the
+ * calendar and the back catalogue, 963 titles — and knows no people at all.
+ * So "Rajinikanth" found nothing unless his name happened to sit in a cast
+ * list on the current page, on a site about Indian film.
+ *
+ * The fix is a proxy, not a database. TMDB already holds the corpus and
+ * already answers /search/multi with films, series and people in one call. A
+ * copy of a million rows here would need storing, syncing and reconciling, and
+ * would be a worse copy of the thing it copied from the day after it landed.
+ *
+ * What this deliberately does NOT do is give those titles pages. A million
+ * generated pages with nothing to say about them is the shape Google's
+ * helpful-content system demotes, and it would drag down the 318 pages that
+ * are genuinely good. Search reaches everything; publishing stays earned.
+ *
+ * ---------------------------------------------------------------------------
+ * Degrading honestly
+ *
+ * With no TMDB_TOKEN bound this returns `remote: false` and an empty list
+ * rather than an error. The front end reads that flag and says "Search films,
+ * series and people" instead of "Search 1M+ titles" — the claim appears only
+ * once it is true. A placeholder promising a million titles over a search of
+ * nine hundred is exactly the kind of lie this codebase keeps refusing.
+ *
+ * The token is bound to this Worker, separately from the one the refresh uses
+ * in Actions — docs/search-setup.md has the step, and /api/watchdog reports
+ * whether it landed, since a missing secret is otherwise indistinguishable
+ * from a search that found nothing.
+ */
+const SEARCH_TTL = 3600;
+
+async function searchTmdb(request, url, env, ctx) {
+  if (request.method !== 'GET') return json(405, { error: 'method_not_allowed' });
+
+  const q = (url.searchParams.get('q') ?? '').trim().slice(0, 80);
+  const token = env.TMDB_TOKEN || env.TMDB_API_KEY;
+
+  /* The capability probe. The front end asks with no query on mount to learn
+     which placeholder it is allowed to print, and that must not cost a TMDB
+     call. */
+  if (!q) return json(200, { remote: Boolean(token), results: [], total: 0 }, SEARCH_TTL);
+  if (!token) return json(200, { remote: false, results: [], total: 0 }, SEARCH_TTL);
+
+  /*
+   * Cached at the edge by the query itself.
+   *
+   * Search traffic is long-tailed but not evenly so — a film in the news is
+   * typed by thousands of people in the same hour, and without this each one
+   * would spend a TMDB call. The cache key drops everything but the query, so
+   * a stray utm parameter cannot split the cache.
+   */
+  const key = new Request(`https://newonott.in/api/search?q=${encodeURIComponent(q.toLowerCase())}`, {
+    method: 'GET',
+  });
+  const cache = caches.default;
+  const hit = await cache.match(key);
+  if (hit) return hit;
+
+  const isJwt = /^ey[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/.test(token);
+  const api = new URL('https://api.themoviedb.org/3/search/multi');
+  api.searchParams.set('query', q);
+  api.searchParams.set('include_adult', 'false');
+  /* Region and language shape the results TMDB returns first, and this
+     audience is Indian. Without it a search for a Tamil title surfaces the
+     American remake. */
+  api.searchParams.set('region', 'IN');
+  api.searchParams.set('language', 'en-IN');
+  if (!isJwt) api.searchParams.set('api_key', token);
+
+  let upstream;
+  try {
+    upstream = await fetch(api.toString(), {
+      headers: isJwt ? { authorization: `Bearer ${token}`, accept: 'application/json' } : { accept: 'application/json' },
+      cf: { cacheEverything: true, cacheTtl: SEARCH_TTL },
+    });
+  } catch {
+    /* TMDB unreachable. The local half of the search has already rendered, so
+       the honest thing is to return nothing extra rather than an error the
+       reader cannot act on. */
+    return json(200, { remote: true, results: [], total: 0, degraded: true });
+  }
+  if (!upstream.ok) {
+    return json(200, { remote: true, results: [], total: 0, degraded: true });
+  }
+
+  const body = await upstream.json();
+
+  /*
+   * Trimmed to what a result row draws.
+   *
+   * TMDB's payload is roughly 2KB per result and a row uses six fields. On a
+   * phone, on Indian mobile data, shipping the rest is the difference between
+   * a search that feels instant and one that does not — and the front end
+   * would throw it away anyway.
+   */
+  const results = (body.results ?? [])
+    .filter((r) => r.media_type === 'movie' || r.media_type === 'tv' || r.media_type === 'person')
+    .slice(0, 24)
+    .map((r) =>
+      r.media_type === 'person'
+        ? {
+            kind: 'person',
+            id: `p-${r.id}`,
+            name: r.name,
+            image: r.profile_path ? `/img/w185${r.profile_path}` : null,
+            role: r.known_for_department === 'Acting' ? 'Actor' : r.known_for_department || null,
+            knownFor: (r.known_for ?? [])
+              .map((k) => k.title || k.name)
+              .filter(Boolean)
+              .slice(0, 3),
+          }
+        : {
+            kind: r.media_type === 'tv' ? 'series' : 'film',
+            /* The same id shape the feed uses, so the front end can match a
+               remote result against a title it already has and show one row
+               rather than two. */
+            id: `${r.media_type === 'tv' ? 't' : 'm'}-${r.id}`,
+            title: r.title || r.name,
+            year: (r.release_date || r.first_air_date || '').slice(0, 4) || null,
+            image: r.poster_path ? `/img/w185${r.poster_path}` : null,
+            lang: r.original_language || null,
+          },
+    );
+
+  const res = json(200, { remote: true, results, total: body.total_results ?? results.length }, SEARCH_TTL);
+  ctx.waitUntil(cache.put(key, res.clone()));
+  return res;
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -122,6 +265,13 @@ export default {
           addressed: Boolean(env.ALERT_EMAIL),
           slots: REFRESH_SLOTS.length,
           graceHours: GRACE_HOURS,
+          /* Whether search can reach past this site's own 963 rows. The token
+             lives in Actions secrets for the refresh and has to be bound here
+             separately, and nothing else would say whether that happened — the
+             box degrades quietly by design, so a missing secret looks exactly
+             like a site that simply has fewer results. Reports only that the
+             binding exists, never what it holds. */
+          searchable: Boolean(env.TMDB_TOKEN || env.TMDB_API_KEY),
         },
         { headers: { 'cache-control': 'no-store' } },
       );
@@ -167,6 +317,10 @@ export default {
       url.pathname = url.pathname.replace(/\/+$/, '');
       return Response.redirect(url.toString(), 301);
     }
+
+    /* Before the asset fallback, and before the subscribe guard below, which
+       is a POST-only path. */
+    if (url.pathname === '/api/search') return searchTmdb(request, url, env, ctx);
 
     if (url.pathname !== '/api/subscribe') return env.ASSETS.fetch(request);
 

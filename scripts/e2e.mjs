@@ -755,13 +755,12 @@ for (const width of [390, 1440]) {
       rail: top('.landed'),
       heading: top('.controls'),
       board: top('.board'),
-      share: top('.weekbar .share'),
+      menu: top('.weekbar .hmenu'),
       // The bands this change removed. Their absence is the change.
       oldWeekBand: !!document.querySelector('.weekbar__week'),
       oldMetaBand: !!document.querySelector('.weekbar__right'),
       headingText: document.querySelector('.controls__heading')?.textContent?.trim() ?? '',
-      hasSearch: !!document.querySelector('.searchbox'),
-      searchInHeader: !!document.querySelector('.weekbar .searchbox'),
+      searchInHeader: !!document.querySelector('.weekbar .gsearch input'),
       stepper: document.querySelectorAll('.controls__row .weeknav__btn').length,
       toggle: document.querySelectorAll('.controls__row .viewtoggle button').length,
     };
@@ -786,18 +785,19 @@ for (const width of [390, 1440]) {
     `lenses ${m.lenses}, rail ${m.rail}, heading ${m.heading}, board ${m.board}`,
   );
   /**
-   * Share is in the header, above everything.
+   * Share is above everything, behind the header menu.
    *
    * It spent one commit at the foot of the board on the reasoning that nobody
    * shares a week they have not read — true of a reader, and beside the point:
    * the picture it makes is how the site travels, and a growth loop that needs
-   * scrolling to find does not run. The owner called it, and this check now
-   * holds the placement they chose rather than the one it replaced.
+   * scrolling to find does not run. It is one of the menu's sections now
+   * rather than a button of its own, so what this holds is the menu's
+   * placement; that Share is inside it is checked where Share is exercised.
    */
   is(
-    m.share !== null && m.share < m.rail,
-    `${label}: Share is in the header, above the fold`,
-    `share ${m.share}, rail ${m.rail}`,
+    m.menu !== null && m.menu < m.rail,
+    `${label}: the header menu is above the fold`,
+    `menu ${m.menu}, rail ${m.rail}`,
   );
   is(errors.length === 0, `${label}: no console errors`, errors[0]);
   await ctx.close();
@@ -930,6 +930,122 @@ console.log('\nSearch is global');
   await ctx.close();
 }
 
+// --- the search box answers about more than this site ------------------------
+
+/**
+ * The dropdown, and the seam in it.
+ *
+ * Two things can go wrong here that no unit test sees. The placeholder can
+ * promise "1M+ titles" on a deploy where the Worker has no TMDB credential —
+ * which is the state this shipped in, so it is not hypothetical. And the three
+ * sections can collapse into one ranked list, which reads fine in a screenshot
+ * and destroys the only thing the site knows that TMDB does not: that a row is
+ * on Netflix on Friday.
+ */
+console.log('\nThe search dropdown');
+for (const width of [390, 1440]) {
+  const { ctx, page, errors } = await newPage(browser, { width, height: 900 });
+
+  /* No credential bound. The honest degraded state, and the one live today. */
+  let asked = 0;
+  await page.route('**/api/search*', (route) => {
+    asked++;
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ remote: false, results: [], total: 0 }),
+    });
+  });
+
+  await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('.controls__row');
+  await page.waitForTimeout(400);
+
+  is(
+    await page.locator('.weekbar .gsearch input').isVisible(),
+    `${width}px: the search field is drawn, not hidden behind an icon`,
+    'it collapsed',
+  );
+  const placeholder = await page.getAttribute('.gsearch input', 'placeholder');
+  is(
+    !/\d/.test(placeholder ?? ''),
+    `${width}px: with no credential it does not promise a million titles`,
+    `it says "${placeholder}"`,
+  );
+
+  /* Typing must not move the board. A panel that pushes content is the bug
+     this codebase has already shipped once, with the out-today rail. */
+  const before = await page.evaluate(() => document.querySelector('.landed')?.getBoundingClientRect().top);
+  await page.click('.gsearch input');
+  await page.type('.gsearch input', 'a', { delay: 30 });
+  await page.waitForTimeout(300);
+  is(
+    !(await page.locator('.gsearch__panel').isVisible()),
+    `${width}px: one letter opens nothing`,
+    'it searched on a single character',
+  );
+
+  const feed = JSON.parse(await readFile(join(DIST, 'data/releases.json'), 'utf8'));
+  const row = feed.weeks
+    .flatMap((w) => w.releases)
+    .find((r) => (r.regions ?? []).includes('IN') && r.slug && r.title.length > 5);
+
+  await page.fill('.gsearch input', row ? row.title.slice(0, 6) : 'the');
+  await page.waitForTimeout(700);
+
+  is(
+    await page.locator('.gsearch__panel').isVisible(),
+    `${width}px: the results panel opens`,
+    'nothing appeared',
+  );
+  const after = await page.evaluate(() => document.querySelector('.landed')?.getBoundingClientRect().top);
+  is(before === after, `${width}px: and floats over the board rather than pushing it`, `${before} then ${after}`);
+
+  const labels = await page.evaluate(() =>
+    [...document.querySelectorAll('.gsearch__label')].map((el) => el.firstChild?.textContent?.trim()),
+  );
+  is(
+    labels[0] === 'On New on OTT',
+    `${width}px: what the site can answer about comes first`,
+    `sections: ${labels.join(', ') || 'none'}`,
+  );
+  is(
+    !labels.includes('Everywhere else'),
+    `${width}px: and nothing is offered from a source that answered nothing`,
+    'an empty remote section rendered',
+  );
+
+  /* The panel must not overflow its viewport — it is the widest thing in the
+     header and the first to run off a 390px screen. */
+  const fits = await page.evaluate(() => {
+    const r = document.querySelector('.gsearch__panel').getBoundingClientRect();
+    return r.left >= -1 && r.right <= window.innerWidth + 1;
+  });
+  is(fits, `${width}px: the panel stays inside the viewport`, 'it overflowed');
+
+  // A result leads somewhere. Enter on the first row is the keyboard path, and
+  // the one most likely to rot, since the mouse path is what gets clicked in
+  // review.
+  if (row) {
+    await page.keyboard.press('ArrowDown');
+    await page.waitForTimeout(120);
+    await Promise.all([
+      page.waitForURL(/\/ott-release-date\//, { timeout: 8000 }).catch(() => {}),
+      page.keyboard.press('Enter'),
+    ]);
+    await page.waitForTimeout(400);
+    is(
+      /\/ott-release-date\//.test(page.url()),
+      `${width}px: Enter on the first result opens its page`,
+      `it went to ${page.url()}`,
+    );
+  }
+
+  is(asked > 0, `${width}px: the proxy was actually asked`, 'no request was made');
+  is(errors.length === 0, `${width}px: no console errors`, errors[0]);
+  await ctx.close();
+}
+
 // --- sharing the week as a picture -------------------------------------------
 
 console.log('\nShare');
@@ -960,24 +1076,24 @@ for (const width of [390, 1440]) {
     return r.fulfill({ status: 200, contentType: 'image/png', body: PIXEL });
   });
   await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
-  await page.waitForSelector('.share .iconbtn');
+  await page.waitForSelector('.weekbar .hmenu__toggle');
 
-  const inHeader = await page.evaluate(() => !!document.querySelector('.weekbar .share'));
-  is(inHeader, `${width}px: the share button is in the header`, 'it is somewhere else');
-
-  await page.locator('.share .iconbtn').click();
+  await page.locator('.hmenu__toggle').click();
   await page.waitForTimeout(300);
-  const items = await page.locator('.share__item').count();
+  /* The two image buttons, which are the only .hmenu__item that are buttons
+     rather than links — the four above them are navigation. */
+  const share = page.locator('.hmenu__panel button.hmenu__item');
+  const items = await share.count();
   is(items === 2, `${width}px: it offers both a board and a poster image`, `${items} options`);
 
   for (const [i, kind] of [[0, 'board'], [1, 'posters']]) {
-    if (!(await page.locator('.share__menu').isVisible())) {
-      await page.locator('.share .iconbtn').click();
+    if (!(await page.locator('.hmenu__panel').isVisible())) {
+      await page.locator('.hmenu__toggle').click();
       await page.waitForTimeout(250);
     }
     const [dl] = await Promise.all([
       page.waitForEvent('download', { timeout: 40_000 }),
-      page.locator('.share__item').nth(i).click(),
+      share.nth(i).click(),
     ]);
     const file = join(SHOTS, `share-${width}-${kind}.png`);
     await dl.saveAs(file);
@@ -1007,15 +1123,23 @@ for (const width of [390, 1440]) {
   }
 
   // Escape closes the menu — it is a popover, and popovers that trap you are a
-  // bug people report as "the site froze".
-  await page.locator('.share .iconbtn').click();
-  await page.waitForTimeout(200);
+  // bug people report as "the site froze". It also restores the body scroll it
+  // locks on a phone, which is the same bug wearing a worse hat.
+  if (!(await page.locator('.hmenu__panel').isVisible())) {
+    await page.locator('.hmenu__toggle').click();
+    await page.waitForTimeout(250);
+  }
   await page.keyboard.press('Escape');
   await page.waitForTimeout(200);
   is(
-    !(await page.locator('.share__menu').isVisible()),
-    `${width}px: Escape closes the share menu`,
+    !(await page.locator('.hmenu__panel').isVisible()),
+    `${width}px: Escape closes the header menu`,
     'it stayed open',
+  );
+  is(
+    await page.evaluate(() => getComputedStyle(document.body).overflow !== 'hidden'),
+    `${width}px: and gives the page its scroll back`,
+    'the body is still locked',
   );
   is(errors.length === 0, `${width}px: no console errors`, errors[0]);
   await ctx.close();
@@ -1473,7 +1597,7 @@ console.log('\nTouch targets');
   */
   const reach = await page.evaluate(() => {
     const out = {};
-    for (const sel of ['.iconbtn', '.searchbox__toggle']) {
+    for (const sel of ['.iglink', '.hmenu__toggle']) {
       const el = document.querySelector(sel);
       if (!el) { out[sel] = 'absent'; continue; }
       const r = el.getBoundingClientRect();
@@ -1482,10 +1606,10 @@ console.log('\nTouch targets');
     }
     return out;
   });
-  is(reach['.iconbtn'] === 'hit', 'a thumb landing beside a header icon still hits it',
-     `.iconbtn: ${reach['.iconbtn']}`);
-  is(reach['.searchbox__toggle'] === 'hit', 'and beside the search toggle',
-     `.searchbox__toggle: ${reach['.searchbox__toggle']}`);
+  is(reach['.iglink'] === 'hit', 'a thumb landing beside a header icon still hits it',
+     `.iglink: ${reach['.iglink']}`);
+  is(reach['.hmenu__toggle'] === 'hit', 'and beside the menu button',
+     `.hmenu__toggle: ${reach['.hmenu__toggle']}`);
 
   /*
     A tap has to be acknowledged.

@@ -39,6 +39,7 @@
     "test:affiliates": "node --test src/data/affiliates.test.mjs",
     "coverage": "node scripts/coverage.mjs",
     "test:share": "node --test src/lib/share.test.mjs",
+    "test:search": "node --test src/lib/globalSearch.test.mjs",
     "test:changes": "node --test src/lib/changes.test.mjs",
     "test:backfill": "node --test scripts/backfill-archive.test.mjs"
   },

@@ -76,6 +76,13 @@ jobs:
           npm run test:fetch
           npm run test:affiliates
           npm run test:worker
+          # Written alongside the features they cover and never wired in here,
+          # which meant four suites that only ran when somebody remembered to
+          # run them. They take under ten seconds between them.
+          npm run test:search
+          npm run test:share
+          npm run test:changes
+          npm run test:backfill
           npm run eval
           # The library comes from package.json; this fetches the browser
           # binary it drives, which is not an npm package. Pinned by the

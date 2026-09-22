@@ -8,9 +8,8 @@ import { Controls } from './components/Controls';
 import { DetailSheet } from './components/DetailSheet';
 import { EmailSignup } from './components/EmailSignup';
 import { ReleaseCard } from './components/ReleaseCard';
-import { ShareWeek } from './components/ShareWeek';
-import { SearchBox } from './components/SearchBox';
-import { SubscribeButton } from './components/SubscribeButton';
+import { GlobalSearch } from './components/GlobalSearch';
+import { HeaderMenu } from './components/HeaderMenu';
 import { TrendingStrip, normalise } from './components/TrendingStrip';
 import { PosterRail, relativeDay } from './components/PosterRail';
 import {
@@ -693,6 +692,28 @@ export default function App() {
               <span className="logo__dot">.</span>
             </span>
           </a>
+          {/*
+            Search takes the middle of the header, and everything else moved
+            behind the menu on the right.
+
+            The row used to hold six controls beside a wordmark: Instagram,
+            share, subscribe and a 34px search circle. At 390px that is 358
+            usable pixels spread across things a reader mostly ignores, with
+            the one control this site's highest-intent traffic arrives *wanting*
+            reduced to the smallest target on the row. A large share of arrivals
+            are someone who searched "<film> OTT release date" — the next thing
+            they do is type a second title.
+
+            So the field is the header now, at every width, and it searches a
+            million titles rather than the week on screen.
+          */}
+          <GlobalSearch
+            value={filters.query}
+            onChange={(query) => update({ query })}
+            corpus={releases}
+            onOpen={setSelected}
+          />
+
           {/* Up here rather than in the footer.
               Buried at the bottom it was reachable only by someone who had
               already scrolled the whole board — which is precisely the reader
@@ -711,34 +732,19 @@ export default function App() {
           >
             <IconInstagram />
           </a>
-          {/*
-            Search, promoted from the fifth band down into the header.
-            The site's highest-intent traffic arrives asking where to watch one
-            specific title, and that reader had to scroll past five rows of
-            navigation to find the field. This is where every app puts it.
-          */}
-          {/*
-            Share, in the header, on the owner's call — and the reasoning that
-            put it at the foot of the board was too narrow. That argument was
-            about a reader, who has no use for it until they have read the week.
-            But the picture this makes is how the site travels: it goes out on
-            WhatsApp and Instagram carrying the address, and a growth loop that
-            needs scrolling to find is a growth loop that does not run. It does
-            not fit on the board's heading row, which has nothing to spare at
-            360px, and it does not belong back in a band of its own.
 
-            Only where the card can name what it holds: it says "4–10 Sep" and
-            means it, which is true of a week and not of a month or of seventy
-            years of back catalogue.
-          */}
-          {feed && !offBoard && !span && !route?.catalogue && (
-            <ShareWeek releases={visible} filters={filters} />
-          )}
-          {/* Before search rather than after: search is the one control a
-              reader reaches for by muscle memory and it should stay in the
-              rightmost slot it has always occupied. */}
-          <SubscribeButton />
-          <SearchBox value={filters.query} onChange={(query) => update({ query })} />
+          {/* Share and subscribe, which were two popovers side by side and
+              could both be open at once, overlapping. They are sections of one
+              panel now.
+
+              Share only where a card can name what it holds: it says "4–10 Sep"
+              and means it, which is true of a week and not of a month or of
+              seventy years of back catalogue. */}
+          <HeaderMenu
+            releases={visible}
+            filters={filters}
+            canShare={Boolean(feed) && !offBoard && !span && !route?.catalogue}
+          />
         </div>
 
       </div>
