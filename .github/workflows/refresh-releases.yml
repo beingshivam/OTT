@@ -237,6 +237,32 @@ jobs:
         continue-on-error: true
         run: node scripts/archive.mjs
 
+      # Fill the gaps the daily enrichment can no longer reach.
+      #
+      # enrich-releases walks the eight-week window, so a row that entered the
+      # calendar during a slow TMDB run keeps that gap forever — it ages out
+      # and nothing tries again. Measured on 22 September: runtime on 53% of
+      # Indian archive rows, certificate on 37%, and 72 films with enough
+      # metadata to deserve a page but a missing field blocking one.
+      #
+      # After the archive so it sweeps rows this run has already merged, and
+      # before the catalogue so a slow sweep cannot delay the feed. Budgeted at
+      # 40 titles: ~40 API calls, under a minute, and the whole backlog is
+      # cleared inside a fortnight of daily runs without ever being a job
+      # anybody waits on.
+      #
+      # continue-on-error like every other enrichment step here. A sweep that
+      # fails costs nobody a calendar, and the gate downstream neither knows
+      # nor cares that it ran.
+      - name: Backfill the archive's older rows
+        if: steps.archive.outcome == 'success'
+        continue-on-error: true
+        env:
+          TMDB_TOKEN: ${{ secrets.TMDB_TOKEN }}
+          OMDB_API_KEY: ${{ secrets.OMDB_API_KEY }}
+          BUDGET: '40'
+        run: node scripts/backfill-archive.mjs
+
       # The back catalogue: what is good and streaming now, whatever its age.
       #
       # A reader asked for this — a release calendar can only ever answer "what

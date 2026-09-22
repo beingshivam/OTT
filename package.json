@@ -39,7 +39,8 @@
     "test:affiliates": "node --test src/data/affiliates.test.mjs",
     "coverage": "node scripts/coverage.mjs",
     "test:share": "node --test src/lib/share.test.mjs",
-    "test:changes": "node --test src/lib/changes.test.mjs"
+    "test:changes": "node --test src/lib/changes.test.mjs",
+    "test:backfill": "node --test scripts/backfill-archive.test.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
