@@ -47,12 +47,16 @@ curl -s https://newonott.in/api/watchdog
 `"searchable": true` means the binding exists. It reports only that — never the
 value.
 
-That endpoint exists because **the failure is silent by design**. With no
-credential the route answers honestly rather than erroring: `remote: false`, no
-results, and the front end quietly drops its "Search 1M+ titles" placeholder for
-"Search films, series and people" and shows the local half alone. A reader sees
-a smaller search. Nothing in the logs, nothing in the UI, and no way to tell it
-apart from a search that simply found nothing.
+That endpoint exists because **the failure is quiet by design**. With no
+credential the route answers honestly rather than erroring — `remote: false`,
+no results — and the page keeps working on the local half alone. A reader just
+sees a smaller search.
+
+The header says **"Search 1M+ titles"** either way. That is one line at every
+width, phone first, and it is the claim the site is making: the token is what
+makes it true, so bind it before anyone else sees the site. The only place the
+difference shows is the empty state, which says "Nothing on New on OTT matches
+X" rather than a flat "Nothing matches" while the wider half is missing.
 
 ---
 

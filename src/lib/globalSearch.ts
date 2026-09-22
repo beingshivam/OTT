@@ -31,8 +31,9 @@ export interface RemoteHit {
 }
 
 export interface SearchState {
-  /** Whether the proxy has a credential. The placeholder claim depends on it —
-   *  see the probe below. */
+  /** Whether the proxy has a credential at all, as opposed to having one and
+   *  coming back empty. Only the empty state reads it, to tell "we searched a
+   *  million titles and there is no such film" from "we searched ours". */
   remote: boolean;
   /** True when TMDB was reachable but did not answer. The local half still
    *  rendered, so this is a smaller search rather than a broken one. */
@@ -44,16 +45,24 @@ export interface SearchState {
 export const EMPTY: SearchState = { remote: false, degraded: false, hits: [], total: 0 };
 
 /**
- * What the box is allowed to promise.
+ * One placeholder, sized for the narrowest phone.
  *
- * "Search 1M+ titles" is true only once the proxy can actually reach TMDB.
- * With no token bound it would be a claim over nine hundred rows, which is the
- * one kind of copy this site has consistently refused to write — and the
- * fastest to be caught at, since a reader types one obscure film and sees an
- * empty list.
+ * There were two: this, and "Search films, series and people" for the case
+ * where the Worker has no TMDB credential and the search really is only nine
+ * hundred rows. The owner's call is one line, and phone first — and the
+ * fallback was the worse of the two on a phone by every measure. At 360px the
+ * field is about 200px wide; three nouns and two commas ran past it and
+ * truncated to "Search films, series and…", which promises less than the site
+ * does and reads like a field that has not finished loading.
+ *
+ * It costs the mount-time probe that existed only to choose between them —
+ * one request per page load, on Indian mobile data, to pick a string.
+ *
+ * What it buys is a claim that is true once TMDB is reachable and not before,
+ * so binding the token is what makes the header honest. docs/search-setup.md
+ * is the step, and /api/watchdog reports whether it landed.
  */
-export const placeholderFor = (remote: boolean) =>
-  remote ? 'Search 1M+ titles' : 'Search films, series and people';
+export const PLACEHOLDER = 'Search 1M+ titles';
 
 /**
  * Titles the local half already has, so the same film is not offered twice.
@@ -129,36 +138,6 @@ export function localMatches(rows: Release[], query: string, limit = 6): Release
     if (bands[0].length >= limit) break;
   }
   return bands.flat().slice(0, limit);
-}
-
-/**
- * What the last visit learned, so the placeholder does not flip on arrival.
- *
- * Whether the box may claim a million titles is a fact about the Worker, and
- * the only way to learn it is to ask — which lands a frame or two after first
- * paint. Printing the cautious copy and swapping it under the reader's eyes on
- * every single load is a worse lie than either sentence on its own.
- *
- * So the answer is remembered and used as the opening assumption. A first-ever
- * visit gets the cautious placeholder for one frame, which is exactly right: on
- * that visit the site genuinely does not know yet.
- */
-const REMOTE_KEY = 'newonott.search.remote';
-
-export function recallRemote(): boolean {
-  try {
-    return localStorage.getItem(REMOTE_KEY) === '1';
-  } catch {
-    return false;
-  }
-}
-
-export function rememberRemote(remote: boolean): void {
-  try {
-    localStorage.setItem(REMOTE_KEY, remote ? '1' : '0');
-  } catch {
-    /* Private mode. The probe still runs; only the head start is lost. */
-  }
 }
 
 /**

@@ -4,9 +4,9 @@
  * One box searches two things — 963 rows already in the browser, and a million
  * more behind /api/search — and almost every way this can go wrong is a way of
  * blurring that line. The same film offered twice because one copy carries a
- * `~ott` suffix. A placeholder promising a million titles on a deploy where the
- * Worker has no TMDB credential, which is the state the site is in right now.
- * TMDB timing out and taking the local results down with it.
+ * `~ott` suffix. TMDB timing out and taking the local results down with it. An
+ * empty state that says "nothing matches" when what it searched was this site
+ * alone, because the Worker has no TMDB credential bound yet.
  *
  * None of that is visible in a screenshot of a working search, which is why it
  * is pinned here.
@@ -37,7 +37,7 @@ execFileSync(
   ],
   { stdio: 'pipe' },
 );
-const { placeholderFor, withoutLocal, localMatches, askRemote, EMPTY } = await import(
+const { PLACEHOLDER, withoutLocal, localMatches, askRemote, EMPTY } = await import(
   join(dir, 'globalSearch.mjs')
 );
 
@@ -58,14 +58,12 @@ const hit = (over = {}) => ({ kind: 'film', id: 'm-99', title: 'Some Film', ...o
 
 /* ------------------------------------------------------------------ copy -- */
 
-test('the placeholder only claims a million once the proxy can reach TMDB', () => {
-  assert.match(placeholderFor(true), /1M\+/);
-  assert.doesNotMatch(placeholderFor(false), /\d/);
-});
-
-test('the no-credential placeholder still says what the box searches', () => {
-  const copy = placeholderFor(false).toLowerCase();
-  for (const word of ['films', 'series', 'people']) assert.ok(copy.includes(word), copy);
+test('the placeholder fits the narrowest phone', () => {
+  // The field is about 200px wide at 360px once the icon and the clear button
+  // have taken their padding. This is not a style preference: the copy that
+  // was here before ran past it and truncated mid-word.
+  assert.ok(PLACEHOLDER.length <= 20, PLACEHOLDER);
+  assert.match(PLACEHOLDER, /1M\+/);
 });
 
 /* --------------------------------------------------------------- overlap -- */
@@ -222,9 +220,10 @@ test('a superseded keystroke aborts without throwing into the UI', async () => {
 });
 
 test('a degraded answer is not the same as no credential', async () => {
-  // `remote: true, degraded: true` is "we can search, TMDB blinked" — the box
-  // keeps its million-title placeholder. `remote: false` is "no credential",
-  // and the placeholder has to stop making the claim.
+  // `remote: true, degraded: true` is "we can search, TMDB blinked".
+  // `remote: false` is "no credential, this was our rows only". The header no
+  // longer distinguishes them — it is one line now — so the empty state is
+  // what has to, and it reads these two flags to do it.
   const state = await withFetch(
     async () =>
       new Response(JSON.stringify({ remote: true, results: [], total: 0, degraded: true }), {
@@ -234,7 +233,13 @@ test('a degraded answer is not the same as no credential', async () => {
   );
   assert.equal(state.remote, true);
   assert.equal(state.degraded, true);
-  assert.equal(placeholderFor(state.remote), placeholderFor(true));
+
+  const noCredential = await withFetch(
+    async () => new Response(JSON.stringify({ remote: false, results: [], total: 0 }), { status: 200 }),
+    () => askRemote('kantara'),
+  );
+  assert.equal(noCredential.remote, false);
+  assert.equal(noCredential.degraded, false);
 });
 
 test('a body missing its fields does not crash the dropdown', async () => {

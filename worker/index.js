@@ -120,10 +120,10 @@ async function proxyPoster(request, url) {
  * Degrading honestly
  *
  * With no TMDB_TOKEN bound this returns `remote: false` and an empty list
- * rather than an error. The front end reads that flag and says "Search films,
- * series and people" instead of "Search 1M+ titles" — the claim appears only
- * once it is true. A placeholder promising a million titles over a search of
- * nine hundred is exactly the kind of lie this codebase keeps refusing.
+ * rather than an error, so the local half of the search still renders and the
+ * page works. The front end reads that flag in its empty state — "Nothing on
+ * New on OTT matches X" rather than a flat "Nothing matches", which would be a
+ * far bigger claim than the site could stand behind.
  *
  * The token is bound to this Worker, separately from the one the refresh uses
  * in Actions — docs/search-setup.md has the step, and /api/watchdog reports

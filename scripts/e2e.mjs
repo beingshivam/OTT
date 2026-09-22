@@ -943,7 +943,10 @@ console.log('\nSearch is global');
  * on Netflix on Friday.
  */
 console.log('\nThe search dropdown');
-for (const width of [390, 1440]) {
+/* 360 first, and not as an afterthought: it is the narrowest screen this site
+   supports and the width the placeholder has to survive. A field that reads
+   "Search 1M+ ti…" makes the claim and fails to make it in the same breath. */
+for (const width of [360, 390, 1440]) {
   const { ctx, page, errors } = await newPage(browser, { width, height: 900 });
 
   /* No credential bound. The honest degraded state, and the one live today. */
@@ -966,11 +969,35 @@ for (const width of [390, 1440]) {
     `${width}px: the search field is drawn, not hidden behind an icon`,
     'it collapsed',
   );
-  const placeholder = await page.getAttribute('.gsearch input', 'placeholder');
   is(
-    !/\d/.test(placeholder ?? ''),
-    `${width}px: with no credential it does not promise a million titles`,
-    `it says "${placeholder}"`,
+    asked === 0,
+    `${width}px: loading the page costs no search request`,
+    `${asked} made before anybody typed`,
+  );
+  /* One placeholder at every width, and it has to fit the field it is in.
+     The copy that varied by credential ran past a 360px field and truncated
+     mid-word, which is the failure this measures rather than asserts. */
+  const copy = await page.evaluate(() => {
+    const el = document.querySelector('.gsearch input');
+    const probe = document.createElement('span');
+    probe.textContent = el.placeholder;
+    probe.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap';
+    probe.style.font = getComputedStyle(el).font;
+    document.body.append(probe);
+    const w = probe.getBoundingClientRect().width;
+    probe.remove();
+    // 34px of padding at each end for the magnifier and the clear button.
+    return { text: el.placeholder, room: el.getBoundingClientRect().width - 68, w };
+  });
+  is(
+    copy.text === 'Search 1M+ titles',
+    `${width}px: the placeholder is the one line, not a variant`,
+    `it says "${copy.text}"`,
+  );
+  is(
+    copy.w <= copy.room,
+    `${width}px: and it fits the field without truncating`,
+    `${Math.round(copy.w)}px of copy in ${Math.round(copy.room)}px of field`,
   );
 
   /* Typing must not move the board. A panel that pushes content is the bug
@@ -1041,6 +1068,9 @@ for (const width of [390, 1440]) {
     );
   }
 
+  /* Exactly the keystrokes, and nothing on mount. The probe that used to run
+     on every page load existed only to choose between two placeholders; there
+     is one now, so the request is gone and must stay gone. */
   is(asked > 0, `${width}px: the proxy was actually asked`, 'no request was made');
   is(errors.length === 0, `${width}px: no console errors`, errors[0]);
   await ctx.close();

@@ -2,11 +2,9 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { IconClose, IconSearch } from './icons';
 import {
   EMPTY,
+  PLACEHOLDER,
   askRemote,
   localMatches,
-  placeholderFor,
-  recallRemote,
-  rememberRemote,
   withoutLocal,
   type RemoteHit,
   type SearchState,
@@ -78,10 +76,7 @@ export function GlobalSearch({ value, onChange, corpus, onOpen }: Props) {
     () => typeof window !== 'undefined' && window.innerWidth >= ROOM_FOR_A_FIELD,
   );
   const [focused, setFocused] = useState(false);
-  const [remote, setRemote] = useState<SearchState>(() => ({
-    ...EMPTY,
-    remote: typeof window !== 'undefined' && recallRemote(),
-  }));
+  const [remote, setRemote] = useState<SearchState>(EMPTY);
   const [cursor, setCursor] = useState(-1);
 
   useEffect(() => {
@@ -90,26 +85,6 @@ export function GlobalSearch({ value, onChange, corpus, onOpen }: Props) {
     read();
     mq.addEventListener('change', read);
     return () => mq.removeEventListener('change', read);
-  }, []);
-
-  /*
-   * The capability probe.
-   *
-   * An empty query costs the Worker no upstream call — it exists so the box can
-   * learn whether it is allowed to print "1M+" before anybody types. Without a
-   * credential bound the proxy says so, and the placeholder stops making a
-   * claim it cannot keep.
-   */
-  useEffect(() => {
-    let live = true;
-    askRemote('').then((s) => {
-      if (!live) return;
-      rememberRemote(s.remote);
-      setRemote((prev) => ({ ...prev, remote: s.remote }));
-    });
-    return () => {
-      live = false;
-    };
   }, []);
 
   const query = value.trim();
@@ -261,7 +236,7 @@ export function GlobalSearch({ value, onChange, corpus, onOpen }: Props) {
         <input
           ref={input}
           type="search"
-          placeholder={placeholderFor(remote.remote)}
+          placeholder={PLACEHOLDER}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onFocus={() => setFocused(true)}
@@ -324,11 +299,23 @@ export function GlobalSearch({ value, onChange, corpus, onOpen }: Props) {
             </Section>
           )}
 
+          {/*
+            Where the honesty went once the placeholder became one line.
+
+            The header now says "Search 1M+ titles" unconditionally, so this is
+            the only thing left that can tell a reader what was actually
+            searched — and "nothing matches" under that promise is a much bigger
+            claim than "nothing of ours matches". It scopes itself down when the
+            wider half is missing or silent, and says nothing extra when it
+            worked, which is the state this runs in once the token is bound.
+          */}
           {empty && (
             <p className="gsearch__none">
               {remote.degraded
-                ? `Nothing here matches “${query}”, and the wider search didn’t answer just now.`
-                : `Nothing matches “${query}”.`}
+                ? `Nothing here matches “${query}” — the wider search didn’t answer just now.`
+                : remote.remote
+                  ? `Nothing matches “${query}”.`
+                  : `Nothing on New on OTT matches “${query}”.`}
             </p>
           )}
         </div>
