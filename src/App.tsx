@@ -3,6 +3,7 @@ import { Board } from './components/Board';
 import { BrowseLinks } from './components/BrowseLinks';
 import { PageIntro } from './components/PageIntro';
 import { ReleaseDatePage } from './components/ReleaseDatePage';
+import { ChangesPage, type Change } from './components/ChangesPage';
 import { Controls } from './components/Controls';
 import { DetailSheet } from './components/DetailSheet';
 import { EmailSignup } from './components/EmailSignup';
@@ -73,6 +74,10 @@ export default function App() {
    */
   const [catalogue, setCatalogue] = useState<Release[] | null>(null);
   const [catalogueError, setCatalogueError] = useState<string | null>(null);
+  /** The change log, fetched only on its own page — see ChangesPage. Same
+   *  reasoning as the catalogue above: a file most visits never open does not
+   *  belong in the first paint of the ones that do not. */
+  const [changes, setChanges] = useState<Change[] | null>(null);
 
   const today = useMemo(() => new Date(), []);
   const currentWeek = useMemo(() => weekIdFor(today), [today]);
@@ -226,6 +231,22 @@ export default function App() {
     };
   }, [route, catalogue, searching]);
 
+  /* The change log, on its page only. Failure is silent and leaves the page in
+     its empty state: a log that cannot load is indistinguishable to a reader
+     from a log with nothing in it, and an error box over a page that is
+     usually empty anyway would be the louder lie. */
+  useEffect(() => {
+    if (!route?.changes || changes) return;
+    let live = true;
+    fetch('/data/changes.json')
+      .then((r) => (r.ok ? r.json() : { events: [] }))
+      .then((d) => live && setChanges(d.events ?? []))
+      .catch(() => live && setChanges([]));
+    return () => {
+      live = false;
+    };
+  }, [route, changes]);
+
   useEffect(() => {
     writeFilters(
       filters,
@@ -306,6 +327,13 @@ export default function App() {
   /** A title page is the one route that does not render the board at all, so
    *  the week bar, the filters and the grid all step aside for it. */
   const isTitlePage = Boolean(route?.titleSlug);
+
+  /** /changes replaces the board for the same reason a title page does: it is
+   *  a different page, not a filtered view of this one. Everywhere below that
+   *  asks `!isTitlePage` is asking "is the board on screen", so it asks this
+   *  too. */
+  const isChanges = Boolean(route?.changes);
+  const offBoard = isTitlePage || isChanges;
 
   /**
    * A month page or /upcoming: the board spans weeks, so the week the filters
@@ -703,7 +731,7 @@ export default function App() {
             means it, which is true of a week and not of a month or of seventy
             years of back catalogue.
           */}
-          {feed && !isTitlePage && !span && !route?.catalogue && (
+          {feed && !offBoard && !span && !route?.catalogue && (
             <ShareWeek releases={visible} filters={filters} />
           )}
           {/* Before search rather than after: search is the one control a
@@ -734,7 +762,7 @@ export default function App() {
           before seeing anything, clipped at 390px, on a site whose name is the
           other half. It reads better as one of the two rows under "Just
           landed", which is where it now lives. */}
-      {!isTitlePage && (
+      {!offBoard && (
         <div className="shell lenses-row">
         <nav className="lenses" aria-label="What to show">
           <a className="lens" href="/" aria-current={!route ? 'page' : undefined}>
@@ -778,7 +806,7 @@ export default function App() {
 
       {/* Only on a page that promised something specific. On "/" this renders
           nothing and the layout is exactly what it was. */}
-      {route && feed && !isTitlePage && (
+      {route && feed && !offBoard && (
         <PageIntro
           route={route}
           rows={route.catalogue ? releases : undefined}
@@ -797,7 +825,7 @@ export default function App() {
         the order is the same: what the page is, then the row worth looking at,
         then the controls that act on the board underneath.
       */}
-      {!isTitlePage && feed && !error && facets.total > 0 && !span && !route?.catalogue && showRails && (
+      {!offBoard && feed && !error && facets.total > 0 && !span && !route?.catalogue && showRails && (
         <div className="shell">
           {showSoon ? (
             /*
@@ -915,7 +943,7 @@ export default function App() {
         </div>
       )}
 
-      {!isTitlePage && (
+      {!offBoard && (
       <Controls
         filters={filters}
         facets={facets}
@@ -997,6 +1025,23 @@ export default function App() {
         {isTitlePage && feed && !error && titlePage && (
           <ReleaseDatePage release={titlePage} feed={feed} region={filters.region} />
         )}
+
+        {/* The change log. Drawn from its own file and its own component, and
+            it needs the feed only for the slug lookup that turns a title into
+            a link to its page. */}
+        {isChanges && (
+          <ChangesPage
+            events={changes}
+            slugById={
+              new Map(
+                (feed?.weeks ?? [])
+                  .flatMap((w) => w.releases)
+                  .filter((r) => r.slug)
+                  .map((r) => [r.id, r.slug as string]),
+              )
+            }
+          />
+        )}
         {isTitlePage && feed && !error && titlePage === null && (
           <div className="empty">
             <span className="empty__icon">
@@ -1012,7 +1057,7 @@ export default function App() {
           </div>
         )}
 
-        {!isTitlePage && !feed && !error && <LoadingBoard view={view} />}
+        {!offBoard && !feed && !error && <LoadingBoard view={view} />}
 
         {/* Its own state: the feed loaded fine, so the shell is right and only
             this lens has nothing. Saying so beats an empty board that looks
@@ -1034,7 +1079,7 @@ export default function App() {
           <LoadingBoard view={view} />
         )}
 
-        {!isTitlePage && feed && !error && facets.total === 0 && (
+        {!offBoard && feed && !error && facets.total === 0 && (
           <div className="empty">
             <span className="empty__icon">
               <IconCalendar />
@@ -1076,7 +1121,7 @@ export default function App() {
           </div>
         )}
 
-        {!isTitlePage && feed && !error && facets.total > 0 && (
+        {!offBoard && feed && !error && facets.total > 0 && (
           <>
             {visible.length === 0 ? (
               <div className="empty">
@@ -1227,7 +1272,15 @@ export default function App() {
           </div>
 
           <div className="footer__meta">
-            <span>Refreshes {refreshDaysLabel()}</span>
+            {/* The one place this belongs, and the reason it is not a fourth
+                lens: "Refreshes daily" is already a claim about the pipeline,
+                and /changes is that claim's evidence. A reader who wonders
+                whether the site really updates every day is exactly the reader
+                who should land on the log — and the nav above stays three
+                tabs, which it is deliberately. */}
+            <span>
+              Refreshes <a className="footer__link" href="/changes">{refreshDaysLabel()}</a>
+            </span>
             {/* Says whose scores these are — they are TMDB's, not IMDb's, and
                 the two differ by a few tenths often enough that leaving a bare
                 star to be read as IMDb would be misleading. The wording is also

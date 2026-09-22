@@ -4069,3 +4069,113 @@ select,
   width: 100%;
   justify-content: center;
 }
+
+/* --- what changed today ---------------------------------------------------
+ *
+ * A log, not a list of cards. The unit here is a sentence — "Got a Prime Video
+ * date, 29 days after its cinema release" — and a poster beside it would be
+ * decoration competing with the only thing on the page worth reading. Every
+ * other surface on this site leads with artwork because it is answering "what
+ * should I watch"; this one answers "what happened", and that is text.
+ */
+.changes {
+  padding-bottom: 40px;
+}
+.changes__lede {
+  margin: 8px 0 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text-2);
+  max-width: 54ch;
+}
+.changes__rss {
+  color: var(--brand-2);
+  text-decoration: none;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.changes__rss:hover {
+  text-decoration: underline;
+}
+
+.changes__day {
+  margin-top: 26px;
+}
+.changes__date {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  font-weight: 600;
+  margin: 0 0 4px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid var(--line);
+}
+.changes__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.changes__item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 13px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Tinted by kind, because the glyphs are emoji and emoji do not take a colour.
+   The tint is what makes the column scannable — a reader looking only for new
+   dates finds the amber ones without reading a word. */
+.changes__glyph {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+  line-height: 1;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+.changes__glyph--dated {
+  background: rgba(255, 176, 58, 0.13);
+  border-color: rgba(255, 176, 58, 0.3);
+}
+.changes__glyph--platform {
+  background: rgba(37, 211, 102, 0.13);
+  border-color: rgba(37, 211, 102, 0.3);
+}
+.changes__glyph--added {
+  background: rgba(120, 160, 255, 0.13);
+  border-color: rgba(120, 160, 255, 0.3);
+}
+.changes__glyph--moved {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.changes__body {
+  flex: 1;
+  min-width: 0;
+}
+.changes__title {
+  display: block;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text);
+  text-decoration: none;
+  margin-bottom: 2px;
+}
+a.changes__title:hover {
+  color: var(--brand-2);
+}
+.changes__detail {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-2);
+}
+.changes__lang {
+  color: var(--text-3);
+}

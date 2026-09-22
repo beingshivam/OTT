@@ -172,6 +172,16 @@ export type Route = Partial<Pick<Filters, 'platforms' | 'languages' | 'kinds' | 
   /** Set when the path names one title. Unlike every other route this is not a
    *  filter over the board — the app renders a different page entirely. */
   titleSlug?: string;
+  /**
+   * Set for /changes, the log of what the daily refresh noticed.
+   *
+   * Like a title page and unlike every filter route: it replaces the board
+   * rather than narrowing it, and it is drawn from its own file. It has to be
+   * here rather than left to fall through to null, because a prerendered page
+   * the app cannot draw is swapped for the homepage the instant React
+   * hydrates — a crawler reads the log and a reader gets the board.
+   */
+  changes?: boolean;
   /** Set when the path names a stretch of dates rather than a week. The board
    *  reads across weeks and the week stepper steps aside. */
   span?: Span;
@@ -218,6 +228,7 @@ export function routeFilters(pathname: string): Route | null {
   if (path === '/upcoming') return { span: upcomingSpan() };
   if (path === '/in-cinemas') return { span: cinemasSpan() };
   if (path === '/streaming') return { catalogue: true };
+  if (path === '/changes') return { changes: true };
 
   const month = MONTH_PATH.exec(path);
   if (month) {

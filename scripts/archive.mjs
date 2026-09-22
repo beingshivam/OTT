@@ -107,6 +107,39 @@ let added = 0;
 let updated = 0;
 let restamped = 0;
 
+/**
+ * What changed, not just that something did.
+ *
+ * `changedAt` answers "when" for the sitemap. This answers "what" for a reader,
+ * and the two are different jobs: nobody wants to know that a row was touched,
+ * they want to know that a film they are waiting for got a date.
+ *
+ * Only what can honestly be detected from two consecutive archives. The
+ * temptation is to report things the shape of news — "Coolie left cinemas
+ * after six weeks" reads beautifully — and the feed cannot support it: a row
+ * leaving the eight-week window is the window moving, not the film ending its
+ * run, and there is no way here to tell those apart. So it is not reported.
+ * Four kinds, each of which is a fact:
+ *
+ *   dated     a film with a cinema listing gained a streaming date, which is
+ *             the single event this whole site exists to catch
+ *   added     a title entered the calendar
+ *   moved     an announced date changed, which in Indian cinema is common and
+ *             is exactly what someone planning around it wants to know
+ *   platform  a row gained a service it did not have
+ */
+const events = [];
+const services = (r) => (r.platforms ?? []).filter((p) => p !== 'theatres');
+const note = (kind, row, detail) =>
+  events.push({
+    at: TODAY,
+    kind,
+    id: row.id,
+    title: row.title,
+    ...(row.languages?.[0] ? { lang: row.languages[0] } : {}),
+    ...detail,
+  });
+
 for (const week of feed.weeks) {
   for (const row of week.releases) {
     const existing = byId.get(row.id);
@@ -138,8 +171,37 @@ for (const week of feed.weeks) {
       // "every row, every run" — a diff of 300 touched rows twice a week is a
       // diff nobody reads.
       if (JSON.stringify({ ...existing, lastSeen: TODAY }) !== JSON.stringify(merged)) updated++;
+
+      if (existing.releaseDate !== merged.releaseDate) {
+        note('moved', merged, { from: existing.releaseDate, to: merged.releaseDate });
+      }
+      const was = services(existing);
+      const now = services(merged);
+      const gained = now.filter((p) => !was.includes(p));
+      if (gained.length) note('platform', merged, { platforms: gained, date: merged.releaseDate });
     } else {
       added++;
+      /*
+       * A `~ott` row appearing is the film getting its streaming date.
+       *
+       * It arrives as a new row rather than an edit to the cinema listing —
+       * see the digital pass in fetch-releases.mjs — so the interesting event
+       * looks like an addition unless you go and find the film it belongs to.
+       * `afterDays` is the wait, which is the number the reader actually wants
+       * and the same one the Wait Clock will be built on.
+       */
+      const base = String(row.id).endsWith('~ott') ? byId.get(String(row.id).replace(/~ott$/, '')) : null;
+      if (base) {
+        note('dated', { ...merged, title: base.title }, {
+          platforms: services(merged),
+          date: merged.releaseDate,
+          ...(base.releaseDate
+            ? { afterDays: Math.round((Date.parse(merged.releaseDate) - Date.parse(base.releaseDate)) / 86400000) }
+            : {}),
+        });
+      } else if (!String(row.id).endsWith('~ott')) {
+        note('added', merged, { platforms: merged.platforms ?? [], date: merged.releaseDate });
+      }
     }
     byId.set(row.id, merged);
   }
@@ -181,6 +243,69 @@ await writeFile(
   `${JSON.stringify({ updatedAt: new Date().toISOString(), titles }, null, 0)}\n`,
 );
 
+/*
+ * The change log, kept beside the archive and shipped to the browser.
+ *
+ * In public/ because the app renders /changes itself — a prerendered page the
+ * app cannot also draw gets replaced by the homepage the moment React
+ * hydrates, which is the one failure mode worth designing around here.
+ *
+ * Append-only within a window. Ninety days is the horizon: long enough that a
+ * quiet fortnight does not empty the page, short enough that the file stays
+ * small enough to ship on every visit. Older events are not archived
+ * elsewhere, deliberately — this is a news feed, not a second archive, and the
+ * archive already keeps the facts.
+ *
+ * Deduplicated on the whole event, because a day can run more than once: the
+ * schedule fires daily and a manual dispatch on the same day would otherwise
+ * report every morning's news twice.
+ */
+const CHANGES = resolve(ROOT, 'public/data/changes.json');
+const KEEP_DAYS = 90;
+const horizon = new Date(Date.now() - KEEP_DAYS * 86400000).toISOString().slice(0, 10);
+
+const before_ = await readFile(CHANGES, 'utf8')
+  .then((s) => JSON.parse(s).events ?? [])
+  .catch(() => []);
+
+const key = (e) => JSON.stringify([e.at, e.kind, e.id, e.from, e.to, (e.platforms ?? []).join()]);
+const seenEvents = new Set(before_.map(key));
+const fresh = events.filter((e) => !seenEvents.has(key(e)));
+
+/*
+ * A date that moves twice in a day moved once.
+ *
+ * The very first run of this produced "Matchbox the Movie moved to 8 Oct" and
+ * "Matchbox the Movie moved to 9 Oct" on the same day, because the job ran
+ * twice against feeds either side of a refresh. Both entries were true and
+ * together they were noise — and a film whose date wobbles by a day is exactly
+ * the kind that would do it repeatedly.
+ *
+ * So a title's moves within one day collapse to the net journey: the date it
+ * started the day on, and the one it ended on. If those match it did not move
+ * and nothing is reported at all.
+ */
+const collapsed = [];
+const moves = new Map();
+for (const e of [...before_, ...fresh].filter((e) => e.at >= horizon)) {
+  if (e.kind !== 'moved') {
+    collapsed.push(e);
+    continue;
+  }
+  const k = `${e.at}|${e.id}`;
+  const seen = moves.get(k);
+  if (seen) seen.to = e.to;
+  else moves.set(k, { ...e });
+}
+for (const e of moves.values()) if (e.from !== e.to) collapsed.push(e);
+
+const kept = collapsed.sort((a, b) => b.at.localeCompare(a.at) || a.title.localeCompare(b.title));
+
+await writeFile(
+  CHANGES,
+  `${JSON.stringify({ generatedAt: new Date().toISOString(), days: KEEP_DAYS, events: kept }, null, 0)}\n`,
+);
+
 const withPages = titles.filter(
   (t) => t.platforms?.includes('theatres') && t.synopsis && t.cast?.length,
 ).length;
@@ -188,6 +313,7 @@ const withPages = titles.filter(
 console.log(
   `archive: ${titles.length} titles (${before} before, +${added} new, ${updated} updated)\n` +
     `         ${restamped} changed something a reader would see, and moved their lastmod\n` +
+    `         ${fresh.length} new change events (${kept.length} in the ${KEEP_DAYS}-day log)\n` +
     (backfilled ? `         ${backfilled} older rows dated from when the feed last carried them\n` : '') +
     `         ${withPages} carry enough metadata for a title page`,
 );
