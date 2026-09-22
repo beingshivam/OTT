@@ -519,8 +519,35 @@ const brandDescription = (s) => {
      New on OTT, updated daily." A description that repeats its own
      clause reads as generated, which is the one impression a snippet cannot
      afford. */
-  const suffixed = `${s} | ${BRAND}`;
-  return suffixed.length <= DESC_BUDGET ? suffixed : s;
+  const suffix = ` | ${BRAND}`;
+  if (s.length + suffix.length <= DESC_BUDGET) return s + suffix;
+
+  /*
+   * Over budget: make room, rather than drop the name.
+   *
+   * This used to return the description unchanged, which meant the brand went
+   * on "where it fits" — while the gate next door asserted it was always
+   * there. Two rules that cannot both hold, waiting for a description to grow
+   * past the line. On 22 September /upcoming did: its text ends with the next
+   * title to arrive, a longer film name pushed it over, the suffix was
+   * silently dropped, and the gate failed the whole publish over it. A perfect
+   * calendar went unpublished for a day because of a seven-character overrun.
+   *
+   * A generator that sometimes obeys a rule is worse than one that never does,
+   * because only the first kind fails at random and only on the days the data
+   * happens to be long. This one always obeys: the sentence is cut back to
+   * leave room and the name goes on. The description is the thing with slack
+   * in it; the invariant is not.
+   */
+  /* Less one for the full stop this puts back. */
+  const room = DESC_BUDGET - suffix.length - 1;
+  const cut = s.slice(0, room);
+  /* Prefer a clean break — a description ending mid-clause reads as broken in
+     a way a slightly shorter one does not — but only where that still leaves
+     most of the text, rather than amputating it to four words for a suffix. */
+  const stop = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf(' — '), cut.lastIndexOf(', '));
+  const body = stop > room * 0.6 ? cut.slice(0, stop) : cut.replace(/\s+\S*$/, '');
+  return `${body.replace(/[\s.,—|]+$/, '')}.${suffix}`;
 };
 
 async function renderPage(page, pages) {

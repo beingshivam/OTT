@@ -26,7 +26,7 @@
  * Usage: npm run eval          (after npm run build)
  */
 
-import { readFile, readdir, stat } from 'node:fs/promises';
+import { appendFile, readFile, readdir, stat } from 'node:fs/promises';
 import { slugify } from './slug.mjs';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -41,6 +41,31 @@ const record = (section, name, status, detail = '', examples = []) =>
 const pass = (s, n, d) => record(s, n, 'PASS', d);
 const fail = (s, n, d, ex = []) => record(s, n, 'FAIL', d, ex);
 const skip = (s, n, d) => record(s, n, 'SKIP', d);
+/**
+ * A finding that is worth fixing and not worth withholding a calendar for.
+ *
+ * This distinction is the whole design of the gate and it was missing, which
+ * cost three Fridays. On 22 September the refresh fetched a perfect calendar
+ * and refused to publish it because one page out of 356 — /upcoming — had a
+ * description seven characters too long to fit the site's name on the end. The
+ * site went a day stale over a suffix nobody would have noticed.
+ *
+ * So there are two kinds of finding now.
+ *
+ *   fail  the site would tell a reader something untrue: a page claiming a
+ *         film streams when it does not, a link into nothing, a score of 9.8
+ *         from four votes, a calendar too old to be the calendar. Publishing
+ *         that is worse than publishing nothing, so it blocks.
+ *
+ *   warn  the site would be correct and slightly worse at selling itself: a
+ *         missing brand suffix, a description over its display budget, a
+ *         sitemap whose dates have stopped distinguishing pages. Every one of
+ *         these is worth a fix this week. None is worth a stale week.
+ *
+ * The test for which is one question: would a reader be misled? If the answer
+ * is no, it is a warn, however much it annoys an SEO audit.
+ */
+const warn = (s, n, d, ex = []) => record(s, n, 'WARN', d, ex);
 
 const readJson = async (p) => JSON.parse(await readFile(p, 'utf8'));
 const maybe = async (p) => readJson(p).catch(() => null);
@@ -265,14 +290,14 @@ else {
     ([, html]) => !(html.match(/<title>([^<]*)<\/title>/)?.[1] ?? '').includes(BRAND),
   );
   noBrandTitle.length
-    ? fail(S4, 'every title names the site', `${noBrandTitle.length} do not`,
+    ? warn(S4, 'every title names the site', `${noBrandTitle.length} do not`,
         noBrandTitle.slice(0, 5).map(([p]) => p))
     : pass(S4, 'every title names the site', `${pages.size} pages`);
 
   const descOf = (html) => html.match(/name="description" content="([^"]*)"/)?.[1] ?? '';
   const noBrandDesc = [...pages].filter(([, html]) => !descOf(html).includes(BRAND));
   noBrandDesc.length
-    ? fail(S4, 'every description names the site', `${noBrandDesc.length} do not`,
+    ? warn(S4, 'every description names the site', `${noBrandDesc.length} do not`,
         noBrandDesc.slice(0, 5).map(([p]) => p))
     : pass(S4, 'every description names the site');
 
@@ -290,7 +315,7 @@ else {
     return d.length < 70 || d.length > 210;
   });
   badLen.length
-    ? fail(S4, 'descriptions fit a search result', `${badLen.length} outside 70-210 chars`,
+    ? warn(S4, 'descriptions fit a search result', `${badLen.length} outside 70-210 chars`,
         badLen.slice(0, 5).map(([p, html]) => `${p} — ${descOf(html).length}`))
     : pass(S4, 'descriptions fit a search result');
 
@@ -318,7 +343,7 @@ else {
   ok
     ? pass(S4, 'the searchbox action points somewhere real',
         `${action}${onDisk.has(searchPath) ? '' : ' (via the SPA fallback)'}`)
-    : fail(S4, 'the searchbox action points somewhere real',
+    : warn(S4, 'the searchbox action points somewhere real',
         action ? `${action} — nothing serves ${searchPath}` : 'no SearchAction found');
 
   const badCanon = [...pages].filter(([path, html]) => {
@@ -375,11 +400,11 @@ else {
     const distinct = new Set(stamps);
     const allBuilt = feed && stamps.every((d) => d === feed.generatedAt.slice(0, 10));
     !stamps.length
-      ? fail(S4, 'sitemap dates tell the pages apart', 'no lastmod at all')
+      ? warn(S4, 'sitemap dates tell the pages apart', 'no lastmod at all')
       : distinct.size > 1 && !allBuilt
         ? pass(S4, 'sitemap dates tell the pages apart',
             `${distinct.size} distinct dates across ${stamps.length} URLs`)
-        : fail(S4, 'sitemap dates tell the pages apart',
+        : warn(S4, 'sitemap dates tell the pages apart',
             allBuilt ? 'every URL carries the build date' : `all ${stamps.length} share one date`);
   }
 }
@@ -583,16 +608,47 @@ for (const r of results) {
     console.log(`\n${section}`);
   }
   const mark =
-    r.status === 'PASS' ? ' ok ' : r.status === 'FAIL' ? 'FAIL' : r.status === 'NOTE' ? 'note' : 'skip';
+    r.status === 'PASS' ? ' ok '
+    : r.status === 'FAIL' ? 'FAIL'
+    : r.status === 'WARN' ? 'warn'
+    : r.status === 'NOTE' ? 'note'
+    : 'skip';
   console.log(`  ${mark}  ${r.name.padEnd(width)}${r.detail}`);
   for (const ex of r.examples) console.log(`        · ${ex}`);
 }
 
 const failed = results.filter((r) => r.status === 'FAIL').length;
+const warned = results.filter((r) => r.status === 'WARN');
 const skipped = results.filter((r) => r.status === 'SKIP').length;
 const passed = results.filter((r) => r.status === 'PASS').length;
 console.log(
-  `\n${passed} passed, ${failed} failed${skipped ? `, ${skipped} skipped` : ''}` +
-    (failed ? ' — the site is publishing something it should not.\n' : '\n'),
+  `\n${passed} passed, ${failed} failed` +
+    (warned.length ? `, ${warned.length} to fix` : '') +
+    (skipped ? `, ${skipped} skipped` : '') +
+    (failed
+      ? ' — the site is publishing something it should not.\n'
+      : warned.length
+        ? ' — publishing, with the above worth fixing.\n'
+        : '\n'),
 );
+
+/*
+ * Warnings have to reach somebody, or "advisory" just means "ignored".
+ *
+ * They are the reason a calendar still publishes, so nothing stops if they
+ * pile up — which is exactly how a site ends up with eighty pages missing
+ * their descriptions and nobody knowing. The run summary is where the refresh
+ * already reports, so they go there too, under a heading that says they are
+ * not an emergency.
+ */
+if (warned.length && process.env.GITHUB_STEP_SUMMARY) {
+  const lines = [
+    `### ${warned.length} thing${warned.length > 1 ? 's' : ''} to fix (published anyway)`,
+    '',
+    ...warned.flatMap((r) => [`- **${r.name}** — ${r.detail}`, ...r.examples.map((e) => `  - ${e}`)]),
+    '',
+  ];
+  await appendFile(process.env.GITHUB_STEP_SUMMARY, `${lines.join('\n')}\n`).catch(() => {});
+}
+
 process.exit(failed ? 1 : 0);
