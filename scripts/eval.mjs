@@ -369,6 +369,40 @@ else {
     ? fail(S4, 'internal links resolve to real pages', `${broken.size} dead`, [...broken].slice(0, 8))
     : pass(S4, 'internal links resolve to real pages');
 
+  /*
+   * And every page a crawler can reach by following them.
+   *
+   * The links all resolved and 64 pages still could not be got to: 63 title
+   * pages that had aged out of the feed window, kept alive by the archive
+   * while every list page was built from the window, plus /streaming, which
+   * held the entire back catalogue and had simply never been added to the
+   * browse nav. A page in the sitemap and nowhere else is crawled rarely and
+   * carries no internal weight — and the count was growing by about thirty
+   * titles a week, so it would have been most of the site by December.
+   *
+   * This is a fail rather than a warn, which is a deliberate line: an
+   * unreachable page is not the site looking worse, it is the site publishing
+   * something a reader cannot get to. Cheap to keep true, and the one shape
+   * of breakage that gets worse silently.
+   */
+  const reachable = new Set(['/']);
+  const queue = ['/'];
+  while (queue.length) {
+    const here = queue.shift();
+    for (const m of (pages.get(here) ?? '').matchAll(/href="(\/[^"#?]*)"/g)) {
+      const href = m[1].replace(/\/$/, '') || '/';
+      if (pages.has(href) && !reachable.has(href)) {
+        reachable.add(href);
+        queue.push(href);
+      }
+    }
+  }
+  const stranded = [...pages.keys()].filter((p) => !reachable.has(p));
+  stranded.length
+    ? fail(S4, 'every page can be reached by following links', `${stranded.length} unreachable from the homepage`,
+        stranded.slice(0, 8))
+    : pass(S4, 'every page can be reached by following links', `${reachable.size} pages, all linked`);
+
   const sitemap = await readFile(resolve(DIST, 'sitemap.xml'), 'utf8').catch(() => '');
   if (!sitemap) skip(S4, 'every sitemap entry exists', 'no sitemap.xml');
   else {

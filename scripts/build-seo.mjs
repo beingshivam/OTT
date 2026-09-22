@@ -352,6 +352,20 @@ function browseMarkup(pages) {
     `</div></div>`;
   return (
     `<nav class="browse">` +
+    /*
+     * The lens row, which was missing and took /streaming with it.
+     *
+     * Found while fixing the orphaned title pages: /streaming was unreachable
+     * from anywhere on the site by a followable link, for the same reason and
+     * with less excuse. Every other group has a row here; `lens` never got
+     * one, so the page holding the entire back catalogue — 664 titles, the
+     * second-largest thing the site publishes — was in the sitemap and
+     * nowhere else. Its sibling /upcoming only escaped because it is filed
+     * under `month` and rides the Months row.
+     *
+     * First, because it is a destination rather than a filter.
+     */
+    row('Browse', pages.filter((p) => p.group === 'lens')) +
     row('Collections', pages.filter((p) => p.group === 'collection')) +
     row('Platforms', pages.filter((p) => p.group === 'platform')) +
     row('Languages', pages.filter((p) => p.group === 'language')) +
@@ -1022,9 +1036,32 @@ for (const w of feed.weeks) {
     if (slug) r.slug = slug;
   }
 }
-for (const r of everything) {
+/*
+ * Every candidate, not just the ones still in the window.
+ *
+ * This stamped `everything` — the rolling eight-week feed — so an archive-only
+ * row reached a list page carrying no slug and was printed as plain text. It
+ * did not matter while only the window built lists. The month pages read the
+ * archive now, and a month page that names a film without linking to the page
+ * it has is the orphan problem with extra steps.
+ */
+for (const r of titleCandidates) {
   const slug = slugFor(r.id);
   if (slug) r.slug = slug;
+  /*
+   * And cleared when there is no page, which matters more than setting it.
+   *
+   * `slug` is stamped back onto the archive file at the end of every build, so
+   * it outlives the page it named. Four rows carried one from a build where
+   * they still cleared the content bar — Sapan Verma: Lower Back Pain has a
+   * six-word synopsis now — and the moment the month pages started reading the
+   * archive, all four became links into a 404. They had been wrong in the file
+   * for weeks; nothing had read them.
+   *
+   * So the field means one thing: this row has a page, and it is there. A
+   * stale yes is worse than a no.
+   */
+  else delete r.slug;
 }
 
 const weekRangeOf = (id) => formatRange(id);
@@ -1343,9 +1380,32 @@ if (inCinemasRows.length >= MIN_PAGE_ROWS) {
  * the homepage is one week — a month is a different question with a different
  * answer even when it is most of the feed.
  */
-const monthsPresent = [...new Set(everything.map((r) => r.releaseDate.slice(0, 7)))]
+/*
+ * Read from the archive, which is what makes these pages a home rather than a
+ * second copy of the window.
+ *
+ * Measured on 21 September: 63 of 309 title pages had no inbound link from
+ * anywhere on the site — unreachable from the homepage at any depth, present
+ * only in the sitemap. Every one was a title that had rolled off the
+ * eight-week feed. The archive keeps generating their pages, which was the
+ * whole point of building it, while every list page was built from the live
+ * window — so the moment a film aged out, its page carried on existing with
+ * nothing pointing at it.
+ *
+ * That number only goes one way. About thirty titles age out every week, so
+ * the share was 20% and climbing; by December most title pages would have been
+ * orphans. Google crawls an unlinked page rarely and passes it no internal
+ * weight, which would have made the long-tail pages — the ones this site is
+ * built to win — quietly its weakest.
+ *
+ * The month is the right parent for that. It is stable (a film's month never
+ * changes), it is finite, and "what came out in September 2026" is a real
+ * question rather than a container invented to hold links. So every title now
+ * has a permanent path home: title → its month → the homepage.
+ */
+const monthsPresent = [...new Set(titleCandidates.map((r) => r.releaseDate.slice(0, 7)))]
   .sort()
-  .map((ym) => ({ ym, list: everything.filter((r) => r.releaseDate.startsWith(ym)) }))
+  .map((ym) => ({ ym, list: titleCandidates.filter((r) => r.releaseDate.startsWith(ym)) }))
   .filter(({ list }) => list.length >= MIN_PAGE_ROWS);
 
 for (const { ym, list } of monthsPresent) {
