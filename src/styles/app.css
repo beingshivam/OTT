@@ -497,6 +497,36 @@ a {
   color: var(--text);
   border-color: var(--line-strong);
 }
+/*
+ * The WhatsApp button.
+ *
+ * Tinted rather than filled, which is a decision about hierarchy and not about
+ * taste. Every view this appears in already has a primary — "Watch on Netflix"
+ * on the sheet, the trailer on a title page — and WhatsApp's full #25D366 next
+ * to a white primary makes two buttons shouting, so a reader picks neither. A
+ * tint is recognised as fast (the glyph does that work) and stays second.
+ *
+ * The green is lifted for text against the dark surface: #25D366 at 13px on
+ * #0a0c12 sits under 4.5:1, and the brand colour is not worth an unreadable
+ * label.
+ */
+.btn--wa {
+  background: rgba(37, 211, 102, 0.12);
+  border-color: rgba(37, 211, 102, 0.28);
+  color: #5ce894;
+}
+.btn--wa:hover {
+  background: rgba(37, 211, 102, 0.18);
+  border-color: rgba(37, 211, 102, 0.45);
+  color: #7cf0ab;
+}
+/* The glyph is filled where the rest of the set is stroked, so it needs its own
+   sizing to sit on the same optical baseline as the stroked icons beside it. */
+.btn--wa svg {
+  width: 15px;
+  height: 15px;
+}
+
 .btn[data-active='true'] {
   background: var(--text);
   color: #0b0d12;

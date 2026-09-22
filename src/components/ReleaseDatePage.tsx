@@ -1,11 +1,12 @@
 import { PosterArt } from './PosterArt';
 import { Rating } from './Rating';
-import { IconPlay, IconTicket, IconExternal } from './icons';
+import { IconPlay, IconTicket, IconExternal, IconWhatsApp } from './icons';
 import { platform as platformById, languageName } from '../data/platforms';
 import { outbound } from '../data/affiliates';
 import { runtimeLabel } from '../lib/format';
 import { formatWeekRange } from '../lib/week';
 import { scoreOf } from '../lib/score';
+import { shareLine, shareUrl, whatsappHref } from '../lib/share';
 import type { Release, ReleaseFeed } from '../types';
 import { BRAND } from '../data/brand';
 
@@ -318,6 +319,36 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
                 <IconExternal />
               </a>
             )}
+            {/*
+              * The forward, which is the only distribution this site has that
+              * does not depend on Google.
+              *
+              * Here rather than only in the sheet because this is the page a
+              * search lands on, and the moment someone has their answer —
+              * "it's on Netflix from the 18th" — is the moment they tell the
+              * person they were going to watch it with. Asking after the
+              * answer, never before it.
+              *
+              * The sentence is built in lib/share.ts from the same four states
+              * this page reads, and it is handed the streaming date this page
+              * found on the film's other row: the message says "on Netflix
+              * from 18 Sep" where the sheet could only ever have said "in
+              * cinemas".
+              */}
+            <a
+              className="btn btn--lg btn--wa"
+              href={whatsappHref(
+                shareLine(release, {
+                  streamsOn: streamsOn ? { date: streamsOn, platforms: dated!.platforms } : null,
+                }),
+                shareUrl(release, window.location.href, window.location.origin),
+              )}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <IconWhatsApp />
+              WhatsApp
+            </a>
           </div>
         </div>
       </div>

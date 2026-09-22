@@ -104,6 +104,22 @@ export const IconShare = (p: P) => (
   </svg>
 );
 
+/**
+ * The one filled icon in the set, and deliberately so.
+ *
+ * Everything else here is a stroke on a 24 grid, which is what makes the row
+ * of them read as one family. WhatsApp's mark is a solid glyph, and a
+ * stroked-outline imitation of it is the thing people fail to recognise — the
+ * whole value of putting it on a button is that it is identified before it is
+ * read. So it keeps its own construction, and `fill` is set explicitly rather
+ * than inherited from `base`.
+ */
+export const IconWhatsApp = (p: P) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...p}>
+    <path d="M17.5 14.4c-.3-.15-1.75-.86-2.02-.96-.27-.1-.47-.15-.67.15-.2.3-.77.96-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.47-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.53.15-.18.2-.3.3-.5.1-.2.05-.38-.02-.53-.08-.15-.67-1.6-.92-2.2-.24-.57-.49-.5-.67-.5h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.07 2.87 1.22 3.07.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.7.63.71.23 1.36.2 1.87.12.57-.08 1.75-.71 2-1.4.25-.7.25-1.29.17-1.42-.07-.13-.27-.2-.57-.35M12.05 21.8h-.02a9.8 9.8 0 0 1-4.98-1.36l-.36-.21-3.7.97.99-3.61-.23-.37a9.76 9.76 0 0 1-1.5-5.22c0-5.4 4.4-9.79 9.8-9.79a9.73 9.73 0 0 1 6.92 2.87 9.7 9.7 0 0 1 2.87 6.93c0 5.4-4.4 9.79-9.8 9.79M20.5 3.49A11.8 11.8 0 0 0 12.05 0C5.5 0 .18 5.32.18 11.86c0 2.09.55 4.13 1.59 5.93L.08 24l6.35-1.66a11.8 11.8 0 0 0 5.62 1.43h.01c6.54 0 11.86-5.32 11.87-11.86a11.8 11.8 0 0 0-3.47-8.42" />
+  </svg>
+);
+
 export const IconExternal = (p: P) => (
   <svg {...base} {...p}>
     <path d="M14 4h6v6M20 4l-8.5 8.5" />

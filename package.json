@@ -37,7 +37,8 @@
     "e2e": "node scripts/e2e.mjs",
     "lookup": "node scripts/lookup.mjs",
     "test:affiliates": "node --test src/data/affiliates.test.mjs",
-    "coverage": "node scripts/coverage.mjs"
+    "coverage": "node scripts/coverage.mjs",
+    "test:share": "node --test src/lib/share.test.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

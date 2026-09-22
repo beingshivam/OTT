@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { IconCalendar, IconClose, IconDoc, IconExternal, IconShare, IconCheck } from './icons';
+import { IconCalendar, IconClose, IconDoc, IconExternal, IconShare, IconCheck, IconWhatsApp } from './icons';
 import { PosterArt } from './PosterArt';
 import { dropLabel } from './ReleaseCard';
 import { KIND_LABEL, languageName, platform } from '../data/platforms';
@@ -7,6 +7,7 @@ import { outbound } from '../data/affiliates';
 import { runtimeLabel } from '../lib/format';
 import { formatDay } from '../lib/week';
 import { scoreOf, scoreTitle } from '../lib/score';
+import { shareLine, shareUrl, whatsappHref } from '../lib/share';
 import type { Release } from '../types';
 
 interface Props {
@@ -90,9 +91,25 @@ export function DetailSheet({ release, onClose }: Props) {
     };
   }, [onClose]);
 
+  /*
+   * One sentence, built once, used by both ways out of this sheet.
+   *
+   * This wrote its own line — `title — Platform, Fri 18 Sep` — from
+   * `platforms[0]`, which never asked whether the film was actually out: a
+   * release three weeks away was forwarded as though it were on tonight. And
+   * it shared `window.location.href`, so a title opened from the board sent
+   * the reader to the homepage rather than to the film. Both now come from
+   * lib/share.ts, which asks the same four states the title page does.
+   *
+   * No `streamsOn` passed: the sheet has one row and the film's digital date
+   * lives on another. The title page has both and says the better sentence;
+   * this says the true one.
+   */
+  const line = shareLine(release);
+  const url = shareUrl(release, window.location.href, window.location.origin);
+
   async function share() {
-    const text = `${release.title} — ${p.name}, ${day.weekday} ${day.day} ${day.month}`;
-    const url = window.location.href;
+    const text = line;
     if (navigator.share) {
       try {
         await navigator.share({ title: release.title, text, url });
@@ -267,6 +284,19 @@ export function DetailSheet({ release, onClose }: Props) {
                 {detail.label}
               </a>
             )}
+            {/* The forward, and the reason it is a link rather than a button:
+                a WhatsApp hand-off is a navigation, so it gets middle-click,
+                long-press and "open in new tab" for free, and it works with
+                JavaScript still loading. */}
+            <a
+              className="btn btn--lg btn--wa"
+              href={whatsappHref(line, url)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <IconWhatsApp />
+              WhatsApp
+            </a>
             <button className="btn btn--lg" onClick={share}>
               {copied ? <IconCheck /> : <IconShare />}
               {copied ? 'Copied' : 'Share'}
