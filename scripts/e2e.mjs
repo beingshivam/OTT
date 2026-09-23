@@ -78,11 +78,18 @@ const PIXEL = Buffer.from(
   'base64',
 );
 
-async function newPage(browser, { width, height, seen = true, reducedMotion, slowImages = false }) {
+async function newPage(browser, { width, height, seen = true, reducedMotion, slowImages = false, touch = false }) {
   const ctx = await browser.newContext({
     viewport: { width, height },
     deviceScaleFactor: 1,
     reducedMotion,
+    /* A phone is not a narrow desktop. The touch stylesheet raises every input
+       to 16px so iOS does not magnify the page, which makes the header's copy
+       measurably wider than the same width without it — and that is exactly
+       where a placeholder runs out of field. Off by default so the existing
+       checks keep measuring what they were written against. */
+    isMobile: touch || undefined,
+    hasTouch: touch || undefined,
   });
   if (seen) await ctx.addInitScript(() => { try { localStorage.setItem('dropday.seen', '1'); } catch {} });
   const page = await ctx.newPage();
@@ -946,8 +953,8 @@ console.log('\nThe search dropdown');
 /* 360 first, and not as an afterthought: it is the narrowest screen this site
    supports and the width the placeholder has to survive. A field that reads
    "Search 1M+ ti…" makes the claim and fails to make it in the same breath. */
-for (const width of [360, 390, 1440]) {
-  const { ctx, page, errors } = await newPage(browser, { width, height: 900 });
+for (const [width, touch] of [[320, true], [360, true], [390, true], [430, true], [1440, false]]) {
+  const { ctx, page, errors } = await newPage(browser, { width, height: 900, touch });
 
   /* No credential bound. The honest degraded state, and the one live today. */
   let asked = 0;
@@ -974,20 +981,37 @@ for (const width of [360, 390, 1440]) {
     `${width}px: loading the page costs no search request`,
     `${asked} made before anybody typed`,
   );
-  /* One placeholder at every width, and it has to fit the field it is in.
-     The copy that varied by credential ran past a 360px field and truncated
-     mid-word, which is the failure this measures rather than asserts. */
+  /*
+   * One placeholder at every width, and it has to fit the field it is in.
+   *
+   * Measured rather than asserted, and measured off ::placeholder rather than
+   * the input: those are two different font sizes on a phone on purpose — the
+   * input is pinned at 16px so iOS does not magnify the page, and the hint
+   * renders at 13px so it fits beside the wordmark. An earlier version of this
+   * check read the input's size on a desktop context and passed while the real
+   * phone was drawing 142px of copy into 132px of field.
+   */
   const copy = await page.evaluate(() => {
     const el = document.querySelector('.gsearch input');
+    const cs = getComputedStyle(el);
+    const ps = getComputedStyle(el, '::placeholder');
     const probe = document.createElement('span');
     probe.textContent = el.placeholder;
     probe.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap';
-    probe.style.font = getComputedStyle(el).font;
+    probe.style.fontFamily = cs.fontFamily;
+    probe.style.fontWeight = ps.fontWeight || cs.fontWeight;
+    probe.style.fontSize = ps.fontSize || cs.fontSize;
+    probe.style.letterSpacing = ps.letterSpacing || cs.letterSpacing;
     document.body.append(probe);
     const w = probe.getBoundingClientRect().width;
     probe.remove();
-    // 34px of padding at each end for the magnifier and the clear button.
-    return { text: el.placeholder, room: el.getBoundingClientRect().width - 68, w };
+    /* The real padding, not a guess: it differs by width and shrinks again
+       while the placeholder is the only thing in the box. */
+    const room =
+      el.getBoundingClientRect().width -
+      parseFloat(cs.paddingLeft) -
+      parseFloat(cs.paddingRight);
+    return { text: el.placeholder, room, w };
   });
   is(
     copy.text === 'Search 1M+ titles',
@@ -999,6 +1023,37 @@ for (const width of [360, 390, 1440]) {
     `${width}px: and it fits the field without truncating`,
     `${Math.round(copy.w)}px of copy in ${Math.round(copy.room)}px of field`,
   );
+
+  /*
+   * The name, back beside the field.
+   *
+   * It was dropped on every phone to make room for the search box, which was
+   * the wrong half of the trade: a first-time visitor arriving from Instagram
+   * had nothing in the header telling them where they had landed. Sizing the
+   * whole row rather than deleting from it buys it back above 380px, and the
+   * play mark still carries the link home below that.
+   */
+  const brand = await page.evaluate(() => {
+    const word = document.querySelector('.logo__word');
+    const mark = document.querySelector('.logo__mark');
+    const shown = (el) => el && getComputedStyle(el).display !== 'none';
+    return {
+      word: shown(word) ? word.textContent.trim() : null,
+      mark: shown(mark),
+      home: document.querySelector('.logo')?.getAttribute('href'),
+      reach: Math.round(document.querySelector('.logo').getBoundingClientRect().width),
+    };
+  });
+  if (width >= 380) {
+    is(
+      brand.word === 'New on OTT.',
+      `${width}px: the site's name is in the header beside the field`,
+      brand.word === null ? 'the wordmark is hidden' : `it says "${brand.word}"`,
+    );
+  } else {
+    is(brand.mark, `${width}px: the mark still carries the way home`, 'nothing of the brand is left');
+  }
+  is(brand.home === '/', `${width}px: and the brand is a link to the homepage`, `href is ${brand.home}`);
 
   /* Typing must not move the board. A panel that pushes content is the bug
      this codebase has already shipped once, with the out-today rail. */

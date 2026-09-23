@@ -415,7 +415,10 @@ a {
   min-width: 0;
   max-width: 380px;
 }
-.search svg {
+/* The magnifier only — a direct child. As `.search svg` this also caught the
+   ✕ inside .search__clear and yanked it out of the grid that centres it, so
+   the clear button drew its icon against its own left edge. */
+.search > svg {
   position: absolute;
   left: 12px;
   top: 50%;
@@ -1369,20 +1372,6 @@ a {
  * wrapped "New on OTT." onto three lines and pushed the whole header to 150px
  * tall. The mark stays, so the way home does too.
  */
-/*
- * The wordmark stands down before the field does.
- *
- * At 480px the header wants 16px of gutter, a 24px mark, a 95px wordmark, two
- * 34px icons and a field — and the field loses, which is how it ended up as an
- * icon in the first place. The mark stays and is still the link home; the name
- * is on every tab title, every share card and the page the reader came from.
- */
-@media (max-width: 519px) {
-  .logo__word {
-    display: none;
-  }
-}
-
 @media (max-width: 719px) {
   /*
    * Full width on a phone.
@@ -1573,6 +1562,114 @@ a {
   }
   .hmenu__item {
     padding: 11px 12px;
+  }
+}
+
+/*
+ * The phone header, sized rather than sacrificed.
+ *
+ * The first pass dropped the wordmark below 520px, because the field at its
+ * desktop proportions left no room for it. That was solving the wrong half:
+ * the field was 230px of mostly empty pill on a 390px screen, and the site's
+ * name — the one thing that tells a first-time visitor from Instagram where
+ * they have landed — was the thing that went.
+ *
+ * So every part of the row is given a phone size instead of the desktop one,
+ * and the budget is spent deliberately. At 390px, 358 usable pixels:
+ *
+ *     20  mark          — the play square, still the brand's colour up here
+ *      6  gap
+ *     87  "New on OTT." at 13px, down from 113px at 17px
+ *      8  gap
+ *    161  field         — 127px of room for a 116px placeholder
+ *      8  gap
+ *     30  Instagram     — 44px of hit area, unchanged, via the inset below
+ *      8  gap
+ *     30  menu
+ *
+ * Nothing here is a token nudged by eye: each number was measured against the
+ * rendered width of the two strings that have to fit, and the e2e asserts the
+ * placeholder against the field it ends up in, on a touch context, so a font
+ * change cannot quietly bring the truncation back.
+ */
+@media (max-width: 519px) {
+  .weekbar__brand {
+    gap: 8px;
+  }
+  .logo {
+    gap: 6px;
+    font-size: 13px;
+  }
+
+  /* Slimmer, and closer to its own text. 38px tall with 34px of padding at
+     each end was a desktop pill: on a phone that is 68px of the field spent on
+     air around a 12px magnifier. */
+  .search input {
+    height: 36px;
+    padding-left: 28px;
+    padding-right: 30px;
+  }
+  .search > svg {
+    left: 10px;
+    width: 13px;
+    height: 13px;
+  }
+  /* The right-hand padding only has to clear the ✕, and the ✕ only exists once
+     there is something to clear. While the placeholder is showing there is
+     nothing there, so those 22 pixels go back to the copy. */
+  .search input:placeholder-shown {
+    padding-right: 8px;
+  }
+  /*
+   * The placeholder is 13px; the input stays 16px.
+   *
+   * Not a style choice — iOS magnifies any focused input under 16px and does
+   * not zoom back out, so the field's own font-size is fixed at 16 and cannot
+   * be spent here. Safari sizes the placeholder from this pseudo-element and
+   * reads the zoom rule off the input, so the hint can be 13px while the text
+   * somebody types stays at the size that keeps the page still.
+   */
+  .search input::placeholder {
+    font-size: 13px;
+  }
+  .logo__mark {
+    width: 20px;
+    height: 20px;
+  }
+  .iglink,
+  .hmenu__toggle {
+    width: 30px;
+    height: 30px;
+  }
+  .iglink svg {
+    width: 15px;
+    height: 15px;
+  }
+  .hmenu__toggle svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/*
+ * Below 380px the name stands down after all, and it is worth being plain
+ * about where that line is.
+ *
+ * At 360px the row is 328 pixels wide and the budget above runs 26 short —
+ * measured, not estimated. Three things want that space: the site's name, a
+ * placeholder making a claim, and two icons a thumb has to be able to hit.
+ * There is no arrangement of them that fits, and the honest answer is a
+ * breakpoint rather than a placeholder that truncates to "Search 1M+ ti…",
+ * which makes a promise and fails to make it in the same breath.
+ *
+ * 380 is not an arbitrary line: it sits under every phone in current use
+ * (390, 393, 402, 412, 414, 430) and above the two that are not — the 360px
+ * Android and the 375px SE. The mark stays, the way home stays, and the name
+ * comes back the moment there is room for it.
+ */
+@media (max-width: 379px) {
+  .logo__word {
+    display: none;
   }
 }
 
@@ -3722,6 +3819,12 @@ select,
   }
   .signup__dismiss::after {
     inset: -8px;
+  }
+  /* The two header icons came down to 30px to buy the wordmark its room back.
+     The thumb does not know that: 7px around 30 is the same 44. */
+  .iglink::after,
+  .hmenu__toggle::after {
+    inset: -7px;
   }
 
   /*
