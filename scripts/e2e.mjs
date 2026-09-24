@@ -30,6 +30,22 @@ const DIST = join(ROOT, 'dist');
 const SHOTS = join(ROOT, '.e2e');
 const KEEP = process.argv.includes('--keep');
 
+/*
+ * How many cards at the head of a rail are the ranking rather than the news,
+ * read from the app rather than written down here. A literal 3 in this file is
+ * how the row came to be three cards of week-old ranking on a screen that
+ * shows three cards.
+ */
+const LEAD_CARDS = await (async () => {
+  const d = mkdtempSync(join(tmpdir(), 'e2e-rails-'));
+  execFileSync(
+    'npx',
+    ['--yes', 'esbuild', 'src/lib/rails.ts', '--bundle', '--format=esm', `--outfile=${join(d, 'rails.mjs')}`],
+    { stdio: 'pipe' },
+  );
+  return (await import(join(d, 'rails.mjs'))).TRENDING_IN_CINEMAS;
+})();
+
 const TYPES = {
   '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css',
   '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png',
@@ -334,8 +350,11 @@ for (const [width, height] of [[360, 780], [390, 844], [1280, 900]]) {
     const cells = [...row.querySelectorAll('.landed__cell')];
     return {
       marked: cells.filter((c) => c.querySelector('.landed__hot')).length,
-      leading: cells.slice(0, 3).filter((c) => c.querySelector('.landed__hot')).length,
-      names: cells.slice(0, 1).map((c) => c.querySelector('.landed__name')?.textContent?.trim()),
+      /* Where the chips are, not how many: the badge has to sit at the head of
+         the row, wherever the head ends. */
+      firstUnmarked: cells.findIndex((c) => !c.querySelector('.landed__hot')),
+      names: cells.slice(0, 4).map((c) => c.querySelector('.landed__name')?.textContent?.trim()),
+      dates: cells.slice(0, 4).map((c) => c.querySelector('.landed__meta')?.textContent?.trim()),
     };
   });
   /*
@@ -424,14 +443,47 @@ for (const [width, height] of [[360, 780], [390, 844], [1280, 900]]) {
   );
   is(squeezed.length === 0, `${width}px: every service name fits its pill`, `clipped: ${squeezed.join(', ')}`);
 
-  is(hot.marked === 3, `${width}px: three cinema cards are marked trending`, `${hot.marked} marked`);
-  is(hot.leading === 3, `${width}px: and they are the three at the front`,
-     `${hot.leading} of the first three carry the chip`);
+  /*
+   * One badged card, at the front.
+   *
+   * It was three, and three is the whole of what a phone can see — so for a
+   * week the homepage opened on the same three posters every day while this
+   * week's openings sat in cards four to nine, correct and invisible. The
+   * count is asserted against the constant rather than a literal, and the
+   * chips must be contiguous from card one: a badge on cards one and four
+   * reads as a bug.
+   */
+  is(
+    hot.marked === LEAD_CARDS,
+    `${width}px: ${LEAD_CARDS} cinema card is marked trending`,
+    `${hot.marked} marked`,
+  );
+  is(
+    hot.firstUnmarked === LEAD_CARDS,
+    `${width}px: and the chips run from the front without a gap`,
+    `first card without a chip is ${hot.firstUnmarked}, expected ${LEAD_CARDS}`,
+  );
   is(
     hot.names[0] === 'Mirzapur: The Movie',
     `${width}px: the biggest film in cinemas leads the row`,
     `the row opens with "${hot.names[0]}"`,
   );
+  /*
+   * And the rest of what a phone can see is news rather than more ranking.
+   * This is the reported bug in its observable form — three times reported,
+   * never tested, because every test looked at the array and none at the
+   * screen.
+   */
+  {
+    /* "Today", "Yesterday", "3 days ago" — recent. "3 weeks ago" is the
+       ranking still talking. */
+    const after = hot.dates.slice(LEAD_CARDS, 3);
+    is(
+      after.some((d) => /today|yesterday|^\d+ days? ago/i.test(d ?? '')),
+      `${width}px: a phone sees something that opened recently, not only the ranking`,
+      `cards after the badge say: ${after.join(' / ')}`,
+    );
+  }
 
   /*
     No window in the subtitle. It said "last 6 weeks" under a tab that says

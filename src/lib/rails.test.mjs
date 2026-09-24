@@ -430,9 +430,17 @@ test('one language can take the whole shortlist when it owns the week', () => {
     row({ releaseDate: iso(i + 2), platforms: ['theatres'], languages: ['hi'], heat: 90 - i }),
   );
   const tamil = row({ releaseDate: iso(9), platforms: ['theatres'], languages: ['ta'], heat: 40 });
+  // Asserted over the row rather than over the badged head: the head is one
+  // card now (see TRENDING_IN_CINEMAS) and one card cannot show whether a rule
+  // about sharing slots between languages is in force. Four louder Hindi films
+  // ahead of a quieter Tamil one is the observable form of the same property.
   const out = inCinemas([...hindi, tamil], 'IN', TODAY);
-  const lead = out.releases.slice(0, TRENDING_IN_CINEMAS).map((r) => r.languages[0]);
-  assert.deepEqual(lead, ['hi', 'hi', 'hi'], `the interleave is still in the way: ${lead.join(', ')}`);
+  const order = out.releases.map((r) => r.languages[0]);
+  assert.deepEqual(
+    order,
+    ['hi', 'hi', 'hi', 'hi', 'ta'],
+    `the interleave is still in the way: ${order.join(', ')}`,
+  );
 });
 
 test('the interleave still holds on the rows built to spread a field', () => {
@@ -522,19 +530,35 @@ test('a co-production counts as local, and an unknown origin is not an import', 
   const rest = Array.from({ length: 4 }, (_, i) =>
     row({ releaseDate: iso(i + 4), platforms: ['theatres'], heat: 50 - i, origin: ['IN'] }),
   );
-  const out = inCinemas([co, quiet, ...rest], 'IN', TODAY);
-  const crowned = out.releases.slice(0, out.trending).map((r) => r.title);
-  assert.ok(crowned.includes('Co-production'), `India among several was treated as foreign: ${crowned.join(', ')}`);
-  assert.ok(crowned.includes('No origin recorded'), `an unrecorded origin was treated as foreign: ${crowned.join(', ')}`);
+  // One case each, because the badged head is a single card now and two titles
+  // cannot both hold it. Each is the loudest thing in its own row, so if origin
+  // demoted it the card would go to something quieter.
+  const withCo = inCinemas([co, ...rest], 'IN', TODAY);
+  assert.equal(
+    withCo.releases[0].title,
+    'Co-production',
+    `India among several was treated as foreign: the row opened on ${withCo.releases[0].title}`,
+  );
+  const withQuiet = inCinemas([quiet, ...rest], 'IN', TODAY);
+  assert.equal(
+    withQuiet.releases[0].title,
+    'No origin recorded',
+    `an unrecorded origin was treated as foreign: the row opened on ${withQuiet.releases[0].title}`,
+  );
 });
 
 test('a row too short to have standouts says nothing rather than crowning everything', () => {
-  // Three cinema listings and a badge on three would be the whole row wearing
-  // one, which tells a reader nothing.
-  const rows = Array.from({ length: 3 }, (_, i) =>
-    row({ releaseDate: iso(i), platforms: ['theatres'], heat: 50 }),
+  // A badge on the whole row tells a reader nothing. That used to mean three
+  // cards of three; with a single-card head it means one of one, which is the
+  // same sentence about a shorter row.
+  const alone = [row({ releaseDate: iso(0), platforms: ['theatres'], heat: 50 })];
+  assert.equal(inCinemas(alone, 'IN', TODAY).trending, undefined);
+
+  // And two is enough to distinguish one from the other, so the badge returns.
+  const pair = Array.from({ length: 2 }, (_, i) =>
+    row({ releaseDate: iso(i + 8), platforms: ['theatres'], heat: 50 - i }),
   );
-  assert.equal(inCinemas(rows, 'IN', TODAY).trending, undefined);
+  assert.equal(inCinemas(pair, 'IN', TODAY).trending, TRENDING_IN_CINEMAS);
 });
 
 test('the count is everything playing, not everything the row could show', () => {
@@ -800,5 +824,96 @@ test('the newest day leads the allowance', () => {
     out.indexOf(out.find((r) => r.title === 'Sunday')) <
       out.indexOf(out.find((r) => r.title === 'Friday')),
     'the later opening comes first, whatever the attention numbers say',
+  );
+});
+
+/*
+ * ---------------------------------------------------------------------------
+ * The row a phone can actually see
+ *
+ * Three separate reports, three separate fixes, and the same complaint each
+ * time: "the rails are not refreshed". The first two fixes were about whether
+ * a new film was in the row at all, and both were right — the allowance put
+ * this week's openings in cards four to nine and the tests proved it.
+ *
+ * Nobody tested where four to nine is. A phone shows between two and three
+ * cards, and the badged head was three, so every fix landed just past the edge
+ * of the screen. Rebuilt from the data that shipped each morning, the cinema
+ * row opened with the same three titles on all seven days to 24 September and
+ * the streaming row had the same card two on all seven.
+ *
+ * So these two tests are about the visible window rather than the array. They
+ * are the ones that would have caught it.
+ */
+
+/** What a 360px phone gets before it has to swipe, measured in the browser. */
+const VISIBLE_ON_A_PHONE = 3;
+
+test('a film that opens today reaches the cards a phone can see', () => {
+  // The row it has to get past: a month of films that have had time to earn
+  // attention, which a title released this morning cannot have by construction.
+  const established = Array.from({ length: 12 }, (_, i) =>
+    row({ releaseDate: iso(i + 10), platforms: ['theatres'], heat: 90 - i, title: `Playing ${i}` }),
+  );
+  const openedToday = row({
+    releaseDate: iso(0),
+    platforms: ['theatres'],
+    heat: 0,
+    title: 'Opened this morning',
+  });
+
+  const out = inCinemas([...established, openedToday], 'IN', TODAY).releases;
+  const seen = out.slice(0, VISIBLE_ON_A_PHONE).map((r) => r.title);
+  assert.ok(
+    seen.includes('Opened this morning'),
+    `a phone would show none of today's openings: ${seen.join(', ')}`,
+  );
+});
+
+test('the head of each row changes when something new lands', () => {
+  /*
+   * The complaint itself, as a test. Not "is the new title present" but "did
+   * the page change" — which is the only thing a returning reader can observe,
+   * and the thing that was false for a week while every other test passed.
+   */
+  const yesterday = new Date(TODAY.getTime() - 86_400_000);
+  const dayBefore = (n) => new Date(yesterday.getTime() - n * 86_400_000).toISOString().slice(0, 10);
+
+  const backdrop = Array.from({ length: 12 }, (_, i) => [
+    row({ releaseDate: dayBefore(i + 6), platforms: ['theatres'], heat: 90 - i, title: `Cinema ${i}` }),
+    row({ releaseDate: dayBefore(i + 1), platforms: ['netflix'], heat: 90 - i, title: `Stream ${i}` }),
+  ]).flat();
+
+  const landedOvernight = [
+    row({ releaseDate: iso(0), platforms: ['theatres'], heat: 1, title: 'Opened overnight' }),
+    row({ releaseDate: iso(0), platforms: ['netflix'], heat: 1, title: 'Dropped overnight' }),
+  ];
+
+  const head = (rel) => rel.slice(0, VISIBLE_ON_A_PHONE).map((r) => r.title).join(' | ');
+
+  const cinemaBefore = head(inCinemas(backdrop, 'IN', yesterday).releases);
+  const cinemaAfter = head(inCinemas([...backdrop, ...landedOvernight], 'IN', TODAY).releases);
+  assert.notEqual(
+    cinemaAfter,
+    cinemaBefore,
+    `the cinema row looks identical two days running: ${cinemaAfter}`,
+  );
+
+  const ottBefore = head(landedOnOtt(backdrop, 'IN', yesterday).releases);
+  const ottAfter = head(landedOnOtt([...backdrop, ...landedOvernight], 'IN', TODAY).releases);
+  assert.notEqual(
+    ottAfter,
+    ottBefore,
+    `the streaming row looks identical two days running: ${ottAfter}`,
+  );
+});
+
+test('the badged head never fills the visible row on its own', () => {
+  // The structural version of the above, and the one that fails loudly if
+  // somebody widens the head again: whatever else changes, a phone must never
+  // be looking at nothing but the ranking.
+  assert.ok(
+    TRENDING_IN_CINEMAS < VISIBLE_ON_A_PHONE,
+    `${TRENDING_IN_CINEMAS} badged cards leaves no room for news in ${VISIBLE_ON_A_PHONE}`,
   );
 });

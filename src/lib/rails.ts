@@ -161,7 +161,29 @@ export const CINEMA_DAYS = 42;
  * three is what a reader scanning a poster row takes in before they start
  * swiping.
  */
-export const TRENDING_IN_CINEMAS = 3;
+/**
+ * How many cards at the head of a row are given to the ranking rather than to
+ * what just landed.
+ *
+ * One, and it was three for a week, which is how long the homepage went
+ * without visibly changing.
+ *
+ * Measured over the seven days to 24 September, rebuilding each rail from the
+ * data that actually shipped that morning: the cinema row opened with Mirzapur
+ * : The Movie, Jeevan Bheema Yojana and Toxic on all seven days, and the OTT
+ * row had Irumudi in card two on all seven. Both rows were correct underneath
+ * — this week's titles were sitting in cards four to nine — and a phone shows
+ * between two and three cards. So a reader coming back daily to a site whose
+ * whole promise is what is new saw the same three posters every day and
+ * reasonably concluded the site had stopped updating. Reported three times.
+ *
+ * The ranking is not wrong: Mirzapur genuinely is the biggest thing in Indian
+ * cinemas and burying it under sixteen small Friday openings is the failure
+ * the lead was built to prevent. But three slots is the whole visible row, and
+ * the lead only has to answer "what is the big one" once. One card does that.
+ * Everything a phone can see after it now changes when the data does.
+ */
+export const TRENDING_IN_CINEMAS = 1;
 
 /**
  * How many of this week's openings are guaranteed a place in that row.
@@ -241,9 +263,8 @@ export function inCinemas(all: Release[], region: string, today: Date = new Date
    * of everything in Indian cinemas except Mirzapur, on a popularity score
    * earned worldwide. Reported as not making sense, and it does not.
    *
-   * Promoting the eligible three to the front rather than badging them where
-   * they sit: badges landing on cards one, three and four read as a bug, and
-   * the row's first three cards are the ones anyone actually sees.
+   * Promoted to the front rather than badged where it sits: a badge landing on
+   * card four reads as a bug, and the first card is the one everybody sees.
    */
   const lead = ranked.filter((r) => !imported(r)).slice(0, TRENDING_IN_CINEMAS);
   const crowned = new Set(lead.map((r) => r.id));
@@ -311,9 +332,8 @@ export function inCinemas(all: Release[], region: string, today: Date = new Date
     MAX_ITEMS,
   );
 
-  /* Fewer than three eligible leads means nothing is badged — but films still
-     opened this week, and the row still has to show them. Only the badge
-     stands down. */
+  /* No eligible lead means nothing is badged — but films still opened this
+     week, and the row still has to show them. Only the badge stands down. */
   if (lead.length < TRENDING_IN_CINEMAS) return { ...row, releases, trending: 0 };
 
   return { ...row, releases, trending: TRENDING_IN_CINEMAS };
