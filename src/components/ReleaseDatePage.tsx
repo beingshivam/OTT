@@ -1,7 +1,7 @@
 import { PosterArt } from './PosterArt';
 import { Rating } from './Rating';
 import { IconPlay, IconTicket, IconExternal, IconWhatsApp } from './icons';
-import { platform as platformById, languageName } from '../data/platforms';
+import { platform as platformById, languageName, hasLanguageRoute } from '../data/platforms';
 import { outbound } from '../data/affiliates';
 import { runtimeLabel } from '../lib/format';
 import { formatWeekRange } from '../lib/week';
@@ -259,10 +259,17 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
               <div>
                 <dt>Language</dt>
                 <dd>
+                  {/* A link only where there is a page to link to. The feed
+                      carries languages this site builds no page for, and an
+                      anchor to /catalan is exactly as dead as one to /ca. */}
                   {release.languages.map((l, i) => (
                     <span key={l}>
                       {i > 0 && ', '}
-                      <a href={`/${languageName(l).toLowerCase()}`}>{languageName(l)}</a>
+                      {hasLanguageRoute(l) ? (
+                        <a href={`/${languageName(l).toLowerCase()}`}>{languageName(l)}</a>
+                      ) : (
+                        languageName(l)
+                      )}
                     </span>
                   ))}
                 </dd>

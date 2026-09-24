@@ -19,8 +19,11 @@
 import { chromium } from 'playwright';
 import { createServer } from 'node:http';
 import { readFile, mkdir, stat } from 'node:fs/promises';
+import { mkdtempSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { extname, join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = join(ROOT, 'dist');
@@ -1420,22 +1423,74 @@ for (const width of [360, 1280]) {
  */
 console.log('\nNames and targets');
 {
+  /*
+   * Languages, asked about the two things that can actually go wrong.
+   *
+   * This used to assert that every code in the feed appeared in the LANGUAGES
+   * table, which made it a treadmill: TMDB sent `ca` on one Catalan film and
+   * the whole suite went red — and with it the deploy — over a chip that would
+   * have read "CA". Cosmetic, and the third time a cosmetic gap has stopped a
+   * publish.
+   *
+   * The table cannot be complete and does not need to be. What must hold is
+   * that a reader never sees a bare code, and that a language's name is only
+   * ever a link when the build actually produces that page. The second is the
+   * one with teeth: naming `ca` better without checking would have shipped an
+   * anchor to /catalan, which is exactly as dead as /ca.
+   */
   const feedRaw = await readFile(join(ROOT, 'dist/data/releases.json'), 'utf8').catch(() => null);
-  const registry = await readFile(join(ROOT, 'src/data/platforms.ts'), 'utf8').catch(() => '');
-  if (feedRaw && registry) {
-    const named = new Set(
-      [...(registry.match(/LANGUAGES[^{]*\{([\s\S]*?)\n\};/) ?? ['', ''])[1].matchAll(/(\w+):\s*'/g)].map(
-        (m) => m[1],
-      ),
-    );
-    const unnamed = new Set();
+  if (feedRaw) {
+    const codes = new Set();
     for (const w of JSON.parse(feedRaw).weeks)
-      for (const r of w.releases) for (const l of r.languages ?? []) if (!named.has(l)) unnamed.add(l);
-    is(
-      unnamed.size === 0,
-      'every language in the feed has a name the UI can print',
-      `raw codes would reach the page: ${[...unnamed].join(', ')}`,
+      for (const r of w.releases) for (const l of r.languages ?? []) codes.add(l);
+
+    /* Compiled rather than regexed out of the source, so this measures what
+       the app renders and not what the file looks like. */
+    const dir = mkdtempSync(join(tmpdir(), 'lang-'));
+    execFileSync(
+      'npx',
+      ['--yes', 'esbuild', 'src/data/platforms.ts', '--bundle', '--format=esm',
+       `--outfile=${join(dir, 'platforms.mjs')}`],
+      { stdio: 'pipe' },
     );
+    execFileSync(
+      'npx',
+      ['--yes', 'esbuild', 'src/lib/route.ts', '--bundle', '--format=esm',
+       `--outfile=${join(dir, 'route.mjs')}`],
+      { stdio: 'pipe' },
+    );
+    const { languageName, hasLanguageRoute } = await import(join(dir, 'platforms.mjs'));
+    const { routeFilters } = await import(join(dir, 'route.mjs'));
+
+    const bare = [...codes].filter((c) => languageName(c) === c.toUpperCase() && c.length <= 3);
+    is(
+      bare.length === 0,
+      'no language reaches a reader as a bare code',
+      `would print: ${bare.join(', ')}`,
+    );
+
+    /*
+     * The anchor a title page draws, resolved by the thing that has to resolve
+     * it. Two modules derive this URL from the same table by different routes
+     * — one lowercases the display name, the other keys a map on it — and they
+     * agree until a name has a space or a hyphen in it. A prerendered page is
+     * deliberately not the test: /japanese answers from the client router with
+     * four titles and no static page, and that is fine.
+     */
+    const dangling = [...codes]
+      .filter(hasLanguageRoute)
+      .filter((c) => routeFilters(`/${languageName(c).toLowerCase()}`)?.languages?.[0] !== c);
+    is(
+      dangling.length === 0,
+      'every language the app links to is an address it can resolve',
+      `unresolvable: ${dangling.map((c) => `/${languageName(c).toLowerCase()}`).join(', ')}`,
+    );
+
+    /* And the ones it must not link, because nothing answers them. */
+    const unlinked = [...codes].filter((c) => !hasLanguageRoute(c));
+    if (unlinked.length) {
+      console.log(`         (${unlinked.join(', ')} named but not linked — no route for them)`);
+    }
   }
 }
 {

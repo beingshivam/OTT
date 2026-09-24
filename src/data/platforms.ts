@@ -196,9 +196,66 @@ export const LANGUAGES: Record<string, string> = {
   ro: 'Romanian',
 };
 
-export function languageName(code: string): string {
-  return LANGUAGES[code] ?? code.toUpperCase();
+/**
+ * The tail, which no hand-maintained list was ever going to reach.
+ *
+ * The table above is a list of languages somebody thought of, and the feed is
+ * whatever TMDB sends. Today it sent `ca` on one title, the fallback printed
+ * "CA", and a check that asserted every code was in the table turned the whole
+ * deploy red over a Catalan film. That is the third time a cosmetic gap has
+ * blocked a publish, and adding `ca:` to the list would just reset the
+ * treadmill until the next code arrives.
+ *
+ * Intl.DisplayNames knows every ISO-639 code and ships in every browser and in
+ * Node, so it answers the tail. The table still comes first, because it is not
+ * a worse version of the same thing: it carries the names this audience uses
+ * and codes the standard does not have — `tu` for Tulu is not ISO-639-1, and
+ * Intl hands it straight back.
+ *
+ * An unknown code comes back unchanged rather than throwing, so that is the
+ * test for "it did not know either".
+ */
+let display: Intl.DisplayNames | null | undefined;
+
+function fromIntl(code: string): string | null {
+  if (display === undefined) {
+    try {
+      display = new Intl.DisplayNames(['en'], { type: 'language' });
+    } catch {
+      display = null;
+    }
+  }
+  if (!display) return null;
+  try {
+    const name = display.of(code);
+    return name && name.toLowerCase() !== code.toLowerCase() ? name : null;
+  } catch {
+    return null;
+  }
 }
+
+export function languageName(code: string): string {
+  return LANGUAGES[code] ?? fromIntl(code) ?? code.toUpperCase();
+}
+
+/**
+ * Whether `/<name>` is an address this site answers — which is the only thing
+ * that should decide whether a language's name is rendered as a link.
+ *
+ * Not the same question as whether a page was prerendered for it. route.ts
+ * builds LANGUAGE_BY_SLUG from this whole table, so /japanese resolves and
+ * draws a board even though build-seo writes no static page for a language
+ * with four titles. What does not resolve is a language that is not in the
+ * table at all, and a title page linked one anyway: `/${languageName(code)}`
+ * for every language on the film, so a Catalan title shipped an anchor to /ca.
+ *
+ * Giving the language a better name would have made that worse rather than
+ * better — /catalan is exactly as dead as /ca. The link has to be conditional,
+ * and this table is what both the resolver and the page generator read, so
+ * membership in it is the honest test.
+ */
+export const hasLanguageRoute = (code: string): boolean =>
+  Object.prototype.hasOwnProperty.call(LANGUAGES, code);
 
 export const KIND_LABEL: Record<string, string> = {
   film: 'Film',
