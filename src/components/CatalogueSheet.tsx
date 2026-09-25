@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { PosterArt } from './PosterArt';
+import { MoreLikeThis } from './MoreLikeThis';
 import { IconClose, IconExternal } from './icons';
 import { platform, languageName, KIND_LABEL } from '../data/platforms';
 import { runtimeLabel } from '../lib/format';
@@ -218,42 +219,11 @@ export function CatalogueSheet({
                   </div>
                 )}
 
-                {t.similar.length > 0 && (
-                  <div className="sheet__section">
-                    <h3>More like this</h3>
-                    {/* Reopens in place rather than stacking sheets. A stack
-                        needs a back affordance and a history entry, and this
-                        is deliberately not a page — the close button still
-                        means "done", wherever you wandered to. */}
-                    <ul className="sheet__more">
-                      {t.similar.map((s) => (
-                        <li key={s.id}>
-                          <button
-                            type="button"
-                            onClick={() => setShowing({ id: s.id, title: s.title })}
-                          >
-                            <PosterArt
-                              className="sheet__more-art"
-                              title={s.title}
-                              platformId={lead}
-                              imageUrl={s.image ?? undefined}
-                              quiet
-                            />
-                            <span className="sheet__more-name">{s.title}</span>
-                            {s.year && <span className="sheet__more-year">{s.year}</span>}
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {/* A credit, not a caveat. This said "Details from TMDB. Not
-                    in the India release calendar" — half attribution, half
-                    apology, and the apology stopped being true the moment the
-                    sheet started naming the service streaming it. TMDB's terms
-                    want the credit; nothing wants the second sentence. */}
-                <p className="sheet__pending">Details from TMDB.</p>
+                <MoreLikeThis
+                  items={t.similar}
+                  platformId={lead}
+                  onPick={(s) => setShowing({ id: s.id, title: s.title })}
+                />
               </>
             )}
           </div>

@@ -9,14 +9,20 @@ import { formatDay } from '../lib/week';
 import { scoreOf, scoreTitle } from '../lib/score';
 import { shareLine, shareUrl, whatsappHref } from '../lib/share';
 import type { Release } from '../types';
+import { MoreLikeThis, useSimilar, type SimilarHit } from './MoreLikeThis';
 
 interface Props {
   release: Release;
   onClose: () => void;
+  /** Where a "More like this" card goes. The sheet does not decide — a
+   *  recommendation this site has a page for should become a page view, and
+   *  only App knows the corpus well enough to tell. */
+  onPickSimilar: (hit: SimilarHit) => void;
 }
 
-export function DetailSheet({ release, onClose }: Props) {
+export function DetailSheet({ release, onClose, onPickSimilar }: Props) {
   const closeRef = useRef<HTMLButtonElement>(null);
+  const similar = useSimilar(release.id);
   const [copied, setCopied] = useState(false);
   const p = platform(release.platforms[0]);
   const day = formatDay(release.releaseDate);
@@ -352,6 +358,12 @@ export function DetailSheet({ release, onClose }: Props) {
               <p>{release.cast.join(' · ')}</p>
             </div>
           )}
+
+          {/* The same row the catalogue sheet carries. It lived only there at
+              first, which was the narrowest possible place for it: the one
+              kind of title this site has no page for. A reader who opens a
+              film from the board wants the next thing just as much. */}
+          <MoreLikeThis items={similar} platformId={p.id} onPick={onPickSimilar} />
 
         </div>
         </div>

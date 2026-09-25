@@ -76,6 +76,7 @@ export default function App() {
   /* A title only search can reach. Its own state rather than `selected`,
      because it is not a Release and the two sheets are different components. */
   const [remoteTitle, setRemoteTitle] = useState<{ id: string; title: string } | null>(null);
+
   const [catalogueError, setCatalogueError] = useState<string | null>(null);
   /** The change log, fetched only on its own page — see ChangesPage. Same
    *  reasoning as the catalogue above: a file most visits never open does not
@@ -404,6 +405,34 @@ export default function App() {
             (r.platforms.includes('theatres') && !r.platforms.some((p) => p !== 'theatres'))),
       );
   }, [searching, route, catalogue, span, week, feed]);
+  /**
+   * Where a "More like this" card leads.
+   *
+   * A page when this site has one, and that is the whole reason this decision
+   * sits here rather than in the sheet: 985 of these titles have a page of
+   * their own carrying the streaming links, the JSON-LD and the outbound the
+   * site is actually paid on. Sending a reader to a TMDB overlay instead would
+   * be showing them the thinner of two things we own.
+   *
+   * The sheet only for the rest — the recommendations that are genuinely
+   * elsewhere, which is most of them.
+   */
+  const openSimilar = useCallback(
+    (hit: { id: string; title: string }) => {
+      const bare = hit.id.replace(/~[a-z]+$/, '');
+      const mine = (releases ?? []).find(
+        (r) => String(r.id).replace(/~[a-z]+$/, '') === bare && r.slug,
+      );
+      if (mine?.slug) {
+        window.location.href = `/ott-release-date/${mine.slug}`;
+        return;
+      }
+      setSelected(null);
+      setRemoteTitle(hit);
+    },
+    [releases],
+  );
+
   const facets = useMemo(() => facetsFor(releases, filters.region), [releases, filters.region]);
   /**
    * The week's own titles, ranked by how much attention they are getting.
@@ -1332,7 +1361,13 @@ export default function App() {
         </footer>
       </main>
 
-      {selected && <DetailSheet release={selected} onClose={() => setSelected(null)} />}
+      {selected && (
+        <DetailSheet
+          release={selected}
+          onClose={() => setSelected(null)}
+          onPickSimilar={openSimilar}
+        />
+      )}
       {remoteTitle && (
         <CatalogueSheet
           id={remoteTitle.id}

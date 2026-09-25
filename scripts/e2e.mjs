@@ -1980,22 +1980,31 @@ console.log('\nA title only search can reach');
         'a TMDB provider id becomes a service this site can name',
         `buttons: ${sheet.buttons.join(' / ') || '(none)'}`,
       );
-      /* The credit, which TMDB's terms require. This used to assert the
-         sentence beside it — "not in the India release calendar" — which was
-         written when these rows were inert and became false the moment the
-         sheet started naming the service streaming the thing. A test that
-         pins apologetic copy keeps it alive long after the product has
-         outgrown it. */
-      is(
-        /Details from TMDB/i.test(sheet.text),
-        'and it credits where the facts came from',
-        'the sheet does not credit TMDB',
-      );
+      /*
+       * The sheet says neither of the two sentences it used to.
+       *
+       * "Not in the India release calendar" was written when these rows were
+       * inert and became false the moment the sheet started naming the service
+       * streaming the thing. "Details from TMDB" went with it, because the
+       * footer already carries the attribution TMDB's terms actually ask for,
+       * in the wording they ask for it — repeating a credit on every overlay
+       * is not what the terms require and it read as a disclaimer on the
+       * answer above it.
+       *
+       * So the requirement is still asserted; it is just asserted where the
+       * credit really lives. A sheet that has stopped crediting TMDB while the
+       * page behind it has too is the failure worth catching.
+       */
       is(
         !/not in the India release calendar/i.test(sheet.text),
-        'without apologising for a gap that no longer exists',
-        'the sheet still defines the title by what it is not',
+        'the sheet does not define the title by what it is not',
+        'the apology is still there',
       );
+      const credited = await page.evaluate(() =>
+        /themoviedb\.org/.test(document.querySelector('.footer__credit')?.innerHTML ?? '') &&
+        /not endorsed or certified by TMDB/i.test(document.body.textContent ?? ''),
+      );
+      is(credited, 'and the site still credits TMDB where its terms ask', 'the attribution is gone');
 
       /* A sheet is not a page. If this ever starts changing the URL it has
          become one, and the reasoning that allowed it stops applying. */
@@ -2035,6 +2044,66 @@ console.log('\nA title only search can reach');
   }
 
   is(errors.length === 0, 'no console errors opening a catalogue title', errors.slice(0, 2).join(' | '));
+  await ctx.close();
+}
+
+/*
+ * ---------------------------------------------------------------------------
+ * "More like this", on a title the site does have
+ *
+ * The row started inside the sheet that TMDB-only search results opened, which
+ * was the narrowest possible place for it: the one kind of title with no page.
+ * Asked for everywhere instead — somebody opening a film from the board wants
+ * the next thing as much as somebody who found it through search.
+ *
+ * The seam this guards is that the detail sheet asks for it at all. It has no
+ * TMDB call of its own, so the row depends on a hook firing on the row's id,
+ * and a row whose id is not a TMDB one must ask for nothing rather than
+ * request a title that cannot exist.
+ */
+console.log('\nMore like this, on the board');
+{
+  const { ctx, page, errors } = await newPage(browser, { width: 390, height: 844, touch: true });
+  const asked = [];
+  page.on('request', (r) => r.url().includes('/api/title') && asked.push(r.url()));
+  await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('.landed__cell', { timeout: 15_000 }).catch(() => {});
+
+  /* Deliberately a row with a TMDB id. Twenty-two of the feed's rows are
+     hand-seeded and carry ids like `th-mirzapur-the-movie`; those correctly
+     show no row, and clicking whichever card happens to be first would make
+     this test pass or fail on that coincidence. */
+  const feed = JSON.parse(await readFile(join(DIST, 'data/releases.json'), 'utf8'));
+  const named = new Set(
+    feed.weeks
+      .flatMap((w) => w.releases)
+      .filter((r) => /^[mt]-\d+$/.test(String(r.id).replace(/~[a-z]+$/, '')))
+      .map((r) => r.title),
+  );
+
+  let opened = null;
+  for (const cell of await page.locator('.landed__cell button').all()) {
+    const name = (await cell.locator('.landed__name').textContent().catch(() => ''))?.trim();
+    if (name && named.has(name)) {
+      opened = name;
+      await cell.click();
+      break;
+    }
+  }
+  is(Boolean(opened), 'a calendar title opens its sheet', 'no card with a TMDB id was found');
+
+  if (opened) {
+    await page.waitForSelector('.sheet', { timeout: 8000 }).catch(() => {});
+    await page.waitForTimeout(900);
+    is(asked.length > 0, 'the sheet asks what is like it', 'nothing was requested');
+    is(
+      (await page.locator('.sheet__more button').count()) > 0,
+      'and shows the row, not only on titles we lack a page for',
+      'no recommendations rendered',
+    );
+  }
+
+  is(errors.length === 0, 'no console errors', errors.slice(0, 2).join(' | '));
   await ctx.close();
 }
 
