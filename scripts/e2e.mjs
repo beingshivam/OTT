@@ -997,35 +997,55 @@ console.log('\nSearch is global');
   if (!elsewhere) {
     bad('a title exists outside the current week', 'the feed holds only this week');
   } else {
-    await page.fill('.search input[type=search]', elsewhere.title);
-    await page.waitForTimeout(700);
-
-    const found = await page.evaluate((title) => ({
+    /*
+     * Two questions, one input, and only one of them belongs to this box.
+     *
+     * Typing used to redraw the board: the week was replaced by matches from
+     * every week plus the catalogue, the stepper switched off and the heading
+     * became "12 results for …". Asked to stop — "this top search shouldn't
+     * work on this week or now streaming or coming soon" — and rightly, since
+     * a box at the top of a page reads as "find me this title", not "narrow
+     * what I am looking at".
+     *
+     * It also produced the contradiction that gave it away: results in the
+     * dropdown and "Nothing matches" on the board behind them.
+     *
+     * So the box finds the title and the week underneath is left exactly as it
+     * was. Both halves are asserted, because the failure mode of separating
+     * them is to narrow the dropdown along with the board.
+     */
+    const before = await page.evaluate(() => ({
       heading: document.querySelector('.controls__heading')?.textContent ?? '',
-      hit: [...document.querySelectorAll('.row__title')].some((el) =>
-        el.textContent.trim().startsWith(title),
-      ),
+      rows: [...document.querySelectorAll('.row__title')].map((e) => e.textContent.trim()).join('|'),
+      stepper: !!document.querySelector('.controls__row .weeknav'),
+    }));
+
+    await page.fill('.search input[type=search]', elsewhere.title);
+    await page.waitForTimeout(900);
+
+    const after = await page.evaluate((title) => ({
+      heading: document.querySelector('.controls__heading')?.textContent ?? '',
+      rows: [...document.querySelectorAll('.row__title')].map((e) => e.textContent.trim()).join('|'),
       stepper: !!document.querySelector('.controls__row .weeknav'),
       empty: !!document.querySelector('.empty'),
+      inDropdown: [...document.querySelectorAll('.gsearch__panel .gsearch__text strong')].some((e) =>
+        e.textContent.trim().startsWith(title),
+      ),
     }), elsewhere.title);
 
-    is(found.hit, `"${elsewhere.title}" is found from another week`, 'the query stayed inside the week');
-    is(!found.empty, 'and the board is not the empty state', 'it said there were no matches');
     is(
-      /results? for/.test(found.heading),
-      'the heading names the search rather than a week',
-      `heading was "${found.heading}"`,
+      after.inDropdown,
+      `"${elsewhere.title}" is found from another week`,
+      'the dropdown searched only what the board was drawing',
     );
-    is(!found.stepper, 'the week stepper stands down', 'the arrows would step a week nothing is drawn from');
-
-    // And clearing it puts the week back, rather than leaving the board global.
-    await page.locator('.search__clear').click();
-    await page.waitForTimeout(500);
+    is(after.rows === before.rows, 'and the board underneath does not move', 'the week was redrawn');
     is(
-      !!(await page.evaluate(() => document.querySelector('.controls__row .weeknav'))),
-      'clearing the query returns the week',
-      'the board stayed in search mode',
+      after.heading === before.heading,
+      'the heading still names the week',
+      `heading became "${after.heading}"`,
     );
+    is(after.stepper && before.stepper, 'the week stepper stays', 'the arrows went away');
+    is(!after.empty, 'and the week is never emptied by typing', 'the board said there were no matches');
   }
 
   is(errors.length === 0, 'no console errors', errors[0]);

@@ -38,7 +38,6 @@ export function readFilters(
     })(),
     languages: languages.length ? languages : (route?.languages ?? []),
     genres: list(p, 'g').length ? list(p, 'g') : (route?.genres ?? []),
-    query: p.get('q') ?? '',
     /**
      * Trending everywhere, including the catalogue.
      *
@@ -94,7 +93,6 @@ export function writeFilters(
   if (f.kinds.length && !sameList(f.kinds, route?.kinds)) p.set('t', f.kinds.join(','));
   if (f.languages.length && !sameList(f.languages, route?.languages)) p.set('l', f.languages.join(','));
   if (f.genres.length && !sameList(f.genres, route?.genres)) p.set('g', f.genres.join(','));
-  if (f.query) p.set('q', f.query);
   if (f.sort !== 'trending') p.set('sort', f.sort);
 
   const qs = p.toString();

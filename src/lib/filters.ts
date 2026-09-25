@@ -6,17 +6,8 @@ export const EMPTY_FILTERS: Omit<Filters, 'weekId' | 'region'> = {
   kinds: [],
   languages: [],
   genres: [],
-  query: '',
   sort: 'trending',
 };
-
-/** Cheap fuzzy-ish match: every whitespace-separated term must appear somewhere. */
-function matchesQuery(r: Release, query: string): boolean {
-  const q = query.trim().toLowerCase();
-  if (!q) return true;
-  const hay = [r.title, r.director ?? '', ...(r.cast ?? []), ...r.genres].join(' ').toLowerCase();
-  return q.split(/\s+/).every((term) => hay.includes(term));
-}
 
 export function applyFilters(releases: Release[], f: Filters): Release[] {
   const out = releases.filter((r) => {
@@ -25,7 +16,7 @@ export function applyFilters(releases: Release[], f: Filters): Release[] {
     if (f.kinds.length && !f.kinds.includes(r.kind)) return false;
     if (f.languages.length && !r.languages.some((l) => f.languages.includes(l))) return false;
     if (f.genres.length && !r.genres.some((g) => f.genres.includes(g))) return false;
-    return matchesQuery(r, f.query);
+    return true;
   });
   return sortReleases(out, f.sort);
 }
@@ -100,7 +91,7 @@ export function facetsFor(releases: Release[], region: string) {
 
 export function activeFilterCount(f: Filters): number {
   return (
-    f.platforms.length + f.kinds.length + f.languages.length + f.genres.length + (f.query ? 1 : 0)
+    f.platforms.length + f.kinds.length + f.languages.length + f.genres.length
   );
 }
 

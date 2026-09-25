@@ -172,6 +172,5 @@ export interface Filters {
   kinds: TitleKind[];
   languages: string[];
   genres: string[];
-  query: string;
   sort: SortKey;
 }
