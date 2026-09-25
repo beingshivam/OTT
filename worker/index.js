@@ -132,6 +132,59 @@ async function proxyPoster(request, url) {
  */
 const SEARCH_TTL = 3600;
 
+/**
+ * The query as typed, then progressively less of it.
+ *
+ * TMDB's /search/multi requires every token to land. One word it does not
+ * recognise returns nothing at all rather than fewer results, and measuring it
+ * against the live index showed how sharp that edge is:
+ *
+ *   jawan              65 results        jawan movie        nothing
+ *   coolie             27 results        coolie 2025        nothing
+ *   punchnama           2 results        pyar punchnama     nothing
+ *
+ * So the commonest way to get nothing out of a million titles is not an exotic
+ * query — it is typing the word "movie" after the name, or the year you think
+ * it came out, or one vowel of a transliterated title differently from
+ * whoever filed it. Every one of those reads to the person typing as "this
+ * site does not have it", under a header promising it does.
+ *
+ * Two fallbacks, tried only when the query as typed found nothing, so the
+ * common case still costs exactly one call:
+ *
+ *   1. Drop the words that are never part of a title — movie, trailer, a bare
+ *      year — and ask again.
+ *   2. Ask for the longest remaining word alone. In a title someone half
+ *      remembers, the longest word is almost always the distinctive one, and
+ *      TMDB is far more forgiving of a single token than of a phrase.
+ *
+ * What this deliberately cannot rescue is a word TMDB has never heard —
+ * "panchnama" for "punchnama" is a real spelling of a real film and returns
+ * nothing at any length. Fixing that needs generated transliteration variants,
+ * which is a larger and much riskier change than this one, and worth doing
+ * only once this has shown what is left.
+ */
+const NOISE = new Set([
+  'movie', 'movies', 'film', 'films', 'series', 'show', 'shows',
+  'trailer', 'teaser', 'full', 'hd', 'online', 'watch', 'streaming',
+]);
+
+export function relaxations(q) {
+  const tokens = q.split(/\s+/).filter(Boolean);
+  const kept = tokens.filter(
+    (t) => !NOISE.has(t.toLowerCase().replace(/[^a-z0-9]/g, '')) && !/^(19|20)\d{2}$/.test(t),
+  );
+
+  const out = [q];
+  if (kept.length && kept.length !== tokens.length) out.push(kept.join(' '));
+  /* Only worth asking for one word when there was more than one; a single
+     token that already failed will fail again. */
+  if (kept.length > 1) {
+    out.push(kept.reduce((a, b) => (b.length > a.length ? b : a)));
+  }
+  return [...new Set(out)];
+}
+
 async function searchTmdb(request, url, env, ctx) {
   if (request.method !== 'GET') return json(405, { error: 'method_not_allowed' });
 
@@ -160,72 +213,103 @@ async function searchTmdb(request, url, env, ctx) {
   if (hit) return hit;
 
   const isJwt = /^ey[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/.test(token);
-  const api = new URL('https://api.themoviedb.org/3/search/multi');
-  api.searchParams.set('query', q);
-  api.searchParams.set('include_adult', 'false');
-  /* Region and language shape the results TMDB returns first, and this
-     audience is Indian. Without it a search for a Tamil title surfaces the
-     American remake. */
-  api.searchParams.set('region', 'IN');
-  api.searchParams.set('language', 'en-IN');
-  if (!isJwt) api.searchParams.set('api_key', token);
 
-  let upstream;
-  try {
-    upstream = await fetch(api.toString(), {
-      headers: isJwt ? { authorization: `Bearer ${token}`, accept: 'application/json' } : { accept: 'application/json' },
-      cf: { cacheEverything: true, cacheTtl: SEARCH_TTL },
-    });
-  } catch {
-    /* TMDB unreachable. The local half of the search has already rendered, so
-       the honest thing is to return nothing extra rather than an error the
-       reader cannot act on. */
-    return json(200, { remote: true, results: [], total: 0, degraded: true });
-  }
-  if (!upstream.ok) {
-    return json(200, { remote: true, results: [], total: 0, degraded: true });
-  }
+  /** One question to TMDB. Returns null when it could not be asked at all,
+   *  which is a different thing from an answer of nothing. */
+  const askTmdb = async (query) => {
+    const api = new URL('https://api.themoviedb.org/3/search/multi');
+    api.searchParams.set('query', query);
+    api.searchParams.set('include_adult', 'false');
+    /* Region and language shape the results TMDB returns first, and this
+       audience is Indian. Without it a search for a Tamil title surfaces the
+       American remake. */
+    api.searchParams.set('region', 'IN');
+    api.searchParams.set('language', 'en-IN');
+    if (!isJwt) api.searchParams.set('api_key', token);
 
-  const body = await upstream.json();
+    let upstream;
+    try {
+      upstream = await fetch(api.toString(), {
+        headers: isJwt
+          ? { authorization: `Bearer ${token}`, accept: 'application/json' }
+          : { accept: 'application/json' },
+        cf: { cacheEverything: true, cacheTtl: SEARCH_TTL },
+      });
+    } catch {
+      return null;
+    }
+    if (!upstream.ok) return null;
+    const body = await upstream.json();
+
+    const results = (body.results ?? [])
+      .filter((r) => r.media_type === 'movie' || r.media_type === 'tv' || r.media_type === 'person')
+      .slice(0, 24)
+      .map((r) =>
+        r.media_type === 'person'
+          ? {
+              kind: 'person',
+              id: `p-${r.id}`,
+              name: r.name,
+              image: r.profile_path ? `/img/w185${r.profile_path}` : null,
+              role: r.known_for_department === 'Acting' ? 'Actor' : r.known_for_department || null,
+              knownFor: (r.known_for ?? [])
+                .map((k) => k.title || k.name)
+                .filter(Boolean)
+                .slice(0, 3),
+            }
+          : {
+              kind: r.media_type === 'tv' ? 'series' : 'film',
+              /* The same id shape the feed uses, so the front end can match a
+                 remote result against a title it already has and show one row
+                 rather than two. */
+              id: `${r.media_type === 'tv' ? 't' : 'm'}-${r.id}`,
+              title: r.title || r.name,
+              year: (r.release_date || r.first_air_date || '').slice(0, 4) || null,
+              image: r.poster_path ? `/img/w185${r.poster_path}` : null,
+              lang: r.original_language || null,
+            },
+      );
+
+    return { results, total: body.total_results ?? results.length };
+  };
 
   /*
-   * Trimmed to what a result row draws.
-   *
-   * TMDB's payload is roughly 2KB per result and a row uses six fields. On a
-   * phone, on Indian mobile data, shipping the rest is the difference between
-   * a search that feels instant and one that does not — and the front end
-   * would throw it away anyway.
+   * As typed first, then less of it — see relaxations(). The loop stops at the
+   * first query that returns anything, so a query that works costs one call
+   * and only a miss pays for the retries.
    */
-  const results = (body.results ?? [])
-    .filter((r) => r.media_type === 'movie' || r.media_type === 'tv' || r.media_type === 'person')
-    .slice(0, 24)
-    .map((r) =>
-      r.media_type === 'person'
-        ? {
-            kind: 'person',
-            id: `p-${r.id}`,
-            name: r.name,
-            image: r.profile_path ? `/img/w185${r.profile_path}` : null,
-            role: r.known_for_department === 'Acting' ? 'Actor' : r.known_for_department || null,
-            knownFor: (r.known_for ?? [])
-              .map((k) => k.title || k.name)
-              .filter(Boolean)
-              .slice(0, 3),
-          }
-        : {
-            kind: r.media_type === 'tv' ? 'series' : 'film',
-            /* The same id shape the feed uses, so the front end can match a
-               remote result against a title it already has and show one row
-               rather than two. */
-            id: `${r.media_type === 'tv' ? 't' : 'm'}-${r.id}`,
-            title: r.title || r.name,
-            year: (r.release_date || r.first_air_date || '').slice(0, 4) || null,
-            image: r.poster_path ? `/img/w185${r.poster_path}` : null,
-            lang: r.original_language || null,
-          },
-    );
+  let found = null;
+  let asked = q;
+  for (const candidate of relaxations(q)) {
+    const attempt = await askTmdb(candidate);
+    /* Unreachable is not the same as empty: a TMDB outage must report itself
+       rather than be retried three ways and reported as "nothing matched". */
+    if (attempt === null) {
+      return json(200, { remote: true, results: [], total: 0, degraded: true });
+    }
+    if (attempt.results.length) {
+      found = attempt;
+      asked = candidate;
+      break;
+    }
+  }
 
-  const res = json(200, { remote: true, results, total: body.total_results ?? results.length }, SEARCH_TTL);
+  if (!found) {
+    const miss = json(200, { remote: true, results: [], total: 0 }, SEARCH_TTL);
+    ctx.waitUntil(cache.put(key, miss.clone()));
+    return miss;
+  }
+
+  const { results, total } = found;
+
+  /* When the answer came from a relaxed query, say so. A reader who typed
+     "jawan movie" and gets Jawan is well served; a reader who is not told why
+     is left guessing whether the site understood them. */
+  const res = json(
+    200,
+    { remote: true, results, total, ...(asked === q ? {} : { relaxedTo: asked }) },
+    SEARCH_TTL,
+  );
   ctx.waitUntil(cache.put(key, res.clone()));
   return res;
 }

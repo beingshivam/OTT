@@ -796,3 +796,106 @@ await test('search is a GET', async () => {
   const res = await worker.fetch(new Request(`${ORIGIN}/api/search?q=a`, { method: 'POST' }), {}, ctx);
   assert.equal(res.status, 405);
 });
+
+/*
+ * ---------------------------------------------------------------------------
+ * Getting nothing out of a million titles
+ *
+ * Measured against the live index rather than imagined: TMDB's /search/multi
+ * needs every token to land, and one it does not know returns nothing at all
+ * rather than fewer rows.
+ *
+ *   jawan   65 results | jawan movie  nothing
+ *   coolie  27 results | coolie 2025  nothing
+ *
+ * So the commonest way to miss is to type the word "movie" after the name.
+ */
+
+await test('the words people add to a title do not erase it', async () => {
+  fakeCache();
+  const asked = [];
+  globalThis.fetch = async (u) => {
+    const q = new URL(u).searchParams.get('query');
+    asked.push(q);
+    return {
+      ok: true,
+      json: async () => ({
+        total_results: q === 'jawan' ? 65 : 0,
+        results: q === 'jawan' ? [{ media_type: 'movie', id: 1, title: 'Jawan' }] : [],
+      }),
+    };
+  };
+  const res = await worker.fetch(new Request(`${ORIGIN}/api/search?q=jawan%20movie`), { TMDB_TOKEN: 't' }, ctx);
+  const body = await res.json();
+  assert.deepEqual(asked, ['jawan movie', 'jawan'], `asked: ${asked.join(' | ')}`);
+  assert.equal(body.results[0].title, 'Jawan');
+  assert.equal(body.relaxedTo, 'jawan', 'the reader is not told which query answered');
+});
+
+await test('a year the reader added is not part of the title either', async () => {
+  fakeCache();
+  const asked = [];
+  globalThis.fetch = async (u) => {
+    const q = new URL(u).searchParams.get('query');
+    asked.push(q);
+    return { ok: true, json: async () => ({ results: q === 'coolie' ? [{ media_type: 'movie', id: 2, title: 'Coolie' }] : [] }) };
+  };
+  const res = await worker.fetch(new Request(`${ORIGIN}/api/search?q=coolie%202025`), { TMDB_TOKEN: 't' }, ctx);
+  assert.deepEqual(asked, ['coolie 2025', 'coolie']);
+  assert.equal((await res.json()).results[0].title, 'Coolie');
+});
+
+await test('the distinctive word carries a half-remembered title', async () => {
+  // "pyar ka punchnama" finds nothing and "punchnama" finds the film. The
+  // longest word is the one worth asking for on its own.
+  fakeCache();
+  const asked = [];
+  globalThis.fetch = async (u) => {
+    const q = new URL(u).searchParams.get('query');
+    asked.push(q);
+    return { ok: true, json: async () => ({ results: q === 'punchnama' ? [{ media_type: 'movie', id: 3, title: 'Pyaar Ka Punchnama' }] : [] }) };
+  };
+  const res = await worker.fetch(new Request(`${ORIGIN}/api/search?q=pyar%20ka%20punchnama`), { TMDB_TOKEN: 't' }, ctx);
+  assert.deepEqual(asked, ['pyar ka punchnama', 'punchnama']);
+  assert.equal((await res.json()).relaxedTo, 'punchnama');
+});
+
+await test('a query that works costs exactly one call', async () => {
+  // The fallbacks are for misses. Paying for them on every search would make
+  // the common case slower to rescue the uncommon one.
+  fakeCache();
+  let calls = 0;
+  globalThis.fetch = async () => {
+    calls += 1;
+    return { ok: true, json: async () => ({ results: [{ media_type: 'movie', id: 4, title: 'Kantara' }] }) };
+  };
+  const res = await worker.fetch(new Request(`${ORIGIN}/api/search?q=kantara`), { TMDB_TOKEN: 't' }, ctx);
+  assert.equal(calls, 1);
+  assert.equal((await res.json()).relaxedTo, undefined, 'an untouched query claims no relaxation');
+});
+
+await test('an outage is not retried three ways and called "nothing matched"', async () => {
+  // The difference that matters: TMDB saying no, and TMDB not answering. The
+  // second must still reach the reader as degraded rather than as an empty
+  // result they would read as "this site does not have it".
+  fakeCache();
+  let calls = 0;
+  globalThis.fetch = async () => {
+    calls += 1;
+    throw new Error('network');
+  };
+  const res = await worker.fetch(new Request(`${ORIGIN}/api/search?q=jawan%20movie`), { TMDB_TOKEN: 't' }, ctx);
+  const body = await res.json();
+  assert.equal(calls, 1, 'an unreachable TMDB was asked again');
+  assert.equal(body.degraded, true);
+});
+
+await test('a genuine miss is still a miss, and is cached as one', async () => {
+  fakeCache();
+  globalThis.fetch = async () => ({ ok: true, json: async () => ({ results: [] }) });
+  const res = await worker.fetch(new Request(`${ORIGIN}/api/search?q=zzzz%20qqqq`), { TMDB_TOKEN: 't' }, ctx);
+  const body = await res.json();
+  assert.equal(body.remote, true);
+  assert.deepEqual(body.results, []);
+  assert.equal(body.degraded, undefined, 'a miss is not an outage');
+});
