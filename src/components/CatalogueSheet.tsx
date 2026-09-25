@@ -248,12 +248,12 @@ export function CatalogueSheet({
                   </div>
                 )}
 
-                {/* Where the facts came from. The calendar rows credit TMDB in
-                    the footer; a row that is entirely TMDB should say so where
-                    it is read. */}
-                <p className="sheet__pending">
-                  Details from TMDB. Not in the India release calendar.
-                </p>
+                {/* A credit, not a caveat. This said "Details from TMDB. Not
+                    in the India release calendar" — half attribution, half
+                    apology, and the apology stopped being true the moment the
+                    sheet started naming the service streaming it. TMDB's terms
+                    want the credit; nothing wants the second sentence. */}
+                <p className="sheet__pending">Details from TMDB.</p>
               </>
             )}
           </div>

@@ -1139,11 +1139,24 @@ export default function App() {
                 <span className="empty__icon">
                   <IconSearch />
                 </span>
-                {/* The old heading said "in this week" whatever had been typed,
-                    which turned a scoping accident into a claim about the
-                    catalogue. Now the search really has read everything, so it
-                    can say so — and only it can. */}
-                <h3>{searching ? `Nothing matches "${filters.query.trim()}"` : 'No matches in this week'}</h3>
+                {/*
+                  * Scoped to what this board actually read.
+                  *
+                  * It said "in this week" whatever had been typed, which was a
+                  * scoping accident stated as a fact about the catalogue. That
+                  * was fixed to a flat "Nothing matches" once the box read all
+                  * 963 of our own rows — correct at the time, and wrong again
+                  * the moment search started reaching TMDB's million. A reader
+                  * searching Shawshank now gets three results in the dropdown
+                  * and "Nothing matches Shawshank" on the page underneath it.
+                  *
+                  * Only the board is empty, so only the board says so.
+                  */}
+                <h3>
+                  {searching
+                    ? `Nothing on New on OTT matches "${filters.query.trim()}"`
+                    : 'No matches in this week'}
+                </h3>
                 <p>
                   {nearMisses.length
                     ? 'Nothing fits all of those at once. Here is the closest thing that does:'

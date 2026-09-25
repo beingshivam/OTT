@@ -1980,10 +1980,21 @@ console.log('\nA title only search can reach');
         'a TMDB provider id becomes a service this site can name',
         `buttons: ${sheet.buttons.join(' / ') || '(none)'}`,
       );
+      /* The credit, which TMDB's terms require. This used to assert the
+         sentence beside it — "not in the India release calendar" — which was
+         written when these rows were inert and became false the moment the
+         sheet started naming the service streaming the thing. A test that
+         pins apologetic copy keeps it alive long after the product has
+         outgrown it. */
       is(
-        /Not in the India release calendar/i.test(sheet.text),
-        'and it still says what it is not',
-        'the sheet does not say the title is outside the calendar',
+        /Details from TMDB/i.test(sheet.text),
+        'and it credits where the facts came from',
+        'the sheet does not credit TMDB',
+      );
+      is(
+        !/not in the India release calendar/i.test(sheet.text),
+        'without apologising for a gap that no longer exists',
+        'the sheet still defines the title by what it is not',
       );
 
       /* A sheet is not a page. If this ever starts changing the URL it has

@@ -292,11 +292,25 @@ export function GlobalSearch({ value, onChange, corpus, onOpen, onOpenCatalogue 
           )}
 
           {elsewhere.length > 0 && (
-            /* Named for what it is. "More results" would imply the site can
-               tell you something about these, and it cannot — there is no
-               Indian streaming date for them, which is the only thing this
-               site exists to say. */
-            <Section label="Everywhere else" note="Found on TMDB — not in the India release calendar">
+            /*
+             * This used to read "Everywhere else — found on TMDB, not in the
+             * India release calendar", and the note beside it explained that
+             * the site could tell you nothing about these rows.
+             *
+             * That was true and is not any more. It was written when the rows
+             * were inert; they now open a sheet with the cast, the runtime and
+             * which Indian service is streaming the thing tonight. Copy that
+             * apologises for a gap the product has since closed is worse than
+             * no copy, because a reader believes it and does not tap.
+             *
+             * "Everywhere else" pointed off-site as well, which was the deeper
+             * mistake: this is not a release calendar that also has a search
+             * box. It is a search for every film and show, and the calendar is
+             * the part of it that can additionally say "Netflix, from Friday".
+             * So the heading says everything else is here, and the note says
+             * what tapping gets you rather than what the row lacks.
+             */
+            <Section label="Everything else" note="Cast, ratings and where to watch — tap any title">
               {elsewhere.map((h) => (
                 <TitleRow
                   key={h.id}
