@@ -4677,3 +4677,64 @@ a.changes__title:hover {
 }
 
 .sheet__more-year { font-size: 12px; opacity: 0.6; }
+
+/*
+ * A person's filmography, in the sheet a search result opens.
+ *
+ * The same cards as "More like this" and deliberately so — a poster with a
+ * name under it is one component wearing two hats — but wrapping instead of
+ * scrolling. A recommendations row is a footnote under an answer and can be
+ * swiped; a filmography *is* the answer, and hiding two thirds of it behind a
+ * horizontal gesture would be hiding the thing the reader came for.
+ */
+.sheet__more--grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 16px 12px;
+  overflow: visible;
+  scroll-snap-type: none;
+}
+
+.sheet__more--grid button { width: 100%; }
+.sheet__more--grid .sheet__more-art { width: 100%; }
+
+/*
+ * A person sheet has no hero, so it has to undo the hero's overlap.
+ *
+ * .sheet__body carries margin-top: -46px to tuck the copy under the backdrop's
+ * scrim. Without a backdrop above it that margin pulls the body out through
+ * the top of the sheet, and the first 46px of it — which is the person's name
+ * — is simply clipped. It rendered, it measured correctly, and it was above
+ * the scroll container's top edge.
+ */
+.sheet__body--plain {
+  margin-top: 0;
+  padding-top: clamp(20px, 4vw, 28px);
+}
+
+/* The headshot and the name, side by side. A person has a portrait, not a
+   backdrop, so this sheet has no hero band at all. */
+.person__head {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.person__photo {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: top center;
+  flex: 0 0 auto;
+  display: block;
+}
+
+.person__photo--blank { background: var(--card, #1a1d24); }
+
+.person__role {
+  margin: 2px 0 0;
+  font-size: 14px;
+  opacity: 0.65;
+}

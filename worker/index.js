@@ -468,6 +468,109 @@ async function titleFromTmdb(request, url, env, ctx) {
   return res;
 }
 
+/**
+ * Everything one person has been in.
+ *
+ * Search has always returned people — TMDB's /search/multi gives them for
+ * free, and a reader who half-remembers a face and not a title types the name.
+ * Tapping one used to put the name in the search box, which worked only
+ * because the box also filtered the board: their films appeared underneath
+ * because the board matched on cast. The box stopped touching the board, so
+ * that quietly became a tap that does nothing but re-run the same search.
+ *
+ * A person is a destination after all. Not a page — the same reasoning as
+ * titles, and a hundred thousand actor pages carrying a filmography and
+ * nothing else is exactly the shape that gets demoted — but a sheet listing
+ * the work, from which any title opens.
+ *
+ * Cast and crew merged, because the answer to "what has this person done"
+ * should not depend on which side of the camera they were on: an actor's list
+ * is `cast`, a director's is `crew`, and plenty of people have both. Deduped
+ * by title, since a person who acted in and directed the same film is one
+ * credit on a filmography, not two.
+ */
+const PERSON_TTL = 21_600;
+const PERSON_ID = /^p-(\d{1,12})$/;
+
+async function personFromTmdb(request, url, env, ctx) {
+  if (request.method !== 'GET') return json(405, { error: 'method_not_allowed' });
+
+  const raw = (url.searchParams.get('id') ?? '').trim();
+  const token = env.TMDB_TOKEN || env.TMDB_API_KEY;
+  const match = PERSON_ID.exec(raw);
+  if (!match) return json(400, { error: 'bad_id' });
+  if (!token) return json(200, { remote: false, degraded: true });
+
+  const key = new Request(`https://newonott.in/api/person?id=${raw}`, { method: 'GET' });
+  const cache = caches.default;
+  const hit = await cache.match(key);
+  if (hit) return hit;
+
+  const isJwt = /^ey[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/.test(token);
+  const api = new URL(`https://api.themoviedb.org/3/person/${match[1]}`);
+  api.searchParams.set('append_to_response', 'combined_credits');
+  api.searchParams.set('language', 'en-IN');
+  if (!isJwt) api.searchParams.set('api_key', token);
+
+  let upstream;
+  try {
+    upstream = await fetch(api.toString(), {
+      headers: isJwt
+        ? { authorization: `Bearer ${token}`, accept: 'application/json' }
+        : { accept: 'application/json' },
+      cf: { cacheEverything: true, cacheTtl: PERSON_TTL },
+    });
+  } catch {
+    return json(200, { remote: true, degraded: true });
+  }
+  if (upstream.status === 404) return json(404, { error: 'not_found' }, PERSON_TTL);
+  if (!upstream.ok) return json(200, { remote: true, degraded: true });
+
+  const b = await upstream.json();
+  const credits = b.combined_credits ?? {};
+
+  const rows = new Map();
+  for (const c of [...(credits.cast ?? []), ...(credits.crew ?? [])]) {
+    if (c.media_type !== 'movie' && c.media_type !== 'tv') continue;
+    if (!c.poster_path) continue;
+    const id = `${c.media_type === 'tv' ? 't' : 'm'}-${c.id}`;
+    /* First wins, and cast comes first: "as Vijay" is more use on a
+       filmography than "Executive Producer" for the same film. */
+    if (rows.has(id)) continue;
+    rows.set(id, {
+      id,
+      title: c.title || c.name,
+      year: (c.release_date || c.first_air_date || '').slice(0, 4) || null,
+      image: `/img/w185${c.poster_path}`,
+      as: c.character || c.job || null,
+      popularity: c.popularity ?? 0,
+    });
+  }
+
+  /* Best known first. A filmography ordered by date opens on whatever they did
+     most recently, which for a long career is usually the least recognisable
+     thing on it. */
+  const credited = [...rows.values()]
+    .sort((a, b) => b.popularity - a.popularity)
+    .slice(0, 24)
+    .map(({ popularity, ...rest }) => rest);
+
+  const res = json(
+    200,
+    {
+      remote: true,
+      id: raw,
+      name: b.name,
+      role: b.known_for_department === 'Acting' ? 'Actor' : b.known_for_department || null,
+      image: b.profile_path ? `/img/w185${b.profile_path}` : null,
+      credits: credited,
+    },
+    PERSON_TTL,
+  );
+  ctx.waitUntil(cache.put(key, res.clone()));
+  return res;
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -560,6 +663,7 @@ export default {
        is a POST-only path. */
     if (url.pathname === '/api/search') return searchTmdb(request, url, env, ctx);
     if (url.pathname === '/api/title') return titleFromTmdb(request, url, env, ctx);
+    if (url.pathname === '/api/person') return personFromTmdb(request, url, env, ctx);
 
     if (url.pathname !== '/api/subscribe') return env.ASSETS.fetch(request);
 

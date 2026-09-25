@@ -81,9 +81,28 @@ function serve() {
       return res.end(
         JSON.stringify(
           q
-            ? { remote: true, total: 1, results: [{ kind: 'film', id: 'm-278', title: 'A Film Only TMDB Has', year: '1994', image: null, lang: 'en' }] }
+            ? {
+                remote: true,
+                total: 2,
+                results: [
+                  { kind: 'film', id: 'm-278', title: 'A Film Only TMDB Has', year: '1994', image: null, lang: 'en' },
+                  { kind: 'person', id: 'p-42', name: 'A Person TMDB Knows', image: null, role: 'Actor', knownFor: ['One', 'Two'] },
+                ],
+              }
             : { remote: true, results: [], total: 0 },
         ),
+      );
+    }
+    if (path === '/api/person') {
+      res.writeHead(200, { 'content-type': 'application/json' });
+      return res.end(
+        JSON.stringify({
+          remote: true, id: 'p-42', name: 'A Person TMDB Knows', role: 'Actor', image: null,
+          credits: [
+            { id: 'm-278', title: 'A Film Only TMDB Has', year: '1994', image: null, as: 'Themselves' },
+            { id: 'm-13', title: 'Another Of Theirs', year: '2001', image: null, as: 'A Part' },
+          ],
+        }),
       );
     }
     if (path === '/api/title') {
@@ -2327,6 +2346,82 @@ for (const [label, path] of [
     `${label}: nor what it calls itself`,
     `"${before.heading}" became "${after.heading}"`,
   );
+  await ctx.close();
+}
+
+/*
+ * ---------------------------------------------------------------------------
+ * A person is somewhere to go
+ *
+ * Search has always returned people. Tapping one wrote the name into the box,
+ * which worked only because the box also filtered the board — their films
+ * appeared underneath because the board matched on cast. The box stopped
+ * touching the board and that became a tap that re-runs the same search and
+ * shows you the person again: a regression created by a fix, and invisible
+ * because the tap still did *something*.
+ *
+ * So the check is not "does a person appear" but "does tapping one get you
+ * anywhere", and then that a credit leads on to the title.
+ */
+console.log('\nA person leads somewhere');
+{
+  const { ctx, page, errors } = await newPage(browser, { width: 390, height: 844, touch: true });
+  await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('.landed__cell', { timeout: 15_000 }).catch(() => {});
+  await page.locator('input[type="search"], .search input').first().fill('a person');
+  await page.waitForTimeout(800);
+
+  const row = page.locator('button.gsearch__row').filter({ hasText: 'A Person TMDB Knows' }).first();
+  is(await row.count() > 0, 'a person is a result you can tap', 'the person row is missing');
+
+  if (await row.count()) {
+    await row.click();
+    const opened = await page.waitForSelector('.sheet', { timeout: 8000 }).then(() => true).catch(() => false);
+    is(opened, 'and tapping one opens them rather than re-running the search', 'no sheet appeared');
+
+    if (opened) {
+      await page.waitForTimeout(700);
+      const sheet = await page.evaluate(() => {
+        const s = document.querySelector('.sheet');
+        return {
+          title: s.querySelector('.sheet__title')?.textContent?.trim() ?? '',
+          /* The name has to be inside the scrolling region. It once measured
+             correctly and rendered 46px above it, clipped by a negative margin
+             meant to tuck the body under a hero this sheet does not have. */
+          nameVisible: (() => {
+            const t = s.querySelector('.sheet__title');
+            const scroll = s.querySelector('.sheet__scroll');
+            if (!t || !scroll) return false;
+            return t.getBoundingClientRect().top >= scroll.getBoundingClientRect().top - 1;
+          })(),
+          credits: [...s.querySelectorAll('.sheet__more--grid button')].map((b) => b.textContent.trim()),
+        };
+      });
+
+      is(sheet.title === 'A Person TMDB Knows', 'the sheet is about them', `titled "${sheet.title}"`);
+      is(sheet.nameVisible, 'and their name is inside the sheet, not above it', 'the name is clipped');
+      is(sheet.credits.length === 2, 'the filmography is there', `${sheet.credits.length} credits`);
+      is(
+        /1994/.test(sheet.credits[0] ?? ''),
+        'each credit says when, and what they were',
+        `first credit reads "${sheet.credits[0]}"`,
+      );
+
+      /* And a credit is itself a destination — the whole point of listing it. */
+      await page.locator('.sheet__more--grid button').first().click();
+      await page.waitForTimeout(900);
+      const after = await page.evaluate(
+        () => document.querySelector('.sheet__title')?.textContent?.trim() ?? '',
+      );
+      is(
+        after === 'A Film Only TMDB Has',
+        'and tapping a credit opens the film',
+        `the sheet became "${after}"`,
+      );
+    }
+  }
+
+  is(errors.length === 0, 'no console errors', errors.slice(0, 2).join(' | '));
   await ctx.close();
 }
 

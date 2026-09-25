@@ -1081,3 +1081,96 @@ await test('a title carries somewhere to go next', async () => {
     'a card with no poster is a grey rectangle, not a recommendation',
   );
 });
+
+/*
+ * ---------------------------------------------------------------------------
+ * A person, and everything they have been in
+ *
+ * Search has always returned people. Tapping one used to put the name in the
+ * search box, which only worked because the box also filtered the board — so
+ * when the box stopped touching the board, that became a tap that re-runs the
+ * same search and does nothing.
+ */
+
+const PERSON_BODY = {
+  id: 35742,
+  name: 'Shahid Kapoor',
+  known_for_department: 'Acting',
+  profile_path: '/sk.jpg',
+  combined_credits: {
+    cast: [
+      { media_type: 'movie', id: 1, title: 'Vivah', release_date: '2006-11-10', poster_path: '/v.jpg', character: 'Prem', popularity: 30 },
+      { media_type: 'movie', id: 2, title: 'Kaminey', release_date: '2009-08-14', poster_path: '/k.jpg', character: 'Guddu', popularity: 90 },
+      { media_type: 'movie', id: 3, title: 'No Poster', release_date: '2010-01-01', poster_path: null, character: 'X', popularity: 99 },
+      { media_type: 'person', id: 9, title: 'Nonsense', poster_path: '/n.jpg', popularity: 100 },
+    ],
+    crew: [
+      /* The same film he acted in — one credit on a filmography, not two. */
+      { media_type: 'movie', id: 1, title: 'Vivah', release_date: '2006-11-10', poster_path: '/v.jpg', job: 'Producer', popularity: 30 },
+      { media_type: 'tv', id: 7, name: 'A Series', first_air_date: '2020-02-02', poster_path: '/s.jpg', job: 'Director', popularity: 50 },
+    ],
+  },
+};
+
+await test('a person is a destination, not a query', async () => {
+  fakeCache();
+  globalThis.fetch = async () => ({ ok: true, status: 200, json: async () => PERSON_BODY });
+  const res = await worker.fetch(new Request(`${ORIGIN}/api/person?id=p-35742`), { TMDB_TOKEN: 't' }, ctx);
+  const b = await res.json();
+
+  assert.equal(b.name, 'Shahid Kapoor');
+  assert.equal(b.role, 'Actor');
+  assert.equal(b.image, '/img/w185/sk.jpg', 'the photo goes through the proxy');
+
+  const ids = b.credits.map((c) => c.id);
+  assert.deepEqual(ids, ['m-2', 't-7', 'm-1'], `best known first, got ${ids.join(', ')}`);
+  assert.equal(b.credits.length, 3, 'a duplicate, a posterless row and a non-title got through');
+  assert.equal(b.credits[2].as, 'Prem', 'the acting credit lost to the producing one');
+  assert.equal(b.credits[1].as, 'Director', 'crew-only work carries its job instead');
+});
+
+await test('cast and crew are one filmography', async () => {
+  // An actor's list is `cast` and a director's is `crew`; asking which side of
+  // the camera somebody was on is not the reader's question.
+  fakeCache();
+  globalThis.fetch = async () => ({
+    ok: true,
+    status: 200,
+    json: async () => ({
+      id: 1, name: 'A Director', known_for_department: 'Directing', profile_path: null,
+      combined_credits: {
+        cast: [],
+        crew: [{ media_type: 'movie', id: 5, title: 'Their Film', release_date: '2019-01-01', poster_path: '/f.jpg', job: 'Director', popularity: 10 }],
+      },
+    }),
+  });
+  const b = await (await worker.fetch(new Request(`${ORIGIN}/api/person?id=p-1`), { TMDB_TOKEN: 't' }, ctx)).json();
+  assert.equal(b.role, 'Directing');
+  assert.equal(b.credits.length, 1, 'a director with no acting credits came back empty');
+  assert.equal(b.credits[0].title, 'Their Film');
+});
+
+await test('a made-up person id is refused before it costs a TMDB call', async () => {
+  fakeCache();
+  let calls = 0;
+  globalThis.fetch = async () => { calls += 1; return { ok: true, status: 200, json: async () => ({}) }; };
+  for (const id of ['', 'm-5', 'p-', 'p-abc', '../x']) {
+    const res = await worker.fetch(new Request(`${ORIGIN}/api/person?id=${encodeURIComponent(id)}`), { TMDB_TOKEN: 't' }, ctx);
+    assert.equal(res.status, 400, `"${id}" was let through`);
+  }
+  assert.equal(calls, 0);
+});
+
+await test('the person route degrades and caches like the others', async () => {
+  fakeCache();
+  globalThis.fetch = async () => { throw new Error('network'); };
+  const down = await worker.fetch(new Request(`${ORIGIN}/api/person?id=p-1`), { TMDB_TOKEN: 't' }, ctx);
+  assert.equal((await down.json()).degraded, true);
+
+  fakeCache();
+  let calls = 0;
+  globalThis.fetch = async () => { calls += 1; return { ok: true, status: 200, json: async () => PERSON_BODY }; };
+  await worker.fetch(new Request(`${ORIGIN}/api/person?id=p-35742`), { TMDB_TOKEN: 't' }, ctx);
+  await worker.fetch(new Request(`${ORIGIN}/api/person?id=p-35742`), { TMDB_TOKEN: 't' }, ctx);
+  assert.equal(calls, 1, 'the second open went back to TMDB');
+});

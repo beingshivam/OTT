@@ -46,6 +46,9 @@ interface Props {
    *  onOpen because the two sheets answer different questions: one is a
    *  release on a calendar, the other is a film with no Indian date at all. */
   onOpenCatalogue: (hit: { id: string; title: string }) => void;
+  /** Opens the person sheet. A third destination because a person is a third
+   *  kind of thing: not a release, not a film, a filmography. */
+  onOpenPerson: (hit: { id: string; name: string }) => void;
 }
 
 /** Below this the header cannot hold the wordmark and a field at once, so the
@@ -73,7 +76,7 @@ type Row =
   | { key: string; kind: 'local'; release: Release }
   | { key: string; kind: 'remote'; hit: RemoteHit };
 
-export function GlobalSearch({ value, onChange, corpus, onOpen, onOpenCatalogue }: Props) {
+export function GlobalSearch({ value, onChange, corpus, onOpen, onOpenCatalogue, onOpenPerson }: Props) {
   const input = useRef<HTMLInputElement>(null);
   const wrap = useRef<HTMLDivElement>(null);
   const [wide, setWide] = useState(
@@ -183,12 +186,21 @@ export function GlobalSearch({ value, onChange, corpus, onOpen, onOpenCatalogue 
       }
       return;
     }
-    /* A person is a query, not a destination: the site has no page for one, but
-       it does index cast lists, so their full name is the most useful thing to
-       put in the box. */
+    /*
+     * A person is a destination now.
+     *
+     * This wrote the name into the box instead, on the reasoning that the site
+     * had no page for a person but did index cast lists — which worked only
+     * because the box also filtered the board, so their films appeared
+     * underneath. The box no longer touches the board, and the tap became a
+     * no-op that re-runs the same search and shows you the person again.
+     *
+     * Still not a page: a hundred thousand actor pages carrying a filmography
+     * and nothing else is the shape that gets demoted. A sheet, like a title.
+     */
     if (row.hit.kind === 'person' && row.hit.name) {
-      onChange(row.hit.name);
-      input.current?.focus();
+      onOpenPerson({ id: row.hit.id, name: row.hit.name });
+      setFocused(false);
     }
   }
 

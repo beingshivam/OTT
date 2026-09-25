@@ -7,6 +7,7 @@ import { ChangesPage, type Change } from './components/ChangesPage';
 import { Controls } from './components/Controls';
 import { DetailSheet } from './components/DetailSheet';
 import { CatalogueSheet } from './components/CatalogueSheet';
+import { PersonSheet } from './components/PersonSheet';
 import { EmailSignup } from './components/EmailSignup';
 import { ReleaseCard } from './components/ReleaseCard';
 import { GlobalSearch } from './components/GlobalSearch';
@@ -76,6 +77,9 @@ export default function App() {
   /* A title only search can reach. Its own state rather than `selected`,
      because it is not a Release and the two sheets are different components. */
   const [remoteTitle, setRemoteTitle] = useState<{ id: string; title: string } | null>(null);
+  /* And a person, which is a third kind of thing again: not a release, not a
+     film, a filmography. */
+  const [person, setPerson] = useState<{ id: string; name: string } | null>(null);
 
   const [catalogueError, setCatalogueError] = useState<string | null>(null);
   /** The change log, fetched only on its own page — see ChangesPage. Same
@@ -775,6 +779,7 @@ export default function App() {
             corpus={corpus}
             onOpen={setSelected}
             onOpenCatalogue={setRemoteTitle}
+            onOpenPerson={setPerson}
           />
 
           {/* Up here rather than in the footer.
@@ -1372,6 +1377,20 @@ export default function App() {
           release={selected}
           onClose={() => setSelected(null)}
           onPickSimilar={openSimilar}
+        />
+      )}
+      {person && (
+        <PersonSheet
+          id={person.id}
+          fallbackName={person.name}
+          onClose={() => setPerson(null)}
+          /* A credit goes wherever that title goes — our page when we have
+             one, the TMDB sheet when we do not. Same rule as a
+             recommendation, so the two cannot drift. */
+          onPick={(credit) => {
+            setPerson(null);
+            openSimilar({ id: credit.id, title: credit.title });
+          }}
         />
       )}
       {remoteTitle && (

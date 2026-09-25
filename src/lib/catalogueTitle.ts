@@ -81,3 +81,54 @@ export async function fetchCatalogueTitle(
     return { status: 'degraded' };
   }
 }
+
+/**
+ * A person, and everything they have been in.
+ *
+ * Search has always returned people, and tapping one used to write the name
+ * into the search box. That only ever worked because the box also filtered the
+ * board — their films appeared underneath because the board matched on cast.
+ * Once the box stopped touching the board it became a tap that re-runs the
+ * same search and shows you the person again.
+ *
+ * So a person is a destination now, the same way a title is: a sheet, not a
+ * page. The reasoning about pages is unchanged — a hundred thousand actor
+ * pages carrying a filmography and nothing else is the shape that gets
+ * demoted — but there is plenty worth showing, and a filmography is the one
+ * place a reader who half-remembers a face rather than a title can start.
+ */
+export type PersonCredit = {
+  id: string;
+  title: string;
+  year: string | null;
+  image: string | null;
+  as: string | null;
+};
+
+export type CataloguePerson = {
+  remote: true;
+  id: string;
+  name: string;
+  role: string | null;
+  image: string | null;
+  credits: PersonCredit[];
+};
+
+export type PersonState =
+  | { status: 'loading' }
+  | { status: 'ready'; person: CataloguePerson }
+  | { status: 'missing' }
+  | { status: 'degraded' };
+
+export async function fetchPerson(id: string, signal?: AbortSignal): Promise<PersonState> {
+  try {
+    const res = await fetch(`/api/person?id=${encodeURIComponent(id)}`, { signal });
+    if (res.status === 404) return { status: 'missing' };
+    if (!res.ok) return { status: 'degraded' };
+    const body = (await res.json()) as CataloguePerson & { degraded?: boolean };
+    if (body.degraded || !body.name) return { status: 'degraded' };
+    return { status: 'ready', person: body };
+  } catch {
+    return { status: 'degraded' };
+  }
+}
