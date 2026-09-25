@@ -1,12 +1,13 @@
 import { PosterArt } from './PosterArt';
 import { Rating } from './Rating';
-import { IconPlay, IconTicket, IconExternal, IconWhatsApp } from './icons';
+import { IconPlay,  IconTicket,  IconExternal } from './icons';
 import { platform as platformById, languageName, hasLanguageRoute } from '../data/platforms';
 import { outbound } from '../data/affiliates';
 import { runtimeLabel } from '../lib/format';
 import { formatWeekRange } from '../lib/week';
 import { scoreOf } from '../lib/score';
-import { shareLine, shareUrl, whatsappHref } from '../lib/share';
+import { shareLine, shareUrl } from '../lib/share';
+import { ShareButtons } from './ShareButtons';
 import type { Release, ReleaseFeed } from '../types';
 import { BRAND } from '../data/brand';
 
@@ -342,20 +343,16 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
               * from 18 Sep" where the sheet could only ever have said "in
               * cinemas".
               */}
-            <a
-              className="btn btn--lg btn--wa"
-              href={whatsappHref(
-                shareLine(release, {
-                  streamsOn: streamsOn ? { date: streamsOn, platforms: dated!.platforms } : null,
-                }),
-                shareUrl(release, window.location.href, window.location.origin),
-              )}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <IconWhatsApp />
-              WhatsApp
-            </a>
+            {/* Both, now. This page had WhatsApp alone, so the surface most
+                likely to be arrived at from Google had one fewer way to pass
+                it on than the same film opened from the board. */}
+            <ShareButtons
+              title={release.title}
+              line={shareLine(release, {
+                streamsOn: streamsOn ? { date: streamsOn, platforms: dated!.platforms } : null,
+              })}
+              url={shareUrl(release, window.location.href, window.location.origin)}
+            />
           </div>
         </div>
       </div>

@@ -90,6 +90,33 @@ export function shareLine(release: Release, ctx: ShareContext = {}): string {
 }
 
 /**
+ * The same sentence for a title this site has no row for.
+ *
+ * Search reaches past the calendar into TMDB's million, and those titles open
+ * a sheet rather than a page. They were the one place on the site you could
+ * not forward anything from, which is backwards: the sheet knows which Indian
+ * service carries the film, and that is exactly the message worth sending.
+ *
+ * Same rules as above — no emoji, no "Check out", the information is the
+ * point. The tense is simpler because there is nothing to be upcoming about:
+ * these are catalogue titles, either streaming somewhere in India or not.
+ *
+ * The year earns its place here and not in shareLine: a 2006 film shared with
+ * no date reads as a new release, which is the one thing a message from this
+ * site must never accidentally say.
+ */
+export function catalogueShareLine(
+  title: string,
+  year: string | null,
+  platformIds: string[],
+): string {
+  const named = year ? `${title} (${year})` : title;
+  return platformIds.length
+    ? `${named} is streaming on ${names(platformIds)} in India`
+    : `${named} is not streaming in India right now`;
+}
+
+/**
  * Where a forward should land: the film's own page, never the page you shared
  * from.
  *

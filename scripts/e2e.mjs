@@ -2190,6 +2190,75 @@ console.log('\nA tab left open across a deploy');
   await ctx.close();
 }
 
+/*
+ * ---------------------------------------------------------------------------
+ * Both ways out, on every surface that names a film
+ *
+ * A forwarded message is this site's only organic distribution — in India film
+ * news travels on WhatsApp, not in feeds — so the surface that cannot be
+ * forwarded from is the surface that cannot spread.
+ *
+ * It was one place and a half. The detail sheet had both buttons; the title
+ * page had WhatsApp and no native share, which is backwards for the page most
+ * likely to be arrived at from Google; and the sheet a search result opens had
+ * neither, making the one surface that reaches a million titles the only one
+ * you could not send anybody.
+ */
+console.log('\nBoth ways out, everywhere');
+{
+  const { ctx, page, errors } = await newPage(browser, { width: 390, height: 844, touch: true });
+
+  const pair = async () =>
+    page.evaluate(() => {
+      const scope = document.querySelector('.sheet, .titlepage') ?? document.body;
+      const labels = [...scope.querySelectorAll('.btn')].map((b) => b.textContent.trim());
+      const wa = scope.querySelector('a.btn--wa');
+      return {
+        whatsapp: labels.some((l) => /WhatsApp/i.test(l)),
+        share: labels.some((l) => /^Share$/i.test(l)),
+        /* The message is the advert, so an empty one is a failure even when
+           the button is present. */
+        text: wa ? decodeURIComponent(wa.getAttribute('href') ?? '').replace(/^[^?]*\?text=/, '') : '',
+      };
+    });
+
+  /* A title page. */
+  const slug = JSON.parse(await readFile(join(DIST, 'data/releases.json'), 'utf8'))
+    .weeks.flatMap((w) => w.releases)
+    .find((r) => r.slug)?.slug;
+  if (slug) {
+    await page.goto(`${BASE}/ott-release-date/${slug}`, { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('.titlepage__actions', { timeout: 10_000 }).catch(() => {});
+    await page.waitForTimeout(600);
+    const p1 = await pair();
+    is(p1.whatsapp && p1.share, 'a title page offers both', `whatsapp=${p1.whatsapp} share=${p1.share}`);
+    is(p1.text.length > 10, 'and its message says something', `"${p1.text}"`);
+  }
+
+  /* The sheet a TMDB-only result opens. */
+  await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('.landed__cell', { timeout: 15_000 }).catch(() => {});
+  await page.locator('input[type="search"], .search input').first().fill('a film only');
+  await page.waitForTimeout(700);
+  const row = page.locator('button.gsearch__row').filter({ hasText: 'A Film Only TMDB Has' }).first();
+  if (await row.count()) {
+    await row.click();
+    await page.waitForSelector('.sheet', { timeout: 8000 }).catch(() => {});
+    await page.waitForTimeout(600);
+    const p2 = await pair();
+    is(p2.whatsapp && p2.share, 'so does a title only search can reach', `whatsapp=${p2.whatsapp} share=${p2.share}`);
+    /* No page to point at, so the sentence has to carry the answer on its own. */
+    is(
+      /streaming on .+ in India|not streaming in India/i.test(p2.text),
+      'and its message carries the answer, since the link cannot',
+      `"${p2.text}"`,
+    );
+  }
+
+  is(errors.length === 0, 'no console errors', errors.slice(0, 2).join(' | '));
+  await ctx.close();
+}
+
 await browser.close();
 server.close();
 

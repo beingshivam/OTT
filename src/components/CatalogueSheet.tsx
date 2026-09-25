@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { PosterArt } from './PosterArt';
 import { MoreLikeThis } from './MoreLikeThis';
+import { ShareButtons } from './ShareButtons';
 import { IconClose, IconExternal } from './icons';
 import { platform, languageName, KIND_LABEL } from '../data/platforms';
 import { runtimeLabel } from '../lib/format';
+import { catalogueShareLine } from '../lib/share';
 import {
   fetchCatalogueTitle,
   platformsFor,
@@ -126,6 +128,20 @@ export function CatalogueSheet({
                       {t.seasons} season{t.seasons === 1 ? '' : 's'}
                     </span>
                   )}
+                </div>
+
+                {/* The two ways out, which this sheet did not have — making
+                    the one surface that reaches a million titles the only one
+                    you could not forward anything from. There is no page to
+                    point at, so the link is the site and the sentence carries
+                    the answer, which is the half of a forward that does the
+                    work anyway. */}
+                <div className="sheet__actions sheet__actions--lead">
+                  <ShareButtons
+                    title={t.title}
+                    line={catalogueShareLine(t.title, t.year, streaming)}
+                    url={window.location.origin}
+                  />
                 </div>
 
                 {/*

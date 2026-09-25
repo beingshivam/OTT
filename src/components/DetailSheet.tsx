@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import { IconCalendar, IconClose, IconDoc, IconExternal, IconShare, IconCheck, IconWhatsApp } from './icons';
+import { useEffect, useRef } from 'react';
+import { IconCalendar,  IconClose,  IconDoc,  IconExternal } from './icons';
 import { PosterArt } from './PosterArt';
 import { dropLabel } from './ReleaseCard';
 import { KIND_LABEL, languageName, platform } from '../data/platforms';
@@ -7,8 +7,9 @@ import { outbound } from '../data/affiliates';
 import { runtimeLabel } from '../lib/format';
 import { formatDay } from '../lib/week';
 import { scoreOf, scoreTitle } from '../lib/score';
-import { shareLine, shareUrl, whatsappHref } from '../lib/share';
+import { shareLine, shareUrl } from '../lib/share';
 import type { Release } from '../types';
+import { ShareButtons } from './ShareButtons';
 import { MoreLikeThis, useSimilar, type SimilarHit } from './MoreLikeThis';
 
 interface Props {
@@ -23,7 +24,6 @@ interface Props {
 export function DetailSheet({ release, onClose, onPickSimilar }: Props) {
   const closeRef = useRef<HTMLButtonElement>(null);
   const similar = useSimilar(release.id);
-  const [copied, setCopied] = useState(false);
   const p = platform(release.platforms[0]);
   const day = formatDay(release.releaseDate);
   const drop = release.drop;
@@ -114,24 +114,6 @@ export function DetailSheet({ release, onClose, onPickSimilar }: Props) {
   const line = shareLine(release);
   const url = shareUrl(release, window.location.href, window.location.origin);
 
-  async function share() {
-    const text = line;
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: release.title, text, url });
-        return;
-      } catch {
-        /* User dismissed the share sheet — fall through to copying. */
-      }
-    }
-    try {
-      await navigator.clipboard.writeText(`${text}\n${url}`);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1800);
-    } catch {
-      /* Clipboard blocked; nothing useful left to do. */
-    }
-  }
 
   // Land on the title, not the homepage. On a phone these https links are
   // universal links, so the installed app opens instead of the browser.
@@ -294,19 +276,7 @@ export function DetailSheet({ release, onClose, onPickSimilar }: Props) {
                 a WhatsApp hand-off is a navigation, so it gets middle-click,
                 long-press and "open in new tab" for free, and it works with
                 JavaScript still loading. */}
-            <a
-              className="btn btn--lg btn--wa"
-              href={whatsappHref(line, url)}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <IconWhatsApp />
-              WhatsApp
-            </a>
-            <button className="btn btn--lg" onClick={share}>
-              {copied ? <IconCheck /> : <IconShare />}
-              {copied ? 'Copied' : 'Share'}
-            </button>
+            <ShareButtons title={release.title} line={line} url={url} />
           </div>
 
           <dl className="sheet__grid">
