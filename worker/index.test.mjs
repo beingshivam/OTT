@@ -899,3 +899,142 @@ await test('a genuine miss is still a miss, and is cached as one', async () => {
   assert.deepEqual(body.results, []);
   assert.equal(body.degraded, undefined, 'a miss is not an outage');
 });
+
+/*
+ * ---------------------------------------------------------------------------
+ * One title, for the sheet a search result now opens
+ *
+ * The row for a film TMDB has and this calendar does not used to be inert,
+ * because there was nowhere to send anybody. A sheet is not a page — not
+ * crawled, not indexed, not linked — so search can answer rather than only
+ * acknowledge, and "publishing stays earned" survives intact.
+ *
+ * What makes it worth opening is the providers, not the cast.
+ */
+
+const TITLE_BODY = {
+  id: 278,
+  title: 'The Shawshank Redemption',
+  release_date: '1994-09-23',
+  overview: 'Two imprisoned men bond over a number of years.',
+  poster_path: '/p.jpg',
+  backdrop_path: '/b.jpg',
+  runtime: 142,
+  vote_average: 8.7,
+  vote_count: 27000,
+  genres: [{ name: 'Drama' }, { name: 'Crime' }],
+  original_language: 'en',
+  credits: {
+    cast: Array.from({ length: 20 }, (_, i) => ({ name: `Actor ${i}` })),
+    crew: [{ job: 'Producer', name: 'Someone' }, { job: 'Director', name: 'Frank Darabont' }],
+  },
+  release_dates: {
+    results: [
+      { iso_3166_1: 'US', release_dates: [{ certification: 'R' }] },
+      { iso_3166_1: 'IN', release_dates: [{ certification: '' }, { certification: 'A' }] },
+    ],
+  },
+  'watch/providers': {
+    results: {
+      IN: { flatrate: [{ provider_id: 8 }], rent: [{ provider_id: 9 }] },
+      US: { flatrate: [{ provider_id: 15 }] },
+    },
+  },
+};
+
+await test('a search result opens into something worth opening', async () => {
+  fakeCache();
+  globalThis.fetch = async () => ({ ok: true, status: 200, json: async () => TITLE_BODY });
+  const res = await worker.fetch(new Request(`${ORIGIN}/api/title?id=m-278`), { TMDB_TOKEN: 't' }, ctx);
+  const b = await res.json();
+
+  assert.equal(b.title, 'The Shawshank Redemption');
+  assert.equal(b.year, '1994');
+  assert.equal(b.kind, 'film');
+  assert.equal(b.director, 'Frank Darabont', 'the director is found among the crew, not assumed first');
+  assert.equal(b.cast.length, 8, 'twenty names is a credits page, not a sheet');
+  assert.equal(b.runtimeMinutes, 142);
+  assert.equal(b.rating, 8.7);
+  assert.equal(b.certification, 'A', 'the Indian certificate, and not the blank one before it');
+  assert.equal(b.posterUrl, '/img/w500/p.jpg', 'artwork goes through the proxy, not to image.tmdb.org');
+});
+
+await test('only India is offered, because only India is the answer', async () => {
+  // Telling a reader in Chennai that a film is on a service they cannot get
+  // is worse than telling them nothing, because it reads as an answer.
+  fakeCache();
+  globalThis.fetch = async () => ({ ok: true, status: 200, json: async () => TITLE_BODY });
+  const res = await worker.fetch(new Request(`${ORIGIN}/api/title?id=m-278`), { TMDB_TOKEN: 't' }, ctx);
+  const b = await res.json();
+  assert.deepEqual(b.providerIds, [8], 'a US provider reached an Indian reader');
+  assert.deepEqual(b.rentBuyIds, [9], 'renting is a different offer from streaming and is kept apart');
+});
+
+await test('a series is asked the questions a series has answers to', async () => {
+  fakeCache();
+  let asked = '';
+  globalThis.fetch = async (u) => {
+    asked = String(u);
+    return {
+      ok: true,
+      status: 200,
+      json: async () => ({
+        id: 1399, name: 'Show', first_air_date: '2011-04-17', episode_run_time: [62],
+        number_of_seasons: 8, created_by: [{ name: 'A Creator' }], credits: {},
+        content_ratings: { results: [{ iso_3166_1: 'IN', rating: 'U/A 16+' }] },
+        'watch/providers': { results: {} },
+      }),
+    };
+  };
+  const res = await worker.fetch(new Request(`${ORIGIN}/api/title?id=t-1399`), { TMDB_TOKEN: 't' }, ctx);
+  const b = await res.json();
+  assert.ok(asked.includes('/tv/1399'), `asked the film endpoint for a series: ${asked}`);
+  assert.ok(asked.includes('content_ratings'), 'a series has no release_dates to rate');
+  assert.equal(b.kind, 'series');
+  assert.equal(b.seasons, 8);
+  assert.equal(b.certification, 'U/A 16+');
+  assert.equal(b.director, 'A Creator', 'a series is created, not directed');
+  assert.equal(b.runtimeMinutes, 62);
+});
+
+await test('a made-up id is refused before it costs a TMDB call', async () => {
+  fakeCache();
+  let calls = 0;
+  globalThis.fetch = async () => { calls += 1; return { ok: true, status: 200, json: async () => ({}) }; };
+  for (const id of ['', 'x-1', 'm-', 'm-abc', '../secrets', 'm-99999999999999999999']) {
+    const res = await worker.fetch(new Request(`${ORIGIN}/api/title?id=${encodeURIComponent(id)}`), { TMDB_TOKEN: 't' }, ctx);
+    assert.equal(res.status, 400, `"${id}" was let through`);
+  }
+  assert.equal(calls, 0, 'a malformed id reached TMDB');
+});
+
+await test('a title that does not exist says so, rather than degrading', async () => {
+  // 404 and "TMDB is down" want different words on the page, so they must not
+  // arrive as the same response.
+  fakeCache();
+  globalThis.fetch = async () => ({ ok: false, status: 404, json: async () => ({}) });
+  const res = await worker.fetch(new Request(`${ORIGIN}/api/title?id=m-1`), { TMDB_TOKEN: 't' }, ctx);
+  assert.equal(res.status, 404);
+});
+
+await test('an outage on the title route degrades like the search does', async () => {
+  fakeCache();
+  globalThis.fetch = async () => { throw new Error('network'); };
+  const res = await worker.fetch(new Request(`${ORIGIN}/api/title?id=m-278`), { TMDB_TOKEN: 't' }, ctx);
+  assert.equal(res.status, 200);
+  assert.equal((await res.json()).degraded, true);
+});
+
+await test('the title route is a GET and is cached at the edge', async () => {
+  fakeCache();
+  let calls = 0;
+  globalThis.fetch = async () => { calls += 1; return { ok: true, status: 200, json: async () => TITLE_BODY }; };
+  await worker.fetch(new Request(`${ORIGIN}/api/title?id=m-278`), { TMDB_TOKEN: 't' }, ctx);
+  await worker.fetch(new Request(`${ORIGIN}/api/title?id=m-278`), { TMDB_TOKEN: 't' }, ctx);
+  assert.equal(calls, 1, 'the second open went back to TMDB');
+
+  const post = await worker.fetch(
+    new Request(`${ORIGIN}/api/title?id=m-278`, { method: 'POST' }), { TMDB_TOKEN: 't' }, ctx,
+  );
+  assert.equal(post.status, 405);
+});

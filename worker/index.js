@@ -314,6 +314,141 @@ async function searchTmdb(request, url, env, ctx) {
   return res;
 }
 
+/**
+ * One title from TMDB, for the sheet a search result now opens.
+ *
+ * The row that shows a film TMDB has and this calendar does not used to be
+ * inert, with a fair reason written beside it: there was nowhere to send
+ * somebody, because the site has no page for a title it has no Indian release
+ * date for, and a row that looks clickable and lands on an empty board is
+ * worse than one that plainly says "that film exists, we have no date".
+ *
+ * That reasoning was about pages, and it still holds for pages. A million
+ * generated pages with nothing to say is the shape Google demotes, and it
+ * would drag down the 331 that are genuinely good. A sheet is not a page. It
+ * is not crawled, not indexed and not linked; it opens over the board and
+ * closes again. So search can now answer rather than only acknowledge,
+ * without publishing anything.
+ *
+ * What makes it worth opening is not the cast list. It is the providers: TMDB
+ * knows what is streaming in India, and platforms.ts already carries the TMDB
+ * provider ids for every service this site names. So the sheet can answer the
+ * question the whole site exists to answer — where do I watch this — for a
+ * title that is nowhere near the release calendar. Shawshank is a 1994 film
+ * with no Indian release date and a perfectly good answer to that question.
+ *
+ * Six hours at the edge. Providers change, but not by the minute, and a title
+ * page is a much longer-lived thing than a search result.
+ */
+const TITLE_TTL = 21_600;
+
+/** `m-278` / `t-1399` — the id shape the feed and the search results share. */
+const TITLE_ID = /^([mt])-(\d{1,12})$/;
+
+async function titleFromTmdb(request, url, env, ctx) {
+  if (request.method !== 'GET') return json(405, { error: 'method_not_allowed' });
+
+  const raw = (url.searchParams.get('id') ?? '').trim();
+  const token = env.TMDB_TOKEN || env.TMDB_API_KEY;
+  const match = TITLE_ID.exec(raw);
+  if (!match) return json(400, { error: 'bad_id' });
+  if (!token) return json(200, { remote: false, degraded: true });
+
+  const [, prefix, id] = match;
+  const kind = prefix === 't' ? 'tv' : 'movie';
+
+  const key = new Request(`https://newonott.in/api/title?id=${raw}`, { method: 'GET' });
+  const cache = caches.default;
+  const hit = await cache.match(key);
+  if (hit) return hit;
+
+  const isJwt = /^ey[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/.test(token);
+  const api = new URL(`https://api.themoviedb.org/3/${kind}/${id}`);
+  /* One call rather than four. credits and watch/providers are the two the
+     sheet cannot be drawn without, and the ratings endpoint differs by kind. */
+  api.searchParams.set(
+    'append_to_response',
+    kind === 'tv' ? 'credits,watch/providers,content_ratings' : 'credits,watch/providers,release_dates',
+  );
+  api.searchParams.set('language', 'en-IN');
+  if (!isJwt) api.searchParams.set('api_key', token);
+
+  let upstream;
+  try {
+    upstream = await fetch(api.toString(), {
+      headers: isJwt
+        ? { authorization: `Bearer ${token}`, accept: 'application/json' }
+        : { accept: 'application/json' },
+      cf: { cacheEverything: true, cacheTtl: TITLE_TTL },
+    });
+  } catch {
+    return json(200, { remote: true, degraded: true });
+  }
+  if (upstream.status === 404) return json(404, { error: 'not_found' }, TITLE_TTL);
+  if (!upstream.ok) return json(200, { remote: true, degraded: true });
+
+  const b = await upstream.json();
+
+  /*
+   * India, and only India.
+   *
+   * TMDB returns providers for every country it knows. Showing a reader in
+   * Chennai that a film streams on Hulu is worse than showing them nothing,
+   * because it reads as an answer. flatrate first because "included with your
+   * subscription" is a different offer from "rent for 149", and the pills
+   * cannot express the difference.
+   */
+  const inIndia = b['watch/providers']?.results?.IN ?? {};
+  const providerIds = [
+    ...(inIndia.flatrate ?? []),
+    ...(inIndia.free ?? []),
+    ...(inIndia.ads ?? []),
+  ].map((p) => p.provider_id);
+  const rentBuyIds = [...(inIndia.rent ?? []), ...(inIndia.buy ?? [])].map((p) => p.provider_id);
+
+  const credits = b.credits ?? {};
+  const certification =
+    kind === 'tv'
+      ? (b.content_ratings?.results ?? []).find((r) => r.iso_3166_1 === 'IN')?.rating || null
+      : ((b.release_dates?.results ?? []).find((r) => r.iso_3166_1 === 'IN')?.release_dates ?? [])
+          .map((r) => r.certification)
+          .find(Boolean) || null;
+
+  const payload = {
+    remote: true,
+    id: raw,
+    kind: kind === 'tv' ? 'series' : 'film',
+    title: b.title || b.name,
+    year: (b.release_date || b.first_air_date || '').slice(0, 4) || null,
+    synopsis: b.overview || null,
+    posterUrl: b.poster_path ? `/img/w500${b.poster_path}` : null,
+    backdropUrl: b.backdrop_path ? `/img/w780${b.backdrop_path}` : null,
+    runtimeMinutes: b.runtime ?? b.episode_run_time?.[0] ?? null,
+    genres: (b.genres ?? []).map((g) => g.name).slice(0, 4),
+    languages: [b.original_language].filter(Boolean),
+    certification,
+    rating: typeof b.vote_average === 'number' && b.vote_count > 0
+      ? Math.round(b.vote_average * 10) / 10
+      : null,
+    cast: (credits.cast ?? []).slice(0, 8).map((c) => c.name).filter(Boolean),
+    director:
+      (credits.crew ?? []).find((c) => c.job === 'Director')?.name ??
+      (b.created_by ?? [])[0]?.name ??
+      null,
+    /* Raw TMDB provider ids. The mapping to this site's platform ids lives in
+       platforms.ts, which the Worker cannot import — and should not duplicate,
+       because two copies of that table would drift the first time a service
+       was renamed. */
+    providerIds,
+    rentBuyIds,
+    seasons: kind === 'tv' ? (b.number_of_seasons ?? null) : null,
+  };
+
+  const res = json(200, payload, TITLE_TTL);
+  ctx.waitUntil(cache.put(key, res.clone()));
+  return res;
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -405,6 +540,7 @@ export default {
     /* Before the asset fallback, and before the subscribe guard below, which
        is a POST-only path. */
     if (url.pathname === '/api/search') return searchTmdb(request, url, env, ctx);
+    if (url.pathname === '/api/title') return titleFromTmdb(request, url, env, ctx);
 
     if (url.pathname !== '/api/subscribe') return env.ASSETS.fetch(request);
 
