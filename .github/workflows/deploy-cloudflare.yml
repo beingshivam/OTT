@@ -136,14 +136,26 @@ jobs:
         run: |
           echo "Asking $SITE what it is serving…"
 
-          # 1. Is it serving this commit? Workers Builds may land after this job
-          #    starts, so give it a few minutes before calling it a failure.
+          # 1. Is it serving this commit?
+          #
+          #    Workers Builds land after this job starts, so this waits. It
+          #    used to wait 5m15s and that was measurably too short: a run
+          #    whose tests all passed failed on this line alone, reporting the
+          #    previous commit, because Cloudflare's queue was simply busier
+          #    than usual. A deploy that goes red for being early is worse than
+          #    no check — it is the kind of red people learn to scroll past,
+          #    and then the real one goes past too.
+          #
+          #    Ten minutes, with the backoff flattening at 90s rather than
+          #    growing: past the first couple of minutes the useful behaviour
+          #    is to keep asking at a steady rate, not to double the gap each
+          #    time and overshoot a build that finished thirty seconds ago.
           live=""
-          for attempt in 1 2 3 4 5 6; do
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
             live=$(curl -fsS --max-time 20 "$SITE/build.txt" | awk '/^commit/ { print $2 }' || true)
             [ "$live" = "$GITHUB_SHA" ] && break
             echo "  attempt $attempt: live=${live:-<no build.txt>} want=${GITHUB_SHA:0:8} — waiting"
-            sleep $((attempt * 15))
+            sleep $(( attempt < 6 ? attempt * 15 : 90 ))
           done
 
           # 1b. Can the last-resort alarm actually sound?
