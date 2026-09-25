@@ -2279,6 +2279,57 @@ console.log('\nBoth ways out, everywhere');
   await ctx.close();
 }
 
+/*
+ * ---------------------------------------------------------------------------
+ * All three tabs, not just the one the last test happened to be on
+ *
+ * "Search doesn't impact this week, now streaming and coming soon?" — asked as
+ * a question, and the honest answer was that the check covered This week and
+ * the other two were reasoned about. They share the fix, because the query
+ * branch short-circuited ahead of the span and catalogue branches alike, so
+ * typing replaced all three boards. Reasoning is not evidence, and the three
+ * are different code paths: a week, a date span, and a different corpus
+ * entirely.
+ */
+console.log('\nTyping leaves every tab alone');
+for (const [label, path] of [
+  ['This week', '/'],
+  ['Coming soon', '/upcoming'],
+  ['Now streaming', '/streaming'],
+]) {
+  const { ctx, page } = await newPage(browser, { width: 390, height: 844, touch: true });
+  await page.goto(`${BASE}${path}`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('.row__title, .empty', { timeout: 15_000 }).catch(() => {});
+  await page.waitForTimeout(700);
+
+  const snapshot = () =>
+    page.evaluate(() => ({
+      heading: document.querySelector('.controls__heading')?.textContent ?? '',
+      rows: [...document.querySelectorAll('.row__title')].map((e) => e.textContent.trim()).join('|'),
+      count: document.querySelectorAll('.row__title').length,
+    }));
+
+  const before = await snapshot();
+  /* A word that matches almost nothing, so if the board were still listening
+     it would empty out — the loudest possible version of the failure. */
+  await page.fill('.search input[type=search]', 'shawshank');
+  await page.waitForTimeout(1100);
+  const after = await snapshot();
+
+  is(before.count > 0, `${label}: the tab has something on it to begin with`, 'the board was empty');
+  is(
+    after.rows === before.rows,
+    `${label}: typing does not change what it lists`,
+    `${before.count} rows became ${after.count}`,
+  );
+  is(
+    after.heading === before.heading,
+    `${label}: nor what it calls itself`,
+    `"${before.heading}" became "${after.heading}"`,
+  );
+  await ctx.close();
+}
+
 await browser.close();
 server.close();
 
