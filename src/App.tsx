@@ -6,6 +6,7 @@ import { ReleaseDatePage } from './components/ReleaseDatePage';
 import { ChangesPage, type Change } from './components/ChangesPage';
 import { Controls } from './components/Controls';
 import { DetailSheet } from './components/DetailSheet';
+import { CatalogueSheet } from './components/CatalogueSheet';
 import { EmailSignup } from './components/EmailSignup';
 import { ReleaseCard } from './components/ReleaseCard';
 import { GlobalSearch } from './components/GlobalSearch';
@@ -72,6 +73,9 @@ export default function App() {
    * the first render of that lens rather than alongside the feed.
    */
   const [catalogue, setCatalogue] = useState<Release[] | null>(null);
+  /* A title only search can reach. Its own state rather than `selected`,
+     because it is not a Release and the two sheets are different components. */
+  const [remoteTitle, setRemoteTitle] = useState<{ id: string; title: string } | null>(null);
   const [catalogueError, setCatalogueError] = useState<string | null>(null);
   /** The change log, fetched only on its own page — see ChangesPage. Same
    *  reasoning as the catalogue above: a file most visits never open does not
@@ -712,6 +716,7 @@ export default function App() {
             onChange={(query) => update({ query })}
             corpus={releases}
             onOpen={setSelected}
+            onOpenCatalogue={setRemoteTitle}
           />
 
           {/* Up here rather than in the footer.
@@ -1315,6 +1320,13 @@ export default function App() {
       </main>
 
       {selected && <DetailSheet release={selected} onClose={() => setSelected(null)} />}
+      {remoteTitle && (
+        <CatalogueSheet
+          id={remoteTitle.id}
+          fallbackTitle={remoteTitle.title}
+          onClose={() => setRemoteTitle(null)}
+        />
+      )}
     </>
   );
 }

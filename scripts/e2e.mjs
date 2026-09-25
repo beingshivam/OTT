@@ -62,7 +62,43 @@ const TYPES = {
  */
 function serve() {
   const server = createServer(async (req, res) => {
-    const path = decodeURIComponent(new URL(req.url, 'http://x').pathname);
+    const url = new URL(req.url, 'http://x');
+    const path = decodeURIComponent(url.pathname);
+
+    /*
+     * The two Worker routes, stubbed.
+     *
+     * dist is static files; /api/search and /api/title only exist at the edge,
+     * so without this the search dropdown has no wider half and the sheet a
+     * remote result opens can only ever render its error state. Stubbed rather
+     * than skipped because the wiring between them — a result carrying an id
+     * that the sheet then asks about — is exactly the part that breaks
+     * silently, and neither the worker tests nor the unit tests can see it.
+     */
+    if (path === '/api/search') {
+      const q = url.searchParams.get('q') ?? '';
+      res.writeHead(200, { 'content-type': 'application/json' });
+      return res.end(
+        JSON.stringify(
+          q
+            ? { remote: true, total: 1, results: [{ kind: 'film', id: 'm-278', title: 'A Film Only TMDB Has', year: '1994', image: null, lang: 'en' }] }
+            : { remote: true, results: [], total: 0 },
+        ),
+      );
+    }
+    if (path === '/api/title') {
+      res.writeHead(200, { 'content-type': 'application/json' });
+      return res.end(
+        JSON.stringify({
+          remote: true, id: 'm-278', kind: 'film', title: 'A Film Only TMDB Has', year: '1994',
+          synopsis: 'A synopsis.', posterUrl: null, backdropUrl: null, runtimeMinutes: 142,
+          genres: ['Drama'], languages: ['en'], certification: 'A', rating: 8.7,
+          cast: ['Someone', 'Someone Else'], director: 'A Director',
+          providerIds: [8], rentBuyIds: [], seasons: null,
+        }),
+      );
+    }
+
     for (const candidate of [join(DIST, path), join(DIST, path, 'index.html'), join(DIST, 'index.html')]) {
       try {
         const body = await readFile(candidate);
@@ -1877,6 +1913,90 @@ for (const path of ['/streaming', '/upcoming', '/in-cinemas', '/hindi', '/netfli
     `${m.rows} rows and no empty state`,
   );
   is(errors.length === 0, `${path}: no console errors`, errors[0]);
+  await ctx.close();
+}
+
+
+/*
+ * ---------------------------------------------------------------------------
+ * A title the calendar has never heard of
+ *
+ * Search reaches past this site's 963 rows into TMDB's million, and those rows
+ * used to be inert because there was nowhere to send anybody. There is now: a
+ * sheet, not a page, so nothing is published and nothing is crawled — and what
+ * makes it worth opening is that TMDB knows which Indian service carries the
+ * film, which is the question this whole site exists to answer.
+ *
+ * The part that breaks silently is the wiring: a result carrying an id, the
+ * sheet asking about that id, and the provider coming back as a platform this
+ * site can name. Neither the worker tests nor the unit tests can see across
+ * that seam.
+ */
+console.log('\nA title only search can reach');
+{
+  /* The shared helper, so this counts the same things every other section
+     counts: fonts aborted, poster CDN stubbed, and the console noise that
+     comes from that setup filtered out rather than reported as the site's. */
+  const { ctx, page, errors } = await newPage(browser, { width: 390, height: 844, touch: true });
+  await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('.landed__cell', { timeout: 15_000 }).catch(() => {});
+
+  await page.locator('input[type="search"], .search input').first().fill('a film only');
+  await page.waitForTimeout(700);
+
+  const row = page.locator('button.gsearch__row').filter({ hasText: 'A Film Only TMDB Has' }).first();
+  is(await row.count() > 0, 'a result the calendar lacks is something you can open', 'the row is not a button');
+
+  if (await row.count() > 0) {
+    await row.click();
+    const opened = await page.waitForSelector('.sheet', { timeout: 8000 }).then(() => true).catch(() => false);
+    is(opened, 'opening one gets a sheet rather than a dead end', 'no sheet appeared');
+
+    if (opened) {
+      await page.waitForTimeout(500);
+      const sheet = await page.evaluate(() => {
+        const s = document.querySelector('.sheet');
+        return {
+          title: s.querySelector('.sheet__title')?.textContent?.trim() ?? '',
+          headings: [...s.querySelectorAll('.sheet__section h3')].map((e) => e.textContent.trim()),
+          buttons: [...s.querySelectorAll('.btn')].map((e) => e.textContent.trim()),
+          text: s.textContent ?? '',
+        };
+      });
+
+      is(sheet.title === 'A Film Only TMDB Has', 'the sheet is about the film that was tapped', `titled "${sheet.title}"`);
+      is(
+        sheet.headings.includes('Streaming in India'),
+        'it answers where to watch, which is the reason to open it',
+        `sections: ${sheet.headings.join(' / ')}`,
+      );
+      /* The seam: TMDB provider 8 has to arrive as this site's Netflix. */
+      is(
+        sheet.buttons.some((b) => /Netflix/.test(b)),
+        'a TMDB provider id becomes a service this site can name',
+        `buttons: ${sheet.buttons.join(' / ') || '(none)'}`,
+      );
+      is(
+        /Not in the India release calendar/i.test(sheet.text),
+        'and it still says what it is not',
+        'the sheet does not say the title is outside the calendar',
+      );
+
+      /* A sheet is not a page. If this ever starts changing the URL it has
+         become one, and the reasoning that allowed it stops applying. */
+      is(
+        new URL(page.url()).pathname === '/',
+        'opening a catalogue title publishes nothing and changes no URL',
+        `the URL became ${page.url()}`,
+      );
+
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(300);
+      is((await page.locator('.sheet').count()) === 0, 'Escape closes it', 'the sheet stayed open');
+    }
+  }
+
+  is(errors.length === 0, 'no console errors opening a catalogue title', errors.slice(0, 2).join(' | '));
   await ctx.close();
 }
 

@@ -42,6 +42,10 @@ interface Props {
   corpus: Release[];
   /** Opens the detail sheet for a row that has no page of its own. */
   onOpen: (release: Release) => void;
+  /** Opens the catalogue sheet for a title only TMDB has. Separate from
+   *  onOpen because the two sheets answer different questions: one is a
+   *  release on a calendar, the other is a film with no Indian date at all. */
+  onOpenCatalogue: (hit: { id: string; title: string }) => void;
 }
 
 /** Below this the header cannot hold the wordmark and a field at once, so the
@@ -69,7 +73,7 @@ type Row =
   | { key: string; kind: 'local'; release: Release }
   | { key: string; kind: 'remote'; hit: RemoteHit };
 
-export function GlobalSearch({ value, onChange, corpus, onOpen }: Props) {
+export function GlobalSearch({ value, onChange, corpus, onOpen, onOpenCatalogue }: Props) {
   const input = useRef<HTMLInputElement>(null);
   const wrap = useRef<HTMLDivElement>(null);
   const [wide, setWide] = useState(
@@ -294,7 +298,14 @@ export function GlobalSearch({ value, onChange, corpus, onOpen }: Props) {
                site exists to say. */
             <Section label="Everywhere else" note="Found on TMDB — not in the India release calendar">
               {elsewhere.map((h) => (
-                <TitleRow key={h.id} hit={h} />
+                <TitleRow
+                  key={h.id}
+                  hit={h}
+                  onOpen={() => {
+                    onOpenCatalogue({ id: h.id, title: h.title ?? '' });
+                    setFocused(false);
+                  }}
+                />
               ))}
             </Section>
           )}
@@ -433,13 +444,26 @@ function PersonRow({
   );
 }
 
-/* Not a button. There is nowhere to send somebody: the site has no page for a
-   title it has no Indian release date for, and a row that looks clickable and
-   lands on an empty board is worse than a row that plainly answers "yes, that
-   film exists, we don't have a date for it". */
-function TitleRow({ hit }: { hit: RemoteHit }) {
+/*
+ * A button now, and the reason it was not one is worth keeping.
+ *
+ * It read: there is nowhere to send somebody, the site has no page for a title
+ * it has no Indian release date for, and a row that looks clickable and lands
+ * on an empty board is worse than one that plainly answers "yes, that film
+ * exists, we don't have a date for it".
+ *
+ * All true, and all about pages. A million generated pages with nothing to say
+ * is still the shape Google demotes and would still drag down the 331 that are
+ * earned, so this does not create one. It opens a sheet — not crawled, not
+ * indexed, not linked — over the board, and closes again.
+ *
+ * What changed is that there is now something to say. TMDB knows which Indian
+ * services carry a title, so the sheet answers the question the whole site is
+ * for, on a film the calendar has never heard of.
+ */
+function TitleRow({ hit, onOpen }: { hit: RemoteHit; onOpen: () => void }) {
   return (
-    <div className="gsearch__row gsearch__row--flat">
+    <button type="button" className="gsearch__row" onClick={onOpen}>
       <Thumb src={hit.image} />
       <span className="gsearch__text">
         <strong>{hit.title}</strong>
@@ -447,6 +471,6 @@ function TitleRow({ hit }: { hit: RemoteHit }) {
           {[hit.kind === 'series' ? 'Series' : 'Film', hit.year].filter(Boolean).join(' · ')}
         </small>
       </span>
-    </div>
+    </button>
   );
 }
