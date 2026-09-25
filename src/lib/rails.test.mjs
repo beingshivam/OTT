@@ -583,19 +583,64 @@ test('ranking never duplicates a title', () => {
   assert.equal(new Set(out.map((r) => r.id)).size, out.length, 'a title appears twice');
 });
 
-test('the shipped feed ranks the films that prompted this', () => {
+test('the shipped feed produces a row that is both a ranking and news', () => {
+  /*
+   * The same two properties this row has always owed, asked of the feed that
+   * ships rather than of a fixture — but without naming anything in it.
+   *
+   * This test used to pin three live facts at a fixed date: that the row led
+   * on Mirzapur: The Movie, and that Hanuman Ansh had a seat, evaluated at
+   * 11 September. It passed for six weeks and then could never pass again.
+   * The feed is a rolling window of about eleven weeks, and on Friday 25
+   * September it rolled past 7 August and took Hanuman Ansh out of the data
+   * altogether — so the gate failed, the commit step was skipped, and Friday's
+   * calendar, the biggest release day of the week, did not publish. Mirzapur
+   * was the same bomb on a longer fuse, and so was the hardcoded date.
+   *
+   * A test against live data cannot name a row in it. What it can do is state
+   * the property the names were standing in for, which is the whole argument
+   * of this row in one line: a ranking that is also news. An established film
+   * deep into its run keeps its seat, and something from this week is on the
+   * row beside it. Both halves have been reported as broken, in that order.
+   */
   const feed = JSON.parse(readFileSync('public/data/releases.json', 'utf8'));
   const all = feed.weeks.flatMap((w) => w.releases);
-  const out = inCinemas(all, 'IN', new Date('2026-09-11T06:00:00Z'));
-  assert.equal(out.trending, TRENDING_IN_CINEMAS);
-  assert.equal(out.releases[0].title, 'Mirzapur: The Movie');
+  const now = new Date();
+  const out = inCinemas(all, 'IN', now);
 
-  // The film the change was asked for. It opened on 7 August and is rated 8.6,
-  // and under date order it was seventieth of eighty-nine — off the row by
-  // fifty places. Nothing about its numbers puts it in the top three; what the
-  // row owed it was a place on the row at all.
-  const seat = out.releases.findIndex((r) => r.title === 'Hanuman Ansh');
-  assert.ok(seat >= 0 && seat < MAX_ITEMS, `Hanuman Ansh is still off the row (${seat})`);
+  assert.ok(out.releases.length > 0, 'the cinema row is empty against the shipped feed');
+  assert.equal(new Set(out.releases.map((r) => r.id)).size, out.releases.length, 'a title appears twice');
+  if (out.releases.length > TRENDING_IN_CINEMAS) {
+    assert.equal(out.trending, TRENDING_IN_CINEMAS, 'the shipped row lost its badge');
+  }
+
+  const ago = (days) => new Date(now.getTime() - days * 86_400_000).toISOString().slice(0, 10);
+
+  /* Still a ranking: chronology alone would have swept these off. */
+  const established = out.releases.filter((r) => r.releaseDate < ago(14));
+  assert.ok(
+    established.length > 0,
+    `the row is pure chronology — nothing on it opened before ${ago(14)}`,
+  );
+
+  /* Still news: whatever opened this week reaches it. Asserted only when the
+     feed actually has such a film, because a week with no openings is a fact
+     about the week rather than a failure of the row. */
+  const openedThisWeek = all.filter(
+    (r) =>
+      r.regions?.includes('IN') &&
+      r.platforms?.includes('theatres') &&
+      r.posterUrl &&
+      r.releaseDate >= ago(6) &&
+      r.releaseDate <= now.toISOString().slice(0, 10),
+  );
+  if (openedThisWeek.length > 0) {
+    const onRow = out.releases.filter((r) => r.releaseDate >= ago(6));
+    assert.ok(
+      onRow.length > 0,
+      `${openedThisWeek.length} film(s) opened this week and none reached the row`,
+    );
+  }
 });
 
 test('a narrowed streaming row reaches back until it has something to say', () => {
