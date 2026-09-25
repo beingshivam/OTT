@@ -203,31 +203,20 @@ jobs:
           #     watchdog flag was that a missing secret is invisible; a bad
           #     secret is invisible in the same way and was not covered.
           #
-          #     So ask it for something TMDB certainly has and this site's own
-          #     eight-week calendar certainly does not. A hit proves the token
-          #     is real, TMDB accepted it, and the proxy shape still parses.
+          #     So ask it the things a reader would actually type. One probe
+          #     for one famous film proves the token works; it does not prove
+          #     the claim the header makes, which is about breadth. The list
+          #     lives in scripts/search-probe.mjs and covers the world
+          #     catalogue, a South Indian title, a Hindi title in two spellings
+          #     and a person — the transliteration pair being the one with a
+          #     real answer, since an Indian title has no single correct Latin
+          #     spelling and TMDB matches closer to exact than fuzzy.
+          #
+          #     It reports and never gates: a search that misses a spelling is
+          #     a product problem to fix in the route, not a reason to refuse
+          #     to publish the site.
           if printf '%s' "$watchdog" | grep -q '"searchable":true'; then
-            probe=$(curl -fsS --max-time 25 "$SITE/api/search?q=sholay" || true)
-            case "$probe" in
-              '')
-                echo "::warning title=The search route did not answer::$SITE/api/search did not respond. The binding is reported present, so this is the route or the edge rather than the token."
-                ;;
-              *'"degraded":true'*)
-                # A warning, not a failure, and for the same reason as the
-                # binding check above: the route returns degraded:true both
-                # when TMDB refuses the credential and when TMDB is simply
-                # unreachable. Failing here would freeze deploys through an
-                # outage nobody here can fix, to report a search box that is
-                # still degrading honestly on the page.
-                echo "::warning title=Search is bound but TMDB did not answer::$SITE/api/search returned degraded:true. That is either a credential TMDB refused — an expired or revoked token, a v3 key where a v4 read token was meant, trailing whitespace — or TMDB being unreachable just now. If it clears on the next deploy it was theirs; if it persists, re-add TMDB_TOKEN in the Cloudflare dashboard."
-                ;;
-              *'"results":[]'*)
-                echo "::warning title=Search answered but found nothing::$SITE/api/search returned no results for a title TMDB certainly holds. Not necessarily broken — but if this persists the query shape or the region filter is worth a look."
-                ;;
-              *)
-                echo "  search probe: $(printf '%s' "$probe" | cut -c1-110)…"
-                ;;
-            esac
+            SITE="$SITE" node scripts/search-probe.mjs || true
           fi
 
           # 2. Does the app actually boot? Every page ships prerendered markup
