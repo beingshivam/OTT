@@ -2107,6 +2107,89 @@ console.log('\nMore like this, on the board');
   await ctx.close();
 }
 
+/*
+ * ---------------------------------------------------------------------------
+ * The tab that was open when a deploy landed
+ *
+ * Asset filenames are hashed, so the old ones stop existing the moment a new
+ * build publishes. Any tab still holding the previous page then asks for a
+ * file that is gone, and because not_found_handling is single-page-application
+ * the server answers 200 with index.html — so the browser refuses to run HTML
+ * as a module, the prerendered fallback stays on screen, and the page looks
+ * broken. Reported from a phone minutes after a publish, with the site's own
+ * banner confidently blaming the reader's network.
+ *
+ * A deleted asset and a blocked one are distinguishable: the first answers
+ * with HTML, the second does not answer. So the recovery has to fire on the
+ * first and not on the second, and it has to fire exactly once, because a
+ * reload loop is a worse failure than the banner it replaces.
+ */
+console.log('\nA tab left open across a deploy');
+{
+  const { ctx, page, errors } = await newPage(browser, { width: 390, height: 844 });
+  const indexHtml = await readFile(join(DIST, 'index.html'), 'utf8');
+
+  /*
+   * The first page load names a bundle that does not exist, which is what a
+   * tab held across a deploy is: the markup is the old build's, the filename
+   * in it was deleted by the new one. The reload then gets the current markup,
+   * naming the bundle that does.
+   *
+   * Modelled by rewriting the document rather than by intercepting the asset,
+   * which is how the first version of this got it wrong: intercepting made the
+   * recovery's own probe re-request the same URL and receive real JavaScript,
+   * so it concluded the file was fine. A deleted file stays deleted, and the
+   * probe has to see that.
+   */
+  let firstLoad = true;
+  let askedForGone = 0;
+  await page.route(`${BASE}/`, async (route) => {
+    if (!firstLoad) return route.continue();
+    firstLoad = false;
+    const bundle = /\/assets\/[^"]+\.js/.exec(indexHtml)?.[0] ?? '';
+    return route.fulfill({
+      status: 200,
+      contentType: 'text/html',
+      body: indexHtml.replace(bundle, '/assets/index-DELETED.js'),
+    });
+  });
+  page.on('request', (r) => r.url().includes('index-DELETED.js') && (askedForGone += 1));
+
+  await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
+  await page.waitForTimeout(5000);
+
+  is(askedForGone > 0, 'a stale page asks for a bundle that is gone', 'the deleted bundle was never requested');
+  is(
+    (await page.locator('.landed__cell').count()) > 0,
+    'and recovers itself rather than sitting there broken',
+    'the app never booted',
+  );
+  is(
+    (await page.getByText('This page did not finish loading').count()) === 0,
+    'without blaming the reader for a deploy',
+    'the network-filter banner was shown for a deleted asset',
+  );
+  await ctx.close();
+}
+
+{
+  /* And the case the banner was written for, which must still reach it: an
+     asset that does not answer at all is a filter, not a deploy. */
+  const { ctx, page } = await newPage(browser, { width: 390, height: 844 });
+  let reloads = 0;
+  page.on('framenavigated', (f) => f === page.mainFrame() && (reloads += 1));
+  await page.route('**/assets/**', (r) => r.abort());
+  await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
+  await page.waitForTimeout(3500);
+  is(reloads === 1, 'a blocked asset is not reloaded at', `the page navigated ${reloads} times`);
+  is(
+    (await page.getByText('This page did not finish loading').count()) > 0,
+    'it still says so plainly',
+    'a genuinely blocked page said nothing',
+  );
+  await ctx.close();
+}
+
 await browser.close();
 server.close();
 

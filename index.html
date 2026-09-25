@@ -55,10 +55,70 @@
       immediately; the timer catches the quieter version, where the file arrives
       but is the SPA fallback's HTML rather than CSS or JavaScript, so nothing
       errors and nothing runs.
+
+      And two causes, which this used to report as one. A network filter is the
+      reason it was written. The other is a deploy: asset filenames are hashed
+      and the old ones stop existing the moment a new build lands, so any tab
+      holding the previous page asks for a file that is gone, gets index.html
+      back from the SPA fallback, and dies exactly as if it had been blocked.
+      Reported from a phone minutes after a publish, with the banner
+      confidently blaming the reader's network.
+
+      The two are distinguishable. A blocked asset does not answer at all; a
+      deleted one answers 200 with HTML, because that is what the fallback
+      serves. So ask, and when the answer is HTML this is a stale page rather
+      than a filtered one — reload once and the fresh markup names the bundle
+      that now exists. Once, guarded in sessionStorage, because a reload loop
+      is a worse failure than the banner.
     -->
     <script>
       (function () {
         var shown = false;
+        var RELOAD_KEY = 'newonott.staleReload';
+
+        function reloadedAlready() {
+          try {
+            return sessionStorage.getItem(RELOAD_KEY) === '1';
+          } catch (err) {
+            // Private mode, or storage refused. Treat as "already tried", so
+            // the worst case is the banner rather than a reload loop.
+            return true;
+          }
+        }
+
+        function rememberReload() {
+          try {
+            sessionStorage.setItem(RELOAD_KEY, '1');
+          } catch (err) {}
+        }
+
+        /**
+         * Is this a page the deploy left behind, rather than a blocked one?
+         *
+         * A deleted asset comes back 200 with the SPA fallback's HTML. A
+         * filtered one does not come back at all. Only the first is worth
+         * reloading for, and only once.
+         */
+        function recoverIfStale(src, whenNot) {
+          if (!src || src.indexOf('/assets/') === -1 || reloadedAlready() || !window.fetch) {
+            whenNot();
+            return;
+          }
+          fetch(src, { cache: 'reload' })
+            .then(function (res) {
+              var type = res.headers.get('content-type') || '';
+              if (res.ok && type.indexOf('text/html') !== -1) {
+                rememberReload();
+                location.reload();
+                return;
+              }
+              whenNot();
+            })
+            .catch(function () {
+              whenNot();
+            });
+        }
+
         function warn(detail) {
           if (shown) return;
           shown = true;
@@ -87,7 +147,11 @@
             var t = e.target;
             if (!t || !t.tagName) return; // A script threw; that is a different problem.
             var src = t.src || t.href || '';
-            if (src.indexOf('/assets/') !== -1) warn(src);
+            if (src.indexOf('/assets/') !== -1) {
+              recoverIfStale(src, function () {
+                warn(src);
+              });
+            }
           },
           true,
         );
@@ -96,7 +160,14 @@
           var root = document.getElementById('root');
           if (!root) return;
           // React has replaced the prerendered markup by now, or it never will.
-          if (root.querySelector('.seo-fallback') || !root.firstChild) warn('timeout');
+          if (root.querySelector('.seo-fallback') || !root.firstChild) {
+            /* The quiet version: the file arrived and was HTML, so nothing
+               errored. Ask about the bundle this page names. */
+            var tag = document.querySelector('script[src*="/assets/"]');
+            recoverIfStale(tag && tag.src, function () {
+              warn('timeout');
+            });
+          }
         }, 8000);
       })();
     </script>
