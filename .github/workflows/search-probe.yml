@@ -1,0 +1,40 @@
+# Ask the live search a question, without deploying anything.
+#
+# The search route runs at the edge and talks to TMDB, so neither half of it
+# can be exercised from a laptop behind a filtered network or from an agent
+# sandbox — and the answer to "does it find X" kept having to wait for a full
+# build, test and deploy cycle to come back. That is a four-minute round trip
+# to type a word into a box.
+#
+# This is the box. It runs the same probe the deploy runs, against the live
+# site, in about thirty seconds, and takes whatever queries you want to ask.
+name: Search probe
+
+on:
+  workflow_dispatch:
+    inputs:
+      queries:
+        description: 'Comma-separated queries. Blank uses the built-in set.'
+        required: false
+        default: ''
+      site:
+        description: 'Site to probe.'
+        required: false
+        default: 'https://newonott.in'
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Ask
+        env:
+          SITE: ${{ inputs.site }}
+          QUERIES: ${{ inputs.queries }}
+        run: node scripts/search-probe.mjs

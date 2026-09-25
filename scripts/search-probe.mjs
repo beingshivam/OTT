@@ -20,18 +20,23 @@
  * problem to fix in the route, not a reason to refuse to publish the site.
  *
  * Usage: SITE=https://newonott.in node scripts/search-probe.mjs
+ *        QUERIES='coolie, jawan, 3 idiots' node scripts/search-probe.mjs
  */
 
 const SITE = (process.env.SITE ?? 'https://newonott.in').replace(/\/$/, '');
 
-/** What the claim has to cover, in the words a reader would use. */
-const QUERIES = [
+/** What the claim has to cover, in the words a reader would use. Overridable,
+ *  because the useful version of this question is usually "does it find the
+ *  thing I just thought of" and that should not need an edit and a deploy. */
+const QUERIES = process.env.QUERIES
+  ? process.env.QUERIES.split(',').map((q) => q.trim()).filter(Boolean).map((q) => ({ q, why: 'asked for' }))
+  : [
   { q: 'shawshank redemption', why: 'the world catalogue' },
   { q: 'coolie', why: 'South Indian, several films share the name' },
   { q: 'pyaar ka punchnama', why: 'Hindi, the spelling TMDB files it under' },
   { q: 'pyaar ka panchnama', why: 'Hindi, a spelling a person actually types' },
   { q: 'rajinikanth', why: 'a person, not a title' },
-];
+    ];
 
 const ask = async ({ q, why }) => {
   try {
