@@ -37,6 +37,9 @@ import { ANALYTICS_TOKEN } from './config.mjs';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const HTML = resolve(ROOT, 'dist/index.html');
 const FEED = resolve(ROOT, 'dist/data/releases.json');
+/* The shipped copy, not the source, and for the same reason as the feed: the
+   slugs decided below are stamped into it and the app reads them back. */
+const CATALOGUE = resolve(ROOT, 'dist/data/catalogue.json');
 
 /**
  * The canonical home of the site.
@@ -882,6 +885,15 @@ const archived = await readFile(resolve(ROOT, 'data/archive.json'), 'utf8')
   .then((s) => JSON.parse(s).titles)
   .catch(() => []);
 
+/**
+ * The back catalogue, read here rather than where its own page is built,
+ * because it is now also a source of title pages.
+ */
+const catalogueFile = await readFile(CATALOGUE, 'utf8')
+  .then((raw) => JSON.parse(raw))
+  .catch(() => null);
+const catalogue = catalogueFile?.titles ?? [];
+
 const liveIds = new Set(everything.map((r) => r.id));
 /** Live rows win: they came from this refresh and the archive may be a run
  *  behind on a platform that has just picked a film up. */
@@ -889,6 +901,33 @@ const titleCandidates = [
   ...everything,
   ...archived.filter((r) => !liveIds.has(r.id) && (r.regions ?? []).includes(REGION)),
 ];
+
+/**
+ * And the back catalogue, which has been sitting here unpublished.
+ *
+ * 658 titles the site already knows the Indian streaming service for, every
+ * one of them rendered in search and on the board, and not one of them with a
+ * page. They were left out because title pages grew out of the release
+ * calendar and the catalogue arrived later by a different route, not because
+ * anybody decided they should not have one.
+ *
+ * Which was a straightforward loss. "Where can I watch X in India" is the
+ * query this site is built to answer and very nearly the only way anybody
+ * arrives at a site like this; nobody searches "new on OTT this week". A page
+ * per title is how the competitors in this space get found, and the objection
+ * that matters — that a few hundred thousand auto-generated pages carrying
+ * nothing but proxied metadata is what Google's scaled-content policy was
+ * written for — does not apply to a title whose Indian availability the site
+ * genuinely knows. That is a real answer to a real question.
+ *
+ * The bar is the same `substantial` one the calendar pages clear, unchanged
+ * and not relaxed for the occasion: 643 of the 650 pass it and the other
+ * seven stay off until TMDB fills in a longer synopsis.
+ */
+const publishedIds = new Set([...liveIds, ...archived.map((r) => r.id)]);
+const catalogueCandidates = catalogue.filter(
+  (r) => !publishedIds.has(r.id) && (r.regions ?? [REGION]).includes(REGION),
+);
 
 /**
  * Every theatrical film with enough on it to fill a page — before it opens as
@@ -976,6 +1015,23 @@ const titlePages = eligible
   // Newest first, so the sitemap leads with what people are searching now.
   .sort((a, b) => b.releaseDate.localeCompare(a.releaseDate));
 
+/**
+ * The catalogue's pages, and deliberately behind the calendar's in this list.
+ *
+ * Order is not cosmetic here: the slug loop below is first-come, and a
+ * catalogue title with a newer release date would otherwise take the bare slug
+ * from a calendar page that already holds it and is already indexed. Moving a
+ * live URL to publish a new one is a strictly worse trade than the new one
+ * taking a suffix, so everything that has a URL today keeps it, and the
+ * catalogue fills in around them.
+ */
+const cataloguePages = catalogueCandidates
+  .filter(substantial)
+  .sort((a, b) => (b.releaseDate ?? '').localeCompare(a.releaseDate ?? ''));
+
+/** Every page with a title behind it, in the order they get to claim a URL. */
+const allTitlePages = [...titlePages, ...cataloguePages];
+
 /*
  * One URL per film, even when two films share a name.
  *
@@ -996,7 +1052,7 @@ const titlePages = eligible
 const slugById = new Map();
 const claimed = new Set();
 const collisions = [];
-for (const r of titlePages) {
+for (const r of allTitlePages) {
   const base = slugify(r.title);
   if (!base) continue;
   let slug = base;
@@ -1036,6 +1092,14 @@ for (const w of feed.weeks) {
     const slug = slugFor(r.id);
     if (slug) r.slug = slug;
   }
+}
+/* And the catalogue's own rows, which now have pages of their own. Without
+   this the /streaming list below prints them as plain text and 643 pages sit
+   in the sitemap with nothing linking to them — which is a page that does not
+   get crawled. */
+for (const r of catalogue) {
+  const slug = slugFor(r.id);
+  if (slug) r.slug = slug;
 }
 /*
  * Every candidate, not just the ones still in the window.
@@ -1203,10 +1267,6 @@ for (const [code, name] of languagesPresent) {
  * result as a judgement about the films. Within a language the comparison is
  * fair, so that is the only comparison offered.
  */
-const catalogue = await readFile(resolve(ROOT, 'public/data/catalogue.json'), 'utf8')
-  .then((raw) => JSON.parse(raw).titles ?? [])
-  .catch(() => []);
-
 if (catalogue.length >= MIN_PAGE_ROWS) {
   const byLang = new Map();
   for (const r of catalogue) {
@@ -1221,17 +1281,36 @@ if (catalogue.length >= MIN_PAGE_ROWS) {
     .sort((a, b) => b[1].length - a[1].length);
 
   const platformCount = new Set(catalogue.flatMap((r) => r.platforms ?? [])).size;
+  /*
+   * Every title, and every one of them a link.
+   *
+   * This listed the best twelve per language as plain text, which was right
+   * while the catalogue had no pages: there was nowhere for a link to go. Now
+   * there are 643 of them, and a sitemap entry that nothing links to is a page
+   * Google does not crawl — so this page is the route in, and it has to name
+   * all of them rather than a shortlist.
+   *
+   * It stays honest about what the app shows, which was the reason the other
+   * prerendered lists were never widened past the eight-week window: /streaming
+   * *is* the catalogue lens (route.ts sets catalogue: true for this path) and
+   * the app loads all 658 rows here. Crawler and reader see the same list.
+   *
+   * Still grouped by language and still rating-ordered inside each group, so
+   * the top of every section is the part worth reading and the tail is the
+   * part worth crawling.
+   */
   const body = groups
     .map(([code, rows]) => {
-      const top = [...rows].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0)).slice(0, 12);
+      const ranked = [...rows].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
       return (
         `<section><h2>Best ${esc(lname(code))} on streaming</h2><ul>` +
-        top
-          .map(
-            (r) =>
-              `<li>${esc(r.title)} (${esc(r.year)}) — ` +
-              `${esc(r.rating?.toFixed(1) ?? '')} · ${esc((r.platforms ?? []).map(pname).join(', '))}</li>`,
-          )
+        ranked
+          .map((r) => {
+            const label =
+              `${esc(r.title)}${r.year ? ` (${esc(r.year)})` : ''} — ` +
+              `${esc(r.rating?.toFixed(1) ?? '')} · ${esc((r.platforms ?? []).map(pname).join(', '))}`;
+            return `<li>${r.slug ? `<a href="/ott-release-date/${esc(r.slug)}">${label}</a>` : label}</li>`;
+          })
           .join('') +
         `</ul></section>`
       );
@@ -1610,11 +1689,11 @@ for (const w of [...stockedWeeks].sort((a, b) => b.id.localeCompare(a.id))) {
  * resolves the path by reading a field rather than re-deriving it — one
  * implementation of the rule, and no way for the two to disagree.
  */
-for (const r of titlePages) {
+for (const r of allTitlePages) {
   const slug = slugById.get(r.id);
   if (!slug) continue;
 
-  const streaming = r.platforms.filter((p) => p !== 'theatres');
+  const streaming = (r.platforms ?? []).filter((p) => p !== 'theatres');
   /** Three states, one URL. The page is written for whichever is true today
    *  and rewrites itself on the next build as the film moves through them. */
   const upcoming = r.releaseDate > TODAY;
@@ -1926,6 +2005,10 @@ await writeFile(resolve(ROOT, 'dist/sitemap.xml'), sitemap);
  * silent: the page exists, the link points at it, and the app renders nothing.
  */
 await writeFile(FEED, JSON.stringify(feed));
+/* And the catalogue, carrying the slugs stamped above. Without this the app
+   loads /streaming, finds no slug on any row and renders 658 titles that do
+   not link to the pages this build just wrote for them. */
+if (catalogueFile) await writeFile(CATALOGUE, JSON.stringify(catalogueFile));
 
 /**
  * And onto the archive, which is the only record a page can have.

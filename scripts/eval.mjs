@@ -85,7 +85,10 @@ const spokenDate = (iso) => {
 };
 
 const feed = await maybe(resolve(DIST, 'data/releases.json'));
-const catalogue = await maybe(resolve(ROOT, 'public/data/catalogue.json'));
+/* The shipped copy, like the feed above: the build stamps slugs into it, and
+   reading the source instead meant every collision-suffixed catalogue page
+   looked orphaned because this re-derived the bare slug from the title. */
+const catalogue = await maybe(resolve(DIST, 'data/catalogue.json'));
 const archive = await maybe(resolve(ROOT, 'data/archive.json'));
 const registrySrc = await readFile(resolve(ROOT, 'src/data/platforms.ts'), 'utf8').catch(() => '');
 const workerCfg = await readFile(resolve(ROOT, 'wrangler.jsonc'), 'utf8').catch(() => '');
@@ -543,7 +546,10 @@ else {
    */
   const bySlug = new Map();
   const datedBySlug = new Map();
-  for (const r of [...feedRows, ...(archive?.titles ?? [])]) {
+  /* The catalogue joins the pool because it now has pages too — 643 of them.
+     Without it every one reads as an orphan, which is the check working from a
+     stale idea of where pages come from rather than a real fault. */
+  for (const r of [...feedRows, ...catRows, ...(archive?.titles ?? [])]) {
     const key = r.slug ?? slugify(r.title ?? '');
     if (!key) continue;
     if (String(r.id ?? '').endsWith('~ott')) {
