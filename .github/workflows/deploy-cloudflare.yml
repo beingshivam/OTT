@@ -167,6 +167,31 @@ jobs:
               ;;
           esac
 
+          # 1c. Is the header telling the truth?
+          #
+          #     Every page prints "Search 1M+ titles" in the box at the top,
+          #     unconditionally and on purpose — the alternative was a
+          #     placeholder that changed after a mount-time probe and read like
+          #     a field that had not finished loading. The claim is true once
+          #     the Worker can reach TMDB and not before, so with no TMDB_TOKEN
+          #     bound the site promises a million titles and searches its own
+          #     963 rows.
+          #
+          #     It degrades honestly — the empty state says "Nothing on New on
+          #     OTT matches X" rather than "Nothing matches X" — so this is not
+          #     a lie, and it is emphatically not worth blocking a deploy over:
+          #     failing here would freeze the site to fix a header. But nothing
+          #     said it either. The flag has been false in every watchdog
+          #     response this workflow has printed, on every deploy, and the
+          #     only way to notice was to read the JSON on line 158.
+          case "$watchdog" in
+            *'"searchable":true'*) echo "  search: the wider half is live" ;;
+            '') ;;
+            *)
+              echo "::warning title=The header promises more than search can deliver::The Worker reports no TMDB_TOKEN binding, so /api/search returns nothing and the box that says 'Search 1M+ titles' is searching this site's ~963 rows. The two halves of search are built and tested; this is the one binding they wait on. Cloudflare dashboard › Workers & Pages › the Worker › Settings › Variables and Secrets › add TMDB_TOKEN (secret) — a v4 read token or a v3 API key, both work. docs/search-setup.md has the detail. Actions cannot lend its own TMDB token to a Worker; they are separate stores, which is why this one gets missed."
+              ;;
+          esac
+
           # 2. Does the app actually boot? Every page ships prerendered markup
           #    that React replaces on mount, so a broken bundle does not 404 —
           #    it renders the fallback, which looks like a plain unstyled list of
