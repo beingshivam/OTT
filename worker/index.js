@@ -366,9 +366,16 @@ async function titleFromTmdb(request, url, env, ctx) {
   const api = new URL(`https://api.themoviedb.org/3/${kind}/${id}`);
   /* One call rather than four. credits and watch/providers are the two the
      sheet cannot be drawn without, and the ratings endpoint differs by kind. */
+  /* recommendations rides along on the same call rather than costing a second
+     round trip. TMDB's "recommendations" is the behavioural one — what people
+     who watched this went on to watch — and it is markedly better than
+     "similar", which matches on genre and keywords and will happily suggest
+     four more prison dramas. */
   api.searchParams.set(
     'append_to_response',
-    kind === 'tv' ? 'credits,watch/providers,content_ratings' : 'credits,watch/providers,release_dates',
+    kind === 'tv'
+      ? 'credits,watch/providers,content_ratings,recommendations'
+      : 'credits,watch/providers,release_dates,recommendations',
   );
   api.searchParams.set('language', 'en-IN');
   if (!isJwt) api.searchParams.set('api_key', token);
@@ -442,6 +449,18 @@ async function titleFromTmdb(request, url, env, ctx) {
     providerIds,
     rentBuyIds,
     seasons: kind === 'tv' ? (b.number_of_seasons ?? null) : null,
+    /* Enough to fill a row and a swipe, no more. Each one is a card the reader
+       may never scroll to, and the payload is already carrying a cast list. */
+    similar: (b.recommendations?.results ?? [])
+      .filter((r) => (r.media_type ? r.media_type === 'movie' || r.media_type === 'tv' : true))
+      .filter((r) => r.poster_path)
+      .slice(0, 12)
+      .map((r) => ({
+        id: `${r.media_type === 'tv' || (!r.media_type && kind === 'tv') ? 't' : 'm'}-${r.id}`,
+        title: r.title || r.name,
+        year: (r.release_date || r.first_air_date || '').slice(0, 4) || null,
+        image: `/img/w185${r.poster_path}`,
+      })),
   };
 
   const res = json(200, payload, TITLE_TTL);

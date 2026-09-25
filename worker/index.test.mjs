@@ -1038,3 +1038,46 @@ await test('the title route is a GET and is cached at the edge', async () => {
   );
   assert.equal(post.status, 405);
 });
+
+await test('a title carries somewhere to go next', async () => {
+  // The row that makes a sheet a place rather than a stop. TMDB's
+  // "recommendations" is behavioural — what people who watched this watched —
+  // rather than "similar", which matches genre and keywords and would offer
+  // four more prison dramas.
+  fakeCache();
+  let asked = '';
+  globalThis.fetch = async (u) => {
+    asked = String(u);
+    return {
+      ok: true,
+      status: 200,
+      json: async () => ({
+        ...TITLE_BODY,
+        recommendations: {
+          results: [
+            { media_type: 'movie', id: 13, title: 'Forrest Gump', release_date: '1994-07-06', poster_path: '/f.jpg' },
+            { media_type: 'tv', id: 1396, name: 'Breaking Bad', first_air_date: '2008-01-20', poster_path: '/bb.jpg' },
+            { media_type: 'movie', id: 99, title: 'No Artwork', release_date: '2001-01-01', poster_path: null },
+            ...Array.from({ length: 20 }, (_, i) => ({
+              media_type: 'movie', id: 500 + i, title: `Filler ${i}`, release_date: '2000-01-01', poster_path: '/x.jpg',
+            })),
+          ],
+        },
+      }),
+    };
+  };
+  const res = await worker.fetch(new Request(`${ORIGIN}/api/title?id=m-278`), { TMDB_TOKEN: 't' }, ctx);
+  const b = await res.json();
+
+  assert.ok(asked.includes('recommendations'), 'recommendations cost a second round trip instead of riding along');
+  assert.equal(b.similar.length, 12, 'a row and a swipe, not a filmography');
+  assert.deepEqual(b.similar[0], {
+    id: 'm-13', title: 'Forrest Gump', year: '1994', image: '/img/w185/f.jpg',
+  });
+  assert.equal(b.similar[1].id, 't-1396', 'a series keeps its own id shape so the sheet can reopen it');
+  assert.equal(
+    b.similar.some((r) => r.title === 'No Artwork'),
+    false,
+    'a card with no poster is a grey rectangle, not a recommendation',
+  );
+});

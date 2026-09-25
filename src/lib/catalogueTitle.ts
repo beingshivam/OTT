@@ -33,6 +33,7 @@ export type CatalogueTitle = {
   providerIds: number[];
   rentBuyIds: number[];
   seasons: number | null;
+  similar: { id: string; title: string; year: string | null; image: string | null }[];
 };
 
 export type CatalogueState =

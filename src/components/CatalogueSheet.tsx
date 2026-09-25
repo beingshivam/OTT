@@ -30,17 +30,27 @@ export function CatalogueSheet({
   fallbackTitle: string;
   onClose: () => void;
 }) {
+  /* The sheet owns which title it is showing rather than reading the prop
+     directly, because a recommendation replaces the contents in place. Opening
+     a different result from search resets it through the effect below. */
+  const [showing, setShowing] = useState({ id, title: fallbackTitle });
+  useEffect(() => setShowing({ id, title: fallbackTitle }), [id, fallbackTitle]);
+
   const [state, setState] = useState<CatalogueState>({ status: 'loading' });
   const closeRef = useRef<HTMLButtonElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const ac = new AbortController();
     setState({ status: 'loading' });
-    fetchCatalogueTitle(id, ac.signal).then((next) => {
+    /* Back to the top, or a reader who tapped a recommendation from the bottom
+       of a long sheet lands halfway down the next one. */
+    scrollRef.current?.scrollTo({ top: 0 });
+    fetchCatalogueTitle(showing.id, ac.signal).then((next) => {
       if (!ac.signal.aborted) setState(next);
     });
     return () => ac.abort();
-  }, [id]);
+  }, [showing.id]);
 
   useEffect(() => {
     closeRef.current?.focus();
@@ -75,11 +85,11 @@ export function CatalogueSheet({
         <button ref={closeRef} className="sheet__close" onClick={onClose} aria-label="Close">
           <IconClose />
         </button>
-        <div className="sheet__scroll">
+        <div className="sheet__scroll" ref={scrollRef}>
           <div className={`sheet__hero${heroIsPoster ? ' sheet__hero--poster' : ''}`}>
             <PosterArt
               className="art"
-              title={t?.title ?? fallbackTitle}
+              title={t?.title ?? showing.title}
               platformId={lead}
               imageUrl={hero ?? undefined}
               quiet
@@ -89,7 +99,7 @@ export function CatalogueSheet({
 
           <div className="sheet__body">
             <h2 className="sheet__title" id="sheet-title">
-              {t?.title ?? fallbackTitle}
+              {t?.title ?? showing.title}
             </h2>
 
             {state.status === 'loading' && <p className="sheet__pending">Looking it up…</p>}
@@ -205,6 +215,36 @@ export function CatalogueSheet({
                   <div className="sheet__section">
                     <h3>Genre</h3>
                     <p>{t.genres.join(', ')}</p>
+                  </div>
+                )}
+
+                {t.similar.length > 0 && (
+                  <div className="sheet__section">
+                    <h3>More like this</h3>
+                    {/* Reopens in place rather than stacking sheets. A stack
+                        needs a back affordance and a history entry, and this
+                        is deliberately not a page — the close button still
+                        means "done", wherever you wandered to. */}
+                    <ul className="sheet__more">
+                      {t.similar.map((s) => (
+                        <li key={s.id}>
+                          <button
+                            type="button"
+                            onClick={() => setShowing({ id: s.id, title: s.title })}
+                          >
+                            <PosterArt
+                              className="sheet__more-art"
+                              title={s.title}
+                              platformId={lead}
+                              imageUrl={s.image ?? undefined}
+                              quiet
+                            />
+                            <span className="sheet__more-name">{s.title}</span>
+                            {s.year && <span className="sheet__more-year">{s.year}</span>}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 )}
 

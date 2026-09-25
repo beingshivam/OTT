@@ -4613,3 +4613,67 @@ a.changes__title:hover {
 .changes__lang {
   color: var(--text-3);
 }
+
+/*
+ * "More like this", inside the catalogue sheet.
+ *
+ * A scrolling row rather than a grid: the sheet is already a long scroll and a
+ * grid of twelve posters would push the TMDB credit two screens down, which on
+ * a phone reads as the sheet never ending. A row is one gesture and stops
+ * where it stops.
+ *
+ * 96px cards because the sheet is narrower than the board and a poster has to
+ * stay recognisable at a glance — below about 90 the artwork stops being the
+ * thing you recognise and the title underneath does all the work, which is a
+ * list, not a row of posters.
+ */
+.sheet__more {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  margin: 0;
+  padding: 0 0 4px;
+  list-style: none;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.sheet__more::-webkit-scrollbar { display: none; }
+
+.sheet__more li { flex: 0 0 auto; scroll-snap-align: start; }
+
+.sheet__more button {
+  display: grid;
+  gap: 6px;
+  width: 96px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.sheet__more-art {
+  width: 96px;
+  aspect-ratio: 2 / 3;
+  border-radius: 10px;
+  object-fit: cover;
+  display: block;
+}
+
+.sheet__more-name {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.25;
+  /* Two lines, then stop. A five-line title turns the row into a paragraph and
+     drags every card beside it taller. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.sheet__more-year { font-size: 12px; opacity: 0.6; }

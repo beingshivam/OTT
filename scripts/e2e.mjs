@@ -95,6 +95,10 @@ function serve() {
           genres: ['Drama'], languages: ['en'], certification: 'A', rating: 8.7,
           cast: ['Someone', 'Someone Else'], director: 'A Director',
           providerIds: [8], rentBuyIds: [], seasons: null,
+          similar: [
+            { id: 'm-13', title: 'Something Else Entirely', year: '1994', image: null },
+            { id: 't-1396', title: 'A Series To Go To', year: '2008', image: null },
+          ],
         }),
       );
     }
@@ -1990,9 +1994,32 @@ console.log('\nA title only search can reach');
         `the URL became ${page.url()}`,
       );
 
+      /*
+       * "More like this" reopens in place rather than stacking sheets. A stack
+       * needs a back affordance and a history entry, and this is deliberately
+       * not a page — so the close button has to keep meaning "done", however
+       * far the reader wandered.
+       */
+      const next = page.locator('.sheet__more button').first();
+      is(await next.count() > 0, 'there is somewhere to go next', 'no recommendations row');
+      if (await next.count() > 0) {
+        await next.click();
+        await page.waitForTimeout(600);
+        is(
+          (await page.locator('.sheet').count()) === 1,
+          'a recommendation replaces the sheet rather than stacking another on it',
+          `${await page.locator('.sheet').count()} sheets are open`,
+        );
+        is(
+          new URL(page.url()).pathname === '/',
+          'and wandering still publishes nothing',
+          `the URL became ${page.url()}`,
+        );
+      }
+
       await page.keyboard.press('Escape');
       await page.waitForTimeout(300);
-      is((await page.locator('.sheet').count()) === 0, 'Escape closes it', 'the sheet stayed open');
+      is((await page.locator('.sheet').count()) === 0, 'Escape closes it wherever you got to', 'the sheet stayed open');
     }
   }
 
