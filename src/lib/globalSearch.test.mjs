@@ -37,7 +37,7 @@ execFileSync(
   ],
   { stdio: 'pipe' },
 );
-const { PLACEHOLDER, withoutLocal, localMatches, askRemote, EMPTY } = await import(
+const { PLACEHOLDER, withoutLocal, localMatches, destinationMatches, askRemote, EMPTY } = await import(
   join(dir, 'globalSearch.mjs')
 );
 
@@ -249,4 +249,94 @@ test('a body missing its fields does not crash the dropdown', async () => {
   );
   assert.deepEqual(state.hits, []);
   assert.equal(state.total, 0);
+});
+
+/*
+ * ---------------------------------------------------------------------------
+ * Queries that are not titles
+ *
+ * "People might search genre as well — like Action movies." They will, and
+ * until now the box answered badly rather than not at all: the local half
+ * matches titles and cast, so it found nothing, and the remote half handed
+ * "action" to TMDB, which returns films literally called Action. A confident
+ * list of the wrong thing is worse than an empty one.
+ *
+ * The answer already existed — ten collection pages, one per platform, one per
+ * language — and was reachable only by scrolling to the chips under the board.
+ */
+
+const ACTION = {
+  slug: 'action',
+  chip: 'Action',
+  label: 'Action movies and shows',
+  match: (r) => (r.genres ?? []).includes('Action'),
+};
+const WEBSERIES = {
+  slug: 'web-series',
+  chip: 'Web series',
+  label: 'New web series',
+  match: (r) => r.kind === 'series',
+};
+const opts = {
+  collections: [ACTION, WEBSERIES],
+  platforms: [{ id: 'netflix', name: 'Netflix' }],
+  languages: [{ code: 'ta', name: 'Tamil' }],
+  lenses: [],
+};
+const corpus = [
+  row({ id: 'm-1', title: 'A', genres: ['Action'], platforms: ['netflix'], languages: ['ta'] }),
+  row({ id: 'm-2', title: 'B', genres: ['Action'], platforms: ['prime'], languages: ['hi'] }),
+  row({ id: 't-3', title: 'C', kind: 'series', genres: ['Drama'], platforms: ['netflix'], languages: ['hi'] }),
+];
+
+test('a genre finds the page that lists it', () => {
+  const [hit] = destinationMatches(corpus, 'action', opts);
+  assert.equal(hit.href, '/action');
+  assert.equal(hit.kind, 'Collection');
+  assert.equal(hit.count, 2, 'the count is what the page will actually hold');
+});
+
+test('and finds it when described rather than named', () => {
+  // The shape this was asked about. "Action" matches the page's name and
+  // "action movies" does not, because the reader described what they wanted
+  // instead of naming it — the same failure the TMDB route had.
+  for (const q of ['action movies', 'action films', 'action movies to watch']) {
+    const [hit] = destinationMatches(corpus, q, opts);
+    assert.equal(hit?.href, '/action', `"${q}" found ${hit?.href ?? 'nothing'}`);
+  }
+});
+
+test('a page whose name contains a describing word still answers to itself', () => {
+  // "series" is noise after a genre and half the name of Web series. The raw
+  // query is tried first for exactly this, so stripping never costs a match
+  // the plain text would have made.
+  const [hit] = destinationMatches(corpus, 'web series', opts);
+  assert.equal(hit.href, '/web-series');
+  assert.equal(hit.count, 1);
+});
+
+test('platforms and languages are destinations too', () => {
+  assert.equal(destinationMatches(corpus, 'netflix', opts)[0].href, '/netflix');
+  assert.equal(destinationMatches(corpus, 'tamil', opts)[0].href, '/tamil');
+});
+
+test('a title is not a destination', () => {
+  // The section must be absent for an ordinary search, or every query grows a
+  // "Browse" heading offering something beside the point.
+  assert.deepEqual(destinationMatches(corpus, 'kantara', opts), []);
+  assert.deepEqual(destinationMatches(corpus, 'jailer', opts), []);
+});
+
+test('a match falls inside a word, not across one', () => {
+  // "ion" inside Action is not somebody asking for action films, and a match
+  // nobody can see the logic of reads as a bug.
+  assert.deepEqual(destinationMatches(corpus, 'ion', opts), []);
+  assert.deepEqual(destinationMatches(corpus, 'tio', opts), []);
+});
+
+test('an empty page is not offered', () => {
+  // A collection that exists but holds nothing is a worse tap than no
+  // suggestion at all.
+  const nothingAction = [row({ id: 'm-9', title: 'D', genres: ['Drama'], platforms: ['prime'], languages: ['hi'] })];
+  assert.deepEqual(destinationMatches(nothingAction, 'action', opts), []);
 });

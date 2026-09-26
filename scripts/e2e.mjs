@@ -76,11 +76,16 @@ function serve() {
      * silently, and neither the worker tests nor the unit tests can see it.
      */
     if (path === '/api/search') {
-      const q = url.searchParams.get('q') ?? '';
+      const q = (url.searchParams.get('q') ?? '').toLowerCase();
+      /* Answers only what it plausibly knows, rather than everything asked.
+         A stub that returns a hit for any string cannot be used to test a
+         miss — the first version of the genre check asserted "nothing matches"
+         for a nonsense query and failed, because this handed it a film. */
+      const knows = q && ('a film only tmdb has'.includes(q) || 'a person tmdb knows'.includes(q) || q.includes('film only') || q.includes('person'));
       res.writeHead(200, { 'content-type': 'application/json' });
       return res.end(
         JSON.stringify(
-          q
+          knows
             ? {
                 remote: true,
                 total: 2,
@@ -2419,6 +2424,96 @@ console.log('\nA person leads somewhere');
         `the sheet became "${after}"`,
       );
     }
+  }
+
+  is(errors.length === 0, 'no console errors', errors.slice(0, 2).join(' | '));
+  await ctx.close();
+}
+
+/*
+ * ---------------------------------------------------------------------------
+ * A genre is a query too
+ *
+ * "People might search genre as well — like Action movies." They will, and the
+ * box used to answer it badly rather than not at all: the local half matches
+ * titles and cast so it found nothing, and the remote half handed "action" to
+ * TMDB, which returns films literally called Action. A confident list of the
+ * wrong thing is worse than an empty one, because a reader believes it.
+ *
+ * Run against the real collections and the real feed rather than a fixture,
+ * because the counts are the part that has to be true: "Action" is a guess,
+ * "Action — 269 titles" is an answer, and a page offered while empty is a
+ * worse tap than no suggestion.
+ */
+console.log('\nA genre finds the page that lists it');
+{
+  const { ctx, page, errors } = await newPage(browser, { width: 390, height: 844, touch: true });
+  await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('.landed__cell', { timeout: 15_000 }).catch(() => {});
+
+  const browse = async (q) => {
+    await page.fill('.search input[type=search]', q);
+    await page.waitForTimeout(550);
+    return page.evaluate(() => {
+      const section = [...document.querySelectorAll('.gsearch__section')].find((s) =>
+        /^BROWSE/i.test(s.textContent.trim()),
+      );
+      if (!section) return { rows: [], none: !!document.querySelector('.gsearch__none') };
+      return {
+        rows: [...section.querySelectorAll('a.gsearch__row')].map((a) => ({
+          href: a.getAttribute('href'),
+          count: Number((a.textContent.match(/(\d+) titles?/) ?? [])[1] ?? 0),
+        })),
+        none: !!document.querySelector('.gsearch__none'),
+      };
+    });
+  };
+
+  for (const [q, href] of [
+    ['action movies', '/action'],
+    ['horror', '/horror'],
+    ['web series', '/web-series'],
+    ['netflix', '/netflix'],
+    ['tamil', '/tamil'],
+  ]) {
+    const r = await browse(q);
+    is(
+      r.rows.some((x) => x.href === href),
+      `"${q}" offers ${href}`,
+      `offered ${r.rows.map((x) => x.href).join(', ') || 'nothing'}`,
+    );
+    is(
+      r.rows.every((x) => x.count > 0),
+      `"${q}" offers nothing empty`,
+      r.rows.map((x) => `${x.href}=${x.count}`).join(' '),
+    );
+    is(!r.none, `"${q}" does not also say nothing matches`, 'the panel contradicted itself');
+  }
+
+  /* An ordinary title search must not grow a Browse heading, and a genuine
+     miss must still say so — the empty state now counts destinations, and the
+     risk of that is silencing it entirely. */
+  const title = await browse('jailer');
+  is(title.rows.length === 0, 'a title search offers no destinations', `offered ${title.rows.length}`);
+
+  const miss = await browse('zzzqqqxx');
+  is(miss.rows.length === 0 && miss.none, 'and a real miss still says nothing matches', 'the empty state went quiet');
+
+  /* The page has to exist, not merely be linked. */
+  const target = (await browse('action movies')).rows[0]?.href;
+  if (target) {
+    const res = await page.goto(`${BASE}${target}`, { waitUntil: 'domcontentloaded' });
+    is(res?.ok() ?? false, 'and the page it offers is a page', `${target} returned ${res?.status()}`);
+    /* Waited for rather than counted immediately: the board is drawn by the
+       app after the feed loads, and the first version of this check counted
+       rows a few milliseconds before they existed and called the page
+       empty. */
+    await page.waitForSelector('.row__title', { timeout: 10_000 }).catch(() => {});
+    is(
+      (await page.locator('.row__title').count()) > 0,
+      'with titles on it',
+      'the collection page rendered empty',
+    );
   }
 
   is(errors.length === 0, 'no console errors', errors.slice(0, 2).join(' | '));

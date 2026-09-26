@@ -6,10 +6,12 @@ import {
   askRemote,
   localMatches,
   withoutLocal,
+  destinationMatches,
   type RemoteHit,
   type SearchState,
 } from '../lib/globalSearch';
-import { platform } from '../data/platforms';
+import { platform, PLATFORMS, LANGUAGES, hasLanguageRoute } from '../data/platforms';
+import { COLLECTIONS, inCollection } from '../data/collections';
 import { formatDay } from '../lib/week';
 import type { Release } from '../types';
 
@@ -123,6 +125,37 @@ export function GlobalSearch({ value, onChange, corpus, onOpen, onOpenCatalogue,
     };
   }, [query]);
 
+  /*
+   * The places, for a query that names one rather than a title.
+   *
+   * "Action movies" found nothing locally and, worse, found films called
+   * Action remotely. The answer is the Action page, which has existed all
+   * along and was reachable only by scrolling to the chips under the board.
+   */
+  const destinations = useMemo(
+    () =>
+      destinationMatches(corpus, value, {
+        collections: COLLECTIONS.map((c) => ({
+          slug: c.slug,
+          chip: c.chip,
+          label: c.label,
+          match: (r) => inCollection(c, r),
+        })),
+        platforms: PLATFORMS.filter((p) => p.regions.includes('IN') && p.id !== 'theatres').map((p) => ({
+          id: p.id,
+          name: p.name,
+        })),
+        languages: Object.entries(LANGUAGES)
+          .filter(([code]) => hasLanguageRoute(code))
+          .map(([code, name]) => ({ code, name })),
+        lenses: [
+          { href: '/in-cinemas', label: 'In cinemas', match: (r) => Boolean(r.platforms?.includes('theatres')) },
+          { href: '/streaming', label: 'Now streaming', match: (r) => (r.platforms ?? []).some((p) => p !== 'theatres') },
+        ],
+      }),
+    [corpus, value],
+  );
+
   const people = useMemo(
     () => remote.hits.filter((h): h is RemoteHit => h.kind === 'person').slice(0, PEOPLE_ROWS),
     [remote.hits],
@@ -143,7 +176,12 @@ export function GlobalSearch({ value, onChange, corpus, onOpen, onOpenCatalogue,
     ],
     [local, people],
   );
-  const empty = !local.length && !people.length && !elsewhere.length;
+  /* Destinations count. Without them the panel offered "Action — 269 titles"
+     and "Nothing matches action movies" one above the other — the same
+     contradiction the board used to have with this dropdown, in miniature,
+     and for the same reason: two halves answering and only one being
+     counted. */
+  const empty = !local.length && !people.length && !elsewhere.length && !destinations.length;
 
   useEffect(() => setCursor(-1), [query]);
 
@@ -275,6 +313,33 @@ export function GlobalSearch({ value, onChange, corpus, onOpen, onOpenCatalogue,
 
       {open && (
         <div className="gsearch__panel" id="gsearch-results" role="listbox">
+          {/*
+            Above the titles, deliberately.
+            
+            Somebody typing "horror" wants the horror page; somebody typing
+            "jailer" will not match a destination at all, so this section
+            simply is not there. Putting a strong answer second because it is
+            a different kind of thing would be filing by shape rather than by
+            usefulness.
+          */}
+          {destinations.length > 0 && (
+            <Section label="Browse" note="Pages that list everything of this kind">
+              {destinations.map((d) => (
+                <a className="gsearch__row" key={d.href} href={d.href}>
+                  <span className="gsearch__dest" aria-hidden="true">
+                    {d.kind === 'Platform' ? platform(d.href.slice(1)).mark : '#'}
+                  </span>
+                  <span className="gsearch__text">
+                    <strong>{d.label}</strong>
+                    <small>
+                      {d.kind} · {d.count} {d.count === 1 ? 'title' : 'titles'}
+                    </small>
+                  </span>
+                </a>
+              ))}
+            </Section>
+          )}
+
           {local.length > 0 && (
             <Section label="On New on OTT">
               {local.map((r, i) => (

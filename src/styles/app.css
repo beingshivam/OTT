@@ -4738,3 +4738,19 @@ a.changes__title:hover {
   font-size: 14px;
   opacity: 0.65;
 }
+
+/* The marker on a "Browse" row. A destination has no poster, and a blank
+   thumbnail slot beside a title row that has one reads as a missing image
+   rather than a different kind of thing. */
+.gsearch__dest {
+  width: 40px;
+  height: 56px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--card, #161a22);
+  font-size: 15px;
+  font-weight: 700;
+  opacity: 0.75;
+}
