@@ -164,6 +164,8 @@ for (const name of genres) {
     films: filmIN,
     series: seriesIN,
     onTmdb: filmAll + seriesAll,
+    onTmdbFilms: filmAll,
+    onTmdbSeries: seriesAll,
     seriesGenreMissing: seriesId === null,
   });
 }
@@ -175,26 +177,65 @@ const [ceilingFilm, ceilingSeries] = await Promise.all([
 ]);
 const ceiling = ceilingFilm + ceilingSeries;
 
+/**
+ * Where total_results stops counting.
+ *
+ * The first run came back with three different genres reporting exactly
+ * 20001 films worldwide, which is not a coincidence — it is a ceiling in
+ * TMDB's own bookkeeping, and a number that has hit it is a floor wearing a
+ * total's clothes. So ask an unfiltered /discover, which must be the whole
+ * catalogue and is certainly not twenty thousand: whatever it answers is the
+ * cap, and every figure at or above it gets marked rather than quoted.
+ */
+const [capFilm, capSeries] = await Promise.all([count('film', {}), count('series', {})]);
+const capped = (n, kind) => n >= (kind === 'film' ? capFilm : capSeries);
+const mark = (n, kind) => `${n}${capped(n, kind) ? '+' : ''}`;
+
 if (JSON_OUT) {
   console.log(
-    JSON.stringify({ region: REGION, providers, ours: ours.total, ceiling, rows }, null, 2),
+    JSON.stringify(
+      {
+        region: REGION,
+        providers,
+        ours: ours.total,
+        ceiling,
+        ceilingFilm,
+        ceilingSeries,
+        reportingCap: { film: capFilm, series: capSeries },
+        rows,
+      },
+      null,
+      2,
+    ),
   );
 } else {
   const pad = (s, n) => String(s).padEnd(n);
   const num = (s, n) => String(s).padStart(n);
+  const sum = (f, s) =>
+    `${f + s}${capped(f, 'film') || capped(s, 'series') ? '+' : ''}`;
   console.log(`\nStreaming in India, across ${providers.length} provider ids\n`);
-  console.log(`  ${pad('Genre', 12)}${num('ours', 7)}${num('in India', 11)}${num('films', 8)}${num('series', 8)}${num('on TMDB', 10)}`);
-  console.log(`  ${'-'.repeat(56)}`);
+  console.log(
+    `  ${pad('Genre', 12)}${num('ours', 7)}${num('in India', 11)}${num('films', 8)}${num('series', 8)}${num('on TMDB', 11)}`,
+  );
+  console.log(`  ${'-'.repeat(57)}`);
   for (const r of rows) {
     console.log(
-      `  ${pad(r.genre, 12)}${num(r.ours, 7)}${num(r.streamingInIndia, 11)}${num(r.films, 8)}${num(r.series, 8)}${num(r.onTmdb, 10)}` +
+      `  ${pad(r.genre, 12)}${num(r.ours, 7)}${num(sum(r.films, r.series), 11)}` +
+        `${num(mark(r.films, 'film'), 8)}${num(mark(r.series, 'series'), 8)}` +
+        `${num(sum(r.onTmdbFilms, r.onTmdbSeries), 11)}` +
         (r.seriesGenreMissing ? '   (no TV genre)' : ''),
     );
   }
-  console.log(`  ${'-'.repeat(56)}`);
-  console.log(`  ${pad('any genre', 12)}${num(ours.total, 7)}${num(ceiling, 11)}${num(ceilingFilm, 8)}${num(ceilingSeries, 8)}`);
-  console.log(`\n  ours   — rows this site ships today (feed + catalogue, deduped)`);
+  console.log(`  ${'-'.repeat(57)}`);
+  console.log(
+    `  ${pad('any genre', 12)}${num(ours.total, 7)}${num(sum(ceilingFilm, ceilingSeries), 11)}` +
+      `${num(mark(ceilingFilm, 'film'), 8)}${num(mark(ceilingSeries, 'series'), 8)}`,
+  );
+  console.log(`\n  ours     — rows this site ships today (feed + catalogue, deduped)`);
   console.log(`  in India — TMDB titles on our platforms, watch_region=IN`);
   console.log(`  on TMDB  — the same genre worldwide, no provider filter`);
+  console.log(
+    `  +        — at TMDB's reporting ceiling (${capFilm} films, ${capSeries} series); a floor, not a total`,
+  );
   console.log(`\n${callCount()} API calls.\n`);
 }
