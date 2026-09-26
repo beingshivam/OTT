@@ -185,6 +185,119 @@ export function relaxations(q) {
   return [...new Set(out)];
 }
 
+/**
+ * The word somebody typed, spelled the other ways it gets spelled.
+ *
+ * This is the gap the relaxations above were written knowing they could not
+ * close, and the comment there said as much: "panchnama" for "punchnama" is a
+ * real spelling of a real film and returns nothing at any length, because
+ * TMDB's search is close to exact and no amount of dropping words rescues a
+ * word it has never seen.
+ *
+ * It is not a typo. An Indian title has no single correct romanisation — the
+ * film is पुँछनामा, and Latin script is a transcription somebody chose. TMDB
+ * has one of those choices on file and the reader has another, and both are
+ * right. On a site whose whole audience types Hindi, Tamil and Telugu titles
+ * in Latin letters, treating that as user error is the wrong model.
+ *
+ * So: equivalence classes, not edit distance. Levenshtein would reach
+ * "punchnama" from "panchnama" and also reach fifty words nobody meant, and a
+ * confident wrong answer is worse than an empty one — that rule has decided
+ * several things on this site already. These are the substitutions that
+ * romanisation actually varies on, and nothing else:
+ *
+ *   a ↔ u     the schwa. Hindi's inherent vowel lands between the two and
+ *             transcribers disagree; this is the reported case, and the
+ *             single most common source of a missed Indian title.
+ *   aa ↔ a    long vowels people double, or don't
+ *   ee ↔ i    Geet / Giit
+ *   oo ↔ u    Noor / Nur
+ *   ph ↔ f    Phir / Fir
+ *   v ↔ w     Vivah / Wiwah
+ *   z ↔ j     Zindagi / Jindagi
+ *   ksh ↔ x   Lakshmi / Laxmi
+ *   doubles   Tumbbad / Tumbad
+ *   final a   Rama / Ram
+ *
+ * One class at a time, never combined. Two simultaneous substitutions is
+ * where the false positives live, and the ranking above means the likeliest
+ * single change is tried first. Round-robin across the classes rather than
+ * exhausting each in turn, so a word full of a's cannot spend the whole
+ * budget on its own schwa before the f and the w get a turn.
+ *
+ * Four letters and up. Geet, Noor and Phir are all real titles and all four
+ * letters, so a higher floor would have excluded the very examples above;
+ * below four a single substitution stops being transcription and starts
+ * being a different word.
+ */
+const SPELLINGS = [
+  [/a/g, 'u'],
+  [/u/g, 'a'],
+  [/aa/g, 'a'],
+  [/a/g, 'aa'],
+  [/ee/g, 'i'],
+  [/i/g, 'ee'],
+  [/oo/g, 'u'],
+  [/ph/g, 'f'],
+  [/f/g, 'ph'],
+  [/v/g, 'w'],
+  [/w/g, 'v'],
+  [/z/g, 'j'],
+  [/j/g, 'z'],
+  [/ksh/g, 'x'],
+  [/x/g, 'ksh'],
+  [/([bcdfgklmnprstz])\1/g, '$1'],
+];
+
+/** Enough to cover the classes above without turning one miss into a burst of
+ *  upstream calls. Tuned against real queries, not picked. */
+const MAX_SPELLINGS = 8;
+const MIN_SPELLABLE = 4;
+
+export function spellings(word, limit = MAX_SPELLINGS) {
+  const w = (word ?? '').toLowerCase();
+  if (w.length < MIN_SPELLABLE || !/^[a-z]+$/.test(w)) return [];
+
+  /* Per class: each single occurrence on its own, then all of them together.
+     "panchnama" under a→u gives punchnama, panchnuma, panchnamu, punchnumu —
+     and the first of those is the film. */
+  const perClass = SPELLINGS.map(([pattern, to]) => {
+    const made = [];
+    const hits = [...w.matchAll(pattern)];
+    if (!hits.length) return made;
+    for (const hit of hits) {
+      made.push(w.slice(0, hit.index) + hit[0].replace(pattern, to) + w.slice(hit.index + hit[0].length));
+    }
+    if (hits.length > 1) made.push(w.replace(pattern, to));
+    return made.filter((v) => v !== w);
+  });
+
+  /* The final vowel, which is its own class: Rama and Ram are one name. */
+  const tail = [];
+  if (w.endsWith('a')) tail.push(w.slice(0, -1));
+  else tail.push(`${w}a`);
+  perClass.push(tail);
+
+  /* Round-robin, so the ranking of the classes survives contact with a word
+     that has six of one letter. */
+  const out = [];
+  const seen = new Set([w]);
+  for (let depth = 0; out.length < limit; depth += 1) {
+    let placed = false;
+    for (const made of perClass) {
+      if (depth >= made.length) continue;
+      placed = true;
+      const variant = made[depth];
+      if (seen.has(variant)) continue;
+      seen.add(variant);
+      out.push(variant);
+      if (out.length >= limit) break;
+    }
+    if (!placed) break;
+  }
+  return out;
+}
+
 async function searchTmdb(request, url, env, ctx) {
   if (request.method !== 'GET') return json(405, { error: 'method_not_allowed' });
 
@@ -312,6 +425,50 @@ async function searchTmdb(request, url, env, ctx) {
       found = attempt;
       asked = candidate;
       break;
+    }
+  }
+
+  /*
+   * Still nothing, so the word itself is the problem — try how else it is
+   * spelled. See spellings() for why this is equivalence classes and not
+   * fuzzy matching.
+   *
+   * Only the distinctive token, because that is the one TMDB is failing on
+   * and it is the one a transcription disagreement lands on: "pyaar ka
+   * panchnama" fails on "panchnama", not on "ka". Asking for that word alone
+   * also sidesteps the thing that makes /search/multi brittle, which is that
+   * every token has to land.
+   *
+   * In parallel, unlike the relaxations above. Those are ordered by how much
+   * of the query they throw away, so stopping at the first hit is the point.
+   * These are equally plausible spellings of one word, there is no reason to
+   * believe the first over the fourth until they answer, and asking one at a
+   * time would put two seconds of round trips in front of a reader who has
+   * already waited through three misses. The rank decides ties afterwards.
+   */
+  if (!found) {
+    const kept = q
+      .split(/\s+/)
+      .filter(Boolean)
+      .filter((t) => !NOISE.has(t.toLowerCase().replace(/[^a-z0-9]/g, '')) && !/^(19|20)\d{2}$/.test(t));
+    const distinctive = kept.length
+      ? kept.reduce((a, b) => (b.length > a.length ? b : a)).toLowerCase().replace(/[^a-z]/g, '')
+      : '';
+
+    const variants = spellings(distinctive);
+    if (variants.length) {
+      const tried = await Promise.all(variants.map((v) => askTmdb(v)));
+      /* An outage mid-fan-out is still an outage, not a miss: if every
+         variant came back null the upstream is down, and saying "nothing
+         matched" would be the lie this route already refuses to tell. */
+      if (tried.every((t) => t === null)) {
+        return json(200, { remote: true, results: [], total: 0, degraded: true });
+      }
+      const winner = variants.findIndex((_, i) => tried[i] && tried[i].results.length);
+      if (winner !== -1) {
+        found = tried[winner];
+        asked = variants[winner];
+      }
     }
   }
 

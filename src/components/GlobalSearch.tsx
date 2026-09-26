@@ -387,7 +387,26 @@ export function GlobalSearch({ value, onChange, corpus, onOpen, onOpenCatalogue,
              * So the heading says everything else is here, and the note says
              * what tapping gets you rather than what the row lacks.
              */
-            <Section label="Everything else" note="Cast, ratings and where to watch — tap any title">
+            <Section
+              label="Everything else"
+              /*
+               * Say so when the answer came from a different spelling.
+               *
+               * The route now tries other romanisations of a word it cannot
+               * find — "panchnama" is Pyaar Ka Punchnama, and both spellings
+               * are legitimate transcriptions of the same Hindi word. Getting
+               * the film is the right outcome. Getting it without being told
+               * is not: a search that quietly substitutes your word for
+               * another one is trustworthy exactly until the first time it
+               * guesses wrong, and then it is worse than the empty result it
+               * replaced. One clause makes the guess visible.
+               */
+              note={
+                remote.relaxedTo
+                  ? `Showing results for “${remote.relaxedTo}” — tap any title`
+                  : 'Cast, ratings and where to watch — tap any title'
+              }
+            >
               {elsewhere.map((h) => (
                 <TitleRow
                   key={h.id}

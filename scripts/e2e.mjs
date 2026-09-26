@@ -82,10 +82,23 @@ function serve() {
          miss — the first version of the genre check asserted "nothing matches"
          for a nonsense query and failed, because this handed it a film. */
       const knows = q && ('a film only tmdb has'.includes(q) || 'a person tmdb knows'.includes(q) || q.includes('film only') || q.includes('person'));
+      /* The other spelling, as the live route answers it: the film, plus the
+         word that actually found it. A reader whose query was quietly swapped
+         for a different one has to be told, so the swap is visible here. */
+      const respelled = q === 'panchnama';
       res.writeHead(200, { 'content-type': 'application/json' });
       return res.end(
         JSON.stringify(
-          knows
+          respelled
+            ? {
+                remote: true,
+                total: 1,
+                relaxedTo: 'punchnama',
+                results: [
+                  { kind: 'film', id: 'm-999001', title: 'Pyaar Ka Punchnama', year: '2011', image: null, lang: 'hi' },
+                ],
+              }
+            : knows
             ? {
                 remote: true,
                 total: 2,
@@ -2623,6 +2636,52 @@ console.log('\nA genre is bigger than the week');
   await page.waitForSelector('.genrebrowse__note', { timeout: 15_000 }).catch(() => {});
   const note = (await page.locator('.genrebrowse__note').first().textContent()) ?? '';
   is(/films only/i.test(note), 'a films-only genre admits it', note.trim().slice(0, 120));
+  await ctx.close();
+}
+
+/*
+ * A word spelled the other way
+ *
+ * An Indian title has no single correct romanisation, so TMDB has one
+ * transcription on file and the reader types another. The route now tries the
+ * equivalence classes romanisation actually varies on — and having found the
+ * film under a different word, it has to say which word, or a search that
+ * silently substitutes yours is trustworthy only until it guesses wrong.
+ */
+console.log('\nA word spelled the other way');
+{
+  const { ctx, page, errors } = await newPage(browser, { width: 390, height: 844, touch: true });
+  await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('.landed__cell', { timeout: 15_000 }).catch(() => {});
+
+  await page.fill('.search input[type=search]', 'panchnama');
+  await page.waitForTimeout(700);
+  await page.waitForSelector('.gsearch__row', { timeout: 10_000 }).catch(() => {});
+
+  const found = await page.evaluate(() =>
+    [...document.querySelectorAll('.gsearch__row')].map((r) => r.textContent).join(' | '),
+  );
+  is(/Punchnama/i.test(found), 'a different spelling still finds the film', found.slice(0, 80) || 'nothing');
+
+  const notes = await page.evaluate(() =>
+    [...document.querySelectorAll('.gsearch__section')].map((s) => s.getAttribute('aria-label') ?? '').join(' | '),
+  );
+  is(
+    /showing results for/i.test(notes) && /punchnama/i.test(notes),
+    'and says which spelling it used',
+    notes.slice(0, 120) || 'no note',
+  );
+
+  /* The note is not permanent furniture: a query that worked as typed must
+     not claim to have been corrected. */
+  await page.fill('.search input[type=search]', 'a film only tmdb has');
+  await page.waitForTimeout(550);
+  const after = await page.evaluate(() =>
+    [...document.querySelectorAll('.gsearch__section')].map((s) => s.getAttribute('aria-label') ?? '').join(' | '),
+  );
+  is(!/showing results for/i.test(after), 'and does not claim it on a query that worked', after.slice(0, 120));
+
+  is(errors.length === 0, 'no console errors', errors.slice(0, 2).join(' | '));
   await ctx.close();
 }
 

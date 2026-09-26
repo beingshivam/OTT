@@ -12,7 +12,7 @@
 
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import worker, { lastDueSlot, GENRE_IDS, IN_PROVIDERS } from './index.js';
+import worker, { lastDueSlot, GENRE_IDS, IN_PROVIDERS, spellings } from './index.js';
 
 const ORIGIN = 'https://newonott.in';
 
@@ -1388,4 +1388,171 @@ await test('and with a token the probe still answers yes, cached', async () => {
   assert.equal(body.remote, true, 'the box would have printed the smaller promise');
   assert.match(probe.headers.get('cache-control'), /max-age=3600/);
   assert.equal(calls, 0, 'the mount probe spent a TMDB call');
+});
+
+/*
+ * ---------------------------------------------------------------------------
+ * The other ways a word gets spelled
+ *
+ * The gap the relaxations were written knowing they could not close. Dropping
+ * words cannot rescue a word TMDB has never seen, and "panchnama" for
+ * "punchnama" is not a typo — an Indian title has no single correct
+ * romanisation, so TMDB has one transcription on file and the reader types
+ * another, and both are right.
+ */
+
+await test('the reported miss is the first thing tried', () => {
+  // Rank matters as much as coverage: this is the commonest way to miss an
+  // Indian title, so the schwa has to lead rather than turn up eighth.
+  assert.equal(spellings('panchnama')[0], 'punchnama');
+});
+
+await test('the substitutions romanisation actually varies on', () => {
+  const finds = (word, wanted) =>
+    assert.ok(
+      spellings(word).includes(wanted),
+      `${word} never offered ${wanted} — got ${spellings(word).join(', ')}`,
+    );
+  finds('jindagi', 'zindagi');   // z ↔ j
+  finds('laxmi', 'lakshmi');     // ksh ↔ x
+  finds('tumbbad', 'tumbad');    // doubled consonant
+  finds('vivah', 'wivah');       // v ↔ w
+  finds('phir', 'fir');          // ph ↔ f
+  finds('geet', 'git');          // ee ↔ i
+  finds('noor', 'nur');          // oo ↔ u
+  finds('rama', 'ram');          // the final vowel
+});
+
+await test('one substitution at a time, never two', () => {
+  /*
+   * Where the false positives live. Combining classes reaches far more of the
+   * dictionary than transcription ever explains, and a confident wrong answer
+   * is worse than an empty one. The all-occurrences variant of a single class
+   * is allowed — that is still one rule.
+   */
+  const classes = [
+    [/a/g, 'u'], [/u/g, 'a'], [/aa/g, 'a'], [/a/g, 'aa'], [/ee/g, 'i'], [/i/g, 'ee'],
+    [/oo/g, 'u'], [/ph/g, 'f'], [/f/g, 'ph'], [/v/g, 'w'], [/w/g, 'v'], [/z/g, 'j'],
+    [/j/g, 'z'], [/ksh/g, 'x'], [/x/g, 'ksh'], [/([bcdfgklmnprstz])\1/g, '$1'],
+  ];
+  for (const word of ['panchnama', 'jindagi', 'vivah', 'laxmi', 'tumbbad']) {
+    for (const variant of spellings(word)) {
+      const reachable =
+        variant === `${word}a` ||
+        variant === word.replace(/a$/, '') ||
+        classes.some(([p, to]) => {
+          const hits = [...word.matchAll(p)];
+          if (!hits.length) return false;
+          if (word.replace(p, to) === variant) return true;
+          return hits.some(
+            (h) =>
+              word.slice(0, h.index) + h[0].replace(p, to) + word.slice(h.index + h[0].length) ===
+              variant,
+          );
+        });
+      assert.ok(reachable, `"${variant}" is not one substitution away from "${word}"`);
+    }
+  }
+});
+
+await test('short words and non-words are left alone', () => {
+  // Below four letters a substitution stops being transcription and starts
+  // being a different word. Digits and punctuation are not romanisation.
+  for (const w of ['ka', 'the', '', 'a']) assert.deepEqual(spellings(w), []);
+  for (const w of ['3 idiots', 'k-pop', '2026']) assert.deepEqual(spellings(w), []);
+});
+
+await test('the budget is bounded and spread across the classes', () => {
+  /*
+   * "aaaaaa" has six of one letter. Exhausting each class in turn would spend
+   * the whole budget on its schwa before the f or the w got a turn, which is
+   * why the generator goes round-robin.
+   */
+  const many = spellings('panchnama');
+  assert.ok(many.length <= 8, `${many.length} variants is a burst of upstream calls`);
+  assert.equal(new Set(many).size, many.length, 'duplicates would waste a call each');
+  assert.ok(!many.includes('panchnama'), 'the original was offered back as a variant');
+  assert.ok(
+    many.some((v) => !v.includes('u')) || many.some((v) => v.includes('aa')),
+    'every variant came from the first class',
+  );
+});
+
+await test('a spelling variant finds the film, and says which spelling', async () => {
+  /*
+   * End to end, as the reported query: three misses through the relaxations,
+   * then the variants. The answer has to carry relaxedTo — a search that
+   * quietly swaps your word for another is trustworthy until the first time
+   * it guesses wrong.
+   */
+  fakeCache();
+  const asked = [];
+  globalThis.fetch = async (u) => {
+    const q = new URL(String(u)).searchParams.get('query');
+    asked.push(q);
+    const hit = q === 'punchnama';
+    return {
+      ok: true,
+      status: 200,
+      json: async () => ({
+        results: hit
+          ? [{ media_type: 'movie', id: 76341, title: 'Pyaar Ka Punchnama', release_date: '2011-05-20', poster_path: '/p.jpg' }]
+          : [],
+        total_results: hit ? 1 : 0,
+      }),
+    };
+  };
+
+  const res = await worker.fetch(
+    new Request(`${ORIGIN}/api/search?q=${encodeURIComponent('pyaar ka panchnama')}`),
+    { TMDB_TOKEN: 't' },
+    ctx,
+  );
+  const b = await res.json();
+  assert.equal(b.results.length, 1, `found nothing; asked ${asked.join(', ')}`);
+  assert.equal(b.results[0].title, 'Pyaar Ka Punchnama');
+  assert.equal(b.relaxedTo, 'punchnama', 'the reader was not told the spelling changed');
+  assert.ok(asked.includes('pyaar ka panchnama'), 'never tried what was typed');
+});
+
+await test('a query that works never reaches the spelling pass', async () => {
+  // The whole cost argument. Variants are a miss-only path; a hit still costs
+  // exactly one upstream call.
+  fakeCache();
+  let calls = 0;
+  globalThis.fetch = async () => {
+    calls += 1;
+    return {
+      ok: true,
+      status: 200,
+      json: async () => ({
+        results: [{ media_type: 'movie', id: 1, title: 'Vivah', release_date: '2006-11-10', poster_path: '/v.jpg' }],
+        total_results: 1,
+      }),
+    };
+  };
+  const b = await (await worker.fetch(new Request(`${ORIGIN}/api/search?q=vivah`), { TMDB_TOKEN: 't' }, ctx)).json();
+  assert.equal(calls, 1, `a hit spent ${calls} calls`);
+  assert.equal(b.relaxedTo, undefined, 'claimed to have relaxed a query that worked as typed');
+});
+
+await test('an outage during the spelling pass is still an outage', async () => {
+  // The rule this route already lives by: unreachable is not empty. Fanning
+  // out must not turn a TMDB outage into "nothing matched".
+  fakeCache();
+  globalThis.fetch = async () => { throw new Error('network'); };
+  const b = await (
+    await worker.fetch(new Request(`${ORIGIN}/api/search?q=panchnama`), { TMDB_TOKEN: 't' }, ctx)
+  ).json();
+  assert.equal(b.degraded, true, 'an outage was reported as a genuine miss');
+});
+
+await test('a real miss is still a miss, after the spellings too', async () => {
+  fakeCache();
+  globalThis.fetch = async () => ({ ok: true, status: 200, json: async () => ({ results: [], total_results: 0 }) });
+  const res = await worker.fetch(new Request(`${ORIGIN}/api/search?q=zzqqxxnothing`), { TMDB_TOKEN: 't' }, ctx);
+  const b = await res.json();
+  assert.equal(b.results.length, 0);
+  assert.equal(b.degraded, undefined, 'a miss was dressed up as an outage');
+  assert.match(res.headers.get('cache-control'), /max-age=3600/, 'the miss was not cached');
 });

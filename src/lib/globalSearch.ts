@@ -40,6 +40,18 @@ export interface SearchState {
   degraded: boolean;
   hits: RemoteHit[];
   total: number;
+  /**
+   * The spelling that actually found these, when it was not the one typed.
+   *
+   * The Worker has always sent this and nothing ever read it, so a reader who
+   * typed "jawan movie" got Jawan with no explanation. That was survivable
+   * while the only relaxations dropped noise words. It is not survivable now
+   * that the route also tries other romanisations — "panchnama" answering
+   * with Pyaar Ka Punchnama is right, and silently swapping a reader's word
+   * for a different one is how a search loses trust the first time it guesses
+   * wrong. Shown, so the guess is visible and correctable.
+   */
+  relaxedTo?: string;
 }
 
 export const EMPTY: SearchState = { remote: false, degraded: false, hits: [], total: 0 };
@@ -159,6 +171,7 @@ export async function askRemote(query: string, signal?: AbortSignal): Promise<Se
       degraded: Boolean(body.degraded),
       hits: body.results ?? [],
       total: body.total ?? 0,
+      relaxedTo: typeof body.relaxedTo === 'string' ? body.relaxedTo : undefined,
     };
   } catch {
     return EMPTY;
