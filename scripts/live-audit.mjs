@@ -96,8 +96,30 @@ console.log(`Auditing ${SITE}`);
 section('The build that is actually serving');
 const build = await get('/build.txt');
 is(build.status === 200, 'build.txt is served', `status ${build.status}`);
-const sha = build.body.trim().split(/\s+/)[0] ?? '';
-console.log(`       serving ${sha || '(unknown)'}`);
+/* "commit <sha>" on the first line, "built <iso>" on the second. The first
+   draft of this split on whitespace and took index 0, and duly reported that
+   the site was serving a build called "commit". */
+const sha = (build.body.match(/commit\s+([0-9a-f]{7,40})/) ?? [])[1] ?? '';
+const builtAt = (build.body.match(/built\s+(\S+)/) ?? [])[1] ?? '';
+console.log(`       serving ${sha || '(unknown)'}${builtAt ? `, built ${builtAt}` : ''}`);
+is(Boolean(sha), 'and names the commit it was built from', build.body.trim().slice(0, 60));
+
+/*
+ * Behind the branch, or serving it?
+ *
+ * "Pushed" and "live" are different events and the gap between them has
+ * swallowed more of this project's afternoons than any bug. When the audit is
+ * run from CI it knows which commit it was asked about, so it can say plainly
+ * whether that is the one answering.
+ */
+if (process.env.EXPECT_SHA) {
+  const want = process.env.EXPECT_SHA.slice(0, sha.length || 40);
+  is(
+    sha.startsWith(want) || want.startsWith(sha),
+    'and it is the commit this audit was run for',
+    `serving ${sha.slice(0, 8)}, asked about ${process.env.EXPECT_SHA.slice(0, 8)}`,
+  );
+}
 
 /* ---------------------------------------------------------------------------
  * The data the whole site is drawn from
@@ -342,6 +364,16 @@ is((pb.credits ?? []).length > 0, 'with a filmography', `${(pb.credits ?? []).le
 const badPerson = await get('/api/person?id=m-1');
 is(badPerson.status === 400, 'a made-up person id is refused', `status ${badPerson.status}`);
 
+/* The one route that writes. Not exercised with a real address — this runs
+   daily and would fill the list with junk — but it should still be the shape
+   it claims: a POST-only endpoint that refuses everything else. */
+const subscribeGet = await get('/api/subscribe');
+is(
+  subscribeGet.status === 405,
+  'the signup endpoint takes POST and nothing else',
+  `GET returned ${subscribeGet.status}`,
+);
+
 /* ---------------------------------------------------------------------------
  * The genre browse, and whether the page above it agrees with it
  */
@@ -394,7 +426,15 @@ if (feed && rows.length) {
     const page = sectionResults.find((r) => r.p === `/${g}`);
     if (!page || page.res.status !== 200) continue;
     const claimed = Number((descOf(page.res.body) ?? '').match(/(\d[\d,]*)/)?.[1]?.replace(/,/g, '') ?? 0);
-    const actual = rows.filter((r) => (r.genres ?? []).includes(GENRE_LABEL[g])).length;
+    /* India only, which is what the page counts. The first run of this audit
+       compared against every row in the feed, reported five genre pages as
+       under-counting, and was wrong five times: /action says 41 because 41 of
+       its 64 action rows are released in India, and the page is right. An
+       audit that cries wolf about the thing it exists to watch is worse than
+       no audit. */
+    const actual = rows.filter(
+      (r) => (r.genres ?? []).includes(GENRE_LABEL[g]) && (r.regions ?? []).includes('IN'),
+    ).length;
     /* Within a day's churn rather than exact: the feed refreshes several
        times a day and the page is rebuilt on deploy, so a handful of rows
        apart is normal and a hundred is a stale build. */
@@ -410,21 +450,65 @@ if (feed && rows.length) {
  * Images, which are most of the page's weight and all of its look
  */
 section('Artwork');
-const posterPath = rows.find((r) => r.posterUrl?.startsWith('/img/'))?.posterUrl;
-if (posterPath) {
-  const poster = await get(posterPath);
-  is(poster.status === 200, 'a poster comes through the proxy', `${posterPath} = ${poster.status}`);
+
+/*
+ * Two paths, on purpose, and both have to work.
+ *
+ * The board's posters are plain <img> tags pointing straight at TMDB's CDN;
+ * only the share card goes through /img/, because a canvas cannot read back a
+ * cross-origin image and image.tmdb.org sends no CORS header. That is a
+ * deliberate trade — a hop per poster would put every thumbnail on the page
+ * through the Worker's request budget — but it means the site depends on two
+ * separate image origins and a check of one proves nothing about the other.
+ *
+ * The first run of this audit only knew about the proxy, found no proxied
+ * poster in the feed, and printed a shrug where a check should have been.
+ */
+const direct = rows.find((r) => r.posterUrl?.startsWith('https://image.tmdb.org/'))?.posterUrl;
+if (direct) {
+  const res = await get(direct);
+  is(res.status === 200, "the board's own poster host answers", `${res.status}`);
   is(
-    (poster.headers.get('content-type') ?? '').startsWith('image/'),
-    'as an image',
-    poster.headers.get('content-type') ?? 'none',
+    (res.headers.get('content-type') ?? '').startsWith('image/'),
+    'with an image',
+    res.headers.get('content-type') ?? 'none',
+  );
+
+  /* The same file through our origin. If these disagree the share card and
+     the page are drawing different artwork for the same film. */
+  const path = new URL(direct).pathname.replace(/^\/t\/p\//, '/img/');
+  const proxied = await get(path);
+  is(proxied.status === 200, 'and the same file comes through our proxy', `${path} = ${proxied.status}`);
+  is(
+    (proxied.headers.get('cache-control') ?? '').includes('immutable'),
+    'cached as immutable, since a TMDB path is content-addressed',
+    proxied.headers.get('cache-control') ?? 'none',
   );
 } else {
-  console.log('       no proxied poster in the feed to test');
+  is(false, 'the feed has a poster to check', 'no posterUrl on any row');
 }
 
-const badImage = await get('/img/w500/../../etc/passwd');
-is(badImage.status >= 400, 'and the proxy refuses a path that is not a poster', `status ${badImage.status}`);
+/*
+ * The proxy is narrow on purpose: an open one is somebody else's bandwidth
+ * bill and a way into networks that trust this origin. A path that does not
+ * look exactly like a TMDB image path must not be forwarded.
+ *
+ * Not "/img/w500/../../etc/passwd" — the first draft used that and it passed
+ * through as a 200, which looked alarming and was nothing: fetch normalises
+ * the dot segments away before the request leaves, so the Worker was asked
+ * for /etc/passwd, never matched /img/, and got the SPA fallback like any
+ * other unknown path. A traversal test that never reaches the code it is
+ * testing is worse than no test. These stay inside /img/.
+ */
+for (const bad of [
+  '/img/w500/notaposter.txt',
+  '/img/w500/short.jpg',
+  '/img/hacker/aaaaaaaaaaaa.jpg',
+  '/img/w500/%2e%2e%2f%2e%2e%2fetc%2fpasswd',
+]) {
+  const res = await get(bad);
+  is(res.status >= 400, `the proxy refuses ${bad}`, `status ${res.status}`);
+}
 
 /* ---------------------------------------------------------------------------
  * Where the links go

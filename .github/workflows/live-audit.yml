@@ -41,6 +41,10 @@ jobs:
         env:
           SITE: ${{ inputs.site || 'https://newonott.in' }}
           SAMPLE: ${{ inputs.sample || '60' }}
+          # So the report can say whether the site is serving this commit or
+          # is still a deploy behind — the difference that has cost the most
+          # time here. Only meaningful against the real site.
+          EXPECT_SHA: ${{ (inputs.site == '' || inputs.site == 'https://newonott.in') && github.sha || '' }}
         # Fenced, or the summary renders the report as one paragraph.
         run: |
           echo '```' >> "$GITHUB_STEP_SUMMARY"

@@ -520,6 +520,48 @@ const S6 = 'Refresh schedule';
   }
 }
 
+const S8 = 'Connection hints';
+{
+  /**
+   * A preconnect has to describe the connection that actually gets opened.
+   *
+   * Browsers keep separate connection pools for CORS and non-CORS requests to
+   * the same host, and a preconnect warms only the pool its own attributes
+   * describe. So `crossorigin` is not a harmless extra: put it on a hint for
+   * an origin the page fetches with plain <img> tags and the warmed
+   * connection is never used, while the first poster still pays DNS, TCP and
+   * TLS in full. It is a line that looks like an optimisation, measures as
+   * nothing, and nothing in a test suite would ever notice.
+   *
+   * Which is what had happened. Every poster and platform logo on this site
+   * comes from image.tmdb.org through PosterArt, which has never set a
+   * crossorigin attribute and has no reason to — nothing reads a poster back
+   * off a canvas. The hint carried one anyway.
+   *
+   * Fonts are the opposite case and keep theirs: a webfont is fetched in CORS
+   * mode whether or not you ask, so gstatic's hint is only useful with it.
+   */
+  const head = await readFile(resolve(ROOT, 'index.html'), 'utf8').catch(() => '');
+  const hints = [...head.matchAll(/<link\s+rel="preconnect"[^>]*>/g)].map((m) => m[0]);
+  const hintFor = (host) => hints.find((h) => h.includes(host)) ?? '';
+
+  if (!hints.length) skip(S8, 'preconnects match how the assets are fetched', 'no preconnects found');
+  else {
+    const images = hintFor('image.tmdb.org');
+    const fontFiles = hintFor('fonts.gstatic.com');
+    const wrong = [];
+    if (images && /crossorigin/.test(images)) {
+      wrong.push('image.tmdb.org is hinted crossorigin but its posters are plain <img> tags');
+    }
+    if (fontFiles && !/crossorigin/.test(fontFiles)) {
+      wrong.push('fonts.gstatic.com is hinted without crossorigin, and webfonts are always CORS');
+    }
+    wrong.length
+      ? fail(S8, 'preconnects match how the assets are fetched', 'a hint warms the wrong pool', wrong)
+      : pass(S8, 'preconnects match how the assets are fetched', `${hints.length} hints`);
+  }
+}
+
 // --- the claim each title page makes ----------------------------------------
 
 const S5 = 'Title page claims';
