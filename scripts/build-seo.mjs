@@ -1051,6 +1051,25 @@ const allTitlePages = [...titlePages, ...cataloguePages];
  */
 const slugById = new Map();
 const claimed = new Set();
+/**
+ * The rows that had to take a suffixed slug, so their <title> can say so too.
+ *
+ * Resolving the URL collision was only half of it. Two different films called
+ * Mayday got /mayday and /mayday-2026 — and then both pages went out under
+ * the identical tag "Watch Mayday (English movie) online", because the tag is
+ * built from the title and the title is genuinely the same. Five pairs were
+ * shipping that way.
+ *
+ * Distinct URLs carrying identical titles and descriptions is the shape
+ * Google reads as duplicate content: it picks one, drops the other, and the
+ * dropped one is a page this site spent its crawl budget on. With paid
+ * traffic pointing at the site that is worse than wasted — it is two pages
+ * competing to be the answer to the same query.
+ *
+ * The year disambiguates, exactly as it already does in the slug, and only
+ * for the rows that collided. Every other tag on the site is untouched.
+ */
+const collidedIds = new Set();
 const collisions = [];
 for (const r of allTitlePages) {
   const base = slugify(r.title);
@@ -1064,6 +1083,7 @@ for (const r of allTitlePages) {
   }
   claimed.add(slug);
   slugById.set(r.id, slug);
+  if (slug !== base) collidedIds.add(r.id);
 }
 if (collisions.length) {
   console.log(`     ${collisions.length} title(s) shared a slug and were given their own: ${collisions.join(', ')}`);
@@ -1748,7 +1768,12 @@ for (const r of allTitlePages) {
   /* "Aasha (Malayalam)" — written once because all five description states
      open with it, and repeating the ternary five times is where a difference
      creeps in that nobody meant. */
-  const named = `${r.title}${langs.length ? ` (${langs.join(', ')})` : ''}`;
+  /* The year rides along when another film shares this name, for the same
+     reason the tag and the slug carry it: two pages opening with the
+     identical sentence is the duplicate-content signal, and the description
+     is the half a reader sees in the result. */
+  const namedParts = [collidedIds.has(r.id) ? (r.releaseDate ?? '').slice(0, 4) : '', ...langs].filter(Boolean);
+  const named = `${r.title}${namedParts.length ? ` (${namedParts.join(', ')})` : ''}`;
 
   /**
    * How a person would name this thing out loud: "Telugu movie", "Hindi series".
@@ -1788,7 +1813,13 @@ for (const r of allTitlePages) {
    * and "(Hindi)" are grammatical, and no template downstream has to care which
    * it got.
    */
-  const qualified = descriptor ? `${r.title} (${descriptor})` : r.title;
+  /* The year joins the bracket when another film shares this name — see
+     collidedIds. "Mayday (2026 English movie)" against "Mayday (English
+     movie)": two pages, two tags, one of them no longer arguing with the
+     other for the same query. */
+  const year = (r.releaseDate ?? '').slice(0, 4);
+  const inBrackets = [collidedIds.has(r.id) ? year : '', descriptor].filter(Boolean).join(' ');
+  const qualified = inBrackets ? `${r.title} (${inBrackets})` : r.title;
   const on = streaming.length ? streaming.map(pname).join(', ') : '';
   // From the archive too, so a page whose week has rolled out of the window
   // keeps its context instead of quietly losing a section as it ages.

@@ -520,6 +520,51 @@ const S6 = 'Refresh schedule';
   }
 }
 
+const S11 = 'One page, one claim';
+{
+  /**
+   * No two published pages may say the same thing.
+   *
+   * Distinct URLs carrying an identical title and description is what Google
+   * reads as duplicate content: it picks one, drops the other, and the
+   * dropped page is crawl budget this site already spent. With paid traffic
+   * arriving that is worse than waste — it is two of your own pages
+   * competing to answer the same query.
+   *
+   * It had happened five times and nothing could see it. The slug collision
+   * resolver gave two different films called Mayday their own URLs, /mayday
+   * and /mayday-2026, and then built both tags from the title — which is
+   * genuinely identical, because the films genuinely share a name. The URLs
+   * were distinct and everything a search engine reads was not.
+   *
+   * Checked over what actually shipped rather than over the data, because
+   * this is a property of the rendered page and every template feeding it.
+   */
+  if (!pages) skip(S11, 'no two pages carry the same title', 'needs dist/');
+  else {
+    const titled = new Map();
+    const described = new Map();
+    for (const [path, html] of pages) {
+      const t = (html.match(/<title>([^<]*)<\/title>/) ?? [])[1] ?? '';
+      const d = (html.match(/name="description"\s+content="([^"]*)"/) ?? [])[1] ?? '';
+      if (t) titled.set(t, [...(titled.get(t) ?? []), path]);
+      if (d) described.set(d, [...(described.get(d) ?? []), path]);
+    }
+    const dupT = [...titled.values()].filter((p) => p.length > 1);
+    const dupD = [...described.values()].filter((p) => p.length > 1);
+
+    dupT.length
+      ? fail(S11, 'no two pages carry the same title', `${dupT.length} titles are shared`,
+          dupT.slice(0, 4).map((p) => p.join(' == ')))
+      : pass(S11, 'no two pages carry the same title', `${titled.size} distinct across ${pages.size} pages`);
+
+    dupD.length
+      ? fail(S11, 'nor the same description', `${dupD.length} descriptions are shared`,
+          dupD.slice(0, 4).map((p) => p.join(' == ')))
+      : pass(S11, 'nor the same description', `${described.size} distinct`);
+  }
+}
+
 const S10 = 'Crawl rules';
 {
   /**

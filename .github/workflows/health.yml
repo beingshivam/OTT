@@ -1,0 +1,47 @@
+# Is the site working right now, for somebody who just clicked an ad?
+#
+# The live audit is the daily sweep — a hundred checks, canonicals, JSON-LD,
+# crawl rules. This is the smoke alarm: six things whose failure means a
+# visitor is having a bad time, on a fifteen-minute clock.
+#
+# The morning both edge secrets were unbound, the site was broken for eight
+# hours and nothing said so — the daily audit had already run, and the next
+# one was twenty hours away. With paid traffic arriving that gap is a bill.
+#
+# Free to run this often: the repository is public, so Actions minutes are
+# not metered.
+name: Health
+
+on:
+  schedule:
+    # Every fifteen minutes. GitHub's scheduler drifts under load and skips
+    # runs when it is busy, which is fine — this is a floor on how long a
+    # breakage can go unseen, not a heartbeat anything depends on.
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+    inputs:
+      site:
+        description: 'Site to check.'
+        required: false
+        default: 'https://newonott.in'
+
+permissions:
+  contents: read
+
+concurrency:
+  # A slow run must not stack up behind the next tick.
+  group: health
+  cancel-in-progress: false
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check
+        env:
+          SITE: ${{ inputs.site || 'https://newonott.in' }}
+        run: node scripts/health.mjs
