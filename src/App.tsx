@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Board } from './components/Board';
 import { BrowseLinks } from './components/BrowseLinks';
+import { GenreBrowse } from './components/GenreBrowse';
 import { PageIntro } from './components/PageIntro';
 import { ReleaseDatePage } from './components/ReleaseDatePage';
 import { ChangesPage, type Change } from './components/ChangesPage';
@@ -1283,6 +1284,24 @@ export default function App() {
               awaiting artwork and synopses.
             </span>
           </p>
+        )}
+
+        {/*
+          The rest of the genre, under the part of it we have dates for.
+
+          /action listed 268 titles beneath a header promising a million, and
+          the honest number is neither: 5,749 action titles are streaming in
+          India tonight. The dated rows above are what the page is published
+          for and what Google indexes; this is the browse a reader who typed
+          "action movies" actually came for. See components/GenreBrowse.tsx —
+          it renders nothing at all if TMDB cannot be reached.
+        */}
+        {route?.collection && route.genres?.length === 1 && !offBoard && (
+          <GenreBrowse
+            genre={route.collection}
+            label={route.genres[0].toLowerCase()}
+            onOpen={openSimilar}
+          />
         )}
 
         {/* Above the footer proper: the crawlable, clickable route to every

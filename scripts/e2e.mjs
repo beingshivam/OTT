@@ -127,6 +127,40 @@ function serve() {
       );
     }
 
+    /*
+     * The rest of a genre, paged.
+     *
+     * Two pages and then nothing, so "Show more" can be proved to both grow
+     * the grid and then stop — a button that keeps offering more after the
+     * last page is the failure worth catching, and a stub that answers every
+     * page identically cannot see it.
+     */
+    if (path === '/api/browse') {
+      const page = Number(url.searchParams.get('page') ?? 1) || 1;
+      const start = (page - 1) * 4;
+      res.writeHead(200, { 'content-type': 'application/json' });
+      return res.end(
+        JSON.stringify({
+          remote: true,
+          genre: url.searchParams.get('g'),
+          page,
+          total: 8,
+          filmsOnly: url.searchParams.get('g') === 'horror',
+          results:
+            page > 2
+              ? []
+              : Array.from({ length: 4 }, (_, i) => ({
+                  kind: i % 2 ? 'series' : 'film',
+                  id: `${i % 2 ? 't' : 'm'}-${start + i + 900}`,
+                  title: `Deep Cut ${start + i + 1}`,
+                  year: '2018',
+                  image: null,
+                  lang: 'hi',
+                })),
+        }),
+      );
+    }
+
     for (const candidate of [join(DIST, path), join(DIST, path, 'index.html'), join(DIST, 'index.html')]) {
       try {
         const body = await readFile(candidate);
@@ -2517,6 +2551,78 @@ console.log('\nA genre finds the page that lists it');
   }
 
   is(errors.length === 0, 'no console errors', errors.slice(0, 2).join(' | '));
+  await ctx.close();
+}
+
+/*
+ * A genre is bigger than the week
+ *
+ * /action listed 268 titles under a header promising a million. The honest
+ * number, measured against TMDB with watch_region=IN and our provider ids, is
+ * 5,749 — so the page was showing one in twenty of the action titles a reader
+ * could actually press play on. The dated rows stay the published part; the
+ * rest arrives underneath them.
+ *
+ * What is worth proving here rather than in the worker tests: that the grid
+ * appears below the board without disturbing it, that "Show more" both grows
+ * and then stops, and that a tile leads somewhere.
+ */
+console.log('\nA genre is bigger than the week');
+{
+  const { ctx, page, errors } = await newPage(browser, { width: 390, height: 844, touch: true });
+  await page.goto(`${BASE}/action`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('.genrebrowse__grid', { timeout: 15_000 }).catch(() => {});
+
+  const tiles = () => page.locator('.genrebrowse__grid > li').count();
+
+  is((await tiles()) === 4, 'the rest of the genre is on the page', `${await tiles()} tiles`);
+
+  /* The board above it is the page's reason to exist and must be untouched. */
+  is(
+    (await page.locator('.row__title').count()) > 0,
+    'and the dated rows above are still there',
+    'the browse grid replaced the board instead of following it',
+  );
+
+  const heading = (await page.locator('.genrebrowse__title').first().textContent()) ?? '';
+  is(/every action title/i.test(heading), 'named after the genre', heading.trim());
+  const note = (await page.locator('.genrebrowse__note').first().textContent()) ?? '';
+  is(/\b8\b/.test(note), 'and says how many there are', note.trim().slice(0, 80));
+
+  /* Grows, then stops offering. A button that keeps saying "show more" after
+     the last page is the failure this stub's two-page limit exists to catch. */
+  await page.click('.genrebrowse__more');
+  await page.waitForFunction(() => document.querySelectorAll('.genrebrowse__grid > li').length > 4, null, { timeout: 10_000 }).catch(() => {});
+  is((await tiles()) === 8, 'show more grows the grid', `${await tiles()} tiles after one tap`);
+  is(
+    (await page.locator('.genrebrowse__more').count()) === 0,
+    'and stops offering once the genre runs out',
+    'the button offered a page that does not exist',
+  );
+
+  /* A tile is a destination, the same one a recommendation is. */
+  await page.click('.genrebrowse__grid > li:first-child button');
+  await page.waitForSelector('.sheet', { timeout: 10_000 }).catch(() => {});
+  is(
+    (await page.locator('.sheet').count()) > 0,
+    'a tile opens the title',
+    'the grid is a wall of dead posters',
+  );
+
+  is(errors.length === 0, 'no console errors', errors.slice(0, 2).join(' | '));
+  await ctx.close();
+}
+
+/*
+ * A genre TMDB has no television side for says so rather than under-counting
+ * quietly — horror series are filed under Drama and Mystery.
+ */
+{
+  const { ctx, page } = await newPage(browser, { width: 390, height: 844, touch: true });
+  await page.goto(`${BASE}/horror`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('.genrebrowse__note', { timeout: 15_000 }).catch(() => {});
+  const note = (await page.locator('.genrebrowse__note').first().textContent()) ?? '';
+  is(/films only/i.test(note), 'a films-only genre admits it', note.trim().slice(0, 120));
   await ctx.close();
 }
 

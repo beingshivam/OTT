@@ -4754,3 +4754,91 @@ a.changes__title:hover {
   font-weight: 700;
   opacity: 0.75;
 }
+
+/*
+ * The rest of the genre.
+ *
+ * A grid rather than a scrolling rail, and deliberately unlike the board above
+ * it. The board's cards carry a date, a platform badge and a rating because
+ * every row on it is a dated release; these are catalogue titles with none of
+ * that, and dressing them in the same card would promise information that is
+ * not there. Poster, name, year — the shape a browse is, which is also the
+ * shape the person sheet's filmography already uses.
+ */
+.genrebrowse {
+  margin: 28px auto 8px;
+}
+
+.genrebrowse__title {
+  margin: 0 0 4px;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.genrebrowse__note {
+  margin: 0 0 14px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-2);
+  max-width: 62ch;
+}
+
+.genrebrowse__grid {
+  display: grid;
+  /* Wider than the sheet's 96px tiles: this is a page, not a drawer, and at
+     desktop width 96px columns give fourteen across and a wall of thumbnails. */
+  grid-template-columns: repeat(auto-fill, minmax(108px, 1fr));
+  gap: 18px 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.genrebrowse__grid button {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.genrebrowse__art {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: 10px;
+  object-fit: cover;
+  display: block;
+}
+
+.genrebrowse__name {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.25;
+  /* Two lines, then stop — same reason as the sheet's rows: one long title
+     otherwise drags every tile in its row taller. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.genrebrowse__year {
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.genrebrowse__more {
+  margin-top: 18px;
+}
+
+.genrebrowse__more[disabled] {
+  opacity: 0.6;
+  cursor: default;
+}

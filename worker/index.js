@@ -571,6 +571,177 @@ async function personFromTmdb(request, url, env, ctx) {
   return res;
 }
 
+/**
+ * A whole genre, not the slice of it this site happens to have dated.
+ *
+ * The /action page shipped 268 titles under a header promising a million, and
+ * the owner was right to call that a contradiction. Measuring it settled what
+ * the honest number is, and it is neither:
+ *
+ *   genre        ours    streaming in India
+ *   Action        268                  5749
+ *   Comedy        285                  9088
+ *   Thriller      251                  3921
+ *   Romance       157                  4015
+ *   Crime         222                  3507
+ *   Horror         67                  1420
+ *
+ * A million is TMDB's whole worldwide catalogue and will never be a genre in
+ * one country. But 268 of 5,749 is 5%, and a reader who came looking for
+ * action films is being shown one in twenty of the ones they could press play
+ * on tonight.
+ *
+ * Read live rather than collected. Pulling 29,000 titles into catalogue.json
+ * would be a fifteen-megabyte download for a page most readers scroll half
+ * of, and thirty thousand thin generated pages is the exact shape that got
+ * the publishing rule written in the first place. Nothing here is prerendered,
+ * crawled or linked: the page's own dated rows stay the indexed part, and this
+ * is a grid underneath them that a reader can browse.
+ *
+ * What it cannot do. TMDB has no television genre for Thriller, Romance or
+ * Horror — a horror series is filed under Drama or Mystery — so those three
+ * are films only, and the route says so rather than quietly returning fewer
+ * titles than it claims.
+ */
+const BROWSE_TTL = 21_600;
+
+/**
+ * TMDB's numeric genre ids, which differ between films and series.
+ *
+ * A second copy of a table that lives elsewhere is how things drift, so this
+ * is the one place where the risk is worth it: these are TMDB's own ids, they
+ * have not changed in a decade, and the alternative is a call to
+ * /genre/movie/list on the way to every single browse. The test asserts this
+ * covers exactly the genres collections.ts has a page for, so adding a
+ * collection without an id here fails the build rather than a reader's page.
+ */
+export const GENRE_IDS = {
+  action: { film: 28, series: 10759 /* Action & Adventure */ },
+  comedy: { film: 35, series: 35 },
+  crime: { film: 80, series: 80 },
+  horror: { film: 27, series: null },
+  romance: { film: 10749, series: null },
+  thriller: { film: 53, series: null },
+};
+
+/**
+ * The services a reader in India can actually open, as TMDB numbers them.
+ *
+ * Duplicated from src/data/platforms.ts, which the Worker cannot import — it
+ * is a TypeScript module in the app bundle and this file is plain JS handed
+ * straight to wrangler. So the copy is pinned instead: worker/index.test.mjs
+ * parses the registry and asserts these are the same set, which turns a
+ * rename into a failing test rather than a genre page that silently stops
+ * counting a platform. JioHotstar has already been renamed once.
+ */
+export const IN_PROVIDERS = [8, 1796, 9, 119, 2336, 122, 970, 350, 2, 237, 232, 309, 315, 532, 1898, 283];
+
+async function browseTmdb(request, url, env, ctx) {
+  if (request.method !== 'GET') return json(405, { error: 'method_not_allowed' });
+
+  const slug = (url.searchParams.get('g') ?? '').trim().toLowerCase();
+  const page = Math.min(Math.max(Number(url.searchParams.get('page') ?? 1) || 1, 1), 100);
+  const genre = GENRE_IDS[slug];
+  const token = env.TMDB_TOKEN || env.TMDB_API_KEY;
+
+  if (!genre) return json(400, { error: 'bad_genre' });
+  if (!token) return json(200, { remote: false, results: [], total: 0 }, BROWSE_TTL);
+
+  const key = new Request(`https://newonott.in/api/browse?g=${slug}&page=${page}`, { method: 'GET' });
+  const cache = caches.default;
+  const hit = await cache.match(key);
+  if (hit) return hit;
+
+  const isJwt = /^ey[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/.test(token);
+
+  /** One /discover page. Null means it could not be asked, which is not the
+   *  same as a genre with nothing in it. */
+  const discover = async (kind, genreId) => {
+    if (!genreId) return { results: [], total: 0 };
+    const api = new URL(
+      `https://api.themoviedb.org/3/discover/${kind === 'series' ? 'tv' : 'movie'}`,
+    );
+    api.searchParams.set('with_genres', String(genreId));
+    /* Region and providers together, which is what makes this a list of
+       things to watch rather than a list of things that exist. TMDB reads the
+       pipe as OR: on any of these services. */
+    api.searchParams.set('watch_region', 'IN');
+    api.searchParams.set('with_watch_providers', IN_PROVIDERS.join('|'));
+    api.searchParams.set('sort_by', 'popularity.desc');
+    api.searchParams.set('include_adult', 'false');
+    api.searchParams.set('language', 'en-IN');
+    api.searchParams.set('page', String(page));
+    if (!isJwt) api.searchParams.set('api_key', token);
+
+    let upstream;
+    try {
+      upstream = await fetch(api.toString(), {
+        headers: isJwt
+          ? { authorization: `Bearer ${token}`, accept: 'application/json' }
+          : { accept: 'application/json' },
+        cf: { cacheEverything: true, cacheTtl: BROWSE_TTL },
+      });
+    } catch {
+      return null;
+    }
+    if (!upstream.ok) return null;
+    const body = await upstream.json();
+
+    const results = (body.results ?? [])
+      /* A poster is most of what a grid row is. Without one the tile is a
+         title in a grey box, and twenty of those read as a broken page. */
+      .filter((r) => r.poster_path)
+      .map((r) => ({
+        kind,
+        id: `${kind === 'series' ? 't' : 'm'}-${r.id}`,
+        title: r.title || r.name,
+        year: (r.release_date || r.first_air_date || '').slice(0, 4) || null,
+        image: `/img/w185${r.poster_path}`,
+        lang: r.original_language || null,
+      }));
+
+    return { results, total: body.total_results ?? results.length };
+  };
+
+  const [films, series] = await Promise.all([
+    discover('film', genre.film),
+    discover('series', genre.series),
+  ]);
+  if (films === null || series === null) {
+    return json(200, { remote: true, results: [], total: 0, degraded: true });
+  }
+
+  /*
+   * Interleaved rather than concatenated. Two popularity-sorted lists laid end
+   * to end give a page of films followed by a page of series, which reads as
+   * two lists that failed to merge; alternating keeps both kinds on screen
+   * from the first row while preserving each side's own order.
+   */
+  const merged = [];
+  for (let i = 0; i < Math.max(films.results.length, series.results.length); i += 1) {
+    if (films.results[i]) merged.push(films.results[i]);
+    if (series.results[i]) merged.push(series.results[i]);
+  }
+
+  const res = json(
+    200,
+    {
+      remote: true,
+      genre: slug,
+      page,
+      results: merged,
+      total: films.total + series.total,
+      /* So the page can say "films only" where that is the truth, instead of
+         a reader wondering where the horror series went. */
+      filmsOnly: genre.series === null,
+      more: merged.length > 0,
+    },
+    BROWSE_TTL,
+  );
+  ctx.waitUntil(cache.put(key, res.clone()));
+  return res;
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -664,6 +835,7 @@ export default {
     if (url.pathname === '/api/search') return searchTmdb(request, url, env, ctx);
     if (url.pathname === '/api/title') return titleFromTmdb(request, url, env, ctx);
     if (url.pathname === '/api/person') return personFromTmdb(request, url, env, ctx);
+    if (url.pathname === '/api/browse') return browseTmdb(request, url, env, ctx);
 
     if (url.pathname !== '/api/subscribe') return env.ASSETS.fetch(request);
 

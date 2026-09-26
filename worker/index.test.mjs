@@ -11,7 +11,8 @@
  */
 
 import assert from 'node:assert/strict';
-import worker, { lastDueSlot } from './index.js';
+import { readFile } from 'node:fs/promises';
+import worker, { lastDueSlot, GENRE_IDS, IN_PROVIDERS } from './index.js';
 
 const ORIGIN = 'https://newonott.in';
 
@@ -1173,4 +1174,167 @@ await test('the person route degrades and caches like the others', async () => {
   await worker.fetch(new Request(`${ORIGIN}/api/person?id=p-35742`), { TMDB_TOKEN: 't' }, ctx);
   await worker.fetch(new Request(`${ORIGIN}/api/person?id=p-35742`), { TMDB_TOKEN: 't' }, ctx);
   assert.equal(calls, 1, 'the second open went back to TMDB');
+});
+
+/*
+ * ---------------------------------------------------------------------------
+ * A whole genre, not the slice of it we happen to have dated
+ *
+ * /action shipped 268 titles under a header promising a million. Measuring it
+ * settled the honest number: 5,749 action titles are streaming in India right
+ * now, so the page was showing one in twenty. These pin the route that closes
+ * that gap, and — more importantly — pin the two tables it depends on against
+ * the ones that live elsewhere in the repo.
+ */
+
+const discoverPage = (kind, n) => ({
+  page: 1,
+  total_results: n,
+  results: Array.from({ length: 3 }, (_, i) => ({
+    id: i + 1,
+    ...(kind === 'tv'
+      ? { name: `${kind} ${i}`, first_air_date: '2021-03-04' }
+      : { title: `${kind} ${i}`, release_date: '2019-05-06' }),
+    poster_path: `/p${i}.jpg`,
+    original_language: 'hi',
+  })),
+});
+
+/** Answers /discover/movie and /discover/tv differently, and records the URLs. */
+function fakeDiscover({ movies = 4435, tv = 1314 } = {}) {
+  const asked = [];
+  globalThis.fetch = async (u) => {
+    asked.push(String(u));
+    const isTv = String(u).includes('/discover/tv');
+    return {
+      ok: true,
+      status: 200,
+      json: async () => discoverPage(isTv ? 'tv' : 'movie', isTv ? tv : movies),
+    };
+  };
+  return asked;
+}
+
+await test('a genre reaches past our own rows', async () => {
+  fakeCache();
+  const asked = fakeDiscover();
+  const b = await (
+    await worker.fetch(new Request(`${ORIGIN}/api/browse?g=action`), { TMDB_TOKEN: 't' }, ctx)
+  ).json();
+
+  assert.equal(b.total, 5749, 'the count the page prints is both halves, not one');
+  assert.equal(b.results.length, 6, 'films and series both came through');
+  assert.equal(b.filmsOnly, false);
+
+  /* Interleaved, or the grid reads as two lists that failed to merge. */
+  const kinds = b.results.map((r) => r.kind);
+  assert.deepEqual(kinds, ['film', 'series', 'film', 'series', 'film', 'series'], kinds.join(','));
+  assert.equal(b.results[0].id, 'm-1', 'the id shape the sheet and the feed share');
+  assert.equal(b.results[1].id, 't-1');
+  assert.equal(b.results[0].image, '/img/w185/p0.jpg', 'posters go through the proxy');
+
+  /* The whole point of the route: things a reader in India can open. */
+  const movieUrl = asked.find((u) => u.includes('/discover/movie'));
+  assert.match(movieUrl, /watch_region=IN/, 'a genre without a region is a list of what exists');
+  assert.match(movieUrl, /with_watch_providers=/);
+  assert.match(movieUrl, /with_genres=28/);
+});
+
+await test('a genre TMDB has no television side for says so', async () => {
+  // Horror series are filed under Drama and Mystery. Returning films only is
+  // correct; returning them without saying so leaves a reader wondering where
+  // the series went.
+  fakeCache();
+  const asked = fakeDiscover();
+  const b = await (
+    await worker.fetch(new Request(`${ORIGIN}/api/browse?g=horror`), { TMDB_TOKEN: 't' }, ctx)
+  ).json();
+
+  assert.equal(b.filmsOnly, true);
+  assert.ok(b.results.every((r) => r.kind === 'film'));
+  assert.equal(asked.filter((u) => u.includes('/discover/tv')).length, 0, 'asked for a genre TV has not got');
+  assert.equal(b.total, 4435, 'the series half must not be counted as zero of something');
+});
+
+await test('every genre with a page has an id, and every id has a page', async () => {
+  /*
+   * The two tables that can drift. GENRE_IDS lives in the Worker because it
+   * cannot import a .ts module from the app bundle; this is what stops the
+   * copy going stale. Adding a genre collection without an id here fails a
+   * test rather than a reader's page.
+   */
+  const src = await readFile(new URL('../src/data/collections.ts', import.meta.url), 'utf8');
+  const paged = [...src.matchAll(/genres:\s*\['([^']+)'\]/g)].map((m) => m[1].toLowerCase());
+  assert.ok(paged.length >= 6, `only found ${paged.length} genre collections — did the regex rot?`);
+  for (const g of paged) {
+    assert.ok(GENRE_IDS[g], `/${g} has a page and no TMDB genre id`);
+  }
+  for (const g of Object.keys(GENRE_IDS)) {
+    assert.ok(paged.includes(g), `${g} has a TMDB genre id and no page to use it`);
+  }
+});
+
+await test('the edge knows the same Indian platforms the app does', async () => {
+  // Same reasoning, for the provider ids. A renamed service that only gets
+  // fixed in one of the two files makes a genre page quietly stop counting a
+  // platform, which is invisible until somebody audits it. JioHotstar has
+  // already been renamed once.
+  const src = await readFile(new URL('../src/data/platforms.ts', import.meta.url), 'utf8');
+  const registry = new Set();
+  for (const line of src.split('\n')) {
+    if (!/^\s*\{\s*id:/.test(line)) continue;
+    if (!/regions:\s*\[[^\]]*'IN'/.test(line)) continue;
+    const ids = line.match(/tmdb:\s*\[([^\]]*)\]/);
+    if (!ids) continue;
+    for (const n of ids[1].split(',')) {
+      const id = Number(n.trim());
+      if (Number.isFinite(id) && id > 0) registry.add(id);
+    }
+  }
+  assert.ok(registry.size >= 10, `parsed only ${registry.size} provider ids — did the regex rot?`);
+  assert.deepEqual(
+    [...IN_PROVIDERS].sort((a, b) => a - b),
+    [...registry].sort((a, b) => a - b),
+    'the Worker and platforms.ts disagree about what is streamable in India',
+  );
+});
+
+await test('a made-up genre is refused before it costs a TMDB call', async () => {
+  fakeCache();
+  let calls = 0;
+  globalThis.fetch = async () => { calls += 1; return { ok: true, status: 200, json: async () => ({}) }; };
+  for (const g of ['', 'drama', '../x', 'action; drop table']) {
+    const res = await worker.fetch(new Request(`${ORIGIN}/api/browse?g=${encodeURIComponent(g)}`), { TMDB_TOKEN: 't' }, ctx);
+    assert.equal(res.status, 400, `"${g}" was let through`);
+  }
+  assert.equal(calls, 0);
+});
+
+await test('browsing degrades and caches like the others', async () => {
+  fakeCache();
+  globalThis.fetch = async () => { throw new Error('network'); };
+  const down = await worker.fetch(new Request(`${ORIGIN}/api/browse?g=action`), { TMDB_TOKEN: 't' }, ctx);
+  assert.equal((await down.json()).degraded, true, 'an outage read as an empty genre');
+
+  fakeCache();
+  let calls = 0;
+  globalThis.fetch = async (u) => {
+    calls += 1;
+    return { ok: true, status: 200, json: async () => discoverPage(String(u).includes('/discover/tv') ? 'tv' : 'movie', 10) };
+  };
+  await worker.fetch(new Request(`${ORIGIN}/api/browse?g=action&page=2`), { TMDB_TOKEN: 't' }, ctx);
+  await worker.fetch(new Request(`${ORIGIN}/api/browse?g=action&page=2`), { TMDB_TOKEN: 't' }, ctx);
+  assert.equal(calls, 2, 'the second scroll went back to TMDB');
+});
+
+await test('page two is a different page, and page nonsense is page one', async () => {
+  fakeCache();
+  let asked = fakeDiscover();
+  await worker.fetch(new Request(`${ORIGIN}/api/browse?g=action&page=3`), { TMDB_TOKEN: 't' }, ctx);
+  assert.match(asked.find((u) => u.includes('/discover/movie')), /[?&]page=3/);
+
+  fakeCache();
+  asked = fakeDiscover();
+  await worker.fetch(new Request(`${ORIGIN}/api/browse?g=action&page=-4`), { TMDB_TOKEN: 't' }, ctx);
+  assert.match(asked.find((u) => u.includes('/discover/movie')), /[?&]page=1/, 'a negative page reached TMDB');
 });
