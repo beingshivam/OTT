@@ -556,6 +556,34 @@ is(
   robots.body.trim().slice(0, 80),
 );
 
+/*
+ * The crawl rules, read off the served file rather than the built one.
+ *
+ * eval checks these at build time against dist/. This checks the copy Google
+ * actually fetches, which is the one that counts — a stale deploy, an edge
+ * rule or a hand-edit in a dashboard can all put a different robots.txt in
+ * front of a crawler than the one in the repo, and none of them would show up
+ * in a build.
+ */
+const disallows = [...robots.body.matchAll(/^Disallow:\s*(\S+)\s*$/gm)].map((m) => m[1]);
+for (const rule of ['/api/', '/diag']) {
+  is(disallows.includes(rule), `and keeps ${rule} out of the index`, disallows.join(' ') || 'no rules');
+}
+
+/*
+ * The dangerous direction. A Disallow is longest-prefix-wins, so one that is
+ * a character too short silently outranks "Allow: /" and deletes real pages
+ * from the index — "/d" would take /documentaries with it. Checked against
+ * the live sitemap because both files have to be right *together*, and they
+ * are served independently.
+ */
+const blocked = paths.filter((p) => disallows.some((d) => p.startsWith(d)));
+is(
+  blocked.length === 0,
+  'and blocks nothing the sitemap publishes',
+  `${blocked.length} blocked, e.g. ${blocked.slice(0, 3).join(' ')}`,
+);
+
 /* --------------------------------------------------------------------------- */
 console.log(`\n${checks - failures} passed, ${failures} failed`);
 if (failures) {

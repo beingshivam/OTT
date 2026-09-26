@@ -520,6 +520,61 @@ const S6 = 'Refresh schedule';
   }
 }
 
+const S10 = 'Crawl rules';
+{
+  /**
+   * No page this site publishes may be blocked from being crawled.
+   *
+   * A Disallow line is the cheapest way to delete a site from Google. It
+   * fails silently — the page still serves, the sitemap still lists it, and
+   * the only symptom is traffic that stops arriving — and the matching rule
+   * is longest-prefix-wins, so a line meant for one path quietly outranks the
+   * `Allow: /` above it and takes every page underneath with it. "/d" instead
+   * of "/diag" would take /documentaries.
+   *
+   * This site has already been on the wrong end of the same class of mistake
+   * once, when a canonical pointed at a URL that redirected away from its own
+   * page and Search Console indexed nothing for weeks. That cost months and
+   * was one character of config.
+   *
+   * So the sitemap and robots.txt are checked against each other: everything
+   * the sitemap offers Google must be something robots.txt permits. The two
+   * files are written eighty lines apart in this same script and nothing
+   * otherwise makes them agree.
+   */
+  const robots = await readFile(resolve(DIST, 'robots.txt'), 'utf8').catch(() => '');
+  const sitemap = await readFile(resolve(DIST, 'sitemap.xml'), 'utf8').catch(() => '');
+
+  if (!robots || !sitemap) skip(S10, 'nothing in the sitemap is blocked by robots.txt', 'needs dist/');
+  else {
+    const disallows = [...robots.matchAll(/^Disallow:\s*(\S+)\s*$/gm)].map((m) => m[1]);
+    const paths = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => new URL(m[1]).pathname);
+    /* Longest prefix wins, which is the rule that makes this dangerous and is
+       therefore the rule this reproduces. */
+    const blocked = paths.filter((p) => disallows.some((d) => p.startsWith(d)));
+    blocked.length
+      ? fail(S10, 'nothing in the sitemap is blocked by robots.txt',
+          `${blocked.length} published pages are disallowed`, blocked.slice(0, 5))
+      : pass(S10, 'nothing in the sitemap is blocked by robots.txt',
+          `${paths.length} urls against ${disallows.length} rule(s): ${disallows.join(' ') || 'none'}`);
+
+    /* And the rules that are meant to be there, are. The api routes and the
+       diagnostics page are not publications; if a future edit drops these
+       lines the sitemap check above would happily keep passing. */
+    const wanted = ['/api/', '/diag'];
+    const missing = wanted.filter((w) => !disallows.includes(w));
+    missing.length
+      ? fail(S10, 'the routes that are not pages stay out of the index',
+          `missing ${missing.join(', ')}`)
+      : pass(S10, 'the routes that are not pages stay out of the index', disallows.join(' '));
+
+    /* The one line that makes the file worth serving at all. */
+    /\nSitemap:\s*https?:\/\/\S+\/sitemap\.xml/.test(robots)
+      ? pass(S10, 'robots.txt still points at the sitemap')
+      : fail(S10, 'robots.txt still points at the sitemap', 'the Sitemap line is gone');
+  }
+}
+
 const S9 = 'Guessed platforms';
 {
   /**

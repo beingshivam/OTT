@@ -2055,9 +2055,33 @@ await writeFile(
   `commit ${buildSha}\nbuilt  ${new Date().toISOString()}\n`,
 );
 
+/**
+ * Open to crawlers, except the two things that are not pages.
+ *
+ * `Allow: /` stays the rule, because everything this site publishes is meant
+ * to be found. Two paths under it are not publications and never were:
+ *
+ *   /api/   the six JSON routes the Worker answers — search, title, person,
+ *           browse, watchdog, subscribe. Nothing links to them, so nothing is
+ *           likely to crawl them, but a JSON body indexed against this domain
+ *           is a page in the index that is not a page on the site.
+ *   /diag   the diagnostics page and the probe script beside it, which exist
+ *           to tell one reader why their network ate the bundle. Deliberately
+ *           absent from the sitemap already; this says the same thing to a
+ *           crawler that guesses.
+ *
+ * A prefix, not a wildcard: "/diag" covers /diag and /diag-probe.js, which is
+ * both of them and nothing else.
+ *
+ * Nothing broader belongs here. A Disallow line is the cheapest way to delete
+ * a site from Google, it fails silently, and the most specific matching rule
+ * wins — so a careless prefix outranks the Allow above it and takes real pages
+ * with it. scripts/eval.mjs checks every sitemap URL against these rules for
+ * exactly that reason.
+ */
 await writeFile(
   resolve(ROOT, 'dist/robots.txt'),
-  `User-agent: *\nAllow: /\n\nSitemap: ${SITE_URL}/sitemap.xml\n`,
+  `User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /diag\n\nSitemap: ${SITE_URL}/sitemap.xml\n`,
 );
 
 /**
