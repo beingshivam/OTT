@@ -317,6 +317,66 @@ test('a cinema-only film never appears on the OTT side', () => {
   assert.equal(landedOnOtt(rows, 'IN', TODAY).releases.length, 0);
 });
 
+/*
+ * A guess is not a landing.
+ *
+ * Reported from the site: Toxic: A Fairy Tale for Grown-ups sitting in "On
+ * OTT", under a ZEE5 badge, dated today. TMDB has no India provider for that
+ * film at all — not subscription, not rent, not buy. Its platform came from
+ * free text a contributor typed onto a digital release date, and the row
+ * carried `namedBy: 'note'` to say so. Nothing read the field, so the guess
+ * rendered exactly like a fact.
+ *
+ * "On OTT", under a heading that reads "On right now", is this site telling
+ * somebody they can press play tonight. Only a watch provider can support
+ * that.
+ */
+test('a platform nobody confirmed is not something you can watch tonight', () => {
+  const guessed = [row({ platforms: ['zee5'], namedBy: 'note' })];
+  assert.equal(
+    landedOnOtt(guessed, 'IN', TODAY).releases.length,
+    0,
+    'a contributor note put a film in the rail that promises you can watch it',
+  );
+
+  /* Every weaker source, not just the one that was reported — a studio
+     inference and a broadcaster are guesses by the same argument. */
+  for (const namedBy of ['note', 'studio', 'network']) {
+    assert.equal(
+      landedOnOtt([row({ platforms: ['netflix'], namedBy })], 'IN', TODAY).releases.length,
+      0,
+      `${namedBy} was treated as confirmation`,
+    );
+  }
+
+  /* And the rail still works. This is the failure worth guarding against: a
+     rule that empties the row is not a fix, it is the same bug pointing the
+     other way. */
+  assert.equal(
+    landedOnOtt([row({ platforms: ['netflix'] })], 'IN', TODAY).releases.length,
+    1,
+    'a provider-confirmed title fell out of the rail too',
+  );
+});
+
+/*
+ * The count has to agree with the row.
+ *
+ * "On OTT — 41 titles" over a row that excludes unconfirmed ones would be the
+ * same overclaim moved into the subtitle, which is where a number nobody
+ * recomputes usually survives a fix.
+ */
+test('the subtitle counts what the row is allowed to show', () => {
+  const mixed = [
+    row({ platforms: ['netflix'] }),
+    row({ platforms: ['zee5'], namedBy: 'note' }),
+    row({ platforms: ['prime'] }),
+  ];
+  const rail = landedOnOtt(mixed, 'IN', TODAY);
+  assert.equal(rail.releases.length, 2);
+  assert.equal(rail.total, 2, `the heading still counted the guess (said ${rail.total})`);
+});
+
 test('both sides are newest first', () => {
   const older = iso(9);
   const newer = iso(2);

@@ -520,6 +520,62 @@ const S6 = 'Refresh schedule';
   }
 }
 
+const S9 = 'Guessed platforms';
+{
+  /**
+   * A guess must never be indistinguishable from a fact.
+   *
+   * `namedBy` marks a platform that came from something weaker than a watch
+   * provider — free text on a release date, a production company, a series'
+   * broadcaster. The field shipped with a comment saying each can be wrong in
+   * a way a provider cannot, and that being wrong sends a reader to a
+   * subscription they do not need. Then nothing read it for months.
+   *
+   * Reported from the site: Toxic: A Fairy Tale for Grown-ups in "On OTT"
+   * under a ZEE5 badge, dated today, when TMDB has no India provider for it
+   * at all. UNABOMBER, two cards along, was the same. Seven rows were making
+   * that claim on the day it was reported.
+   *
+   * This does not forbid a guess — an announced date is most of why anybody
+   * visits a release calendar. It checks the two things that make one safe:
+   * the row has to say where its platform came from, and the guess has to be
+   * a guess about a real service rather than an empty badge.
+   */
+  if (!feed) skip(S9, 'a guessed platform is still marked as one', 'needs the feed');
+  else {
+    const all = feed.weeks.flatMap((w) => w.releases);
+    const guessed = all.filter((r) => r.namedBy);
+    const bad = guessed.filter(
+      (r) => !['note', 'studio', 'network'].includes(r.namedBy) || !r.platforms?.length,
+    );
+    bad.length
+      ? fail(S9, 'a guessed platform is still marked as one', `${bad.length} malformed`,
+          bad.slice(0, 4).map((r) => `${r.title}: namedBy=${r.namedBy} platforms=${(r.platforms ?? []).join(',') || 'none'}`))
+      : pass(S9, 'a guessed platform is still marked as one',
+          `${guessed.length} of ${all.length} rows name a source`);
+
+    /*
+     * The one that would have caught the report. A row claiming a service on
+     * a date that has already passed is claiming availability, and the only
+     * thing entitled to do that is a provider. The refresh now re-asks TMDB
+     * on the day and clears namedBy when it is confirmed — so a row still
+     * carrying namedBy past its date is correctly marked, and the rails and
+     * the sheet treat it as expected rather than available. What this watches
+     * for is the count getting away from us: a handful is TMDB lagging, a
+     * flood means a pass is inventing platforms.
+     */
+    const today = new Date().toISOString().slice(0, 10);
+    const due = guessed.filter((r) => r.releaseDate <= today);
+    const share = all.length ? due.length / all.length : 0;
+    share > 0.1
+      ? warn(S9, 'few rows claim a service their date has outrun',
+          `${due.length} of ${all.length} rows are past their date on a guess`,
+          due.slice(0, 6).map((r) => `${r.releaseDate} ${r.title} → ${r.platforms.join(',')} [${r.namedBy}]`))
+      : pass(S9, 'few rows claim a service their date has outrun',
+          `${due.length} past their date, shown as expected rather than available`);
+  }
+}
+
 const S8 = 'Connection hints';
 {
   /**
@@ -610,6 +666,32 @@ else {
       continue;
     }
     bySlug.set(key, r);
+  }
+
+  /*
+   * The live row wins its own slug, whatever order this loop ran in.
+   *
+   * The pool is feed, then catalogue, then archive, and the line above
+   * overwrites unconditionally — so the archive, iterated last, beat the two
+   * sources that are actually current. The archive is a record of what was
+   * true when a row aged off the board, and it is frozen at that moment.
+   *
+   * Two pages failed this gate on it in one refresh, and both were correct
+   * pages judged against a stale copy of themselves. Ramba Oorvasi Menaka had
+   * reached Prime Video: the feed said so, the page said so, and the archive
+   * still remembered it as a cinema listing — "no streaming platform but says
+   * Streaming now". Anbil Avan had picked up a 28-word synopsis that the
+   * archive copy predates, so a page with a synopsis on it was reported as
+   * published thin.
+   *
+   * Both are the same failure this gate exists to prevent, pointed the wrong
+   * way: a check that is confidently wrong about a page that is right teaches
+   * people to ignore it, and then it is worth nothing on the day it is right.
+   */
+  for (const r of [...feedRows, ...catRows]) {
+    if (String(r.id ?? '').endsWith('~ott')) continue;
+    const key = r.slug ?? slugify(r.title ?? '');
+    if (key) bySlug.set(key, r);
   }
 
   const titlePages = [...pages].filter(([p]) => p.startsWith('/ott-release-date/'));

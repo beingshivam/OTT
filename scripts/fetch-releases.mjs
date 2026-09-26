@@ -327,6 +327,18 @@ const unplaced = [];
 /** Cinema listings that turned out to be streaming too, for the run report. */
 const landed = [];
 
+/** Guessed platforms a provider has since confirmed — see the pass that asks. */
+const confirmedGuesses = [];
+
+/**
+ * Guessed platforms whose claimed date has arrived with no provider behind
+ * them. These are the rows that used to say "streaming now" on the strength of
+ * a contributor's note, so the run prints them: a guess that keeps failing its
+ * own date week after week is a source worth distrusting, and nobody could see
+ * that before.
+ */
+const unconfirmed = [];
+
 /**
  * Which source actually named each row, counted rather than assumed.
  *
@@ -1015,6 +1027,64 @@ async function buildWeek(weekId, platforms, index, cinemaOnly = false) {
     }
   }
 
+  /*
+   * A guess whose day has come, asked about rather than left standing.
+   *
+   * The passes above name a platform from a watch provider when they can and
+   * from something weaker when they cannot: free text on a release date, a
+   * production company, a broadcaster. Those rows carry `namedBy` to say so,
+   * and the comment on that field has always been right — each can be wrong
+   * in a way a provider cannot, and being wrong sends a reader to a
+   * subscription they do not need.
+   *
+   * A guess about the future is a fair thing to print. "Coming to ZEE5 on the
+   * 26th" is what an announcement says and what a reader wants. The day it
+   * claims is the day it stops being a forecast and becomes a statement about
+   * now, and nothing was re-asking then — so the note stood unchallenged and
+   * the board said a film was streaming on the strength of it.
+   *
+   * Reported from the site: Toxic: A Fairy Tale for Grown-ups, in "On OTT"
+   * under a ZEE5 badge, dated today. TMDB has no India provider for it at all
+   * — not subscription, not rent, not buy. The note was the only evidence and
+   * it was wrong, or at least early. UNABOMBER, two cards along, was the same.
+   *
+   * So on or after its date, a guessed row gets one provider call:
+   *
+   *   found     — the platform is a fact now. Take TMDB's answer over the
+   *               guess (it also corrects a guess that named the wrong
+   *               service) and clear namedBy, so the row reads as confirmed
+   *               everywhere.
+   *   not found — leave the row and leave namedBy set. The title did release;
+   *               this calendar's job is still to say so. What it must not do
+   *               is claim you can watch it, and with namedBy intact the
+   *               landed rail skips it and the sheet says "Expected on".
+   *
+   * Deliberately not a drop. The date is real and usually the thing somebody
+   * came for; it is only the service that is unproven, and the display now
+   * carries that distinction rather than the data having to hide the row.
+   */
+  const claimed = [...byId.values()].filter((r) => r.namedBy && r.releaseDate <= TODAY);
+  for (const row of claimed) {
+    const m = /^([mt])-(\d+)(?:~|$)/.exec(row.id);
+    if (!m) continue;
+    for (const region of row.regions ?? []) {
+      const found = [
+        ...new Set(
+          (await providersFor(m[1] === 'm', Number(m[2]), region)).map((p) => index.get(p)).filter(Boolean),
+        ),
+      ];
+      if (found.length) {
+        row.platforms = found;
+        delete row.namedBy;
+        confirmedGuesses.push(`${row.title} → ${found.join(', ')}`);
+        break;
+      }
+    }
+    if (row.namedBy) {
+      unconfirmed.push(`${row.title} (${row.releaseDate}) → ${row.platforms.join(', ')} [${row.namedBy}]`);
+    }
+  }
+
   const releases = [...byId.values()]
     .map(unreleasedCannotBeStreaming)
     .sort((a, b) => (b.heat ?? 0) - (a.heat ?? 0));
@@ -1295,6 +1365,29 @@ if (landed.length) {
     `\n${landed.length} cinema listing(s) turned out to be streaming as well, and now say so:`,
   );
   for (const line of landed.slice(0, 12)) console.log(`  ${line}`);
+}
+
+if (confirmedGuesses.length) {
+  console.log(
+    `\n${confirmedGuesses.length} guessed platform(s) confirmed by a provider now their date has come:`,
+  );
+  for (const line of confirmedGuesses.slice(0, 12)) console.log(`  ${line}`);
+}
+
+/*
+ * The ones whose date arrived and whose service never showed up.
+ *
+ * These are the rows that used to say "streaming now" on a contributor's
+ * note. They still carry the date, which is usually the thing somebody came
+ * for, but they no longer claim availability: the landed rail skips them and
+ * the sheet says "Expected on". Printed because a source that keeps missing
+ * its own date is worth distrusting, and until now nothing could see it.
+ */
+if (unconfirmed.length) {
+  console.log(
+    `\n${unconfirmed.length} guessed platform(s) past their date with no provider — shown as expected, not available:`,
+  );
+  for (const line of unconfirmed.slice(0, 12)) console.log(`  ${line}`);
 }
 
 console.log(

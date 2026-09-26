@@ -252,10 +252,39 @@ export function DetailSheet({ release, onClose, onPickSimilar }: Props) {
                       destination and pointing away from the page is the whole
                       clarification. */}
                   <IconExternal />
-                  {target.theatrical ? 'Book tickets' : `Watch on ${target.short}`}
+                  {/*
+                    "Expected on", when the service is a guess.
+
+                    `namedBy` marks a platform that came from something weaker
+                    than a watch provider: free text on a release date, a
+                    production company, a broadcaster. The field was added with
+                    a comment saying each can be wrong in a way a provider
+                    cannot, and that being wrong here sends a reader to a
+                    subscription they do not need — and then nothing read it,
+                    so the guess offered the same confident "Watch on ZEE5" as
+                    a film actually sitting on ZEE5.
+
+                    Reported: Toxic: A Fairy Tale for Grown-ups, badged ZEE5 on
+                    the day a contributor's note said it would land. TMDB has
+                    no India provider for it at all. One word is the difference
+                    between telling somebody where to watch a film and telling
+                    them where it is expected to turn up.
+                  */}
+                  {target.theatrical
+                    ? 'Book tickets'
+                    : `${release.namedBy ? 'Expected on' : 'Watch on'} ${target.short}`}
                 </a>
               );
             })}
+            {/* Said once, under the buttons, rather than repeated on each: the
+                qualifier is about where the row's information came from, not
+                about any one service. */}
+            {release.namedBy && !release.platforms.includes('theatres') && (
+              <p className="sheet__pending">
+                Announced, not yet confirmed — the film database has no listing for it on this
+                service.
+              </p>
+            )}
             {release.trailerUrl && (
               <a className="btn btn--lg" href={release.trailerUrl} target="_blank" rel="noreferrer">
                 <IconExternal />

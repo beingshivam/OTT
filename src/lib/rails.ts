@@ -123,6 +123,25 @@ const showing = (r: Release) =>
 const streaming = (r: Release) => r.platforms.some((p) => p !== 'theatres');
 
 /**
+ * Whether the service on this row is a fact or a guess.
+ *
+ * `namedBy` marks a platform that came from something weaker than a watch
+ * provider — free text on a release date, a production company, a broadcaster.
+ * The field has existed since those passes were written, with a comment
+ * explaining that each can be wrong in a way a provider cannot and that being
+ * wrong here sends a reader to a subscription they do not need. Nothing ever
+ * read it. The guess rendered identically to the fact.
+ *
+ * Reported from the site: Toxic: A Fairy Tale for Grown-ups sitting in "On
+ * OTT" under a ZEE5 badge, dated today. TMDB has no India provider for that
+ * film at all — not subscription, not even rent or buy. The only evidence was
+ * a contributor's note on a digital release date, and the row said ZEE5 as
+ * flatly as if the film were playing. UNABOMBER, two cards along, was the
+ * same.
+ */
+const confirmed = (r: Release) => !r.namedBy;
+
+/**
  * Whose audience the attention number describes.
  *
  * TMDB popularity means a different thing on either side of this line. For an
@@ -375,6 +394,13 @@ export const NARROWED_DAYS = 365;
  * morning and buries the week's biggest arrival behind it. So the same few
  * lead on attention and wear the same badge, and everything behind them is the
  * chronology it always was.
+ *
+ * Confirmed only, which is the narrowest claim on the page and has to be.
+ * "On OTT" under a heading that says "On right now" is this site promising a
+ * reader they can press play tonight; a platform inferred from a note on a
+ * release date cannot support that. Those rows are announcements, and an
+ * announcement belongs in Coming soon where it reads as one — see confirmed()
+ * for the report that prompted this.
  */
 export function landedOnOtt(
   all: Release[],
@@ -386,7 +412,7 @@ export function landedOnOtt(
     from: toISODate(new Date(today.getTime() - (days - 1) * 86_400_000)),
     to: toISODate(today),
     newestFirst: true,
-    where: streaming,
+    where: (r) => streaming(r) && confirmed(r),
   });
 
   /* The badge says "Trending", which is a claim about now. Across a widened
