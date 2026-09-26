@@ -1,0 +1,48 @@
+# What the live site actually does.
+#
+# The other suites test what was built: unit tests against source, e2e against
+# ./dist on a loopback port, the eval gate against the files the build wrote.
+# All of them can pass while the site is wrong, because between dist and a
+# reader sit a Worker, an edge cache, a deploy that may not have landed and a
+# set of secrets that may not be bound. Those are the failures that have
+# actually happened here.
+#
+# Reports, never gates. It is deliberately not part of the deploy.
+name: Live audit
+
+on:
+  workflow_dispatch:
+    inputs:
+      site:
+        description: 'Site to audit.'
+        required: false
+        default: 'https://newonott.in'
+      sample:
+        description: 'Title pages to check — a number, or "all".'
+        required: false
+        default: '60'
+  schedule:
+    # 06:40 UTC — 12:10 IST. After the morning refresh has had its grace
+    # period, and long before the evening the site is busiest.
+    - cron: '40 6 * * *'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Ask the site
+        env:
+          SITE: ${{ inputs.site || 'https://newonott.in' }}
+          SAMPLE: ${{ inputs.sample || '60' }}
+        # Fenced, or the summary renders the report as one paragraph.
+        run: |
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          node scripts/live-audit.mjs | tee -a "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
