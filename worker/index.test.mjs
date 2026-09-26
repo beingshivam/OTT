@@ -1338,3 +1338,54 @@ await test('page two is a different page, and page nonsense is page one', async 
   await worker.fetch(new Request(`${ORIGIN}/api/browse?g=action&page=-4`), { TMDB_TOKEN: 't' }, ctx);
   assert.match(asked.find((u) => u.includes('/discover/movie')), /[?&]page=1/, 'a negative page reached TMDB');
 });
+
+/*
+ * ---------------------------------------------------------------------------
+ * A missing credential is not an answer worth remembering
+ *
+ * Both edge secrets were unbound one morning. Search answered `remote: false`
+ * with cache-control: public, max-age=3600 — so every reader who typed a film
+ * name was told, by their own browser, that this site cannot search, and kept
+ * being told it for an hour after the token was rebound. The edge recovered
+ * instantly; the people who had actually tried it were the last to see it.
+ */
+await test('no credential is never cached, so the fix reaches everyone at once', async () => {
+  fakeCache();
+  globalThis.fetch = async () => { throw new Error('should not be called'); };
+
+  const res = await worker.fetch(new Request(`${ORIGIN}/api/search?q=vivah`), {}, ctx);
+  const body = await res.json();
+  assert.equal(body.remote, false, 'the honest degrade is unchanged');
+  assert.equal(
+    res.headers.get('cache-control'),
+    'no-store',
+    'a browser was told to remember that this site cannot search',
+  );
+
+  /* The capability probe the front end sends on mount, same reasoning. */
+  const probe = await worker.fetch(new Request(`${ORIGIN}/api/search?q=`), {}, ctx);
+  assert.equal((await probe.json()).remote, false);
+  assert.equal(probe.headers.get('cache-control'), 'no-store', 'the probe pinned the wrong answer');
+});
+
+await test('but a real miss keeps its hour', async () => {
+  // "TMDB has nothing called this" is a fact about the query, not about our
+  // configuration, and stays true. Dropping its cache would spend an upstream
+  // call on every keystroke that finds nothing.
+  fakeCache();
+  globalThis.fetch = async () => ({ ok: true, status: 200, json: async () => ({ results: [], total_results: 0 }) });
+  const res = await worker.fetch(new Request(`${ORIGIN}/api/search?q=zzqqxx`), { TMDB_TOKEN: 't' }, ctx);
+  assert.equal((await res.json()).remote, true);
+  assert.match(res.headers.get('cache-control'), /max-age=3600/);
+});
+
+await test('and with a token the probe still answers yes, cached', async () => {
+  fakeCache();
+  let calls = 0;
+  globalThis.fetch = async () => { calls += 1; return { ok: true, status: 200, json: async () => ({}) }; };
+  const probe = await worker.fetch(new Request(`${ORIGIN}/api/search?q=`), { TMDB_TOKEN: 't' }, ctx);
+  const body = await probe.json();
+  assert.equal(body.remote, true, 'the box would have printed the smaller promise');
+  assert.match(probe.headers.get('cache-control'), /max-age=3600/);
+  assert.equal(calls, 0, 'the mount probe spent a TMDB call');
+});

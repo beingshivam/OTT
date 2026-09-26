@@ -191,11 +191,32 @@ async function searchTmdb(request, url, env, ctx) {
   const q = (url.searchParams.get('q') ?? '').trim().slice(0, 80);
   const token = env.TMDB_TOKEN || env.TMDB_API_KEY;
 
+  /*
+   * No credential is a fact about this Worker, not about the query — so it
+   * must not be cached, for the same reason an outage is not cached below.
+   *
+   * It was, for an hour. Both secrets were unbound one morning and every
+   * search answered `remote: false` with `cache-control: public,
+   * max-age=3600`, which is a browser being told to remember "this site
+   * cannot search" long after the site could. Rebinding the token fixed the
+   * edge instantly and did nothing for anyone who had already typed a name:
+   * their own browser kept replaying the empty answer until the hour ran out,
+   * and the site looked broken to exactly the people who had tried it.
+   *
+   * The cost of getting this wrong is asymmetric and that is the whole
+   * argument. Caching the miss saves a handful of upstream calls in a state
+   * that should never last more than minutes; not caching it means the fix
+   * reaches every reader the moment it lands.
+   *
+   * A real miss further down keeps its hour. "TMDB has nothing called this"
+   * is a fact about the query and stays true.
+   */
+  if (!token) return json(200, { remote: false, results: [], total: 0 });
+
   /* The capability probe. The front end asks with no query on mount to learn
      which placeholder it is allowed to print, and that must not cost a TMDB
-     call. */
-  if (!q) return json(200, { remote: Boolean(token), results: [], total: 0 }, SEARCH_TTL);
-  if (!token) return json(200, { remote: false, results: [], total: 0 }, SEARCH_TTL);
+     call. Cached, because past this line the token exists. */
+  if (!q) return json(200, { remote: true, results: [], total: 0 }, SEARCH_TTL);
 
   /*
    * Cached at the edge by the query itself.
