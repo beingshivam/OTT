@@ -1,0 +1,33 @@
+# How big is a genre, really?
+#
+# The header promises a million titles and a genre page shows a few hundred.
+# Deciding what to do about that needs a number nobody has: how many Action
+# titles are actually streaming in India. TMDB will answer it, but only from
+# somewhere that can reach api.themoviedb.org with a credential — which is a
+# runner, not a laptop behind a filter and not an agent sandbox.
+#
+# Measurement only. It writes nothing and gates nothing; read the summary.
+name: Genre probe
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Count
+        env:
+          TMDB_TOKEN: ${{ secrets.TMDB_TOKEN }}
+        # Fenced, or the summary renders a fixed-width table as one paragraph.
+        run: |
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          node scripts/genre-probe.mjs | tee -a "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
