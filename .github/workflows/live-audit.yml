@@ -7,7 +7,12 @@
 # set of secrets that may not be bound. Those are the failures that have
 # actually happened here.
 #
-# Reports, never gates. It is deliberately not part of the deploy.
+# Not part of the deploy, and gates no publish — but it does fail when the
+# site is wrong, because a scheduled check that cannot fail cannot notify.
+# Both edge secrets were unbound for hours one morning (search dead, every
+# sheet dead, the staleness alarm mute) and nothing said so; it was found by
+# the owner typing a film name into his own site. A red run is the one alert
+# left that does not depend on a binding that can itself be wiped.
 name: Live audit
 
 on:
@@ -46,7 +51,16 @@ jobs:
           # time here. Only meaningful against the real site.
           EXPECT_SHA: ${{ (inputs.site == '' || inputs.site == 'https://newonott.in') && github.sha || '' }}
         # Fenced, or the summary renders the report as one paragraph.
+        #
+        # pipefail because the audit's exit code is the whole point of it
+        # failing, and a pipeline reports its *last* command — without this
+        # the status is tee's, which is always 0, and a red run would never
+        # go red. The closing fence runs either way so the summary is still
+        # readable on the runs that matter most.
+        shell: bash
         run: |
+          set -o pipefail
           echo '```' >> "$GITHUB_STEP_SUMMARY"
-          node scripts/live-audit.mjs | tee -a "$GITHUB_STEP_SUMMARY"
+          node scripts/live-audit.mjs | tee -a "$GITHUB_STEP_SUMMARY"; status=$?
           echo '```' >> "$GITHUB_STEP_SUMMARY"
+          exit $status

@@ -590,5 +590,25 @@ if (failures) {
   console.log('\nWhat to look at:');
   for (const f of failed) console.log(`  - ${f.label}${f.detail ? `: ${f.detail}` : ''}`);
 }
-/* Reports, never gates — see the header. Exit 0 either way so this can be
-   wired anywhere without becoming something that blocks a publish. */
+
+/*
+ * Loud when it is wrong, because quiet was the actual failure today.
+ *
+ * This exited 0 whatever it found, on the reasoning that an audit should
+ * never block a publish. That reasoning is still right and is unaffected:
+ * this runs in its own workflow, gates nothing, and the deploy never calls
+ * it.
+ *
+ * What it got wrong is that a scheduled check which cannot fail cannot
+ * notify. Both edge secrets were unbound at some point this morning — search
+ * dead, every sheet dead, the genre browse returning zero, the staleness
+ * alarm mute — and the site carried on serving pages, so nothing anywhere
+ * said a word. It was found because the owner typed a film name into his own
+ * site and got nothing back. The 06:40 run would have sailed past it green.
+ *
+ * A non-zero exit is how a cron job says something is wrong, and it is the
+ * one notification path left that does not itself depend on a binding that
+ * can be wiped — the watchdog alerts through Brevo, and Brevo's key was one
+ * of the two that went.
+ */
+process.exit(failures ? 1 : 0);
