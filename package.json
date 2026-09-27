@@ -45,6 +45,7 @@
     "windows": "node scripts/track-windows.mjs",
     "test:windows": "node --test scripts/track-windows.test.mjs",
     "test:tmdb": "node --test scripts/tmdb.test.mjs",
+    "angles": "node scripts/build-angles.mjs",
     "plan:ig": "node scripts/plan-instagram.mjs"
   },
   "dependencies": {

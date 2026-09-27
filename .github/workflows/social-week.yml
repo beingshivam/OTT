@@ -1,0 +1,93 @@
+# The week's posts, built and planned but never sent.
+#
+# Three a week was the ask, and the thing standing in the way was never the
+# creative — it was that nothing ran. The builders had to be invoked by hand,
+# which is the same chore the digest was written to avoid and the same one that
+# kills a posting schedule after a fortnight.
+#
+# Friday morning, so the poster and the angles are built from the week that has
+# just landed and the first slot goes out that evening while it is still news.
+#
+# It deliberately stops short of posting. Scheduling needs a connected Instagram
+# account and an irreversible API call; this produces everything that call would
+# need, commits it so the media URLs resolve on the live site, and leaves the
+# send as a separate deliberate step. The plan is a file somebody can read
+# before anything reaches an audience.
+name: Build the week's social posts
+
+on:
+  schedule:
+    # 04:30 UTC is 10:00 in India — after the Friday refresh has rebuilt the
+    # feed, and well before the 19:30 IST slot the plan's first post lands in.
+    - cron: '30 4 * * 5'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: social-week
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+
+      # The builders screenshot an HTML template, so they need a real browser.
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      # Both read public/data/releases.json, which the refresh workflow commits.
+      # Built fresh every week on purpose: the whole point of these two is that
+      # their figures are computed from the current feed rather than typed once
+      # and left to go stale.
+      - name: Build the creative
+        run: |
+          npm run social
+          npm run angles
+
+      - name: Choose the week's three
+        run: npm run plan:ig
+
+      # public/social/ is what makes the media reachable: Metricool fetches by
+      # URL, so the images have to be served by the site before anything can be
+      # scheduled against them. Same filenames each week, so this adds about a
+      # megabyte of history a week rather than growing without bound.
+      - name: Commit the plan and its media
+        run: |
+          git config user.name  'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add social public/social data/instagram-plan.json
+          if git diff --cached --quiet; then
+            echo "Nothing changed — a week with no new releases builds no new posts."
+            exit 0
+          fi
+          git commit -m "chore(social): build the week's posts and plan"
+          git push
+
+      - name: Say what is waiting
+        run: |
+          {
+            echo '## This week'\''s posts'
+            echo
+            echo 'Built and committed. Nothing has been scheduled.'
+            echo
+            echo '```'
+            node -e '
+              const p = require("./data/instagram-plan.json");
+              for (const x of p.posts) {
+                console.log(`${x.date}  ${x.format.padEnd(10)} ${x.asset}`);
+                console.log(`${" ".repeat(25)}  ${x.media[0]}`);
+              }
+            '
+            echo '```'
+            echo
+            echo 'To send them: connect the Instagram account in Metricool, schedule each'
+            echo 'entry above, then run `npm run plan:ig -- --mark` so they are not offered again.'
+          } >> "$GITHUB_STEP_SUMMARY"

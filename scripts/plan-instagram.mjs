@@ -57,6 +57,23 @@ const arg = (name, fallback) => {
   return i === -1 ? fallback : process.argv[i + 1];
 };
 const WEEKS = Number(arg('weeks', 1));
+if (WEEKS > 1) {
+  /*
+   * Planning ahead does less than it looks like it does, and saying so beats
+   * quietly producing a worse plan.
+   *
+   * The posts that carry this account — the weekly poster and the three angles
+   * — are built from the current feed. Next week's do not exist yet, so a
+   * multi-week plan can only use each of them once and then falls back to the
+   * fixed creative, burning in three weeks a stock that is meant to be
+   * occasional variety. One week at a time, rebuilt each time, is the mode
+   * this is designed for.
+   */
+  console.error(
+    `Planning ${WEEKS} weeks, but only this week's data-driven creative exists — later weeks\n` +
+      'will fall back to fixed stock and use it up. Prefer rebuilding and planning weekly.\n',
+  );
+}
 
 /**
  * The formats, and what each one is for.
@@ -79,6 +96,19 @@ const FORMATS = [
     caption: () => 'caption.txt',
     perishable: true,
   },
+  /*
+   * The weekly angles, and the reason three a week is now sustainable rather
+   * than a two-week runway. Each is built from the current feed with its
+   * figures computed rather than typed, so it is new every week and cannot go
+   * stale the way the product screenshots did — see build-angles.
+   *
+   * One format each rather than a shared "angle" id, because the rotation rule
+   * is per format: under one id only a single angle could run in any week and
+   * the other two would never be reached.
+   */
+  { id: 'south', match: (f) => f === 'angle-south.png', perishable: true },
+  { id: 'cinemas', match: (f) => f === 'angle-cinemas.png', perishable: true },
+  { id: 'landed', match: (f) => f === 'angle-landed.png', perishable: true },
   { id: 'meme', match: (f) => /^meme-\d/.test(f) && f.endsWith('.png') },
   {
     id: 'feature',
