@@ -1174,6 +1174,55 @@ pages.push({
   body: sectionMarkup(sectionsBy(rows, (r) => r.platforms), pname),
 });
 
+/**
+ * The rest of the shelf, for the pages that were only ever showing a fortnight.
+ *
+ * Platform, language and collection pages are built from `everything`, which
+ * is the eight-week feed. That was right when the feed was all the site had.
+ * It stopped being right when the back catalogue arrived, and nothing noticed:
+ * /netflix linked 58 titles while the catalogue alone holds 202 on Netflix,
+ * /hindi linked 39 against 196 Hindi titles, /korean linked 6.
+ *
+ * Two separate costs, and they compound.
+ *
+ * The hubs are weaker than the data supports. "New on Netflix India" showing a
+ * quarter of what this site knows is on Netflix is a worse answer than it has
+ * to give, on exactly the query a platform page exists to win.
+ *
+ * And the leaves have no parent worth the name. 754 of 997 title pages had
+ * exactly one inbound link, 651 of them from /streaming — a single page with
+ * 651 links out, which passes almost nothing to each and is the shape a
+ * crawler goes shallow on. That is the entire long tail, the "where to watch
+ * X" pages this site is built to win, hanging off the weakest possible hook.
+ *
+ * So each hub gains a second section: the dated weeks it always had, then
+ * everything else it covers. Same shape as the genre browse and as /streaming
+ * — what is new first, because that is what the page promises, then the rest.
+ *
+ * Only titles that actually have a page, since the job is to link them.
+ */
+const inWindow = new Set(everything.map((r) => String(r.id)));
+const backCatalogue = allTitlePages.filter((r) => r.slug && !inWindow.has(String(r.id)));
+
+/** Best first: a hub's overflow section is a recommendation, not a calendar,
+ *  so date order would bury the reason to click. */
+const byRating = (a, b) => (b.rating ?? 0) - (a.rating ?? 0);
+
+/**
+ * The overflow section for one hub.
+ *
+ * Capped, because a page is a set of links and a hub that lists everything
+ * dilutes every one of them — the /streaming problem repeated. A hundred is
+ * generous next to the fifty-odd these pages carried and still leaves each
+ * link meaningful, and nothing is stranded by the cap: /streaming continues
+ * to link the whole catalogue.
+ */
+const restMarkup = (rows, heading) => {
+  const rest = rows.filter((r) => !inWindow.has(String(r.id))).sort(byRating).slice(0, 100);
+  if (rest.length < MIN_PAGE_ROWS) return '';
+  return sectionMarkup(new Map([[heading, rest]]), (h) => h);
+};
+
 for (const p of platformsPresent) {
   const list = everything.filter((r) => r.platforms.includes(p.id));
   const theatres = p.id === 'theatres';
@@ -1201,7 +1250,12 @@ for (const p of platformsPresent) {
           .map(([c, n]) => ({ text: lname(c), n })),
       },
     }),
-    body: sectionMarkup(sectionsBy(list, (r) => [r.weekId]), weekRangeOf),
+    body:
+      sectionMarkup(sectionsBy(list, (r) => [r.weekId]), weekRangeOf) +
+      restMarkup(
+        backCatalogue.filter((r) => (r.platforms ?? []).includes(p.id)),
+        theatres ? 'Also played in cinemas' : `Everything else on ${p.name}`,
+      ),
   });
 }
 
@@ -1243,7 +1297,9 @@ for (const c of COLLECTIONS) {
       cross: c.languages ? languageCut : platformCut,
       cross2: c.languages ? platformCut : languageCut,
     }),
-    body: sectionMarkup(sectionsBy(list, (r) => [r.weekId]), weekRangeOf),
+    body:
+      sectionMarkup(sectionsBy(list, (r) => [r.weekId]), weekRangeOf) +
+      restMarkup(backCatalogue.filter((r) => inCollection(c, r)), `More ${c.chip.toLowerCase()}`),
   });
 }
 
@@ -1269,7 +1325,12 @@ for (const [code, name] of languagesPresent) {
           .map(([id, n]) => ({ text: pname(id), n })),
       },
     }),
-    body: sectionMarkup(sectionsBy(list, (r) => [r.weekId]), weekRangeOf),
+    body:
+      sectionMarkup(sectionsBy(list, (r) => [r.weekId]), weekRangeOf) +
+      restMarkup(
+        backCatalogue.filter((r) => (r.languages ?? []).includes(code)),
+        `More ${name} titles streaming now`,
+      ),
   });
 }
 

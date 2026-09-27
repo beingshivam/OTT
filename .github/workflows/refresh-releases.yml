@@ -306,9 +306,24 @@ jobs:
           steps.fetch.outcome == 'success' &&
           (github.event_name != 'schedule' || steps.today.outputs.dow == '1')
         continue-on-error: true
-        timeout-minutes: 15
+        timeout-minutes: 30
         env:
           TMDB_TOKEN: ${{ secrets.TMDB_TOKEN || secrets.TMDB_API_KEY }}
+          # The script's own wall-clock stop, raised with the language list.
+          #
+          # It was eight languages against a ten-minute default. It is now
+          # fourteen — Punjabi, Korean, Japanese, Spanish, French and German
+          # joined, because the build writes a page for each of them and was
+          # writing it over nine to thirty titles. Seventy-five per cent more
+          # work against an unchanged budget would simply have cut the tail
+          # off, and the tail is where the new languages are.
+          #
+          # The stop stays: a slow upstream should cost a partial catalogue
+          # rather than a runner held open for an hour. It is safe to be
+          # partial now in a way it was not last week — the archive keeps
+          # every title it has already seen, so a short run costs freshness
+          # rather than deleting the pages it failed to re-fetch.
+          CATALOGUE_BUDGET_MS: '1500000'
         run: node scripts/fetch-catalogue.mjs --verbose
 
       # The week's email, assembled from the feed that was just rebuilt. A

@@ -520,6 +520,59 @@ const S6 = 'Refresh schedule';
   }
 }
 
+const S13 = 'How the long tail is reached';
+{
+  /**
+   * A page a crawler cannot walk to is a page that does not rank, whatever
+   * the sitemap says.
+   *
+   * The title pages are the point of this site — "where to watch X" is very
+   * nearly the only way anybody arrives — and they were reached like this:
+   * 754 of 997 had exactly one inbound link, and 651 of those came from
+   * /streaming alone. A single page with 651 links out passes almost nothing
+   * to each and is precisely the shape a crawler goes shallow on. The whole
+   * long tail was hanging off the weakest hook on the site.
+   *
+   * It was invisible because nothing counted. The sitemap listed every page,
+   * every page returned 200, and the orphan check passed — all true, and none
+   * of it about whether the pages could be *reached*.
+   *
+   * Orphans fail. A rising share of single-linked pages warns rather than
+   * fails, because it drifts with the data rather than with a mistake: a
+   * quiet week genuinely has fewer hubs covering it.
+   */
+  if (!pages) skip(S13, 'every title page is reachable from another page', 'needs dist/');
+  else {
+    const titles = new Set();
+    for (const [path] of pages) if (path.startsWith('/ott-release-date/')) titles.add(path);
+
+    const inbound = new Map();
+    for (const [from, html] of pages) {
+      for (const [, href] of html.matchAll(/href="(\/ott-release-date\/[a-z0-9-]+)"/g)) {
+        if (!inbound.has(href)) inbound.set(href, new Set());
+        inbound.get(href).add(from);
+      }
+    }
+
+    const orphans = [...titles].filter((t) => !(inbound.get(t)?.size > 0));
+    orphans.length
+      ? fail(S13, 'every title page is reachable from another page',
+          `${orphans.length} are linked from nowhere`, orphans.slice(0, 5))
+      : pass(S13, 'every title page is reachable from another page', `${titles.size} pages`);
+
+    const lonely = [...titles].filter((t) => (inbound.get(t)?.size ?? 0) === 1);
+    const share = titles.size ? lonely.length / titles.size : 0;
+    const avg = titles.size
+      ? [...titles].reduce((s, t) => s + (inbound.get(t)?.size ?? 0), 0) / titles.size
+      : 0;
+    share > 0.25
+      ? warn(S13, 'and from more than one place',
+          `${lonely.length} of ${titles.size} hang off a single link`, lonely.slice(0, 5))
+      : pass(S13, 'and from more than one place',
+          `${lonely.length} single-linked, ${avg.toFixed(1)} inbound on average`);
+  }
+}
+
 const S12 = 'Dates the site can vouch for';
 {
   /**
