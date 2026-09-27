@@ -1348,9 +1348,27 @@ for (const [code, name] of languagesPresent) {
  * result as a judgement about the films. Within a language the comparison is
  * fair, so that is the only comparison offered.
  */
-if (catalogue.length >= MIN_PAGE_ROWS) {
+/*
+ * Built from the titles that actually have pages, not from catalogue.json.
+ *
+ * This page is the guaranteed parent for the whole back catalogue — the one
+ * link every one of those titles is certain to get. It was reading the fetch
+ * file, which stopped being the same set the moment the archive started
+ * keeping titles the fetch had dropped: those keep their page, lose their
+ * place here, and if they also miss a hub's top hundred they are orphaned.
+ *
+ * Two were, on the first run after the languages widened. The reachability
+ * gate caught it before anything was committed, which is the whole reason
+ * that gate counts links between built pages rather than trusting the
+ * sitemap.
+ *
+ * Same discriminator as the month pages: a back-catalogue title has no
+ * weekId, because it never came through the weekly calendar.
+ */
+const shelf = allTitlePages.filter((r) => r.slug && !r.weekId);
+if (shelf.length >= MIN_PAGE_ROWS) {
   const byLang = new Map();
-  for (const r of catalogue) {
+  for (const r of shelf) {
     const code = r.languages?.[0];
     if (!code) continue;
     if (!byLang.has(code)) byLang.set(code, []);
@@ -1361,7 +1379,7 @@ if (catalogue.length >= MIN_PAGE_ROWS) {
     .filter(([, rows]) => rows.length >= MIN_PAGE_ROWS)
     .sort((a, b) => b[1].length - a[1].length);
 
-  const platformCount = new Set(catalogue.flatMap((r) => r.platforms ?? [])).size;
+  const platformCount = new Set(shelf.flatMap((r) => r.platforms ?? [])).size;
   /*
    * Every title, and every one of them a link.
    *
@@ -1403,14 +1421,14 @@ if (catalogue.length >= MIN_PAGE_ROWS) {
     group: 'lens',
     crumb: 'Now streaming',
     linkText: 'Now streaming',
-    rows: catalogue,
+    rows: shelf,
     title: 'Best movies and shows streaming in India right now — every platform',
     description:
-      `${catalogue.length} well-rated films and series streaming in India right now, ` +
+      `${shelf.length} well-rated films and series streaming in India right now, ` +
       `across ${platformCount} services — grouped by language, all included with a subscription.`,
     h1: 'Good things streaming right now',
     lede:
-      `${catalogue.length} titles across ${platformCount} platforms, ranked within each language ` +
+      `${shelf.length} titles across ${platformCount} platforms, ranked within each language ` +
       `because a Tamil film and an English one do not get compared on vote counts here.`,
     facts: '',
     body,
