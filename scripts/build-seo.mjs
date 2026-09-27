@@ -1150,13 +1150,30 @@ for (const r of titleCandidates) {
 }
 
 const weekRangeOf = (id) => formatRange(id);
+/*
+ * Which hubs exist, decided over everything published rather than over the
+ * eight-week window.
+ *
+ * The same mistake as the hub *contents*, one level up: these read
+ * `everything`, which is the feed, so a language or platform only got a page
+ * if this fortnight happened to carry five of it.
+ *
+ * It showed the moment the catalogue widened. 172 Japanese titles arrived,
+ * every one of them with a page, and there was still no /japanese — because
+ * the feed had four. Anime is among the largest streaming categories in
+ * India and the site had 172 pages of it and nowhere to say so.
+ *
+ * MIN_PAGE_ROWS is unchanged and still doing its job; it is only counting
+ * the right set now — every title with a page, which is what a hub links to.
+ */
+const publishable = [...everything, ...allTitlePages];
 const platformsPresent = PLATFORM_ROWS.filter(
   (p) =>
     p.regions.includes(REGION) &&
-    everything.filter((r) => r.platforms.includes(p.id)).length >= MIN_PAGE_ROWS,
+    publishable.filter((r) => (r.platforms ?? []).includes(p.id)).length >= MIN_PAGE_ROWS,
 );
 const languagesPresent = [...languageName].filter(
-  ([code]) => everything.filter((r) => (r.languages ?? []).includes(code)).length >= MIN_PAGE_ROWS,
+  ([code]) => publishable.filter((r) => (r.languages ?? []).includes(code)).length >= MIN_PAGE_ROWS,
 );
 
 const pages = [];
