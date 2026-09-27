@@ -44,7 +44,8 @@
     "test:backfill": "node --test scripts/backfill-archive.test.mjs",
     "windows": "node scripts/track-windows.mjs",
     "test:windows": "node --test scripts/track-windows.test.mjs",
-    "test:tmdb": "node --test scripts/tmdb.test.mjs"
+    "test:tmdb": "node --test scripts/tmdb.test.mjs",
+    "plan:ig": "node scripts/plan-instagram.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
