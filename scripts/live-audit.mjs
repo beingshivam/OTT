@@ -45,6 +45,24 @@ function is(ok, label, detail = '') {
   return ok;
 }
 
+/**
+ * Something true and deliberate, so not a failure.
+ *
+ * The audit exits non-zero and that is the point — it is the thing that says
+ * the live site is wrong. But a couple of its checks are really questions about
+ * whether an optional integration has been set up, and the owner is entitled to
+ * answer no. Left as failures they make the audit permanently red, which costs
+ * the audit its only real power: that a red run means something is broken.
+ *
+ * Reported, never counted. A choice that stops being a choice still shows up in
+ * the log.
+ */
+function note(ok, label, detail = '') {
+  checks += 1;
+  console.log(`  ${ok ? 'ok  ' : 'note'} ${label}${!ok && detail ? `  — ${detail}` : ''}`);
+  return ok;
+}
+
 const section = (name) => console.log(`\n${name}`);
 
 /** One request, never throwing: a network error is a result, not a crash. */
@@ -311,7 +329,9 @@ try {
   /* Below. */
 }
 is(wd.searchable === true, 'search has its TMDB credential bound', JSON.stringify(wd));
-is(wd.armed === true, 'the freshness watchdog can send its alert', JSON.stringify(wd));
+/* A note rather than a failure: email alerting is switched off by choice, so a
+   mute watchdog is the configuration working as asked, not a fault. */
+note(wd.armed === true, 'the freshness watchdog can send its alert (email alerting is off)', JSON.stringify(wd));
 
 /* Search, in the words a reader types. A miss on a famous film is the header
    writing a cheque the route cannot cash. */

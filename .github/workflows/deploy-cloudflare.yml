@@ -330,10 +330,18 @@ jobs:
           fi
           echo "::notice title=Deploy confirmed::$SITE is serving ${GITHUB_SHA:0:8} and its bundle loads as $ctype."
 
-          # Last, so it cannot mask anything above it. Everything the site does
-          # has now been checked and reported; this is the monitoring that would
-          # tell us if it stopped doing it.
+          # Last, so it cannot mask anything above it — and a warning rather
+          # than an error, because email alerting is off by choice.
+          #
+          # It was a hard failure, on the reasoning that a smoke alarm with no
+          # battery is worse than none because it is counted on. Sound where the
+          # alarm is meant to exist; wrong where it is not. The owner does not
+          # want Brevo, so an unbound key is the configuration doing as it was
+          # told, and failing every deploy over it makes the deploy permanently
+          # red — which costs far more than the alarm was worth. A red that is
+          # always red stops being read, and then the real one goes past too.
+          #
+          # Still reported, so the day it is wanted nothing has to be rediscovered.
           if [ -n "$mute" ]; then
-            echo "::error title=The staleness alarm is mute::The Worker reports no BREVO_API_KEY binding, so the daily watchdog can detect that the refresh has stopped and has no way to tell anyone. It is the only monitor that still works when GitHub's scheduler is the thing that failed. Bind it: Cloudflare dashboard › Workers & Pages › the Worker › Settings › Variables and Secrets › add BREVO_API_KEY (secret) and ALERT_EMAIL (plain text, the inbox that should hear about it). The site itself is live and verified — everything above this line passed."
-            exit 1
+            echo "::warning title=No staleness alarm::The Worker reports no BREVO_API_KEY binding, so the daily watchdog can detect that the refresh has stopped and cannot tell anyone. Email alerting is off by choice, so this is a note rather than a fault. To turn it on: Cloudflare dashboard › Workers & Pages › the Worker › Settings › Variables and Secrets › add BREVO_API_KEY (secret) and ALERT_EMAIL (plain text)."
           fi
