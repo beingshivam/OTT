@@ -84,6 +84,10 @@ jobs:
           npm run test:changes
           npm run test:backfill
           npm run test:windows
+          # The shared TMDB client's pacing and pooling. Worth a gate because a
+          # limiter that does not limit looks fine until TMDB answers 429, and
+          # a pool that drops an item looks fine until a title loses its page.
+          npm run test:tmdb
           npm run eval
           # The library comes from package.json; this fetches the browser
           # binary it drives, which is not an npm package. Pinned by the

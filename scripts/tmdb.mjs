@@ -40,6 +40,74 @@ export const callCount = () => calls;
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+/**
+ * One rate limit for the whole process, so calls can overlap.
+ *
+ * This was `if (calls++ > 0) await sleep(60)` — a pause before every call,
+ * which is a rate limit only because nothing ever called twice at once. It
+ * made the client strictly serial at about sixteen requests a second against
+ * an allowance of fifty, and that turned out to be the binding constraint on
+ * how much of India's catalogue the site could carry: the fetch spends one
+ * call per title to learn which platform has it, and at a quarter of the
+ * permitted rate a ten-minute budget buys about thirteen hundred titles.
+ * Tamil has nearly two thousand titles on Indian streaming on its own.
+ *
+ * A shared slot allocator instead. Each call reserves the next free instant
+ * and waits until it, so ten callers at once are spaced rather than
+ * simultaneous and the rate holds no matter how many are in flight. The
+ * reservation is written before any await, which is what makes it safe here:
+ * nothing can interleave between reading nextSlot and moving it.
+ *
+ * 25ms is forty a second, under the allowance with room for the retries that
+ * also take a slot.
+ */
+const RATE_MS = Number(process.env.TMDB_RATE_MS ?? 25);
+let nextSlot = 0;
+
+async function slot() {
+  const now = Date.now();
+  const at = Math.max(now, nextSlot);
+  nextSlot = at + RATE_MS;
+  if (at > now) await sleep(at - now);
+}
+
+/**
+ * Map over items with a bounded number in flight, in order.
+ *
+ * The rate limiter above sets the pace; this sets how many round trips are
+ * open at once, which is the other half of the problem. TMDB's latency from a
+ * CI runner is around 250ms, so a serial loop idles for almost all of its
+ * budget waiting on a socket.
+ *
+ * `stop` is checked before each item rather than each batch, so a run that
+ * exhausts its time budget stops promptly and keeps everything already
+ * fetched — a partial catalogue is the documented outcome of running out of
+ * time, and it must stay a clean one.
+ */
+export async function mapPool(items, limit, fn, stop = () => false) {
+  const list = [...items];
+  const out = new Array(list.length);
+  let next = 0;
+  let stopped = false;
+
+  const worker = async () => {
+    for (;;) {
+      if (stop()) {
+        stopped = true;
+        return;
+      }
+      const i = next++;
+      if (i >= list.length) return;
+      out[i] = await fn(list[i], i);
+    }
+  };
+
+  await Promise.all(Array.from({ length: Math.min(limit, list.length) }, worker));
+  /* Holes are items never started, not items that produced nothing — the
+     caller has to be able to tell those apart. */
+  return { results: out, stopped, done: Math.min(next, list.length) };
+}
+
 export async function tmdb(path, params = {}) {
   const url = new URL(API + path);
   for (const [k, v] of Object.entries(params)) {
@@ -51,12 +119,13 @@ export async function tmdb(path, params = {}) {
     ? { Authorization: `Bearer ${TOKEN}`, accept: 'application/json' }
     : { accept: 'application/json' };
 
-  // TMDB allows ~50 req/s. A scheduled job has no reason to rush.
-  if (calls++ > 0) await sleep(60);
-
   let lastError;
   for (let attempt = 0; attempt < ATTEMPTS; attempt++) {
     try {
+      /* Inside the loop, so a retry queues behind everything else in flight
+         rather than jumping the rate limit. */
+      calls++;
+      await slot();
       const res = await fetch(url, { headers });
 
       if (res.ok) return res.json();

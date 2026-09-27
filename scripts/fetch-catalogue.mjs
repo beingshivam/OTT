@@ -48,7 +48,7 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { callCount, requireToken, tmdb } from './tmdb.mjs';
+import { callCount, mapPool, requireToken, tmdb } from './tmdb.mjs';
 import { baselineFor, weekStart } from './rank-movement.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -477,17 +477,44 @@ if (!stopped) {
  * empty are dropped rather than shipped: a catalogue entry that cannot say
  * where to watch it fails at the one job this site has.
  */
+/**
+ * Several at a time. This loop is the whole cost of the fetch — one call per
+ * title, and every other phase is a handful of calls by comparison — so it was
+ * also the whole reason the ten-minute budget bought so few titles. It ran
+ * serially at roughly 250ms of round-trip latency each, which is to say it
+ * spent nearly all of its budget waiting on sockets while the rate limiter had
+ * capacity to spare.
+ *
+ * Twelve in flight sits comfortably under the shared limiter's forty calls a
+ * second at TMDB's observed latency, and the limiter is what enforces the rate
+ * regardless, so this number only decides how much of the allowance gets used.
+ */
+const DETAIL_CONCURRENCY = Number(process.env.TMDB_CONCURRENCY ?? 12);
+
 const rows = [];
 let noProvider = 0;
-for (const row of byId.values()) {
-  if (Date.now() - startedAt > BUDGET_MS) {
-    stopped = stopped ?? `ran out of its ${Math.round(BUDGET_MS / 60_000)}-minute budget`;
-    break;
-  }
-  const { platforms, tiers, runtimeMinutes, cast } = await detailFor(
-    row.kind === 'film',
-    Number(row.id.slice(2)),
-  );
+const overBudget = () => Date.now() - startedAt > BUDGET_MS;
+
+const enriched = await mapPool(
+  [...byId.values()],
+  DETAIL_CONCURRENCY,
+  async (row) => ({
+    row,
+    detail: await detailFor(row.kind === 'film', Number(row.id.slice(2))),
+  }),
+  overBudget,
+);
+if (enriched.stopped) {
+  stopped = stopped ?? `ran out of its ${Math.round(BUDGET_MS / 60_000)}-minute budget`;
+}
+
+for (const entry of enriched.results) {
+  /* A hole is a title the pool never reached because the budget ran out, not
+     one that came back empty — counting it as "no provider" would report a
+     short run as a wall of drops. */
+  if (!entry) continue;
+  const { row, detail } = entry;
+  const { platforms, tiers, runtimeMinutes, cast } = detail;
   if (!platforms.length) {
     noProvider++;
     continue;
