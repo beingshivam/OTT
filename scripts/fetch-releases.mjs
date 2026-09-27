@@ -435,6 +435,28 @@ const SERVICE_NAMES = [
   [/disney\+|disney\s*plus/i, 'disney'],
   [/hulu/i, 'hulu'],
   [/\baha\b/i, 'aha'],
+  /*
+   * The regional and free services, added with the registry they belong to.
+   *
+   * TMDB calls MX Player "Amazon MX Player", which looks like it should
+   * collide with the Prime pattern above. Checked rather than assumed: it
+   * does not, because that pattern's amazon branch is anchored (^amazon$)
+   * and its others want "prime video", "amazon studios" or "amazon
+   * original". So order is not load-bearing here — but the near miss is
+   * worth recording, since mistaking one Amazon-prefixed service for
+   * another is exactly how provider 1898 came to be labelled Lionsgate.
+   */
+  [/\bmx\s*player\b/i, 'mxplayer'],
+  [/manorama\s*max/i, 'manoramamax'],
+  [/shemaroo/i, 'shemaroome'],
+  [/hungama/i, 'hungama'],
+  [/epic\s*on\b/i, 'epicon'],
+  [/chaupal/i, 'chaupal'],
+  [/ap\s*international/i, 'apinternational'],
+  [/namma\s*flix/i, 'nammaflix'],
+  [/discovery\s*\+|discovery\s*plus/i, 'discoveryplus'],
+  [/\bmubi\b/i, 'mubi'],
+  [/tata\s*play|tata\s*sky/i, 'tataplay'],
 ];
 
 /**
