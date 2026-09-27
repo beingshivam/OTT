@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-27T10:08:24.349Z",
+  "generatedAt": "2026-09-27T11:46:31.625Z",
   "source": "tmdb",
   "weeks": [
     {
@@ -1365,8 +1365,8 @@
           "regions": [
             "US"
           ],
-          "rating": 4.8,
-          "votes": 28,
+          "rating": 5,
+          "votes": 30,
           "heat": 50,
           "synopsis": "Set in a near future society ruled by sentient A.I., a private eye investigates a murder case only to discover a rebel group capable of undermining the digital overlord. As the detective's identity slowly unravels, his world enters a state of hypnotic meltdown.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/42egzT6e4CIEdrEo4Xc31DKyGjA.jpg",
@@ -2206,9 +2206,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=-xSxaE1ClEE",
           "origin": [
             "US"
-          ],
-          "imdbRating": 6.5,
-          "imdbVotes": 13521
+          ]
         },
         {
           "id": "m-1514026",
@@ -2249,9 +2247,7 @@
           "origin": [
             "US",
             "IL"
-          ],
-          "imdbRating": 7.1,
-          "imdbVotes": 5019
+          ]
         },
         {
           "id": "m-1339588",
@@ -2291,9 +2287,7 @@
           "origin": [
             "GB",
             "US"
-          ],
-          "imdbRating": 6.9,
-          "imdbVotes": 5364
+          ]
         },
         {
           "id": "m-1480574",
@@ -2332,9 +2326,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=LfpPh2pW0Oo",
           "origin": [
             "GB"
-          ],
-          "imdbRating": 7.5,
-          "imdbVotes": 16
+          ]
         },
         {
           "id": "m-1127625",
@@ -2372,9 +2364,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=TK5j6lQk7CE",
           "origin": [
             "GB"
-          ],
-          "imdbRating": 6.6,
-          "imdbVotes": 7077
+          ]
         },
         {
           "id": "m-445466",
@@ -2413,9 +2403,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=UoAf0LNAn30",
           "origin": [
             "US"
-          ],
-          "imdbRating": 6.2,
-          "imdbVotes": 957
+          ]
         },
         {
           "id": "m-843352",
@@ -2454,9 +2442,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=eqcTr34Y1Zw",
           "origin": [
             "US"
-          ],
-          "imdbRating": 5.6,
-          "imdbVotes": 387
+          ]
         },
         {
           "id": "m-1764193",
@@ -2491,9 +2477,7 @@
             "Cayden Steele"
           ],
           "director": "Evan Marcewicz",
-          "trailerUrl": "https://www.youtube.com/watch?v=3pHhoZtKhyQ",
-          "imdbRating": 2.4,
-          "imdbVotes": 22
+          "trailerUrl": "https://www.youtube.com/watch?v=3pHhoZtKhyQ"
         },
         {
           "id": "m-1314279",
@@ -2534,9 +2518,7 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 9.2,
-          "imdbVotes": 3189
+          ]
         },
         {
           "id": "m-1250502",
@@ -2688,9 +2670,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=nTIfzXx8nJY",
           "origin": [
             "US"
-          ],
-          "imdbRating": 7.2,
-          "imdbVotes": 21
+          ]
         },
         {
           "id": "m-1517111",
@@ -2903,9 +2883,7 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 6.7,
-          "imdbVotes": 18
+          ]
         },
         {
           "id": "m-1755667",
@@ -3036,9 +3014,7 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 9.6,
-          "imdbVotes": 430
+          ]
         }
       ]
     },
@@ -3439,9 +3415,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=WlGzP8FvsfY",
           "origin": [
             "ES"
-          ],
-          "imdbRating": 5.6,
-          "imdbVotes": 325
+          ]
         },
         {
           "id": "hb-fuze",
@@ -3685,9 +3659,7 @@
           "theatrical": "wide",
           "origin": [
             "KR"
-          ],
-          "imdbRating": 6.9,
-          "imdbVotes": 4367
+          ]
         },
         {
           "id": "sn-dc-bloody-valentine",
@@ -4015,9 +3987,7 @@
             "US",
             "AU",
             "GB"
-          ],
-          "imdbRating": 6.6,
-          "imdbVotes": 493
+          ]
         },
         {
           "id": "m-1671548",
@@ -4057,9 +4027,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=abeSQSbNXSk",
           "origin": [
             "CN"
-          ],
-          "imdbRating": 8.6,
-          "imdbVotes": 351
+          ]
         },
         {
           "id": "t-258230",
@@ -4141,9 +4109,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=4280xkO7x0w",
           "origin": [
             "CN"
-          ],
-          "imdbRating": 3.3,
-          "imdbVotes": 1008
+          ]
         },
         {
           "id": "m-977942",
@@ -4305,9 +4271,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=AMLCbpM1fRQ",
           "origin": [
             "US"
-          ],
-          "imdbRating": 6.2,
-          "imdbVotes": 1404
+          ]
         },
         {
           "id": "t-331033",
@@ -4458,9 +4422,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=WKPSSLbnh-E",
           "origin": [
             "US"
-          ],
-          "imdbRating": 4,
-          "imdbVotes": 193
+          ]
         },
         {
           "id": "m-1522689",
@@ -4579,9 +4541,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=IjLg0X59fMA",
           "origin": [
             "US"
-          ],
-          "imdbRating": 8.5,
-          "imdbVotes": 265
+          ]
         },
         {
           "id": "t-329471",
@@ -4836,7 +4796,6 @@
           "posterUrl": "https://image.tmdb.org/t/p/w500/aq9m0ZiiNVquFFrTMeL9dCDstkJ.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/kFp5nRy5b6xghGKObHsqvcyGlR8.jpg",
           "imdbId": "tt9280400",
-          "runtimeMinutes": 118,
           "cast": [
             "Joseph Sexton",
             "Eileen Umbehr",
@@ -5513,9 +5472,7 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 9.3,
-          "imdbVotes": 13
+          ]
         },
         {
           "id": "t-333413",
@@ -5743,9 +5700,7 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 8,
-          "imdbVotes": 44
+          ]
         },
         {
           "id": "t-334552",
@@ -5874,9 +5829,7 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 9.4,
-          "imdbVotes": 466
+          ]
         },
         {
           "id": "m-1609031",
@@ -6589,9 +6542,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=aej2y_BBBFs",
           "origin": [
             "US"
-          ],
-          "imdbRating": 7.8,
-          "imdbVotes": 53
+          ]
         },
         {
           "id": "m-1558568",
@@ -6745,9 +6696,7 @@
           "origin": [
             "CA",
             "US"
-          ],
-          "imdbRating": 6.7,
-          "imdbVotes": 34
+          ]
         },
         {
           "id": "t-299255",
@@ -7029,9 +6978,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=mvSxjFkBdK4",
           "origin": [
             "US"
-          ],
-          "imdbRating": 8.4,
-          "imdbVotes": 138
+          ]
         },
         {
           "id": "m-1157265",
@@ -7367,9 +7314,7 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 9.5,
-          "imdbVotes": 699
+          ]
         },
         {
           "id": "m-1741690",
@@ -7406,9 +7351,7 @@
           "director": "Karlijn Milder",
           "origin": [
             "NL"
-          ],
-          "imdbRating": 9.6,
-          "imdbVotes": 14
+          ]
         },
         {
           "id": "t-334465",
@@ -7510,9 +7453,7 @@
           "director": "Shannon Hartman",
           "origin": [
             "US"
-          ],
-          "imdbRating": 6.5,
-          "imdbVotes": 93
+          ]
         },
         {
           "id": "m-1770842",
@@ -7861,9 +7802,7 @@
             "JP",
             "BE",
             "LU"
-          ],
-          "imdbRating": 5.8,
-          "imdbVotes": 322
+          ]
         },
         {
           "id": "m-1766084",
@@ -8507,9 +8446,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=4ms2zEv1xH4",
           "origin": [
             "RU"
-          ],
-          "imdbRating": 7.2,
-          "imdbVotes": 5163
+          ]
         },
         {
           "id": "t-250203",
@@ -9263,9 +9200,7 @@
           "origin": [
             "GB",
             "US"
-          ],
-          "imdbRating": 7.2,
-          "imdbVotes": 1165
+          ]
         },
         {
           "id": "m-1314122",
@@ -9303,9 +9238,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=lM0zVd8CSR4",
           "origin": [
             "DE"
-          ],
-          "imdbRating": 5.7,
-          "imdbVotes": 27
+          ]
         },
         {
           "id": "t-332118",
@@ -9596,9 +9529,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=O05arcJjOd0",
           "origin": [
             "US"
-          ],
-          "imdbRating": 7.5,
-          "imdbVotes": 21
+          ]
         },
         {
           "id": "m-1588472",
@@ -9674,9 +9605,7 @@
           "origin": [
             "US",
             "JP"
-          ],
-          "imdbRating": 7.8,
-          "imdbVotes": 101
+          ]
         },
         {
           "id": "m-1354301",
@@ -9713,9 +9642,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=kWNj0ZgfgDk",
           "origin": [
             "CA"
-          ],
-          "imdbRating": 8.2,
-          "imdbVotes": 57
+          ]
         },
         {
           "id": "m-1280300",
@@ -9885,9 +9812,7 @@
             "Samta Sudiksha"
           ],
           "director": "Harish Vyas",
-          "theatrical": "wide",
-          "imdbRating": 6.4,
-          "imdbVotes": 7
+          "theatrical": "wide"
         },
         {
           "id": "m-1771300",
@@ -9910,6 +9835,7 @@
           "synopsis": "After 25 years, village schoolmates reunite to find themselves in vastly different stages of life. Their journey makes them question whether hard work alone determines destiny, or whether an unseen force called Time shapes every fate.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/u4xPChcls6z5F5KPShr03F28ZYN.jpg",
           "imdbId": "tt29244905",
+          "runtimeMinutes": 136,
           "cast": [
             "Srinagar Kitty",
             "Meghana Raj",
@@ -10218,9 +10144,7 @@
             "NP",
             "IN",
             "CA"
-          ],
-          "imdbRating": 9,
-          "imdbVotes": 64
+          ]
         },
         {
           "id": "m-1070172",
@@ -10456,9 +10380,7 @@
           "theatrical": "wide",
           "origin": [
             "US"
-          ],
-          "imdbRating": 7.5,
-          "imdbVotes": 542
+          ]
         },
         {
           "id": "m-1492640",
@@ -10588,9 +10510,7 @@
           "theatrical": "wide",
           "origin": [
             "US"
-          ],
-          "imdbRating": 7.7,
-          "imdbVotes": 1331
+          ]
         },
         {
           "id": "m-1375441",
@@ -10633,9 +10553,7 @@
           "theatrical": "wide",
           "origin": [
             "US"
-          ],
-          "imdbRating": 8.7,
-          "imdbVotes": 120
+          ]
         },
         {
           "id": "m-1538457",
@@ -10864,9 +10782,7 @@
           "origin": [
             "US",
             "GB"
-          ],
-          "imdbRating": 5,
-          "imdbVotes": 291
+          ]
         },
         {
           "id": "m-1713517",
@@ -11020,9 +10936,7 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 9.2,
-          "imdbVotes": 3189
+          ]
         },
         {
           "id": "t-298852",
@@ -11363,9 +11277,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=lM0zVd8CSR4",
           "origin": [
             "DE"
-          ],
-          "imdbRating": 5.7,
-          "imdbVotes": 27
+          ]
         },
         {
           "id": "t-332976",
@@ -11616,9 +11528,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=3EwAPmmNBU4",
           "origin": [
             "US"
-          ],
-          "imdbRating": 7.8,
-          "imdbVotes": 55
+          ]
         },
         {
           "id": "m-1629051",
@@ -11766,9 +11676,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=tekO9rGxAU4",
           "origin": [
             "JP"
-          ],
-          "imdbRating": 7,
-          "imdbVotes": 31
+          ]
         },
         {
           "id": "m-1515692",
@@ -12453,9 +12361,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=jkUw2nh6fT0",
           "origin": [
             "US"
-          ],
-          "imdbRating": 7.6,
-          "imdbVotes": 18
+          ]
         },
         {
           "id": "m-1508168~ott",
@@ -12942,9 +12848,7 @@
           "director": "Linden Ashby",
           "origin": [
             "US"
-          ],
-          "imdbRating": 6.5,
-          "imdbVotes": 41
+          ]
         },
         {
           "id": "m-1753405",
@@ -13232,9 +13136,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=RBhp78Xt01w",
           "origin": [
             "US"
-          ],
-          "imdbRating": 6.8,
-          "imdbVotes": 73
+          ]
         },
         {
           "id": "m-1565345",
@@ -13418,9 +13320,7 @@
           "origin": [
             "GB",
             "US"
-          ],
-          "imdbRating": 6.8,
-          "imdbVotes": 1035
+          ]
         },
         {
           "id": "m-1711918",
@@ -13940,9 +13840,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=iHDNxZF7LRw",
           "origin": [
             "CN"
-          ],
-          "imdbRating": 8.3,
-          "imdbVotes": 1083
+          ]
         },
         {
           "id": "m-1401459",
@@ -13986,9 +13884,7 @@
             "DK",
             "SE",
             "US"
-          ],
-          "imdbRating": 7.8,
-          "imdbVotes": 118
+          ]
         },
         {
           "id": "m-1400837",
@@ -15511,9 +15407,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=lcp__Vek4gQ",
           "origin": [
             "ES"
-          ],
-          "imdbRating": 6.8,
-          "imdbVotes": 25277
+          ]
         },
         {
           "id": "m-1284186~ott",
@@ -15558,9 +15452,7 @@
             "US",
             "CY",
             "GB"
-          ],
-          "imdbRating": 5.7,
-          "imdbVotes": 552
+          ]
         },
         {
           "id": "m-1153576",
@@ -15640,9 +15532,7 @@
           "origin": [
             "ES",
             "FR"
-          ],
-          "imdbRating": 7,
-          "imdbVotes": 820
+          ]
         },
         {
           "id": "m-1503762",
@@ -17276,9 +17166,7 @@
             "FR",
             "IT",
             "GB"
-          ],
-          "imdbRating": 7.3,
-          "imdbVotes": 1773
+          ]
         },
         {
           "id": "m-791523",
@@ -17354,9 +17242,7 @@
           "origin": [
             "KR",
             "US"
-          ],
-          "imdbRating": 7.7,
-          "imdbVotes": 23
+          ]
         },
         {
           "id": "t-292741",
@@ -17500,14 +17386,12 @@
             "Elizabeth Debicki",
             "Marli Siu"
           ],
-          "director": "Eleanor Wilson",
+          "director": "Alex Huston Fischer",
           "trailerUrl": "https://www.youtube.com/watch?v=UVAki9SGrlg",
           "origin": [
             "GB",
             "US"
-          ],
-          "imdbRating": 7.5,
-          "imdbVotes": 232
+          ]
         },
         {
           "id": "t-334887",
@@ -17873,9 +17757,7 @@
           "origin": [
             "GB",
             "US"
-          ],
-          "imdbRating": 7.1,
-          "imdbVotes": 41
+          ]
         },
         {
           "id": "m-1728425",
@@ -17947,9 +17829,7 @@
           "origin": [
             "PL",
             "FR"
-          ],
-          "imdbRating": 6.9,
-          "imdbVotes": 19
+          ]
         },
         {
           "id": "m-1759684",
@@ -18530,7 +18410,7 @@
         "US"
       ],
       "rating": 8.3,
-      "votes": 267,
+      "votes": 268,
       "heat": 89,
       "synopsis": "Olive Smith, a biology PhD candidate, and Dr. Adam Carlsen, a hotshot professor and well-known tyrant, enter into a fake relationship, seeing each of their carefully calculated theories on love get thrown into chaos.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/vfZxVHextAGC70zrNhS8lsROqP1.jpg",
@@ -18557,7 +18437,7 @@
         "US"
       ],
       "rating": 8.4,
-      "votes": 911,
+      "votes": 912,
       "heat": 88,
       "synopsis": "Two mob families clash in a war that threatens to topple empires and lives.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/5Xc7WpWsgflfgEMoBlf9TmWhfbH.jpg",
@@ -18640,7 +18520,7 @@
         "US"
       ],
       "rating": 8.2,
-      "votes": 5750,
+      "votes": 5753,
       "heat": 80,
       "synopsis": "After breaking the mysterious \"One Wish Willow\" to win his crush's heart, a hopeless romantic finds himself getting exactly what he asked for but soon discovers that some desires come at a dark, sinister price.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/bRwnj8WEKBCvmfeUNOukJPwB43K.jpg",
@@ -18667,7 +18547,7 @@
         "US"
       ],
       "rating": 7.3,
-      "votes": 92,
+      "votes": 94,
       "heat": 78,
       "synopsis": "Follow Ted Kaczynski's transformation from Harvard prodigy into the infamous Unabomber. Subjected to controversial psychological experiments by Professor Henry Murray, Kaczynski's troubled past resurfaces decades later when his manhunt, led by FBI agent Joanne Miller, brings to light the chilling consequences of ambition and isolation.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/39aMkR8Y5vhCG9dTkjiqRl8AVqp.jpg",
@@ -18756,6 +18636,6 @@
       "backdropUrl": "https://image.tmdb.org/t/p/w780/dqmMWNWfLnExDRpMtIMqI97GQFR.jpg"
     }
   ],
-  "enrichedAt": "2026-09-27T10:09:19.418Z",
-  "ratedAt": "2026-09-27T10:09:41.994Z"
+  "enrichedAt": "2026-09-27T11:47:11.853Z",
+  "ratedAt": "2026-09-27T11:47:13.905Z"
 }
