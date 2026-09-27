@@ -1718,6 +1718,24 @@ for (const r of allTitlePages) {
    *  and rewrites itself on the next build as the film moves through them. */
   const upcoming = r.releaseDate > TODAY;
   const opensOn = formatDate(r.releaseDate);
+  /**
+   * Whether this site can vouch for the date as a streaming date.
+   *
+   * The prerendered facts said "Streaming since: 20 January 2008" about
+   * Breaking Bad. That is the day it first aired on AMC — Netflix did not
+   * launch in India until 2016, and nothing here records when the show
+   * reached it. A back-catalogue row carries the title's own release date,
+   * never a platform's, and 402 of the 658 catalogue titles are pre-2020.
+   *
+   * Inside the window the refresh actually watched, a streaming date is one
+   * it saw land. Outside it, the honest word is that the title came out
+   * then. Ninety days, matching VOUCHED_DAYS in components/ReleaseDatePage —
+   * these two render the same row to the crawler and to the reader, and they
+   * have drifted apart once before, so scripts/eval.mjs now checks that the
+   * wording they choose agrees.
+   */
+  const ageDays = Math.floor((Date.parse(`${TODAY}T00:00:00Z`) - Date.parse(`${r.releaseDate}T00:00:00Z`)) / 86_400_000);
+  const withinMemory = ageDays <= 90;
 
   /**
    * The film's own streaming date, which lives on a different row.
@@ -1928,7 +1946,11 @@ for (const r of allTitlePages) {
             : 'In cinemas'
           : upcoming
             ? 'Streaming from'
-            : 'Streaming since'
+            : withinMemory
+              ? 'Streaming since'
+              : r.kind === 'series'
+                ? 'First aired'
+                : 'Released'
       }:</strong> ${esc(opensOn)}</p>` +
       (inCinemas ? '' : `<p><strong>Watch on:</strong> ${esc(on || 'streaming')}</p>`) +
       (langs.length ? `<p><strong>Language:</strong> ${esc(langs.join(', '))}</p>` : '') +

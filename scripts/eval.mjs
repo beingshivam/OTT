@@ -520,6 +520,59 @@ const S6 = 'Refresh schedule';
   }
 }
 
+const S12 = 'Dates the site can vouch for';
+{
+  /**
+   * "Streaming since" is a claim about a service, and it needs evidence.
+   *
+   * Reported from the Breaking Bad page: "STREAMING SINCE 20 January 2008 ·
+   * 6825 days ago". The relative day was the complaint and the smaller half
+   * of it — six thousand days is a subtraction, not an insight. The claim
+   * above it was wrong. 20 January 2008 is when Breaking Bad first aired on
+   * AMC; Netflix did not launch in India until 2016, and nothing in this
+   * repo records when the show reached it.
+   *
+   * A back-catalogue row carries the title's own release date, never a
+   * platform's, and 402 of the 658 catalogue titles are pre-2020 — so most
+   * of that shelf was dating a streaming arrival it had never observed.
+   *
+   * The window is ninety days, past the eight weeks the feed holds, and it
+   * has to be enforced on the rendered page because two separate renderers
+   * produce it: build-seo.mjs for the crawler and ReleaseDatePage for the
+   * reader. They have drifted apart once already, on this exact block.
+   */
+  if (!pages) skip(S12, 'no page dates a streaming arrival it never saw', 'needs dist/');
+  else {
+    const DAY = 86_400_000;
+    const MONTHS = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11 };
+    const overreach = [];
+    for (const [path, html] of pages) {
+      const m = html.match(/<strong>Streaming since:<\/strong>\s*(\d{1,2}) (\w{3}) (\d{4})/);
+      if (!m) continue;
+      const when = Date.UTC(Number(m[3]), MONTHS[m[2]] ?? 0, Number(m[1]));
+      const age = Math.floor((Date.parse(`${TODAY}T00:00:00Z`) - when) / DAY);
+      if (age > 90) overreach.push(`${path} — "Streaming since ${m[0].split('</strong>')[1].trim()}", ${age} days old`);
+    }
+    overreach.length
+      ? fail(S12, 'no page dates a streaming arrival it never saw',
+          `${overreach.length} pages claim a streaming date older than the calendar`, overreach.slice(0, 5))
+      : pass(S12, 'no page dates a streaming arrival it never saw',
+          `${pages.size} pages checked`);
+
+    /* And the relative day, which is the half that was reported. It is news
+       for a few weeks and arithmetic after that. */
+    const absurd = [];
+    for (const [path, html] of pages) {
+      for (const [, n] of html.matchAll(/(\d{3,})\s+days ago/g)) {
+        absurd.push(`${path} — "${n} days ago"`);
+      }
+    }
+    absurd.length
+      ? fail(S12, 'and none counts the days since 2008', `${absurd.length} pages print a four-figure day count`, absurd.slice(0, 5))
+      : pass(S12, 'and none counts the days since 2008');
+  }
+}
+
 const S11 = 'One page, one claim';
 {
   /**

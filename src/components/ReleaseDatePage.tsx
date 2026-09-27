@@ -70,6 +70,40 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
   const daysToGo = -daysOut;
 
   /**
+   * How long a date is still news, and how long this site can vouch for it.
+   *
+   * Two separate problems, both visible on the Breaking Bad page and both
+   * fixed by the same number.
+   *
+   * The reported one: "20 January 2008 · 6825 days ago". A relative day
+   * answers "how new is this", which is a live question for a week and
+   * arithmetic nobody asked for after that. Six thousand days is not an
+   * insight, it is a subtraction.
+   *
+   * The one underneath it, which is worse: that line said "Streaming since
+   * 20 January 2008". It is not. That is the day Breaking Bad first aired on
+   * AMC; Netflix did not launch in India until 2016, and this site has no
+   * record of when the show arrived there. A back-catalogue row carries the
+   * title's release date, never a platform's — and 402 of the 658 catalogue
+   * titles are pre-2020, so the majority of that shelf was making a claim
+   * about a service it cannot support.
+   *
+   * So the label follows the evidence rather than the row's shape. Inside the
+   * window this calendar actually watched, a streaming date is something the
+   * refresh saw land and "Streaming since" is true. Outside it, the honest
+   * word for a 2008 date is that the show came out then, which is also the
+   * fact a reader wants next to a poster.
+   *
+   * Ninety days, comfortably past the eight weeks the feed holds, so nothing
+   * the calendar genuinely tracked loses its stronger wording at the edge.
+   */
+  const VOUCHED_DAYS = 90;
+  const withinMemory = daysOut <= VOUCHED_DAYS;
+  /* A countdown is news; "in 400 days" is a diary entry. Same rule, forwards. */
+  const showAgo = daysOut > 0 && withinMemory;
+  const showToGo = daysToGo > 0 && daysToGo <= VOUCHED_DAYS;
+
+  /**
    * The film's own streaming date, which lives on a different row.
    *
    * A title with an announced digital date is two rows in this feed: the cinema
@@ -238,17 +272,24 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
                     : 'In cinemas'
                   : upcoming
                     ? 'Streaming from'
-                    : 'Streaming since'}
+                    : withinMemory
+                      ? 'Streaming since'
+                      : /* Past what this calendar watched, the date is the
+                           title's own — see VOUCHED_DAYS. A series says when
+                           it first aired, a film when it was released. */
+                        release.kind === 'series'
+                        ? 'First aired'
+                        : 'Released'}
               </dt>
               <dd>
                 {fmtDate(release.releaseDate)}
-                {daysOut > 0 && (
+                {showAgo && (
                   <span className="titlepage__ago">
                     {' · '}
                     {daysOut === 1 ? 'yesterday' : `${daysOut} days ago`}
                   </span>
                 )}
-                {daysToGo > 0 && (
+                {showToGo && (
                   <span className="titlepage__ago">
                     {' · '}
                     {daysToGo === 1 ? 'tomorrow' : `in ${daysToGo} days`}
