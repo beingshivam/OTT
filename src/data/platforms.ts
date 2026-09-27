@@ -79,17 +79,50 @@ export const PLATFORMS: Platform[] = [
      for browse links, which is the shape of a problem patched at one surface
      instead of at its source. */
   { id: 'theatres',    name: 'In cinemas',   short: 'Cinemas',   mark: '▶',  accent: '#FFC94A', accent2: '#FF8A3D', tmdb: [],           regions: ['IN', 'US'], theatrical: true, homeUrl: 'https://in.bookmyshow.com/', searchUrl: 'https://in.bookmyshow.com/explore/movies?q={q}' },
-  { id: 'netflix',     name: 'Netflix',      short: 'Netflix',   mark: 'N',    accent: '#E50914', accent2: '#FF3B30', tmdb: [8, 1796],    regions: ['IN', 'US'], homeUrl: 'https://www.netflix.com/', searchUrl: 'https://www.netflix.com/search?q={q}' },
-  { id: 'prime',       name: 'Prime Video',  short: 'Prime',     mark: 'pv',   accent: '#00A8E1', accent2: '#48D2FF', tmdb: [9, 119],     regions: ['IN', 'US'], homeUrl: 'https://www.primevideo.com/', searchUrl: 'https://www.primevideo.com/search/ref=atv_nb_sr?phrase={q}' },
+  { id: 'netflix',     name: 'Netflix',      short: 'Netflix',   mark: 'N',    accent: '#E50914', accent2: '#FF3B30', tmdb: [8, 1796, 175], regions: ['IN', 'US'], homeUrl: 'https://www.netflix.com/', searchUrl: 'https://www.netflix.com/search?q={q}' },
+  { id: 'prime',       name: 'Prime Video',  short: 'Prime',     mark: 'pv',   accent: '#00A8E1', accent2: '#48D2FF', tmdb: [9, 119, 613, 2100], regions: ['IN', 'US'], homeUrl: 'https://www.primevideo.com/', searchUrl: 'https://www.primevideo.com/search/ref=atv_nb_sr?phrase={q}' },
   { id: 'jiohotstar',  name: 'JioHotstar',   short: 'JioHotstar',mark: 'JH',   accent: '#7B5CFF', accent2: '#22B8FF', tmdb: [2336, 122, 970], regions: ['IN'],   homeUrl: 'https://www.hotstar.com/in', searchUrl: 'https://www.hotstar.com/in/search?q={q}' },
-  { id: 'appletv',     name: 'Apple TV+',    short: 'Apple TV+', mark: 'tv+',  accent: '#E8E8ED', accent2: '#9BA0AC', tmdb: [350, 2],     regions: ['IN', 'US'], homeUrl: 'https://tv.apple.com/', searchUrl: 'https://tv.apple.com/search?term={q}' },
+  { id: 'appletv',     name: 'Apple TV+',    short: 'Apple TV+', mark: 'tv+',  accent: '#E8E8ED', accent2: '#9BA0AC', tmdb: [350, 2, 2243], regions: ['IN', 'US'], homeUrl: 'https://tv.apple.com/', searchUrl: 'https://tv.apple.com/search?term={q}' },
   { id: 'sonyliv',     name: 'SonyLIV',      short: 'SonyLIV',   mark: 'LIV',  accent: '#6C5CE7', accent2: '#00C2FF', tmdb: [237],        regions: ['IN'],       homeUrl: 'https://www.sonyliv.com/', searchUrl: 'https://www.sonyliv.com/search?searchTerm={q}' },
   { id: 'zee5',        name: 'ZEE5',         short: 'ZEE5',      mark: 'Z5',   accent: '#8A2BE2', accent2: '#C13BFF', tmdb: [232],        regions: ['IN'],       homeUrl: 'https://www.zee5.com/', searchUrl: 'https://www.zee5.com/search?q={q}' },
   { id: 'sunnxt',      name: 'Sun NXT',      short: 'Sun NXT',   mark: 'SUN',  accent: '#E4002B', accent2: '#FF5C7A', tmdb: [309],        regions: ['IN'],       homeUrl: 'https://www.sunnxt.com/', searchUrl: 'https://www.sunnxt.com/search/?q={q}' },
-  { id: 'hoichoi',     name: 'hoichoi',      short: 'hoichoi',   mark: 'ho',   accent: '#F5333F', accent2: '#FF7A45', tmdb: [315],        regions: ['IN'],       homeUrl: 'https://www.hoichoi.tv/', searchUrl: 'https://www.hoichoi.tv/search?q={q}' },
+  { id: 'hoichoi',     name: 'hoichoi',      short: 'hoichoi',   mark: 'ho',   accent: '#F5333F', accent2: '#FF7A45', tmdb: [315, 2176],  regions: ['IN'],       homeUrl: 'https://www.hoichoi.tv/', searchUrl: 'https://www.hoichoi.tv/search?q={q}' },
   { id: 'aha',         name: 'aha',          short: 'aha',       mark: 'aha',  accent: '#FF4E3A', accent2: '#FFA23A', tmdb: [532],        regions: ['IN'],       homeUrl: 'https://www.aha.video/', searchUrl: 'https://www.aha.video/search?query={q}' },
-  { id: 'lionsgate',   name: 'Lionsgate Play', short: 'Lionsgate', mark: 'LG', accent: '#C8A24A', accent2: '#F0D488', tmdb: [1898],     regions: ['IN'],       homeUrl: 'https://www.lionsgateplay.com/', searchUrl: 'https://www.lionsgateplay.com/search?q={q}' },
-  { id: 'crunchyroll', name: 'Crunchyroll',  short: 'Crunchyroll', mark: 'CR', accent: '#F47521', accent2: '#FFA95C', tmdb: [283],      regions: ['IN', 'US'], homeUrl: 'https://www.crunchyroll.com/', searchUrl: 'https://www.crunchyroll.com/search?q={q}' },
+  { id: 'lionsgate',   name: 'Lionsgate Play', short: 'Lionsgate', mark: 'LG', accent: '#C8A24A', accent2: '#F0D488', tmdb: [561, 2074, 2053, 2358], regions: ['IN'], homeUrl: 'https://www.lionsgateplay.com/', searchUrl: 'https://www.lionsgateplay.com/search?q={q}' },
+  /*
+   * The regional and free services, measured rather than remembered.
+   *
+   * TMDB lists 94 watch providers for India and this registry carried 12 —
+   * and that is not a cosmetic gap, because fetch-catalogue passes these ids
+   * to discover as `with_watch_providers`. A title streaming only on a
+   * service missing here is not ranked low by that query, it does not exist.
+   * Tamil came back with 112 titles and Telugu 63 against Japanese 172,
+   * which is backwards for an Indian site, and this is why: the national
+   * players were all present and the regional ones were not.
+   *
+   * These are the ones with a real Indian audience, taken off the provider
+   * listing rather than off a list of names somebody recalled. MX Player is
+   * one of the largest free services in the country; ManoramaMax and
+   * NammaFlix and AP International carry Malayalam, Kannada and Telugu
+   * libraries that the national platforms do not; Chaupal is Punjabi.
+   *
+   * Left out deliberately: Bookmyshow (ticketing, not streaming), Google
+   * Play and Amazon Video (rent and buy, and the fetch filters to flatrate
+   * anyway), and the dozens of niche documentary channels that would add
+   * platform pages nobody searches for.
+   */
+  { id: 'mxplayer',    name: 'MX Player',    short: 'MX Player', mark: 'MX',   accent: '#F5C518', accent2: '#FFE066', tmdb: [515, 1898],  regions: ['IN'],       homeUrl: 'https://www.mxplayer.in/', searchUrl: 'https://www.mxplayer.in/search?q={q}' },
+  { id: 'manoramamax', name: 'ManoramaMAX',  short: 'ManoramaMAX', mark: 'MM', accent: '#E8112D', accent2: '#FF5A6E', tmdb: [482, 2177],  regions: ['IN'],       homeUrl: 'https://www.manoramamax.com/', searchUrl: 'https://www.manoramamax.com/search?q={q}' },
+  { id: 'shemaroome',  name: 'ShemarooMe',   short: 'ShemarooMe', mark: 'SH',  accent: '#D6252B', accent2: '#FF6B70', tmdb: [474],        regions: ['IN'],       homeUrl: 'https://www.shemaroome.com/', searchUrl: 'https://www.shemaroome.com/search?q={q}' },
+  { id: 'hungama',     name: 'Hungama Play', short: 'Hungama',   mark: 'HP',   accent: '#F7671F', accent2: '#FFA45C', tmdb: [437],        regions: ['IN'],       homeUrl: 'https://www.hungama.com/', searchUrl: 'https://www.hungama.com/search/?q={q}' },
+  { id: 'epicon',      name: 'EPIC ON',      short: 'EPIC ON',   mark: 'EP',   accent: '#B8860B', accent2: '#E8C36A', tmdb: [476],        regions: ['IN'],       homeUrl: 'https://www.epicon.in/', searchUrl: 'https://www.epicon.in/search?q={q}' },
+  { id: 'chaupal',     name: 'Chaupal',      short: 'Chaupal',   mark: 'CH',   accent: '#00A99D', accent2: '#4FD8CC', tmdb: [2178],       regions: ['IN'],       homeUrl: 'https://chaupal.tv/', searchUrl: 'https://chaupal.tv/search?q={q}' },
+  { id: 'apinternational', name: 'AP International', short: 'AP Intl', mark: 'AP', accent: '#7A3FBF', accent2: '#B584E8', tmdb: [2708],  regions: ['IN'],       homeUrl: 'https://www.apinternationalfilms.com/', searchUrl: 'https://www.apinternationalfilms.com/' },
+  { id: 'nammaflix',   name: 'NammaFlix',    short: 'NammaFlix', mark: 'NF',   accent: '#E23E3E', accent2: '#FF7A7A', tmdb: [2185],       regions: ['IN'],       homeUrl: 'https://www.primevideo.com/', searchUrl: 'https://www.primevideo.com/search/ref=atv_nb_sr?phrase={q}' },
+  { id: 'discoveryplus', name: 'Discovery+', short: 'Discovery+', mark: 'D+',  accent: '#2175D9', accent2: '#6BA8F0', tmdb: [510, 584],   regions: ['IN'],       homeUrl: 'https://www.discoveryplus.in/', searchUrl: 'https://www.discoveryplus.in/search?q={q}' },
+  { id: 'mubi',        name: 'MUBI',         short: 'MUBI',      mark: 'MU',   accent: '#001489', accent2: '#4A5FD1', tmdb: [11, 201],    regions: ['IN', 'US'], homeUrl: 'https://mubi.com/', searchUrl: 'https://mubi.com/search/{q}' },
+  { id: 'tataplay',    name: 'Tata Play',    short: 'Tata Play', mark: 'TP',   accent: '#0C2E8A', accent2: '#5470C6', tmdb: [502],        regions: ['IN'],       homeUrl: 'https://www.tataplay.com/', searchUrl: 'https://www.tataplaybinge.com/' },
+  { id: 'crunchyroll', name: 'Crunchyroll',  short: 'Crunchyroll', mark: 'CR', accent: '#F47521', accent2: '#FFA95C', tmdb: [283, 1968], regions: ['IN', 'US'], homeUrl: 'https://www.crunchyroll.com/', searchUrl: 'https://www.crunchyroll.com/search?q={q}' },
   { id: 'hbomax',      name: 'HBO Max',      short: 'HBO Max',   mark: 'MAX',  accent: '#8A4BFF', accent2: '#2E6BFF', tmdb: [1899, 384],  regions: ['US'],       homeUrl: 'https://www.max.com/', searchUrl: 'https://www.max.com/search?q={q}' },
   { id: 'hulu',        name: 'Hulu',         short: 'Hulu',      mark: 'hu',   accent: '#1CE783', accent2: '#7CFFC0', tmdb: [15],         regions: ['US'],       homeUrl: 'https://www.hulu.com/', searchUrl: 'https://www.hulu.com/search?q={q}' },
   { id: 'disney',      name: 'Disney+',      short: 'Disney+',   mark: 'D+',   accent: '#1B44C8', accent2: '#4E8CFF', tmdb: [337],        regions: ['US'],       homeUrl: 'https://www.disneyplus.com/', searchUrl: 'https://www.disneyplus.com/search?q={q}' },

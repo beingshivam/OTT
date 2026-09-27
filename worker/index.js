@@ -812,7 +812,7 @@ export const GENRE_IDS = {
  * rename into a failing test rather than a genre page that silently stops
  * counting a platform. JioHotstar has already been renamed once.
  */
-export const IN_PROVIDERS = [8, 1796, 9, 119, 2336, 122, 970, 350, 2, 237, 232, 309, 315, 532, 1898, 283];
+export const IN_PROVIDERS = [8, 1796, 175, 9, 119, 613, 2100, 2336, 122, 970, 350, 2, 2243, 237, 232, 309, 315, 2176, 532, 561, 2074, 2053, 2358, 515, 1898, 482, 2177, 474, 437, 476, 2178, 2708, 2185, 510, 584, 11, 201, 502, 283, 1968];
 
 async function browseTmdb(request, url, env, ctx) {
   if (request.method !== 'GET') return json(405, { error: 'method_not_allowed' });
