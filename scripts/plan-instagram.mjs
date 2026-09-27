@@ -38,6 +38,7 @@
  *
  * Usage: npm run plan:ig
  *        npm run plan:ig -- --weeks 2      (plan further ahead)
+ *        npm run plan:ig -- --mark         (record the current plan as spent)
  */
 
 import { readFile, writeFile, mkdir, copyFile, readdir, stat } from 'node:fs/promises';
@@ -79,10 +80,40 @@ const FORMATS = [
     perishable: true,
   },
   { id: 'meme', match: (f) => /^meme-\d/.test(f) && f.endsWith('.png') },
-  { id: 'feature', match: (f) => /^feature-/.test(f) && f.endsWith('.png') },
+  {
+    id: 'feature',
+    /* build-feature writes post-<slug>.png, not feature-<slug>.png. The first
+       draft matched the name I assumed and so found none of them — seven of the
+       thirteen usable assets were invisible to the planner, which is why it ran
+       out of creative after four posts. */
+    match: (f) => /^post-/.test(f) && f !== 'post-what-we-are.png' && f.endsWith('.png'),
+    /*
+     * Held back from the automatic pool, and this is the interesting one.
+     *
+     * These looked like the answer to sustainability: the image is a screenshot
+     * of a real page, so /south next month shows next month's titles and the
+     * asset recycles itself. I gave them a 28-day cooloff on that reasoning and
+     * it was wrong, because the caption does not come from the page — it is
+     * prose in build-feature.mjs with the numbers typed into it:
+     *
+     *   claims    70 South releases, 64 theatre-only, Tamil 27, Telugu 19
+     *   actual    96 South releases, 79 theatre-only, Tamil 36, Telugu 27
+     *
+     * Every figure in that caption is now wrong, and rebuilding does not fix it:
+     * the screenshot refreshes and the caption is rewritten from the same
+     * hardcoded text. So a fresh file is no evidence of an accurate claim, which
+     * is why the mtime check that catches the stale poster cannot catch this.
+     *
+     * Publishing a wrong number about our own catalogue, in our own voice, is
+     * worse than posting less often. They stay available to post by hand, where
+     * somebody can read the numbers first, and they come back into the pool the
+     * day their captions are derived from the feed rather than typed.
+     */
+    manualOnly: 'its caption has hand-typed statistics that are now out of date',
+  },
   { id: 'hook', match: (f) => /^hook-\d/.test(f) && f.endsWith('.png') },
   { id: 'title', match: (f) => /^mirzapur-/.test(f) && f.endsWith('.png') },
-  { id: 'explainer', match: (f) => /^explainer/.test(f) && f.endsWith('.png') },
+  { id: 'explainer', match: (f) => f === 'post-what-we-are.png' },
 ];
 
 /**
@@ -119,6 +150,51 @@ const nextSlot = (after, slot) => {
   return { dateTime: iso, date: `${iso}${IST}` };
 };
 
+/*
+ * Closing the loop the first draft left open.
+ *
+ * The ledger was read and never written, which meant the guarantee it exists
+ * for — a creative that has gone out is spent — did not actually hold. Every
+ * run would have re-chosen the same meme and the account would have looked like
+ * a broken cron job, which is the precise failure the ledger was described as
+ * preventing.
+ *
+ * It is a separate step from planning on purpose, and takes its timestamps from
+ * the plan rather than from the clock. A plan that was written but never
+ * scheduled must not burn its creative: marking is what happens *after* the
+ * posts are accepted, so the two cannot get out of order. Idempotent, so
+ * running it twice on the same plan is harmless.
+ */
+if (process.argv.includes('--mark')) {
+  const planned = await readFile(PLAN, 'utf8')
+    .then((s) => JSON.parse(s))
+    .catch(() => null);
+  if (!planned?.posts?.length) {
+    console.error(`No plan to mark at ${PLAN}. Run \`npm run plan:ig\` first. Nothing has been written.`);
+    process.exit(1);
+  }
+  const log = await readFile(LEDGER, 'utf8')
+    .then((s) => JSON.parse(s))
+    .catch(() => ({ posts: [] }));
+  const already = new Set(log.posts.map((p) => `${p.asset}@${p.postedAt}`));
+  let added = 0;
+  for (const p of planned.posts) {
+    const key = `${p.asset}@${p.date}`;
+    if (already.has(key)) continue;
+    log.posts.push({ postedAt: p.date, asset: p.asset, format: p.format });
+    already.add(key);
+    added += 1;
+  }
+  log.posts.sort((a, b) => String(a.postedAt).localeCompare(String(b.postedAt)));
+  await mkdir(dirname(LEDGER), { recursive: true });
+  await writeFile(LEDGER, `${JSON.stringify(log, null, 2)}\n`);
+  console.log(
+    `Marked ${added} post(s) as spent; the ledger now holds ${log.posts.length}.` +
+      (added ? '' : ' Nothing new — this plan was already recorded.'),
+  );
+  process.exit(0);
+}
+
 const files = await readdir(SOCIAL).catch(() => []);
 if (!files.length) {
   console.error(
@@ -133,7 +209,22 @@ if (!files.length) {
 const ledger = await readFile(LEDGER, 'utf8')
   .then((s) => JSON.parse(s))
   .catch(() => ({ posts: [] }));
-const spent = new Set(ledger.posts.map((p) => p.asset));
+/**
+ * Spent, for now.
+ *
+ * A fixed joke is spent for good; a screenshot of a live page is spent only
+ * until the page has changed under it. So "have I posted this" is really "have I
+ * posted this recently enough that it would still look like a repeat", and the
+ * answer depends on the format. Anything with no cooloff is spent permanently.
+ */
+const cooloff = new Map(FORMATS.map((f) => [f.id, f.cooloffDays]));
+const isSpent = (asset) =>
+  ledger.posts.some((p) => {
+    if (p.asset !== asset) return false;
+    const days = cooloff.get(p.format);
+    if (!days) return true;
+    return Date.now() - (Date.parse(p.postedAt) || 0) < days * DAY;
+  });
 const lastUsed = new Map();
 for (const p of ledger.posts) {
   const at = Date.parse(p.postedAt) || 0;
@@ -159,9 +250,19 @@ const stale = [];
 
 const inventory = new Map();
 for (const format of FORMATS) {
+  if (format.manualOnly) {
+    const held = files.filter((f) => format.match(f)).length;
+    if (held) {
+      console.error(
+        `  · holding back ${held} ${format.id} post(s): ${format.manualOnly}.\n` +
+          '    Still in social/ to post by hand once the numbers are checked.',
+      );
+    }
+    continue;
+  }
   const candidates = files
     .filter((f) => format.match(f))
-    .filter((f) => format.perishable || !spent.has(f))
+    .filter((f) => format.perishable || !isSpent(f))
     .sort();
 
   const assets = [];
