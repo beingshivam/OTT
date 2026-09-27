@@ -57,6 +57,13 @@ jobs:
           IG_PUBLISH: ${{ vars.IG_PUBLISH }}
           SLOT: ${{ inputs.slot }}
         run: |
+          # Without this the pipeline returns tee's status and the publisher's
+          # exit code is thrown away — so a refusal to post ("no credentials",
+          # "no plan", "image not reachable") reads as success and the job walks
+          # on to the next step. The first run of this workflow did exactly
+          # that, and then failed further down for an unrelated reason, which is
+          # how a swallowed exit code usually announces itself.
+          set -o pipefail
           if [ -n "$SLOT" ]; then
             node scripts/publish-instagram.mjs --slot "$SLOT" | tee post.log
           else
@@ -70,6 +77,14 @@ jobs:
         run: |
           git config user.name  'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
+          # The ledger only exists once something has actually been published,
+          # so `git add` on it fails with exit 128 on every run before the first
+          # post — failing the job for a reason that has nothing to do with
+          # posting, and burying whatever the real outcome was.
+          if [ ! -f data/instagram-log.json ]; then
+            echo "No ledger yet, so nothing has ever been published from here."
+            exit 0
+          fi
           git add data/instagram-log.json
           if git diff --cached --quiet; then
             echo "Nothing was published, so there is nothing to record."
