@@ -237,6 +237,30 @@ jobs:
         continue-on-error: true
         run: node scripts/archive.mjs
 
+      # Write down how long each film took to reach streaming.
+      #
+      # "When will this come to OTT?" is the most-searched question in this
+      # category and every competitor answers it with the word "expected"
+      # beside a rumour. The transition is already visible in the feed — a
+      # cinema row and, weeks later, an ~ott row with the same TMDB id — and
+      # nothing was recording it. The window is eleven weeks, so every
+      # observation aged out and the record survived only by accident, in the
+      # git history of releases.json.
+      #
+      # Provider-confirmed only, which is the difference between a dataset
+      # and a pile of guesses: three of the first four contributor-named
+      # transitions sat at exactly 28 days, because somebody typed "four
+      # weeks". Mining every snapshot since 3 September yielded three clean
+      # observations, which is correctly not enough to publish anything.
+      #
+      # Runs after the archive, for the same reason and with the same
+      # contract: it must never cost a refresh that already worked. Nothing
+      # downstream reads it yet.
+      - name: Record cinema-to-OTT windows
+        if: steps.fetch.outcome == 'success'
+        continue-on-error: true
+        run: node scripts/track-windows.mjs
+
       # Fill the gaps the daily enrichment can no longer reach.
       #
       # enrich-releases walks the eight-week window, so a row that entered the

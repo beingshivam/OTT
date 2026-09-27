@@ -1,0 +1,35 @@
+{
+  "updatedAt": "2026-09-27T11:03:17.528Z",
+  "observations": [
+    {
+      "id": "m-1685882",
+      "title": "Modha Rathri",
+      "language": "ta",
+      "cinemaDate": "2026-08-21",
+      "ottDate": "2026-09-18",
+      "platform": "netflix",
+      "days": 28,
+      "firstRecorded": "2026-09-27"
+    },
+    {
+      "id": "m-1441228",
+      "title": "Irumudi",
+      "language": "te",
+      "cinemaDate": "2026-08-21",
+      "ottDate": "2026-09-18",
+      "platform": "netflix",
+      "days": 28,
+      "firstRecorded": "2026-09-27"
+    },
+    {
+      "id": "m-1560208",
+      "title": "Ramba Oorvasi Menaka",
+      "language": "te",
+      "cinemaDate": "2026-09-04",
+      "ottDate": "2026-09-25",
+      "platform": "prime",
+      "days": 21,
+      "firstRecorded": "2026-09-27"
+    }
+  ]
+}
