@@ -102,8 +102,74 @@ const count = async (kind, { language, minVotes, tiers, providers }) => {
   return body.total_results ?? 0;
 };
 
+const pad = (s, n) => String(s).padEnd(n);
+const num = (n, w = 7) => String(n).padStart(w);
+
 const allMovie = await regionProviders('movie');
 const allTv = await regionProviders('tv');
+
+/*
+ * Calibration mode: what floor would give this language a full page budget?
+ *
+ * The floors were absolute vote counts, and the probe showed what that costs:
+ * 60 votes keeps 4.4% of Tamil's titles while 400 keeps 10% of Japanese's,
+ * because TMDB's voting population is Western and a floor denominated in its
+ * votes is a stricter filter on regional Indian cinema than on anime. Setting
+ * them by hand again would just be a new guess, so this searches for them.
+ *
+ * The target is deliberately a little above what the fetch can take. The
+ * rating pass sorts by score and keeps the first 160, so a language whose
+ * query returns 250 candidates gets a full budget of its best-rated titles
+ * and the page loop is what binds — which is the healthy state. A language
+ * whose query returns 83 is choosing from too small a pool to be selective at
+ * all, and lowering its floor further than that buys nothing but risk: the
+ * pass ranks by vote_average, so the floor is the only thing standing between
+ * the top of a language's page and a film with nine votes averaging 9.5.
+ */
+const TARGET = Number(process.env.TARGET ?? 250);
+
+const calibrate = async (lang) => {
+  const at = async (floor) => {
+    const [movie, tv] = await Promise.all([
+      count('movie', { language: lang.code, minVotes: floor, tiers: 'flatrate', providers: REGISTRY_IDS }),
+      count('tv', { language: lang.code, minVotes: floor, tiers: 'flatrate', providers: REGISTRY_IDS }),
+    ]);
+    return movie + tv;
+  };
+
+  /* Monotonic: a higher floor can only return fewer titles. So bisect on the
+     floor rather than sampling, and report the count that floor really gives
+     rather than the target that was asked for. */
+  let lo = 1;
+  let hi = 4000;
+  let best = { floor: lo, count: await at(lo) };
+  if (best.count < TARGET) return { ...best, short: true };
+  for (let i = 0; i < 11 && lo < hi; i += 1) {
+    const mid = Math.floor((lo + hi) / 2);
+    const got = await at(mid);
+    if (got >= TARGET) {
+      best = { floor: mid, count: got };
+      lo = mid + 1;
+    } else {
+      hi = mid;
+    }
+  }
+  return { ...best, short: false };
+};
+
+if (process.env.CALIBRATE) {
+  console.log(`\nThe floor that leaves each language ${TARGET}+ candidates for a 160-title budget\n`);
+  console.log(`  ${pad('language', 11)}${num('now')}${num('floor')}${num('gives')}`);
+  for (const lang of LANGUAGES) {
+    const r = await calibrate(lang);
+    console.log(
+      `  ${pad(lang.name, 11)}${num(lang.minVotes)}${num(r.short ? '—' : r.floor)}${num(r.count)}` +
+        (r.short ? `   never reaches ${TARGET}, even at one vote` : ''),
+    );
+  }
+  console.log(`\n  ${callCount()} TMDB calls.`);
+  process.exit(0);
+}
 
 const rows = [];
 for (const lang of LANGUAGES) {
@@ -131,8 +197,6 @@ for (const lang of LANGUAGES) {
   console.error(`  measured ${lang.name}`);
 }
 
-const pad = (s, n) => String(s).padEnd(n);
-const num = (n, w = 7) => String(n).padStart(w);
 
 console.log(`\nWhat is holding each language down — ${REGION}, ${REGISTRY_IDS.length} registry providers`);
 console.log(`(region has ${allMovie.length} film and ${allTv.length} television providers)\n`);

@@ -11,6 +11,16 @@ name: Language probe
 
 on:
   workflow_dispatch:
+    inputs:
+      calibrate:
+        description: 'Search for the vote floor that gives each language a full page budget, instead of reporting the knobs.'
+        type: boolean
+        required: false
+        default: false
+      target:
+        description: 'How many candidates a floor should leave (calibrate mode).'
+        required: false
+        default: '250'
 
 permissions:
   contents: read
@@ -26,6 +36,8 @@ jobs:
       - name: Ask TMDB
         env:
           TMDB_TOKEN: ${{ secrets.TMDB_TOKEN || secrets.TMDB_API_KEY }}
+          CALIBRATE: ${{ inputs.calibrate && '1' || '' }}
+          TARGET: ${{ inputs.target || '250' }}
         # Fenced so the summary keeps the columns.
         run: |
           echo '```' >> "$GITHUB_STEP_SUMMARY"
