@@ -114,17 +114,74 @@ requireToken();
  * where a well-loved Punjabi film carries dozens, so one number applied to
  * both would return everything for one and nothing for the other.
  */
+/*
+ * The floors, measured.
+ *
+ * The paragraph above had the principle right and the numbers unexamined, and
+ * the difference cost the site most of Indian cinema. scripts/language-probe
+ * loosened each knob of this query on its own and the floor was the only one
+ * that moved anything: providers were worth about 17%, the flatrate filter 4%,
+ * and the floor a factor of twenty. Worse, it was backwards. Selectivity, as
+ * a share of each language's own titles on Indian streaming:
+ *
+ *   Tamil at 60 votes      83 of 1,987      4.4%
+ *   Japanese at 400       207 of 2,033     10.2%
+ *
+ * So the floor set for a language TMDB's audience barely votes on was more
+ * than twice as strict as the floor set for one it votes on heavily — the
+ * exact failure this comment warns about, in the numbers it was written to
+ * prevent. Telugu had 1,774 titles on Indian streaming and the site carried
+ * 63 of them.
+ *
+ * `floor` below is each language's bisected value: the highest floor that
+ * still leaves the rating pass more candidates than it can take, so every
+ * language gets a full budget chosen for score rather than scraping up
+ * whatever cleared the bar. Bisected rather than picked, because the last two
+ * theories about South were both guesses and both wrong.
+ *
+ * Except that it is never taken below 25, which is where measurement stops
+ * being able to help. Kannada's bisected floor is 1 and Bengali's is 2, and
+ * this pass sorts by vote_average — a floor of 1 puts a single 10.0 vote at
+ * the top of /kannada, which is the brigaded-10.0 failure the paragraph above
+ * describes, arrived at from the other direction. 25 is not an invented
+ * number: it is the lowest floor this file already trusted anywhere, set for
+ * Punjabi for exactly the reason that applies here.
+ *
+ * The non-Indian floors are deliberately left alone. Their shelves are
+ * already full — Japanese has more candidates than it can take — so lowering
+ * them would only add foreign long tail to an Indian site.
+ */
+const MIN_CREDIBLE_VOTES = 25;
+
+/**
+ * How many pages of the popularity pass each language gets.
+ *
+ * The rating pass answers "what is good" and is capped by its floor. This one
+ * answers "what is everyone watching", and its floor is already a fifth of the
+ * rating floor, so it was never floor-bound at all — it was bound at two
+ * pages, eighty titles, for every language equally. That is the wrong shape
+ * for an Indian site: Hindi and the South share the audience, and a reader
+ * searching for a Telugu film is far likelier than one searching for a German
+ * one.
+ *
+ * It is also the pass that matters most for being found at all. Popularity is
+ * a signal that survives low vote counts in a way an average score does not,
+ * which is precisely why this pass can reach down where the other cannot —
+ * and the titles people type into Google are the popular ones.
+ */
 const LANGUAGES = [
-  { code: 'hi', name: 'Hindi', minVotes: 200 },
-  { code: 'ta', name: 'Tamil', minVotes: 60 },
-  { code: 'te', name: 'Telugu', minVotes: 60 },
-  { code: 'ml', name: 'Malayalam', minVotes: 60 },
-  { code: 'kn', name: 'Kannada', minVotes: 40 },
-  { code: 'bn', name: 'Bengali', minVotes: 40 },
-  { code: 'mr', name: 'Marathi', minVotes: 40 },
+  { code: 'hi', name: 'Hindi', minVotes: 104, popPages: 8 },
+  { code: 'ta', name: 'Tamil', minVotes: 25, popPages: 8 },
+  { code: 'te', name: 'Telugu', minVotes: 25, popPages: 8 },
+  { code: 'ml', name: 'Malayalam', minVotes: 25, popPages: 8 },
+  { code: 'kn', name: 'Kannada', minVotes: 25, popPages: 6 },
+  { code: 'bn', name: 'Bengali', minVotes: 25, popPages: 6 },
+  { code: 'mr', name: 'Marathi', minVotes: 25, popPages: 4 },
   /* Low, because TMDB's Punjabi coverage is thin rather than the cinema
-     being small. A floor set for Hindi returns an empty shelf here. */
-  { code: 'pa', name: 'Punjabi', minVotes: 25 },
+     being small. A floor set for Hindi returns an empty shelf here. Alone
+     among these it needed no change: it was already at the credible minimum,
+     which is what made it the right anchor for the rest. */
+  { code: 'pa', name: 'Punjabi', minVotes: 25, popPages: 4 },
   /* The four with global audiences and correspondingly dense vote counts.
      Set well above the Indian-language floors so the shelf is the genuinely
      known work rather than the long tail of its country's output. */
@@ -135,6 +192,18 @@ const LANGUAGES = [
   { code: 'de', name: 'German', minVotes: 400 },
   { code: 'en', name: 'English', minVotes: 2000 },
 ];
+
+/* Asserted rather than trusted: every floor above has to clear the credible
+   minimum, so a future edit that lowers one to chase a count fails here
+   instead of quietly putting a one-vote 10.0 at the top of a page. */
+for (const lang of LANGUAGES) {
+  if (lang.minVotes < MIN_CREDIBLE_VOTES) {
+    throw new Error(
+      `${lang.name}'s floor of ${lang.minVotes} is below the ${MIN_CREDIBLE_VOTES} votes a score needs ` +
+        'to mean anything. The rating pass sorts by average, so this would rank noise first.',
+    );
+  }
+}
 
 /** The registry's own provider ids, so a rebrand is fixed in one place. */
 const registry = await readFile(resolve(ROOT, 'src/data/platforms.ts'), 'utf8');
@@ -417,11 +486,14 @@ outer: for (const lang of LANGUAGES) {
  * in Hindi are the same claim about different audiences, where raw popularity
  * numbers are not comparable at all.
  */
+/** Two for a language whose shelf is already full; see popPages on LANGUAGES
+ *  for the ones that get more and why. */
 const POP_PAGES = 2;
 if (!stopped) {
   for (const lang of LANGUAGES) {
     let rank = 0;
-    for (let page = 1; page <= POP_PAGES && !stopped; page++) {
+    const pages = lang.popPages ?? POP_PAGES;
+    for (let page = 1; page <= pages && !stopped; page++) {
       if (Date.now() - startedAt > BUDGET_MS) {
         stopped = `ran out of its ${Math.round(BUDGET_MS / 60_000)}-minute budget`;
         break;
