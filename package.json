@@ -46,7 +46,8 @@
     "test:windows": "node --test scripts/track-windows.test.mjs",
     "test:tmdb": "node --test scripts/tmdb.test.mjs",
     "angles": "node scripts/build-angles.mjs",
-    "plan:ig": "node scripts/plan-instagram.mjs"
+    "plan:ig": "node scripts/plan-instagram.mjs",
+    "post:ig": "node scripts/publish-instagram.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

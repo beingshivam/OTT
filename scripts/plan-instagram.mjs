@@ -385,7 +385,18 @@ for (let week = 0; week < WEEKS; week += 1) {
 
     const { entry, asset, caption } = chosen;
 
+    /* Both: the PNG because it is the master and worth having served, the JPEG
+       because it is the one Instagram will fetch. A missing JPEG is a broken
+       post rather than a degraded one, so it is an error here and not a
+       shrug — better to find it now than in the publish step's API response. */
     await copyFile(resolve(SOCIAL, asset), resolve(SERVED, asset));
+    const jpeg = asset.replace(/\.png$/, '.jpg');
+    await copyFile(resolve(SOCIAL, jpeg), resolve(SERVED, jpeg)).catch(() => {
+      throw new Error(
+        `${asset} has no ${jpeg} beside it. Instagram rejects PNG, so this post could not be ` +
+          'published. Rebuild the creative (npm run social && npm run angles) and plan again.',
+      );
+    });
 
     plan.push({
       slot: plan.length + 1,
@@ -394,9 +405,11 @@ for (let week = 0; week < WEEKS; week += 1) {
       why: slot.why,
       format: entry.format.id,
       asset,
-      /* The URL Metricool will fetch. It only exists once the site deploys, so
-         the scheduling step has to run after a deploy, not before it. */
-      media: [`${SITE}/social/${asset}`],
+      /* The URL the publisher fetches, which only exists once the site deploys
+         — so publishing has to run after a deploy, not before it.
+         JPEG deliberately: Instagram's publishing API rejects PNG, and the
+         builders write a .jpg beside every .png for exactly this. */
+      media: [`${SITE}/social/${asset.replace(/\.png$/, '.jpg')}`],
       type: 'POST',
       text: caption,
       /* Alt text is not decoration: it is how the post reaches somebody using a

@@ -8,11 +8,11 @@
 # Friday morning, so the poster and the angles are built from the week that has
 # just landed and the first slot goes out that evening while it is still news.
 #
-# It deliberately stops short of posting. Scheduling needs a connected Instagram
-# account and an irreversible API call; this produces everything that call would
-# need, commits it so the media URLs resolve on the live site, and leaves the
-# send as a separate deliberate step. The plan is a file somebody can read
-# before anything reaches an audience.
+# It deliberately stops short of posting. This produces everything the send
+# needs and commits it so the media URLs resolve on the live site; the sending
+# is a separate workflow that wakes at each slot time, because Instagram's API
+# has no scheduling of its own. Splitting them means the plan is a file somebody
+# can read before anything reaches an audience, and a bad build cannot post.
 name: Build the week's social posts
 
 on:
@@ -88,6 +88,7 @@ jobs:
             '
             echo '```'
             echo
-            echo 'To send them: connect the Instagram account in Metricool, schedule each'
-            echo 'entry above, then run `npm run plan:ig -- --mark` so they are not offered again.'
+            echo 'The "Post to Instagram" workflow wakes at each of those times and publishes'
+            echo 'whichever is due. Until the IG_PUBLISH repository variable is set to 1 it'
+            echo 'stops short of the call that makes a post public, and says so in its log.'
           } >> "$GITHUB_STEP_SUMMARY"

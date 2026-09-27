@@ -246,6 +246,15 @@ try {
     // the fallback face about one run in five.
     await p.evaluate(() => document.fonts.ready);
     await writeFile(resolve(OUT, `angle-${angle.slug}.png`), await p.screenshot({ type: 'png' }));
+    /* Instagram's publishing API takes JPEG and rejects PNG, so the posted copy
+       has to be a JPEG — but PNG stays the master, because it is what everything
+       else uses and re-encoding a screenshot of flat type through JPEG twice is
+       how text starts to look fuzzy. Quality 92 is visually lossless here at a
+       third of the weight. */
+    await writeFile(
+      resolve(OUT, `angle-${angle.slug}.jpg`),
+      await p.screenshot({ type: 'jpeg', quality: 92 }),
+    );
     await writeFile(resolve(OUT, `angle-${angle.slug}-caption.txt`), `${angle.caption()}\n`);
     await p.close();
 

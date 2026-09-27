@@ -1,0 +1,93 @@
+# Posts the slot that is due, to Instagram, with no third party in between.
+#
+# Instagram's Content Publishing API has no scheduling of its own — you call it
+# when you mean to post — so the schedule lives here. Three crons, one per slot
+# in the plan that Friday's build produces. Each run publishes whichever entry
+# is due and does nothing the rest of the time.
+#
+# The times are the plan's, converted from IST:
+#   Fri 19:30 IST = Fri 14:00 UTC   the week's releases have just landed
+#   Sun 12:30 IST = Sun 07:00 UTC   the longest scroll of the week
+#   Wed 21:00 IST = Wed 15:30 UTC   the midweek "kya dekhein" gap
+#
+# NOTHING GOES PUBLIC until IG_PUBLISH is set to 1 as a repository variable.
+# Without it every run does the whole job except the final, irreversible call,
+# and says so. That is deliberate: a misconfigured cron or a wrong token ends at
+# a post that cannot be taken back, under the brand, in public. Turning it on is
+# a decision somebody makes once, having read a dry run first.
+name: Post to Instagram
+
+on:
+  schedule:
+    - cron: '0 14 * * 5'
+    - cron: '0 7 * * 0'
+    - cron: '30 15 * * 3'
+  workflow_dispatch:
+    inputs:
+      slot:
+        description: 'Publish a specific slot number instead of whatever is due.'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  # Never two publishes at once: the ledger is the only thing stopping a double
+  # post and it is read-modify-write.
+  group: social-post
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Publish what is due
+        env:
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          # A repository *variable*, not a secret — it is a switch, not a
+          # credential, and it should be readable at a glance to see whether the
+          # account is live.
+          IG_PUBLISH: ${{ vars.IG_PUBLISH }}
+          SLOT: ${{ inputs.slot }}
+        run: |
+          if [ -n "$SLOT" ]; then
+            node scripts/publish-instagram.mjs --slot "$SLOT" | tee post.log
+          else
+            node scripts/publish-instagram.mjs | tee post.log
+          fi
+
+      # Only the publish step writes it, and only after Instagram has confirmed.
+      # A run that posted nothing leaves nothing to commit.
+      - name: Record what went out
+        if: success()
+        run: |
+          git config user.name  'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add data/instagram-log.json
+          if git diff --cached --quiet; then
+            echo "Nothing was published, so there is nothing to record."
+            exit 0
+          fi
+          git commit -m "chore(social): record the post that went out"
+          # The Friday build pushes to this branch too, so rebase rather than
+          # fail on a race between them.
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
+          git push
+
+      - name: Say what happened
+        if: always()
+        run: |
+          {
+            echo '## Instagram'
+            echo
+            echo '```'
+            cat post.log 2>/dev/null || echo 'The publish step did not run.'
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

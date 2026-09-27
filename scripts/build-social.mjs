@@ -106,6 +106,13 @@ try {
     // a fallback face and the whole thing looks like a draft.
     await p.evaluate(() => document.fonts.ready);
     await writeFile(resolve(OUT, `${size.name}.png`), await p.screenshot({ type: 'png' }));
+    /* Instagram's publishing API takes JPEG and rejects PNG. PNG stays the
+       master — it is what WhatsApp and the stories use — and this is the copy
+       that gets posted. See publish-instagram. */
+    await writeFile(
+      resolve(OUT, `${size.name}.jpg`),
+      await p.screenshot({ type: 'jpeg', quality: 92 }),
+    );
     await p.close();
     console.log(`  ${size.name}.png  ${size.w}x${size.h}  ${size.items} titles`);
   }
