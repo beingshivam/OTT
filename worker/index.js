@@ -216,7 +216,7 @@ export function relaxations(q) {
  *   v ↔ w     Vivah / Wiwah
  *   z ↔ j     Zindagi / Jindagi
  *   ksh ↔ x   Lakshmi / Laxmi
- *   doubles   Tumbbad / Tumbad
+ *   doubles   Tumbbad / Tumbad, in both directions — see DOUBLES below
  *   final a   Rama / Ram
  *
  * One class at a time, never combined. Two simultaneous substitutions is
@@ -249,6 +249,43 @@ const SPELLINGS = [
   [/([bcdfgklmnprstz])\1/g, '$1'],
 ];
 
+/**
+ * The doubling class, expanding.
+ *
+ * Every other class above is a pair of rules, one each way. This one was a
+ * single rule that only collapsed, and the comment listing "Tumbbad / Tumbad"
+ * as an equivalence class was describing a symmetry the code did not have.
+ *
+ * The missing direction is the common one. A reader types the plainer
+ * spelling — tumbad, not tumbbad — and TMDB has the film filed under the
+ * doubled one, so the query that gets typed is exactly the query that could
+ * not be rescued. Measured against the live route before this was written:
+ *
+ *   tumbad     6 results, top: Género 101: Corridos Tumbados
+ *   tumbbad    3 results, top: Tumbbad
+ *
+ * Expansion cannot be a regex substitution the way collapsing is, because
+ * there is no pattern for "the consonant that should have been doubled" —
+ * every eligible consonant is a candidate and each one is its own variant.
+ * Two rules keep the count down to two or three for a typical word:
+ *
+ *   - Not word-initial and not word-final. Romanised doubling sits between
+ *     vowels (Tumbbad, Mallika); nobody writes Ttumbad.
+ *   - Not already doubled, which would only undo the collapse rule.
+ */
+const DOUBLEABLE = /[bcdfgklmnprstz]/;
+
+function doublings(w) {
+  const out = [];
+  for (let i = 1; i < w.length - 1; i += 1) {
+    const c = w[i];
+    if (!DOUBLEABLE.test(c)) continue;
+    if (w[i - 1] === c || w[i + 1] === c) continue;
+    out.push(w.slice(0, i) + c + w.slice(i));
+  }
+  return out;
+}
+
 /** Enough to cover the classes above without turning one miss into a burst of
  *  upstream calls. Tuned against real queries, not picked. */
 const MAX_SPELLINGS = 8;
@@ -271,6 +308,11 @@ export function spellings(word, limit = MAX_SPELLINGS) {
     if (hits.length > 1) made.push(w.replace(pattern, to));
     return made.filter((v) => v !== w);
   });
+
+  /* The doubling class's other direction, as its own class so round-robin
+     gives it one turn rather than letting a word full of consonants spend the
+     whole budget on them. */
+  perClass.push(doublings(w));
 
   /* The final vowel, which is its own class: Rama and Ram are one name. */
   const tail = [];
@@ -296,6 +338,68 @@ export function spellings(word, limit = MAX_SPELLINGS) {
     if (!placed) break;
   }
   return out;
+}
+
+/**
+ * Does this result set contain the thing that was asked for, or merely
+ * something?
+ *
+ * The fallbacks below used to fire only on an empty answer, and emptiness is
+ * the wrong test. TMDB's search is close to exact on phrases but it is not
+ * exact on words, so a misspelled title does not come back empty — it comes
+ * back with whatever else happens to share a prefix. "tumbad" returned six
+ * results and the first was a Spanish music documentary called Corridos
+ * Tumbados, which is not a near miss, it is a different thing entirely. The
+ * spelling pass that would have found Tumbbad never ran, because six is more
+ * than zero.
+ *
+ * So: whole tokens, compared exactly. Substring matching is what produced the
+ * bug in the first place — "tumbados" contains "tumbad" and would have been
+ * read as a hit, leaving the reader exactly where they started.
+ *
+ * Deliberately generous in one direction: any result in the set counts, not
+ * just the first. If TMDB has ranked the right film fourth, the set is still
+ * the right set and spending eight more calls on it would be waste.
+ *
+ * A query this cannot judge — a descriptive phrase like "best malayalam
+ * thriller", where no result is titled with the words typed — reads as
+ * unanswered and pays for one fan-out that finds nothing confirmable. It then
+ * keeps the results it already had. Slower for that shape of query, never
+ * wrong.
+ */
+/*
+ * Both readings of a title's words, because initialised titles have two.
+ *
+ * "K.G.F: Chapter 3" splits on punctuation into k, g, f — and a reader types
+ * kgf, which is how distinctive() normalises it too. Splitting only on
+ * whitespace and then stripping punctuation gives kgf but loses nothing,
+ * since Chapter and 3 survive either way. Ra.One is the same shape. So: both,
+ * unioned, and the comparison stays whole-word exact.
+ */
+const wordsOf = (s) => {
+  const t = (s ?? '').toLowerCase();
+  return [
+    ...t.split(/\s+/).map((w) => w.replace(/[^a-z0-9]/g, '')),
+    ...t.split(/[^a-z0-9]+/),
+  ].filter(Boolean);
+};
+
+export function answered(results, wanted) {
+  if (!wanted.length) return true;
+  const want = new Set(wanted);
+  return results.some((r) => wordsOf(r.title ?? r.name).some((w) => want.has(w)));
+}
+
+/** The token a half-remembered title turns on, by the same rule relaxations()
+ *  uses: drop the words no title contains, then take the longest of the rest. */
+export function distinctive(q) {
+  const kept = q
+    .split(/\s+/)
+    .filter(Boolean)
+    .filter((t) => !NOISE.has(t.toLowerCase().replace(/[^a-z0-9]/g, '')) && !/^(19|20)\d{2}$/.test(t));
+  return kept.length
+    ? kept.reduce((a, b) => (b.length > a.length ? b : a)).toLowerCase().replace(/[^a-z]/g, '')
+    : '';
 }
 
 async function searchTmdb(request, url, env, ctx) {
@@ -408,6 +512,18 @@ async function searchTmdb(request, url, env, ctx) {
   };
 
   /*
+   * The word the query turns on, and the other ways it gets spelled. Computed
+   * once here because both halves of what follows need it: the spelling pass
+   * asks for these, and the test for whether the first answer was any good
+   * accepts any of them.
+   */
+  const word = distinctive(q);
+  const variants = spellings(word);
+  /* Any of these in a title means the reader is looking at what they typed,
+     however it was romanised. */
+  const acceptable = [word, ...variants].filter(Boolean);
+
+  /*
    * As typed first, then less of it — see relaxations(). The loop stops at the
    * first query that returns anything, so a query that works costs one call
    * and only a miss pays for the retries.
@@ -429,9 +545,16 @@ async function searchTmdb(request, url, env, ctx) {
   }
 
   /*
-   * Still nothing, so the word itself is the problem — try how else it is
-   * spelled. See spellings() for why this is equivalence classes and not
-   * fuzzy matching.
+   * Nothing, or nothing that is what was asked for — so the word itself is
+   * the problem. Try how else it is spelled. See spellings() for why this is
+   * equivalence classes and not fuzzy matching.
+   *
+   * The second half of that condition is the fix for a reader typing "tumbad"
+   * and being shown a Spanish music documentary: see answered(). This pass
+   * used to run only on an empty answer, which meant the queries it was
+   * written for — a title romanised the other way — mostly never reached it,
+   * because a near-miss prefix is usually enough for TMDB to return
+   * something.
    *
    * Only the distinctive token, because that is the one TMDB is failing on
    * and it is the one a transcription disagreement lands on: "pyaar ka
@@ -446,28 +569,35 @@ async function searchTmdb(request, url, env, ctx) {
    * time would put two seconds of round trips in front of a reader who has
    * already waited through three misses. The rank decides ties afterwards.
    */
-  if (!found) {
-    const kept = q
-      .split(/\s+/)
-      .filter(Boolean)
-      .filter((t) => !NOISE.has(t.toLowerCase().replace(/[^a-z0-9]/g, '')) && !/^(19|20)\d{2}$/.test(t));
-    const distinctive = kept.length
-      ? kept.reduce((a, b) => (b.length > a.length ? b : a)).toLowerCase().replace(/[^a-z]/g, '')
-      : '';
-
-    const variants = spellings(distinctive);
+  if (!found || !answered(found.results, acceptable)) {
     if (variants.length) {
       const tried = await Promise.all(variants.map((v) => askTmdb(v)));
       /* An outage mid-fan-out is still an outage, not a miss: if every
          variant came back null the upstream is down, and saying "nothing
-         matched" would be the lie this route already refuses to tell. */
+         matched" would be the lie this route already refuses to tell.
+         Only when there was nothing to fall back on — results already in
+         hand are still results, and an upstream that went down after
+         answering once must not turn them into an error page. */
       if (tried.every((t) => t === null)) {
-        return json(200, { remote: true, results: [], total: 0, degraded: true });
-      }
-      const winner = variants.findIndex((_, i) => tried[i] && tried[i].results.length);
-      if (winner !== -1) {
-        found = tried[winner];
-        asked = variants[winner];
+        if (!found) return json(200, { remote: true, results: [], total: 0, degraded: true });
+      } else {
+        /*
+         * A variant wins by being confirmed, not by being non-empty. It has
+         * to come back with something actually titled one of the spellings —
+         * otherwise the pass would replace one set of incidental results with
+         * another and call it a correction.
+         *
+         * Judged against every acceptable spelling rather than the one that
+         * was asked, because TMDB matches loosely in both directions: asking
+         * for "panchnama" is how you find the film filed as "Pyaar Ka
+         * Punchnama", and that result confirms the original word even though
+         * it does not contain the variant.
+         */
+        const winner = tried.findIndex((t) => t && answered(t.results, acceptable));
+        if (winner !== -1) {
+          found = tried[winner];
+          asked = variants[winner];
+        }
       }
     }
   }

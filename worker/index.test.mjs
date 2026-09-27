@@ -12,7 +12,7 @@
 
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import worker, { lastDueSlot, GENRE_IDS, IN_PROVIDERS, spellings } from './index.js';
+import worker, { lastDueSlot, GENRE_IDS, IN_PROVIDERS, spellings, answered, distinctive } from './index.js';
 
 const ORIGIN = 'https://newonott.in';
 
@@ -763,7 +763,11 @@ await test('a repeated query is served from the edge, not from TMDB', async () =
   let calls = 0;
   globalThis.fetch = async () => {
     calls++;
-    return { ok: true, json: async () => ({ results: [{ media_type: 'movie', id: 1, title: 'A' }] }) };
+    /* Titled with the word that was asked for, so this stays a test about the
+       cache key. A stub answering "Kantara" with something else is a query
+       the route is now right to treat as unanswered, and it would spend the
+       spelling pass here and measure that instead. */
+    return { ok: true, json: async () => ({ results: [{ media_type: 'movie', id: 1, title: 'Kantara' }] }) };
   };
   const env = { TMDB_TOKEN: 't' };
   await worker.fetch(new Request(`${ORIGIN}/api/search?q=Kantara`), env, ctx);
@@ -1415,7 +1419,8 @@ await test('the substitutions romanisation actually varies on', () => {
     );
   finds('jindagi', 'zindagi');   // z ↔ j
   finds('laxmi', 'lakshmi');     // ksh ↔ x
-  finds('tumbbad', 'tumbad');    // doubled consonant
+  finds('tumbbad', 'tumbad');    // doubled consonant, collapsing
+  finds('tumbad', 'tumbbad');    // and expanding, which is the common one
   finds('vivah', 'wivah');       // v ↔ w
   finds('phir', 'fir');          // ph ↔ f
   finds('geet', 'git');          // ee ↔ i
@@ -1435,11 +1440,19 @@ await test('one substitution at a time, never two', () => {
     [/oo/g, 'u'], [/ph/g, 'f'], [/f/g, 'ph'], [/v/g, 'w'], [/w/g, 'v'], [/z/g, 'j'],
     [/j/g, 'z'], [/ksh/g, 'x'], [/x/g, 'ksh'], [/([bcdfgklmnprstz])\1/g, '$1'],
   ];
-  for (const word of ['panchnama', 'jindagi', 'vivah', 'laxmi', 'tumbbad']) {
+  /* The doubling class's expanding direction. Stated here as "any one
+     character repeated in place" rather than by reusing the implementation's
+     rules, so this stays an independent check on the one thing it is for: a
+     single insertion is one substitution, two would not be. */
+  const doubledOnce = (word, variant) =>
+    variant.length === word.length + 1 &&
+    [...word].some((c, i) => word.slice(0, i) + c + word.slice(i) === variant);
+  for (const word of ['panchnama', 'jindagi', 'vivah', 'laxmi', 'tumbbad', 'tumbad']) {
     for (const variant of spellings(word)) {
       const reachable =
         variant === `${word}a` ||
         variant === word.replace(/a$/, '') ||
+        doubledOnce(word, variant) ||
         classes.some(([p, to]) => {
           const hits = [...word.matchAll(p)];
           if (!hits.length) return false;
@@ -1555,4 +1568,113 @@ await test('a real miss is still a miss, after the spellings too', async () => {
   assert.equal(b.results.length, 0);
   assert.equal(b.degraded, undefined, 'a miss was dressed up as an outage');
   assert.match(res.headers.get('cache-control'), /max-age=3600/, 'the miss was not cached');
+});
+
+/*
+ * Results that are not the answer.
+ *
+ * The reported case, measured against the live route: "tumbad" came back with
+ * six results led by a Spanish music documentary called Corridos Tumbados,
+ * and the spelling pass never ran because six is more than zero. Every test
+ * above this point checked the empty path, which is why a whole class of miss
+ * went unnoticed — including the exact romanisation case the pass exists for.
+ */
+
+await test('what counts as an answer is a whole word, not a prefix', () => {
+  const of = (...titles) => titles.map((title) => ({ title }));
+  // The bug itself: "tumbados" contains "tumbad" and is not it.
+  assert.equal(answered(of('Género 101: Corridos Tumbados'), ['tumbad']), false);
+  assert.equal(answered(of('Tumbbad'), ['tumbad', 'tumbbad']), true);
+  // Any position in the set counts — a right answer ranked fourth is still right.
+  assert.equal(answered(of('Something Else', 'Vivah'), ['vivah']), true);
+  // Punctuation is not part of a word: K.G.F is kgf.
+  assert.equal(answered(of('K.G.F: Chapter 3'), ['kgf']), true);
+  // People are results too, and a cast search lands on their name.
+  assert.equal(answered([{ name: 'Shah Rukh Khan' }], ['khan']), true);
+  // Nothing to judge against is not a failure to answer.
+  assert.equal(answered(of('Anything'), []), true);
+});
+
+await test('the distinctive word survives the noise and the year', () => {
+  assert.equal(distinctive('tumbad'), 'tumbad');
+  assert.equal(distinctive('manjummel boys'), 'manjummel');
+  assert.equal(distinctive('coolie movie 2025'), 'coolie');
+  assert.equal(distinctive('K.G.F'), 'kgf');
+  assert.equal(distinctive('movie'), '');
+});
+
+await test('incidental results do not stop the spelling pass', async () => {
+  /*
+   * The whole point. TMDB answers the typed word with something that merely
+   * shares a prefix, so the old zero-results condition was never met and the
+   * reader was shown the wrong film with no indication anything had been
+   * approximated.
+   */
+  fakeCache();
+  const asked = [];
+  globalThis.fetch = async (u) => {
+    const q = new URL(String(u)).searchParams.get('query');
+    asked.push(q);
+    const results =
+      q === 'tumbbad'
+        ? [{ media_type: 'movie', id: 440472, title: 'Tumbbad', release_date: '2018-10-12', poster_path: '/t.jpg' }]
+        : q === 'tumbad'
+          ? [{ media_type: 'movie', id: 999001, title: 'Género 101: Corridos Tumbados', release_date: '2023-01-01', poster_path: '/c.jpg' }]
+          : [];
+    return { ok: true, status: 200, json: async () => ({ results, total_results: results.length }) };
+  };
+
+  const b = await (await worker.fetch(new Request(`${ORIGIN}/api/search?q=tumbad`), { TMDB_TOKEN: 't' }, ctx)).json();
+  assert.ok(asked.includes('tumbad'), 'never tried what was typed');
+  assert.ok(asked.includes('tumbbad'), `the spelling pass never ran; asked ${asked.join(', ')}`);
+  assert.equal(b.results[0].title, 'Tumbbad', `led with ${b.results[0]?.title}`);
+  assert.equal(b.relaxedTo, 'tumbbad', 'corrected the spelling without saying so');
+});
+
+await test('but unconfirmed results are kept rather than replaced', async () => {
+  /*
+   * A descriptive query — "best malayalam thriller" — has no result titled
+   * with the words typed, so it reads as unanswered and pays for one fan-out.
+   * What it must not do is throw away the results it had for a variant's
+   * unrelated ones. Replacing one set of incidental results with another is
+   * not a correction, and this route's standing rule is that a confident
+   * wrong answer is worse than an approximate one.
+   */
+  fakeCache();
+  globalThis.fetch = async (u) => {
+    const q = new URL(String(u)).searchParams.get('query');
+    const results = [{ media_type: 'movie', id: 999002, title: `Result for ${q}`, release_date: '2020-01-01', poster_path: '/r.jpg' }];
+    return { ok: true, status: 200, json: async () => ({ results, total_results: 1 }) };
+  };
+  const b = await (
+    await worker.fetch(new Request(`${ORIGIN}/api/search?q=${encodeURIComponent('best malayalam thriller')}`), { TMDB_TOKEN: 't' }, ctx)
+  ).json();
+  assert.equal(b.results[0].title, 'Result for best malayalam thriller', 'swapped in a variant nothing confirmed');
+  assert.equal(b.relaxedTo, undefined, 'claimed a correction it did not make');
+});
+
+await test('an outage after an answer keeps the answer', async () => {
+  /*
+   * The confirmation pass can now run when results are already in hand, so
+   * "every variant came back null" no longer means there is nothing to show.
+   * Reporting degraded here would turn a usable page into an error for a
+   * reader who had results a moment earlier.
+   */
+  fakeCache();
+  let first = true;
+  globalThis.fetch = async () => {
+    if (!first) throw new Error('network');
+    first = false;
+    return {
+      ok: true,
+      status: 200,
+      json: async () => ({
+        results: [{ media_type: 'movie', id: 999003, title: 'Corridos Tumbados', release_date: '2023-01-01', poster_path: '/c.jpg' }],
+        total_results: 1,
+      }),
+    };
+  };
+  const b = await (await worker.fetch(new Request(`${ORIGIN}/api/search?q=tumbad`), { TMDB_TOKEN: 't' }, ctx)).json();
+  assert.equal(b.degraded, undefined, 'turned results already in hand into an outage');
+  assert.equal(b.results.length, 1, 'dropped the results it had');
 });

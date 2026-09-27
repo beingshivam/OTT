@@ -1,0 +1,33 @@
+# Why is Tamil thin and Japanese not?
+#
+# The registry theory was measured and turned out to be wrong — eleven
+# platforms added, Tamil moved by one title. This measures the remaining
+# candidates instead of picking the next likely one: the flatrate filter, the
+# vote floors, the provider list and the page loop, each loosened on its own.
+#
+# Needs the TMDB credential, so it runs here. Read-only: it prints, and
+# changes nothing.
+name: Language probe
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Ask TMDB
+        env:
+          TMDB_TOKEN: ${{ secrets.TMDB_TOKEN || secrets.TMDB_API_KEY }}
+        # Fenced so the summary keeps the columns.
+        run: |
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          node scripts/language-probe.mjs | tee -a "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
