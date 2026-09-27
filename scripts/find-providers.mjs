@@ -27,8 +27,33 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 requireToken();
 
 const terms = process.argv.slice(2).filter((a) => !a.startsWith('--'));
-if (!terms.length) {
-  console.error('Usage: npm run providers -- <search term>\n  e.g. npm run providers -- hotstar zee');
+/**
+ * With no search term: every provider the region has, and whether we carry it.
+ *
+ * Searching by name answers "did this one move", which is the question when a
+ * service rebrands. It cannot answer "what are we not carrying at all", and
+ * that turned out to be the more expensive question.
+ *
+ * The catalogue fetch asks TMDB's discover with `with_watch_providers` set to
+ * the registry's sixteen Indian ids, so a title streaming only on a service
+ * the registry has never heard of is invisible to this site — it is not
+ * ranked low, it does not exist. Tamil returned 112 titles and Telugu 63
+ * against Japanese 172, which is backwards for an Indian OTT site, and the
+ * floors were not the cause: the popular pass already reaches down to twelve
+ * votes for Tamil. Missing platforms would explain it, and the regional South
+ * Indian and Punjabi services are exactly the ones a registry built around
+ * the national players would omit.
+ *
+ * So this lists the lot, marks what the registry claims, and lets the gap be
+ * read rather than guessed at from a list of names somebody remembered.
+ */
+const LIST_ALL = process.argv.slice(2).includes('--all');
+if (!terms.length && !LIST_ALL) {
+  console.error(
+    'Usage: npm run providers -- <search term>\n' +
+      '  e.g. npm run providers -- hotstar zee\n' +
+      '       npm run providers -- --all      (every provider in the region)',
+  );
   process.exit(1);
 }
 
@@ -75,6 +100,25 @@ if (!found.size) {
 console.log(`Searched ${found.size} providers across ${REGIONS.join(', ')}.`);
 if (skipped.length) console.log(`(incomplete — ${skipped.length} list(s) failed: ${skipped.join('; ')})`);
 console.log('');
+
+if (LIST_ALL) {
+  /* Carried first so the gap is the tail of the list rather than scattered
+     through it, and alphabetical inside each half so a name is findable. */
+  const rows = [...found.entries()].map(([id, e]) => ({
+    id,
+    name: e.name,
+    regions: [...e.regions].sort().join(','),
+    mine: claimed.get(id) ?? null,
+  }));
+  const ours = rows.filter((r) => r.mine).sort((a, b) => a.name.localeCompare(b.name));
+  const theirs = rows.filter((r) => !r.mine).sort((a, b) => a.name.localeCompare(b.name));
+
+  console.log(`Carried by the registry (${ours.length}):`);
+  for (const r of ours) console.log(`  ${String(r.id).padStart(5)}  ${r.name.padEnd(34)} ${r.regions.padEnd(6)} → ${r.mine}`);
+  console.log(`\nNot carried (${theirs.length}) — a title only on one of these is invisible to the fetch:`);
+  for (const r of theirs) console.log(`  ${String(r.id).padStart(5)}  ${r.name.padEnd(34)} ${r.regions}`);
+  console.log('');
+}
 
 for (const term of terms) {
   const needle = term.toLowerCase();

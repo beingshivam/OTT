@@ -1,0 +1,48 @@
+# Which streaming services does TMDB list for India, and which do we carry?
+#
+# The catalogue fetch asks discover with `with_watch_providers` set to the
+# registry's Indian ids. A title streaming only on a service the registry has
+# never heard of is not ranked low by that query — it does not exist. So the
+# registry is a ceiling on coverage, and nothing was measuring it.
+#
+# Needs the TMDB credential, so it runs here. Read-only: it prints, and
+# changes nothing.
+name: Watch providers
+
+on:
+  workflow_dispatch:
+    inputs:
+      terms:
+        description: 'Names to look up. Blank lists every provider in the region.'
+        required: false
+        default: ''
+      regions:
+        description: 'Regions to search.'
+        required: false
+        default: 'IN'
+
+permissions:
+  contents: read
+
+jobs:
+  providers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Ask TMDB
+        env:
+          TMDB_TOKEN: ${{ secrets.TMDB_TOKEN || secrets.TMDB_API_KEY }}
+          REGIONS: ${{ inputs.regions || 'IN' }}
+          TERMS: ${{ inputs.terms }}
+        # Fenced so the summary keeps the columns.
+        run: |
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          if [ -z "$TERMS" ]; then
+            node scripts/find-providers.mjs --all | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            node scripts/find-providers.mjs $TERMS | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
