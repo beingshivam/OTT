@@ -208,6 +208,55 @@ for (const week of feed.weeks) {
 }
 
 /*
+ * The back catalogue, which was outside all of this.
+ *
+ * Everything above exists because "pages that delete themselves cannot rank",
+ * and the catalogue — 650 of the site's 990 title pages, two thirds of
+ * everything it publishes — was never wired into it. Those pages live exactly
+ * as long as the next fetch-catalogue run returns the same titles, and it
+ * does not: the file has gone 664 → 662 → 658 → 663 → 658 across a fortnight
+ * of refreshes, so URLs have been appearing and disappearing the whole time.
+ * A handful each run, silently, on pages Google had already indexed.
+ *
+ * It is the identical failure the feed had, from the identical cause — a
+ * rebuilt-from-scratch file treated as a source of permanent pages — and it
+ * was simply never noticed, because the catalogue arrived by a different
+ * route after the archive was written.
+ *
+ * Merged the same additive way, so a fetch that comes back short costs a
+ * refresh nothing. build-seo picks these up through the archive instead of
+ * through catalogue.json (publishedIds already excludes anything archived
+ * from catalogueCandidates), so the pages are the same pages and the URLs do
+ * not move.
+ *
+ * No weekId, because a back-catalogue title is not in a week. And no events:
+ * the changes feed answers "what is new this week" for a reader, and 650
+ * "added" notices on the first run would bury a genuine Friday under a
+ * backlog that is not news to anybody.
+ */
+let catalogued = 0;
+const catalogue = await readFile(resolve(ROOT, 'public/data/catalogue.json'), 'utf8')
+  .then((s) => JSON.parse(s).titles ?? [])
+  /* A missing or unreadable catalogue must not cost the feed's archive run —
+     same contract as every other optional pass in the refresh. */
+  .catch(() => []);
+
+for (const row of catalogue) {
+  if (!row?.id) continue;
+  const existing = byId.get(row.id);
+  const merged = {
+    ...(existing ?? {}),
+    ...defined(row),
+    firstSeen: existing?.firstSeen ?? TODAY,
+    lastSeen: TODAY,
+  };
+  const moved = !existing || signature(existing) !== signature(merged);
+  merged.changedAt = moved ? TODAY : (existing.changedAt ?? existing.firstSeen ?? TODAY);
+  if (!existing) catalogued++;
+  byId.set(row.id, merged);
+}
+
+/*
  * And the rows this run never saw.
  *
  * The feed is a rolling window, so most of the archive is not in it — 190 of
@@ -314,6 +363,7 @@ console.log(
   `archive: ${titles.length} titles (${before} before, +${added} new, ${updated} updated)\n` +
     `         ${restamped} changed something a reader would see, and moved their lastmod\n` +
     `         ${fresh.length} new change events (${kept.length} in the ${KEEP_DAYS}-day log)\n` +
+    (catalogued ? `         ${catalogued} back-catalogue titles brought in from the fetch\n` : '') +
     (backfilled ? `         ${backfilled} older rows dated from when the feed last carried them\n` : '') +
     `         ${withPages} carry enough metadata for a title page`,
 );

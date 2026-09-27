@@ -90,6 +90,30 @@ requireToken();
  * people, and the site already learned what an untrustworthy score looks like
  * when a film turned up at a flat 10.0 from 1,029 brigaded votes.
  */
+/*
+ * One row here for every language the site publishes a page for.
+ *
+ * It fetched eight and the build writes thirteen language pages, and the
+ * five it skipped were exactly the five thin ones: Punjabi 9 titles, German
+ * 11, Korean 13, French 14, Spanish 31, against Hindi's 196. A published
+ * page with nine titles on it cannot rank for anything and quietly drags on
+ * every page that could — and the reader who lands on /punjabi from a search
+ * finds a shelf with nothing on it.
+ *
+ * None of the five is a long-tail curiosity for this audience. Korean,
+ * Spanish, German and French on an Indian OTT site mean Squid Game, Money
+ * Heist, Dark and Lupin — four of the most-searched things on streaming here.
+ * Punjabi is a domestic industry with its own stars and its own audience.
+ * Japanese joins them for the same reason: anime is one of the largest
+ * streaming categories in India and had no shelf at all.
+ *
+ * The floors stay floors on *trust* rather than on quality — below them a 9.1
+ * is a handful of people. They differ because TMDB's vote counts measure how
+ * well represented a language is in TMDB's own audience, not how good or how
+ * watched a title is: a mid-tier Korean series carries thousands of votes
+ * where a well-loved Punjabi film carries dozens, so one number applied to
+ * both would return everything for one and nothing for the other.
+ */
 const LANGUAGES = [
   { code: 'hi', name: 'Hindi', minVotes: 200 },
   { code: 'ta', name: 'Tamil', minVotes: 60 },
@@ -98,6 +122,17 @@ const LANGUAGES = [
   { code: 'kn', name: 'Kannada', minVotes: 40 },
   { code: 'bn', name: 'Bengali', minVotes: 40 },
   { code: 'mr', name: 'Marathi', minVotes: 40 },
+  /* Low, because TMDB's Punjabi coverage is thin rather than the cinema
+     being small. A floor set for Hindi returns an empty shelf here. */
+  { code: 'pa', name: 'Punjabi', minVotes: 25 },
+  /* The four with global audiences and correspondingly dense vote counts.
+     Set well above the Indian-language floors so the shelf is the genuinely
+     known work rather than the long tail of its country's output. */
+  { code: 'ko', name: 'Korean', minVotes: 400 },
+  { code: 'ja', name: 'Japanese', minVotes: 400 },
+  { code: 'es', name: 'Spanish', minVotes: 400 },
+  { code: 'fr', name: 'French', minVotes: 400 },
+  { code: 'de', name: 'German', minVotes: 400 },
   { code: 'en', name: 'English', minVotes: 2000 },
 ];
 

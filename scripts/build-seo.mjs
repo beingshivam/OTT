@@ -1609,9 +1609,33 @@ if (inCinemasRows.length >= MIN_PAGE_ROWS) {
  * question rather than a container invented to hold links. So every title now
  * has a permanent path home: title → its month → the homepage.
  */
-const monthsPresent = [...new Set(titleCandidates.map((r) => r.releaseDate.slice(0, 7)))]
+/*
+ * The calendar's own months, not every month a film was ever made in.
+ *
+ * A month page is a container for titles this calendar carried — "what came
+ * out in September 2026" — and it earns its place by being the permanent
+ * parent of pages that would otherwise be orphans.
+ *
+ * The back catalogue broke that assumption the moment it was archived: 570 of
+ * its 650 titles pre-date 2025, so the build started writing
+ * /releases/september-2013 and /releases/january-2014, each holding whichever
+ * five old films happen to be streaming here now. Nobody searches that, it is
+ * not a fact about anything, and a shelf of them is the thin programmatic
+ * content this site refuses to publish elsewhere — twenty-six of them
+ * appeared in one build.
+ *
+ * The catalogue titles are not orphaned by this. They have a parent already,
+ * and a better one: /streaming links all 651 of them, which is what that page
+ * is for.
+ *
+ * weekId is the discriminator because it is the honest one — it records that
+ * the row came through the weekly calendar at all. A back-catalogue title has
+ * never been in a week, which is exactly why it has no month page to be in.
+ */
+const calendarRows = titleCandidates.filter((r) => r.weekId);
+const monthsPresent = [...new Set(calendarRows.map((r) => r.releaseDate.slice(0, 7)))]
   .sort()
-  .map((ym) => ({ ym, list: titleCandidates.filter((r) => r.releaseDate.startsWith(ym)) }))
+  .map((ym) => ({ ym, list: calendarRows.filter((r) => r.releaseDate.startsWith(ym)) }))
   .filter(({ list }) => list.length >= MIN_PAGE_ROWS);
 
 for (const { ym, list } of monthsPresent) {
