@@ -1829,6 +1829,99 @@ for (const w of [...stockedWeeks].sort((a, b) => b.id.localeCompare(a.id))) {
  * resolves the path by reading a field rather than re-deriving it — one
  * implementation of the rule, and no way for the two to disagree.
  */
+/**
+ * Who each title page links to, when it has no week to share.
+ *
+ * The long tail was hanging off /streaming again. 499 of the 539 single-linked
+ * title pages had that one page as their only inbound link — the exact shape
+ * eval's own reachability note warns about, and the exact problem an earlier
+ * fix had already solved once. Adding 581 back-catalogue titles put them all
+ * back on the weakest hook, because the only sibling section a title page has
+ * is "also landing that week" and a back-catalogue title has no week.
+ *
+ * So a ring. Titles are grouped by language, sorted by rating, and each one
+ * links its three neighbours either side. The ring is the point: a page that
+ * linked the six best-rated titles in its language would hand every one of
+ * 2,172 pages the same six, which concentrates signal instead of spreading it.
+ * Neighbours give every title in a group the same six out and the same six in,
+ * so inbound degree is uniform by construction rather than by luck.
+ *
+ * Grouped by language because that is how this audience browses — somebody who
+ * just watched a Malayalam thriller wants another one, not the globally
+ * best-rated thing on the site — and sorted by rating so the neighbours are
+ * genuinely comparable rather than merely adjacent in an id.
+ */
+const RING_NEIGHBOURS = 3;
+const ring = new Map();
+/** Titles whose neighbours are not in their language, so the section above them
+ *  must not claim they are. */
+const ringedByKind = new Set();
+{
+  const byLanguage = new Map();
+  for (const r of allTitlePages) {
+    if (!slugById.has(r.id)) continue;
+    /* The first language is the original one, which is the one a reader means
+       when they say a film is Malayalam. */
+    const key = (r.languages ?? [])[0] ?? 'und';
+    if (!byLanguage.has(key)) byLanguage.set(key, []);
+    byLanguage.get(key).push(r);
+  }
+
+  /*
+   * A title alone in its language has no sibling in it, and skipping it would
+   * leave exactly the page this whole section exists to prevent — the first
+   * build left one, The Secret Woman, hanging off a single month page. So the
+   * singletons are pooled and ringed by kind instead. A worse grouping than
+   * language, and much better than the fallback it replaces, which was one
+   * link from a page listing a hundred others.
+   */
+  const pool = [];
+  for (const [key, group] of byLanguage) {
+    if (group.length < 2) {
+      pool.push(...group);
+      byLanguage.delete(key);
+    }
+  }
+  for (const r of pool) {
+    const key = `kind:${r.kind}`;
+    if (!byLanguage.has(key)) byLanguage.set(key, []);
+    byLanguage.get(key).push(r);
+    ringedByKind.add(r.id);
+  }
+
+  for (const group of byLanguage.values()) {
+    /* Sorted by rating, then id, so a build is reproducible: two titles on the
+       same score must not swap places between runs and churn every link. */
+    group.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0) || String(a.id).localeCompare(String(b.id)));
+    const n = group.length;
+    if (n < 2) continue;
+    for (let i = 0; i < n; i += 1) {
+      const picks = [];
+      /* Outward from the title in both directions, so a small group is covered
+         once rather than listing the same neighbour twice. */
+      for (let step = 1; step <= RING_NEIGHBOURS && picks.length < 2 * RING_NEIGHBOURS; step += 1) {
+        for (const j of [i - step, i + step]) {
+          const at = group[((j % n) + n) % n];
+          if (at.id !== group[i].id && !picks.some((p) => p.id === at.id)) picks.push(at);
+        }
+      }
+      ring.set(group[i].id, picks.slice(0, 2 * RING_NEIGHBOURS));
+    }
+  }
+}
+
+/** A sibling as a link, not as a word. The "also that week" list rendered its
+ *  titles as bare <li> text, so a section that looks like navigation passed no
+ *  crawl signal at all and the pages it names got no credit for being named. */
+const siblingMarkup = (rows) =>
+  rows
+    .map((x) => {
+      const to = slugById.get(x.id);
+      const label = esc(x.title);
+      return to ? `<li><a href="/ott-release-date/${to}">${label}</a></li>` : `<li>${label}</li>`;
+    })
+    .join('');
+
 for (const r of allTitlePages) {
   const slug = slugById.get(r.id);
   if (!slug) continue;
@@ -2089,9 +2182,27 @@ for (const r of allTitlePages) {
                 : 'Also in cinemas that week'
               : 'Also landing that week'
           }</h2><ul>` +
-          alsoThatWeek.map((x) => `<li>${esc(x.title)}</li>`).join('') +
+          siblingMarkup(alsoThatWeek) +
           `</ul></section>`
-        : ''),
+        : '') +
+      /* The back catalogue's only sibling section, and the reason its pages
+         stop depending on /streaming. Headed by language, because that is what
+         the ring is grouped by and a heading that does not describe its list is
+         worse than none. */
+      (() => {
+        const near = (ring.get(r.id) ?? []).filter((x) => !alsoThatWeek.some((w) => w.id === x.id));
+        if (!near.length) return '';
+        /* Only name the language when the list is actually in it. A title
+           pooled into the by-kind ring has neighbours from other languages, and
+           a heading promising otherwise would be the one thing this section
+           must not do. */
+        const lang = ringedByKind.has(r.id) ? '' : langs[0];
+        return (
+          `<section><h2>More ${lang ? `${esc(lang)} ` : ''}titles worth watching</h2><ul>` +
+          siblingMarkup(near) +
+          `</ul></section>`
+        );
+      })(),
   });
 }
 

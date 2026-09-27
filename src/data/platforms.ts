@@ -112,8 +112,8 @@ export const PLATFORMS: Platform[] = [
    * platform pages nobody searches for.
    */
   { id: 'mxplayer',    name: 'MX Player',    short: 'MX Player', mark: 'MX',   accent: '#F5C518', accent2: '#FFE066', tmdb: [515, 1898],  regions: ['IN'],       homeUrl: 'https://www.mxplayer.in/', searchUrl: 'https://www.mxplayer.in/search?q={q}' },
-  { id: 'manoramamax', name: 'ManoramaMAX',  short: 'ManoramaMAX', mark: 'MM', accent: '#E8112D', accent2: '#FF5A6E', tmdb: [482, 2177],  regions: ['IN'],       homeUrl: 'https://www.manoramamax.com/', searchUrl: 'https://www.manoramamax.com/search?q={q}' },
-  { id: 'shemaroome',  name: 'ShemarooMe',   short: 'ShemarooMe', mark: 'SH',  accent: '#D6252B', accent2: '#FF6B70', tmdb: [474],        regions: ['IN'],       homeUrl: 'https://www.shemaroome.com/', searchUrl: 'https://www.shemaroome.com/search?q={q}' },
+  { id: 'manoramamax', name: 'ManoramaMAX',  short: 'Manorama', mark: 'MM', accent: '#E8112D', accent2: '#FF5A6E', tmdb: [482, 2177],  regions: ['IN'],       homeUrl: 'https://www.manoramamax.com/', searchUrl: 'https://www.manoramamax.com/search?q={q}' },
+  { id: 'shemaroome',  name: 'ShemarooMe',   short: 'Shemaroo', mark: 'SH',  accent: '#D6252B', accent2: '#FF6B70', tmdb: [474],        regions: ['IN'],       homeUrl: 'https://www.shemaroome.com/', searchUrl: 'https://www.shemaroome.com/search?q={q}' },
   { id: 'hungama',     name: 'Hungama Play', short: 'Hungama',   mark: 'HP',   accent: '#F7671F', accent2: '#FFA45C', tmdb: [437],        regions: ['IN'],       homeUrl: 'https://www.hungama.com/', searchUrl: 'https://www.hungama.com/search/?q={q}' },
   { id: 'epicon',      name: 'EPIC ON',      short: 'EPIC ON',   mark: 'EP',   accent: '#B8860B', accent2: '#E8C36A', tmdb: [476],        regions: ['IN'],       homeUrl: 'https://www.epicon.in/', searchUrl: 'https://www.epicon.in/search?q={q}' },
   { id: 'chaupal',     name: 'Chaupal',      short: 'Chaupal',   mark: 'CH',   accent: '#00A99D', accent2: '#4FD8CC', tmdb: [2178],       regions: ['IN'],       homeUrl: 'https://chaupal.tv/', searchUrl: 'https://chaupal.tv/search?q={q}' },
