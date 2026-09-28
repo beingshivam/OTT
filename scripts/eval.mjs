@@ -204,6 +204,51 @@ else {
   record(S2, 'thinly-voted high scores (shown grey, by design)', 'NOTE',
     `${thin.length} row(s) show ≥8.0 on fewer than ${TMDB_MIN_VOTES} votes`,
     thin.slice(0, 3).map((r) => `${r.title} — ${displayed(r).value} from ${displayed(r).votes}`));
+
+  /**
+   * And the machine-readable half has to agree with the visible one.
+   *
+   * A page that greys a score because thirty people voted on it, while telling
+   * Google in JSON-LD that it is an aggregate rating worth putting stars on, is
+   * arguing with itself in the one place a reader cannot see and a crawler can.
+   * That is a worse version of the thin-score problem, not a smaller one: the
+   * hedge is the honest part, and structured data that drops it is the site
+   * making a claim it has already decided it does not believe.
+   *
+   * Every rating is checked, not sampled, and so is its attribution — the
+   * number is TMDB's crowd and markup that omits the source is claiming it.
+   */
+  if (!pages) skip(S2, 'no page rates a title more confidently than it shows it', 'needs dist/');
+  else {
+    const offences = [];
+    for (const [path, html] of pages) {
+      for (const [, raw] of html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
+        let parsed;
+        try {
+          parsed = JSON.parse(raw);
+        } catch {
+          offences.push(`${path} — unparseable JSON-LD`);
+          continue;
+        }
+        for (const node of parsed['@graph'] ?? [parsed]) {
+          const ar = node?.aggregateRating;
+          if (!ar) continue;
+          if (!(ar.ratingCount >= TMDB_MIN_VOTES)) {
+            offences.push(`${path} — ${ar.ratingValue} on ${ar.ratingCount} votes`);
+          } else if (ar.ratingValue > MAX_CREDIBLE) {
+            offences.push(`${path} — ${ar.ratingValue} is above the credible ceiling`);
+          } else if (!ar.author?.name) {
+            offences.push(`${path} — rating with no source named`);
+          }
+        }
+      }
+    }
+    offences.length
+      ? fail(S2, 'no page rates a title more confidently than it shows it',
+          `${offences.length} page(s) assert a score the page itself hedges`, offences.slice(0, 5))
+      : pass(S2, 'no page rates a title more confidently than it shows it',
+          `every emitted rating clears ${TMDB_MIN_VOTES} votes and names its source`);
+  }
 }
 
 // --- language fairness -------------------------------------------------------

@@ -463,6 +463,52 @@ const FALLBACK_CSS = `    <style>
  * this service in India — the machine-readable form of the sentence the page
  * leads with.
  */
+/**
+ * The score, but only where the page itself will vouch for it.
+ *
+ * This is the field that puts stars in a search result, and stars are worth
+ * more than a position: a page that moves from tenth to ninth gains little
+ * where a page that gains a rating gains clicks. So it is worth having, and
+ * worth being careful with, because the two easy ways to add it are both
+ * dishonest.
+ *
+ * The first is presenting it as ours. It is not ours — it is TMDB's crowd, and
+ * the page says so in its own tooltip, "because a number with no provenance
+ * invites the reader to assume the wrong one". So the markup names the source
+ * too. Google's guidelines ask for the same thing for the same reason.
+ *
+ * The second is emitting it for every title. The site already decided which
+ * scores it believes: below fifty votes a score renders grey, because "TMDB's
+ * crowd is small enough that a handful of votes is noise", and above 9.5
+ * nothing renders at all, because no film sits above the best-reviewed film
+ * ever made. A machine-readable claim that ignores both would have this page
+ * asserting as fact the very number it is visually hedging — which breaks the
+ * rule the node above is built on, that the markup and the visible page cannot
+ * disagree. Worse, it would be arguing with itself in the one place a reader
+ * cannot see and a crawler can.
+ *
+ * The thresholds are restated rather than imported because src/lib/score.ts is
+ * TypeScript and this is a build script; the eval gate asserts they still
+ * match, so a drift fails rather than quietly re-enabling the greyed scores.
+ */
+const TMDB_MIN_VOTES = 50;
+const MAX_CREDIBLE = 9.5;
+
+function aggregateRatingFor(r) {
+  if (r.rating == null || r.votes == null) return {};
+  if (r.votes < TMDB_MIN_VOTES || r.rating > MAX_CREDIBLE) return {};
+  return {
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: r.rating,
+      ratingCount: r.votes,
+      bestRating: 10,
+      worstRating: 0,
+      author: { '@type': 'Organization', name: 'The Movie Database' },
+    },
+  };
+}
+
 function movieNode(r, canonical) {
   const streamingOn = (r.platforms ?? []).filter((p) => p !== 'theatres');
   return {
@@ -482,6 +528,7 @@ function movieNode(r, canonical) {
       ? { actor: r.cast.map((name) => ({ '@type': 'Person', name })) }
       : {}),
     ...(r.director ? { director: { '@type': 'Person', name: r.director } } : {}),
+    ...aggregateRatingFor(r),
     ...(r.trailerUrl ? { trailer: { '@type': 'VideoObject', name: `${r.title} trailer`, url: r.trailerUrl } } : {}),
     ...(streamingOn.length
       ? {
