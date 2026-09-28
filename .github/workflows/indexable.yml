@@ -1,0 +1,44 @@
+# Which pages are worth a Request Indexing, checked against the live site.
+#
+# Search Console allows a handful of manual indexing requests a day, so the
+# quota is the scarce thing. The expensive mistake is spending one on a URL that
+# Google will decline for a reason that was visible beforehand — a redirect, a
+# noindex, a canonical pointing elsewhere, a robots.txt rule.
+#
+# Runs here rather than on a laptop because it asks the live site, and because
+# the answer that matters is what Google's fetcher would see, not what the build
+# produced.
+name: Which pages to request indexing for
+
+on:
+  workflow_dispatch:
+    inputs:
+      paths:
+        description: 'Space-separated paths to check. Blank uses the ranked default list.'
+        required: false
+        default: ''
+      site:
+        description: 'Site to check.'
+        required: false
+        default: 'https://newonott.in'
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Ask the live site
+        env:
+          SITE: ${{ inputs.site || 'https://newonott.in' }}
+          PATHS: ${{ inputs.paths }}
+        # Fenced so the summary keeps the URLs on their own lines, ready to copy.
+        run: |
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          node scripts/indexable.mjs $PATHS | tee -a "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"

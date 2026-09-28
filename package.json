@@ -47,7 +47,8 @@
     "test:tmdb": "node --test scripts/tmdb.test.mjs",
     "angles": "node scripts/build-angles.mjs",
     "plan:ig": "node scripts/plan-instagram.mjs",
-    "post:ig": "node scripts/publish-instagram.mjs"
+    "post:ig": "node scripts/publish-instagram.mjs",
+    "indexable": "node scripts/indexable.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
