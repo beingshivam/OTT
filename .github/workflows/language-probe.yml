@@ -17,6 +17,11 @@ on:
         type: boolean
         required: false
         default: false
+      avod:
+        description: 'Measure what free and ad-supported adds at a low vote floor, per language.'
+        type: boolean
+        required: false
+        default: false
       target:
         description: 'How many candidates a floor should leave (calibrate mode).'
         required: false
@@ -37,6 +42,7 @@ jobs:
         env:
           TMDB_TOKEN: ${{ secrets.TMDB_TOKEN || secrets.TMDB_API_KEY }}
           CALIBRATE: ${{ inputs.calibrate && '1' || '' }}
+          AVOD: ${{ inputs.avod && '1' || '' }}
           TARGET: ${{ inputs.target || '250' }}
         # Fenced so the summary keeps the columns.
         run: |

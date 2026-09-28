@@ -157,6 +157,54 @@ const calibrate = async (lang) => {
   return { ...best, short: false };
 };
 
+/*
+ * AVOD mode: is free and ad-supported where the thin languages actually live?
+ *
+ * Kannada, Bengali, Marathi and Punjabi did not move when the vote floors were
+ * recalibrated — 37, 46, 15 and 11 titles — and they look exhausted at the
+ * query as it runs. The first probe measured the monetisation filter as worth
+ * about 4%, which is why it was dismissed, but it measured it *at the old vote
+ * floors*, where there was almost nothing left to admit. That is not the same
+ * question as whether free and ad-supported matter down where these languages
+ * live.
+ *
+ * It is a plausible place for them to live. Regional Indian cinema leans on
+ * free tiers and ad-supported catalogues far more than Hindi or English does,
+ * and the discover query asks for `flatrate` only while the provider lookup
+ * that follows deliberately keeps free and ads — so the two halves of the
+ * pipeline have never agreed about this, and only one of them was ever
+ * measured.
+ *
+ * Holds the floor at the popularity pass's own minimum rather than at zero: a
+ * count including titles nobody has voted on at all would be a number about
+ * TMDB's completeness, not about anything this site could publish.
+ */
+if (process.env.AVOD) {
+  const floor = Number(process.env.FLOOR ?? 10);
+  console.log(`\nDoes free and ad-supported unlock the thin languages? Floor ${floor} votes\n`);
+  console.log(`  ${pad('language', 11)}${num('flatrate')}${num('+free/ads')}${num('gain')}`);
+  for (const lang of LANGUAGES) {
+    const at = async (tiers) => {
+      const [movie, tv] = await Promise.all([
+        count('movie', { language: lang.code, minVotes: floor, tiers, providers: REGISTRY_IDS }),
+        count('tv', { language: lang.code, minVotes: floor, tiers, providers: REGISTRY_IDS }),
+      ]);
+      return movie + tv;
+    };
+    const paid = await at('flatrate');
+    const all = await at('flatrate|free|ads');
+    const gain = paid ? `+${Math.round((100 * (all - paid)) / paid)}%` : '—';
+    console.log(`  ${pad(lang.name, 11)}${num(paid)}${num(all)}${num(gain)}`);
+  }
+  console.log(`\n  ${callCount()} TMDB calls.`);
+  console.log(
+    '\n  The gain is what the discover query is refusing that the provider lookup\n' +
+      '  would have kept. A large one means the two halves of the pipeline disagree\n' +
+      '  about this language and the site is the poorer for it.',
+  );
+  process.exit(0);
+}
+
 if (process.env.CALIBRATE) {
   console.log(`\nThe floor that leaves each language ${TARGET}+ candidates for a 160-title budget\n`);
   console.log(`  ${pad('language', 11)}${num('now')}${num('floor')}${num('gives')}`);
