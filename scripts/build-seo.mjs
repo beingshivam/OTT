@@ -2099,6 +2099,15 @@ for (const r of allTitlePages) {
   const inBrackets = [collidedIds.has(r.id) ? year : '', descriptor].filter(Boolean).join(' ');
   const qualified = inBrackets ? `${r.title} (${inBrackets})` : r.title;
   const on = streaming.length ? streaming.map(pname).join(', ') : '';
+  /* For the title tag, where every character is spent against a truncation
+     point. `on` names them all and stays right for the description and the
+     page, which have the room. */
+  const lead = streaming.length ? pname(streaming[0]) : '';
+  const alsoOn = streaming.length > 1 ? ` +${streaming.length - 1}` : '';
+  /* The bracket moves behind the platform rather than being dropped: it
+     disambiguates two films sharing a name, which is a job it can still do
+     from the tail of a tag. */
+  const suffix = inBrackets ? ` — ${inBrackets}` : '';
   // From the archive too, so a page whose week has rolled out of the window
   // keeps its context instead of quietly losing a section as it ages.
   /* Same medium as the page it sits on: cinema listings beside a cinema
@@ -2146,11 +2155,36 @@ for (const r of allTitlePages) {
      * something nobody can watch for another fortnight. Upcoming is asked
      * first now, so a date in the future can never read as available.
      */
+    /*
+     * The platform goes near the front, because that is the answer.
+     *
+     * The paragraph above already says the important terms go first and that a
+     * tag is cut at roughly sixty characters. Measured against the built site,
+     * it was not true of the term that matters most: 953 of 2,172 title pages
+     * — 44% — named the platform past character 57, where nobody sees it.
+     *
+     *   Watch Manjummel Boys (Malayalam movie) online — streaming on JioHotstar
+     *   └────────────── what Google shows ──────────────┘
+     *
+     * Somebody searching "manjummel boys ott" got a result that trailed off
+     * one word before the only word they wanted. The bracket — the language
+     * and the kind — was sitting in front of it, doing disambiguation work
+     * that matters on the page and not in the result.
+     *
+     *   Watch Manjummel Boys on JioHotstar — Malayalam movie
+     *
+     * Same facts, platform at character 24, whole thing inside the budget.
+     *
+     * Only the first service is named. 72% of titles have exactly one, and
+     * spelling out four would spend the budget this is trying to save; `+n`
+     * says there are more without claiming there are not. The page itself
+     * lists them all, which is where somebody who cares will look.
+     */
     title:
       streaming.length && !upcoming
-        ? `Watch ${qualified} online — streaming on ${on}`
+        ? `Watch ${r.title} on ${lead}${alsoOn}${suffix}`
         : streaming.length
-          ? `${qualified} — streaming on ${on} from ${opensOn}`
+          ? `${r.title} on ${lead}${alsoOn} from ${opensOn}${suffix}`
           : streamsOn
             ? `${qualified} OTT release date — ${landsOn} from ${landsDate}`
             : upcoming
