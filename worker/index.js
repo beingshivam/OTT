@@ -291,6 +291,70 @@ function doublings(w) {
 const MAX_SPELLINGS = 8;
 const MIN_SPELLABLE = 4;
 
+/**
+ * The one address a page answers on, worked out in a single step.
+ *
+ * This was two rules that ran in sequence, each with its own redirect, and
+ * that sequence was the bug. Both of the things they fix are real:
+ *
+ * ONE CASING PER PAGE. The first version redirected on capitals alone and took
+ * the whole site down for the length of one deploy: Vite's hashed bundles are
+ * named like index-CqG28YpW.js, so every asset 301'd to a lowercase path that
+ * does not exist, fell through to the SPA fallback, and arrived at the browser
+ * as index.html with a JavaScript content type. A published page path never
+ * has a dot in it — platform ids, language names, slugs, /w/<iso-date> — and
+ * every dotted path is a file whose name is somebody else's to choose. So the
+ * extension is the test, not the casing.
+ *
+ * ONE PATH PER PAGE, WITHOUT A TRAILING SLASH. The asset server answers
+ * /theatres and /theatres/ with the same file, so Google indexed both and split
+ * their signals: Search Console for 4-14 September listed them as separate
+ * rows, 39 impressions against 21, for one page. The canonical already said
+ * /theatres and was being ignored, which is what canonicals do when two URLs
+ * both return 200 — they are a hint, and a redirect is not.
+ *
+ * Doing them one after another produced three faults that Search Console
+ * reports as redirect errors, all found by walking the rules rather than by
+ * reading them:
+ *
+ *   /Theatres/    301 to /theatres/, then 301 to /theatres. Two hops where one
+ *                 would do. Every hop is a round trip and a discount on
+ *                 whatever signal the link carried.
+ *
+ *   /Foo.jpg/     301 to /foo.jpg/ — because the casing rule tested for an
+ *                 extension at the *end of the path*, and a trailing slash
+ *                 means there isn't one. The slash rule then declined to
+ *                 clean it up, on the grounds that it looked like a file. So
+ *                 a redirect landed on a path that cannot exist.
+ *
+ *   /caf%C3%A9    301 to /caf%c3%a9. Percent-escapes are hex, RFC 3986 says
+ *                 that hex should be uppercase, and `/[A-Z]/` cannot tell an
+ *                 escape from a capital letter. Case-insensitive in theory;
+ *                 in practice this 301s the canonical spelling of a URL to a
+ *                 non-canonical one, for no reason, and any byte-exact lookup
+ *                 behind it answers 404.
+ *
+ * Hence one function with the steps in the order that makes them agree: strip
+ * the slashes first so the extension test sees a real filename, lowercase what
+ * is left, and leave the escapes alone. The caller redirects once, if at all.
+ */
+const lowerOutsideEscapes = (s) =>
+  s
+    .split(/(%[0-9A-Fa-f]{2})/)
+    /* split() with a capture puts the escapes at the odd indices, so this
+       lowercases the path and never the hex inside an escape. */
+    .map((part, i) => (i % 2 ? part : part.toLowerCase()))
+    .join('');
+
+export function canonicalPath(pathname) {
+  /* "" is not a path, so a path of nothing but slashes is the root. */
+  let p = pathname.length > 1 ? pathname.replace(/\/+$/, '') || '/' : pathname;
+  /* After the strip, never before: /Foo.jpg/ is a file with a slash stuck on
+     the end, and testing the original would have said it was a page. */
+  if (!/\.[a-z0-9]+$/i.test(p)) p = lowerOutsideEscapes(p);
+  return p;
+}
+
 export function spellings(word, limit = MAX_SPELLINGS) {
   const w = (word ?? '').toLowerCase();
   if (w.length < MIN_SPELLABLE || !/^[a-z]+$/.test(w)) return [];
@@ -1113,29 +1177,12 @@ export default {
      * is somebody else's to choose: bundles, /build.txt, /sitemap.xml, posters.
      * So the extension is the test, not the casing.
      */
-    if (/[A-Z]/.test(url.pathname) && !/\.[a-z0-9]+$/i.test(url.pathname)) {
-      url.pathname = url.pathname.toLowerCase();
-      return Response.redirect(url.toString(), 301);
-    }
-
-    /**
-     * One path per page, without a trailing slash.
-     *
-     * The asset server answers /theatres and /theatres/ with the same file, so
-     * Google indexed both and split their signals between them: Search Console
-     * for 4-14 September lists them as separate rows, 39 impressions against 21,
-     * for one page. The canonical already said /theatres and was being ignored,
-     * which is what canonicals do when two URLs both return 200 — they are a
-     * hint, and a redirect is not.
-     *
-     * Every one of the 314 URLs in the sitemap is slashless except the root, so
-     * the slashed form is never the address of anything. The root is excluded
-     * because "" is not a path, and dotted paths are left alone for the same
-     * reason as the casing rule above: a file's name belongs to whoever made it.
-     */
-    if (url.pathname.length > 1 && url.pathname.endsWith('/') && !/\.[a-z0-9]+\/$/i.test(url.pathname)) {
-      url.pathname = url.pathname.replace(/\/+$/, '');
-      return Response.redirect(url.toString(), 301);
+    {
+      const to = canonicalPath(url.pathname);
+      if (to !== url.pathname) {
+        url.pathname = to;
+        return Response.redirect(url.toString(), 301);
+      }
     }
 
     /* Before the asset fallback, and before the subscribe guard below, which

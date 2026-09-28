@@ -309,6 +309,95 @@ await test('a poster path keeps its capitals', async () => {
   );
 });
 
+/*
+ * One redirect, or none.
+ *
+ * Search Console reported three pages under "Redirect error" with no URLs
+ * attached, so these were found by walking the rules instead: every shape that
+ * could reach both of them, followed hop by hop until it stopped. All three
+ * faults below were real and none of them was visible from reading the code,
+ * because each needed the two rules to interact.
+ */
+
+await test('normalising happens in one step, never two', async () => {
+  /*
+   * /Theatres/ used to 301 to /theatres/ and then 301 again to /theatres. Two
+   * round trips for one page, and Google discounts what it carries at each
+   * hop. The casing rule and the slash rule each did their own redirect, which
+   * is the whole reason they are one function now.
+   */
+  const hops = async (from) => {
+    const seen = [];
+    let at = from;
+    for (let i = 0; i < 6; i += 1) {
+      const res = await worker.fetch(new Request(`${ORIGIN}${at}`), { ASSETS: { ...fakeAssets } });
+      if (res.status < 300 || res.status >= 400) return seen;
+      const to = new URL(res.headers.get('location'));
+      seen.push(to.pathname + to.search);
+      at = to.pathname + to.search;
+    }
+    throw new Error(`${from} never stopped redirecting`);
+  };
+
+  assert.deepEqual(await hops('/Theatres/'), ['/theatres'], 'capitals and a slash must cost one redirect');
+  assert.deepEqual(await hops('/PRIME/?utm=x'), ['/prime?utm=x'], 'the query has to survive the hop');
+  assert.deepEqual(await hops('/theatres/'), ['/theatres']);
+  assert.deepEqual(await hops('/Theatres'), ['/theatres']);
+  assert.deepEqual(await hops('/w/2026-08-28/'), ['/w/2026-08-28']);
+  assert.deepEqual(await hops('/theatres'), [], 'a canonical path must not redirect at all');
+});
+
+await test('a redirect never lands somewhere that cannot exist', async () => {
+  /*
+   * /Foo.jpg/ used to 301 to /foo.jpg/ — the casing rule looked for an
+   * extension at the end of the path and a trailing slash means there is not
+   * one, so it treated a file as a page; the slash rule then refused to tidy up
+   * because it could see the extension. The result was a 301 onto a path no
+   * asset server can answer, which is precisely what Search Console calls a
+   * redirect error. Stripping the slash first makes the two agree.
+   */
+  const res = await worker.fetch(new Request(`${ORIGIN}/Foo.jpg/`), { ASSETS: { ...fakeAssets } });
+  assert.equal(res.status, 301);
+  assert.equal(
+    new URL(res.headers.get('location')).pathname,
+    '/Foo.jpg',
+    'a file keeps its capitals and loses the slash, rather than the other way round',
+  );
+});
+
+await test('percent-escapes are left exactly as they are', async () => {
+  /*
+   * RFC 3986 says the hex in an escape should be uppercase, and /[A-Z]/ cannot
+   * tell an escape from a capital letter — so the canonical spelling of a URL
+   * was being 301'd to a non-canonical one. Harmless in theory, since escapes
+   * are case-insensitive; in practice a pointless redirect on a correct URL,
+   * and a 404 from anything matching bytes.
+   */
+  const assets = { ...fakeAssets, fetched: [] };
+  const res = await worker.fetch(new Request(`${ORIGIN}/ott-release-date/caf%C3%A9`), { ASSETS: assets });
+  assert.notEqual(res.status, 301, 'an escape is not a capital letter');
+  assert.deepEqual(assets.fetched, ['/ott-release-date/caf%C3%A9'], 'the escape must reach assets untouched');
+});
+
+await test('the escape survives while the rest of the path is lowered', async () => {
+  // Both halves at once, which is the case a simpler fix would miss.
+  const res = await worker.fetch(new Request(`${ORIGIN}/Ott-Release-Date/caf%C3%A9`), {
+    ASSETS: { ...fakeAssets },
+  });
+  assert.equal(res.status, 301);
+  assert.equal(
+    new URL(res.headers.get('location')).pathname,
+    '/ott-release-date/caf%C3%A9',
+    'lowercase the path, never the hex',
+  );
+});
+
+await test('a path of nothing but slashes is the root', async () => {
+  const res = await worker.fetch(new Request(`${ORIGIN}//`), { ASSETS: { ...fakeAssets } });
+  assert.equal(res.status, 301);
+  assert.equal(new URL(res.headers.get('location')).pathname, '/', 'an empty path is not a path');
+});
+
 // --- the endpoint's guards ---------------------------------------------------
 
 await test('GET on the endpoint is rejected, not passed to assets', async () => {
@@ -617,16 +706,19 @@ await test('the root keeps its slash, being the one path that is only a slash', 
 });
 
 await test('a capitalised path with a trailing slash ends up lowercase and slashless', async () => {
-  // Two rules in a row: the casing redirect fires first and the next request
-  // hits the slash rule. Worth pinning, because a rule that redirects to
-  // something the other rule also redirects is how a loop starts.
+  /*
+   * This used to assert two hops — /Theatres/ to /theatres/ to /theatres — and
+   * its own comment was uneasy about it: "a rule that redirects to something
+   * the other rule also redirects is how a loop starts." It stopped one step
+   * short of the conclusion. The answer was not to pin the chain but to remove
+   * it, and the two rules are one function now, so this asserts the single hop
+   * the page should always have cost.
+   */
   const first = await worker.fetch(new Request(`${ORIGIN}/Theatres/`), { ASSETS: fakeAssets });
   assert.equal(first.status, 301);
+  assert.equal(first.headers.get('location'), `${ORIGIN}/theatres`, 'one hop, straight to the answer');
   const second = await worker.fetch(new Request(first.headers.get('location')), { ASSETS: fakeAssets });
-  assert.equal(second.status, 301);
-  assert.equal(second.headers.get('location'), `${ORIGIN}/theatres`);
-  const third = await worker.fetch(new Request(second.headers.get('location')), { ASSETS: fakeAssets });
-  assert.notEqual(third.status, 301, 'three hops means a loop');
+  assert.notEqual(second.status, 301, 'the destination must not itself redirect');
 });
 
 /*
