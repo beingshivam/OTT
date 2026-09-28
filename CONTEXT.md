@@ -116,10 +116,19 @@ floor kept 4.4% of Tamil's titles while a 400-vote floor kept 10% of Japanese's.
 Floors are now bisected per language against a target, clamped at a minimum of
 25 votes below which a score is noise.
 
-Kannada, Bengali, Marathi and Punjabi did not move and appear genuinely
-exhausted at the current query. The untested lead is the free and ad-supported
-monetisation tiers, measured as worth ~4% at high vote floors but never
-measured at low ones.
+Kannada, Bengali, Marathi and Punjabi did not move, and this has now been
+settled rather than assumed. Measured at a 10-vote floor, TMDB offers 37
+Kannada titles on Indian streaming providers, 46 Bengali, 15 Marathi and 11
+Punjabi — and the site carries 37, 46, 15 and 11. Coverage of those four is
+already complete against the source. Admitting the free and ad-supported tiers
+adds 2, 1, 2 and 0 titles respectively, so the monetisation filter is not the
+cause either. The ceiling is TMDB's Indian regional data, and going deeper
+needs a different source, not a different query.
+
+The big South languages do still have headroom: at the same floor TMDB offers
+535 Tamil, 478 Malayalam and 415 Telugu against 207, 192 and 191 carried. That
+is the vote floor and the page budgets, and it is deliberately not being spent
+while indexing is the bottleneck.
 
 ## Quality gates
 
