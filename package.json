@@ -49,7 +49,8 @@
     "plan:ig": "node scripts/plan-instagram.mjs",
     "post:ig": "node scripts/publish-instagram.mjs",
     "indexable": "node scripts/indexable.mjs",
-    "post:title": "node scripts/build-title-post.mjs"
+    "post:title": "node scripts/build-title-post.mjs",
+    "drishyam": "node scripts/build-drishyam.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
