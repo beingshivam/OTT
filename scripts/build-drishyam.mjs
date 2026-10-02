@@ -76,6 +76,44 @@ if (streaming.length) {
   process.exit(1);
 }
 
+/**
+ * The poster.
+ *
+ * Normally the one the feed already carries — the same TMDB artwork every
+ * title page on the site shows, so the post and the page agree about what the
+ * film looks like. Identifying a film by its poster is what the artwork is for
+ * and what this whole category of account does; it is not ours, and it is
+ * credited to the film either way by being unmistakably the film's.
+ *
+ * POSTER_FILE overrides it with a local image, because the build sandbox has
+ * no route to image.tmdb.org and a card that silently renders with a grey
+ * rectangle where the poster should be is worse than one that fails. CROP
+ * takes "x,y,w,h" in the source image's own pixels, for when the local file is
+ * a screenshot with something else around the edges.
+ */
+const posterSrc = process.env.POSTER_FILE
+  ? `data:image/jpeg;base64,${(await readFile(process.env.POSTER_FILE)).toString('base64')}`
+  : film.posterUrl;
+
+if (!posterSrc) {
+  console.error('No poster for this title, in the feed or in POSTER_FILE. Nothing has been written.');
+  process.exit(1);
+}
+
+/* Shown at 2:3, which is every film poster's shape. A crop is expressed
+   against the source so the numbers stay readable, and converted here. */
+const SHOW_W = 352;
+const SHOW_H = Math.round(SHOW_W * 1.5);
+const crop = (process.env.CROP ?? '').split(',').map(Number);
+const posterStyle = crop.length === 4 && crop.every(Number.isFinite)
+  ? (() => {
+      const [sx, sy, sw] = crop;
+      const k = SHOW_W / sw;
+      return `background-image:url('${posterSrc}');background-size:${(455 * k).toFixed(1)}px auto;` +
+        `background-position:${(-sx * k).toFixed(1)}px ${(-sy * k).toFixed(1)}px;`;
+    })()
+  : `background-image:url('${posterSrc}');background-size:cover;background-position:center;`;
+
 const html = `<!doctype html><meta charset="utf-8">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -102,21 +140,29 @@ const html = `<!doctype html><meta charset="utf-8">
   .kicker { margin-left:auto; font-size:23px; font-weight:700; letter-spacing:.14em;
             text-transform:uppercase; color:#8d94a4; }
 
+  /* Poster beside the joke, not behind it. Laying text over a poster means
+     fighting six faces for contrast and losing; side by side, each gets to be
+     itself and the eye still reads them as one object. */
   .mid { position:relative; flex:1 1 auto; display:flex; flex-direction:column; justify-content:center; }
+  .split { display:flex; gap:44px; align-items:center; }
+  .col { flex:1 1 auto; min-width:0; }
+  .poster { flex:none; width:352px; height:528px; border-radius:20px;
+            background-repeat:no-repeat; background-color:#11131a;
+            box-shadow:0 26px 70px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.08) inset; }
 
   /* Sized to leave air above and below rather than to be as large as
      possible: the card has to hold the joke, the status line, the FYI and the
      address, and a date that fills the frame starves the three things that
      make it useful. */
-  .date { font-size:158px; line-height:.94; font-weight:900; letter-spacing:-.055em;
+  .date { font-size:112px; line-height:.94; font-weight:900; letter-spacing:-.055em;
           background:linear-gradient(100deg,#ff4d4d,#ff7a3d 42%,#ffb03a);
           -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
 
   /* The alibi, set as something being recited rather than said — the rule the
      family repeat to each other until it is true. */
-  .quote { margin-top:52px; padding-left:34px; border-left:5px solid rgba(255,77,77,.65);
-           font-size:54px; line-height:1.26; font-weight:700; letter-spacing:-.03em; color:#f2f4f9; }
-  .beat { margin-top:40px; font-size:38px; line-height:1.4; font-weight:500; color:#b6bdcc; }
+  .quote { margin-top:34px; padding-left:26px; border-left:5px solid rgba(255,77,77,.65);
+           font-size:40px; line-height:1.26; font-weight:700; letter-spacing:-.03em; color:#f2f4f9; }
+  .beat { margin-top:38px; font-size:36px; line-height:1.4; font-weight:500; color:#b6bdcc; }
   .beat b { color:#f2f4f9; font-weight:800; }
 
   .fyi { position:relative; flex:none; margin-top:44px; padding:26px 30px; border-radius:18px;
@@ -138,11 +184,16 @@ const html = `<!doctype html><meta charset="utf-8">
 </div>
 
 <div class="mid">
-  <div class="date">${DAY}<br>${esc(MONTH)}.</div>
-  <div class="quote">“Yaad rakhna — hum us din bahar the.”</div>
-  <div class="beat">
-    <b>${esc(film.title)}</b> aaj cinemas mein hai.<br>
-    Date dekhi? Fans ko samajh aa gaya hoga.
+  <div class="split">
+    <div class="col">
+      <div class="date">${DAY}<br>${esc(MONTH)}.</div>
+      <div class="quote">“Yaad rakhna — hum us din bahar the.”</div>
+      <div class="beat">
+        <b>${esc(film.title)}</b> aaj cinemas mein hai.
+        Date dekhi? Fans ko samajh aa gaya hoga.
+      </div>
+    </div>
+    <div class="poster" style="${posterStyle}"></div>
   </div>
 </div>
 
