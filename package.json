@@ -48,7 +48,8 @@
     "angles": "node scripts/build-angles.mjs",
     "plan:ig": "node scripts/plan-instagram.mjs",
     "post:ig": "node scripts/publish-instagram.mjs",
-    "indexable": "node scripts/indexable.mjs"
+    "indexable": "node scripts/indexable.mjs",
+    "post:title": "node scripts/build-title-post.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
