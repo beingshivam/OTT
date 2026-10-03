@@ -217,13 +217,15 @@ else {
     return d && d.value > IMDB_MAX_CREDIBLE;
   });
   impossible.length
-    ? fail(S2, 'no impossible scores are shown', `${impossible.length} above ${IMDB_MAX_CREDIBLE}`,
+    ? byBlastRadius(S2, 'no impossible scores are shown', impossible.length, allRows.length,
+        `${impossible.length} of ${allRows.length} above ${IMDB_MAX_CREDIBLE}`,
         impossible.slice(0, 5).map((r) => `${r.title} — ${displayed(r).value} from ${displayed(r).votes} votes`))
     : pass(S2, 'no impossible scores are shown', `checked ${allRows.length} rows`);
 
   const halfScore = allRows.filter((r) => (r.imdbRating == null) !== (r.imdbVotes == null));
   halfScore.length
-    ? fail(S2, 'IMDb rating and vote count travel together', `${halfScore.length} rows have one without the other`,
+    ? byBlastRadius(S2, 'IMDb rating and vote count travel together', halfScore.length, allRows.length,
+        `${halfScore.length} of ${allRows.length} rows have one without the other`,
         halfScore.slice(0, 3).map((r) => `${r.title} — rating ${r.imdbRating}, votes ${r.imdbVotes}`))
     : pass(S2, 'IMDb rating and vote count travel together');
 
@@ -284,7 +286,7 @@ else {
       }
     }
     offences.length
-      ? fail(S2, 'no page rates a title more confidently than it shows it',
+      ? byBlastRadius(S2, 'no page rates a title more confidently than it shows it', offences.length, pages.size,
           `${offences.length} page(s) assert a score the page itself hedges`, offences.slice(0, 5))
       : pass(S2, 'no page rates a title more confidently than it shows it',
           `every emitted rating clears ${TMDB_MIN_VOTES} votes and names its source`);
@@ -555,7 +557,8 @@ const S7 = 'Unreleased titles';
   if (!feedRows.length) skip(S7, 'nothing unreleased is also streaming', 'no feed');
   else
     contradictions.length
-      ? fail(S7, 'nothing unreleased is also streaming', `${contradictions.length} in cinemas and streaming at once`,
+      ? byBlastRadius(S7, 'nothing unreleased is also streaming', contradictions.length, future.length,
+          `${contradictions.length} in cinemas and streaming at once`,
           contradictions.slice(0, 5).map((r) => `${r.title} — opens ${r.releaseDate}, listed on ${r.platforms.join(', ')}`))
       : pass(S7, 'nothing unreleased is also streaming',
           `${feedRows.filter((r) => r.releaseDate > today).length} future rows checked`);
@@ -641,7 +644,7 @@ const S13 = 'How the long tail is reached';
 
     const orphans = [...titles].filter((t) => !(inbound.get(t)?.size > 0));
     orphans.length
-      ? fail(S13, 'every title page is reachable from another page',
+      ? byBlastRadius(S13, 'every title page is reachable from another page', orphans.length, titles.size,
           `${orphans.length} are linked from nowhere`, orphans.slice(0, 5))
       : pass(S13, 'every title page is reachable from another page', `${titles.size} pages`);
 
@@ -692,7 +695,7 @@ const S12 = 'Dates the site can vouch for';
       if (age > 90) overreach.push(`${path} — "Streaming since ${m[0].split('</strong>')[1].trim()}", ${age} days old`);
     }
     overreach.length
-      ? fail(S12, 'no page dates a streaming arrival it never saw',
+      ? byBlastRadius(S12, 'no page dates a streaming arrival it never saw', overreach.length, pages.size,
           `${overreach.length} pages claim a streaming date older than the calendar`, overreach.slice(0, 5))
       : pass(S12, 'no page dates a streaming arrival it never saw',
           `${pages.size} pages checked`);
@@ -706,7 +709,8 @@ const S12 = 'Dates the site can vouch for';
       }
     }
     absurd.length
-      ? fail(S12, 'and none counts the days since 2008', `${absurd.length} pages print a four-figure day count`, absurd.slice(0, 5))
+      ? byBlastRadius(S12, 'and none counts the days since 2008', absurd.length, pages.size,
+          `${absurd.length} pages print a four-figure day count`, absurd.slice(0, 5))
       : pass(S12, 'and none counts the days since 2008');
   }
 }
@@ -745,12 +749,14 @@ const S11 = 'One page, one claim';
     const dupD = [...described.values()].filter((p) => p.length > 1);
 
     dupT.length
-      ? fail(S11, 'no two pages carry the same title', `${dupT.length} titles are shared`,
+      ? byBlastRadius(S11, 'no two pages carry the same title', dupT.length, pages.size,
+          `${dupT.length} titles are shared`,
           dupT.slice(0, 4).map((p) => p.join(' == ')))
       : pass(S11, 'no two pages carry the same title', `${titled.size} distinct across ${pages.size} pages`);
 
     dupD.length
-      ? fail(S11, 'nor the same description', `${dupD.length} descriptions are shared`,
+      ? byBlastRadius(S11, 'nor the same description', dupD.length, pages.size,
+          `${dupD.length} descriptions are shared`,
           dupD.slice(0, 4).map((p) => p.join(' == ')))
       : pass(S11, 'nor the same description', `${described.size} distinct`);
   }
@@ -840,7 +846,8 @@ const S9 = 'Guessed platforms';
       (r) => !['note', 'studio', 'network'].includes(r.namedBy) || !r.platforms?.length,
     );
     bad.length
-      ? fail(S9, 'a guessed platform is still marked as one', `${bad.length} malformed`,
+      ? byBlastRadius(S9, 'a guessed platform is still marked as one', bad.length, allRows.length,
+          `${bad.length} malformed`,
           bad.slice(0, 4).map((r) => `${r.title}: namedBy=${r.namedBy} platforms=${(r.platforms ?? []).join(',') || 'none'}`))
       : pass(S9, 'a guessed platform is still marked as one',
           `${guessed.length} of ${all.length} rows name a source`);
@@ -969,33 +976,79 @@ else {
    * cinema listing, Anbil Avan gained a synopsis the archive copy predates.
    * Both were correct pages judged against a stale copy of themselves.
    */
-  const live = (rows) => [...(archive?.titles ?? []), ...catRows, ...feedRows].filter(rows);
+  /*
+   * id → the page that row belongs to, mirroring slugFor in build-seo.
+   *
+   * Two things make this harder than reading r.slug, and both have bitten.
+   *
+   * The archive's stamps go stale. It freezes a row as it was when it aged off
+   * the board, slug included, and three of them currently disagree with the
+   * live build — Toxic: A Fairy Tale for Grown-ups is stamped "toxic" there
+   * and "toxic-a-fairy-tale-for-grown-ups" in the feed, and only the second
+   * page exists. So the live sources are authoritative for this build: where
+   * they mention a row, their answer stands, including when their answer is
+   * that the row has no page at all. That last part matters — it is how a
+   * cinema row that aged out of the candidates stops claiming a URL the
+   * streaming row now owns.
+   *
+   * And a streaming row usually has no page of its own. build-seo resolves
+   * `m-1213243~ott` to the page of `m-1213243`; it only holds a slug outright
+   * when nothing else claims one. So it asks for its own first and falls back
+   * to the film's.
+   */
+  const frozen = new Map();
+  for (const r of archive?.titles ?? []) if (r.slug) frozen.set(String(r.id), r.slug);
+  const slugOf = new Map();
+  for (const r of [...catRows, ...feedRows]) {
+    const id = String(r.id ?? '');
+    if (r.slug) slugOf.set(id, r.slug);
+    else slugOf.delete(id);
+  }
+  const pageOf = (r) => {
+    const id = String(r.id ?? '');
+    const base = id.replace(/~[a-z]+$/, '');
+    /* A live stamp first, from either the row or — for a streaming row — the
+       film it belongs to. Only then the archive's frozen one, which is right
+       for a row this build never saw and wrong whenever it disagrees. Toxic's
+       streaming row is stamped "toxic" there while the film's page is
+       "toxic-a-fairy-tale-for-grown-ups"; preferring the film's live stamp is
+       what puts the ZEE5 date on the page that exists. */
+    return (
+      slugOf.get(id) ??
+      (base !== id ? slugOf.get(base) : undefined) ??
+      frozen.get(id) ??
+      (base !== id ? frozen.get(base) : undefined) ??
+      null
+    );
+  };
+
   const isOtt = (r) => String(r.id ?? '').endsWith('~ott');
-  /* A streaming row shares the film's page rather than owning one — slugFor in
-     build-seo resolves `m-1317872~ott` to the page of `m-1317872`. So it owns a
-     slug only where no cinema row claims it, which is Camp Miasma's case: that
-     cinema row aged out of the candidates and has no page, leaving the MUBI row
-     the only thing the URL can mean. */
-  for (const r of live(isOtt)) if (r.slug) if (!bySlug.has(r.slug)) bySlug.set(r.slug, r);
-  for (const r of live((r) => !isOtt(r))) if (r.slug) bySlug.set(r.slug, r);
+  const everyRow = [...(archive?.titles ?? []), ...catRows, ...feedRows];
+
+  /* Cinema rows own their page outright; a streaming row only where none does. */
+  for (const r of everyRow) {
+    if (!isOtt(r)) continue;
+    const key = pageOf(r);
+    if (key && !bySlug.has(key)) bySlug.set(key, r);
+  }
+  for (const r of everyRow) {
+    if (isOtt(r)) continue;
+    const key = pageOf(r);
+    if (key) bySlug.set(key, r);
+  }
 
   /*
    * The streaming date, keyed by the page it belongs to.
    *
-   * Separate from ownership because an ~ott row is the film's date sibling
-   * whether or not it owns the page — when the cinema row holds the slug, the
-   * date still has to reach that page. So this one does fall back to the
-   * title, which is the only link back to a page it does not own.
-   *
    * Region matters here and nowhere else. feedRows is already scoped to India;
-   * the archive is not, and The End of Oak Street carries a US digital date
-   * and no Indian one. Counting that as the film's streaming date would fail a
-   * page for refusing to publish an American date to Indian readers — which is
-   * the page being right.
+   * the archive is not, and The Last First: Winter K2 carries a US Apple TV
+   * date and no Indian one. Counting that as the film's streaming date would
+   * fail a page for refusing to publish an American date to Indian readers —
+   * which is the page being right.
    */
-  for (const r of [...feedRows, ...catRows, ...(archive?.titles ?? [])]) {
-    if (!String(r.id ?? '').endsWith('~ott')) continue;
-    const key = r.slug ?? slugify(r.title ?? '');
+  for (const r of everyRow) {
+    if (!isOtt(r)) continue;
+    const key = pageOf(r);
     if (key && (r.regions ?? [REGION]).includes(REGION)) datedBySlug.set(key, r);
   }
 
@@ -1058,7 +1111,8 @@ else {
         `${wrong.length} of ${titlePages.length} pages contradict their row`, wrong.slice(0, 5))
     : pass(S5, 'streaming status matches the data', `${titlePages.length} title pages`);
   orphan.length
-    ? fail(S5, 'every title page has a row behind it', `${orphan.length} orphaned`, orphan.slice(0, 5))
+    ? byBlastRadius(S5, 'every title page has a row behind it', orphan.length, titlePages.length,
+        `${orphan.length} orphaned`, orphan.slice(0, 5))
     : pass(S5, 'every title page has a row behind it');
 
   /*
@@ -1076,7 +1130,8 @@ else {
     return row.cast?.length ? words(row.synopsis) < 12 : words(row.synopsis) < 25;
   });
   thinPages.length
-    ? fail(S5, 'no title page is published thin', `${thinPages.length} thin`, thinPages.slice(0, 5).map(([p]) => p))
+    ? byBlastRadius(S5, 'no title page is published thin', thinPages.length, titlePages.length,
+        `${thinPages.length} thin`, thinPages.slice(0, 5).map(([p]) => p))
     : pass(S5, 'no title page is published thin', `${titlePages.length} pages meet the content bar`);
 }
 

@@ -50,6 +50,12 @@ jobs:
       # future clock reports the 90-day streaming window expiring, which is
       # that window working rather than a fault — the first attempt at this
       # chased exactly that false positive.
+      #
+      # One warning is expected at the longer horizon and is not a finding:
+      # "few rows claim a service their date has outrun" grows with the gap,
+      # because the clock moves and the committed data does not. In production
+      # the refresh runs daily, so the data never ages that far. Read failures
+      # here, and read that warning only if it appears at 35 days too.
       - name: Build and grade ${{ matrix.days }} days ahead
         if: ${{ inputs.days == '' || inputs.days == matrix.days }}
         env:
