@@ -294,6 +294,41 @@ is(
 );
 
 /*
+ * A page that was renamed still answers on its old URL.
+ *
+ * This is the only check here that cannot be settled locally. dist/_redirects
+ * is generated and gated by the eval, but whether Cloudflare's asset server
+ * honours it for a Worker with `run_worker_first` is a fact about production,
+ * and the cost of assuming is the whole reason this check exists: TMDB
+ * renamed "Toxic: A Fairy Tale for Grown-ups" to "Toxic", the page moved, and
+ * the old URL — 36% of the site's clicks — returned 200 and the app shell for
+ * a day. A soft 404 looks healthy to every check that only reads a status.
+ *
+ * Reads the first rule out of the deployed file rather than naming a slug, so
+ * it keeps testing the real thing after Toxic stops mattering.
+ */
+const redirectsFile = await get('/_redirects');
+const firstRule = (await redirectsFile.text().catch(() => ''))
+  .split('\n')
+  .find((l) => l.startsWith('/'));
+if (!firstRule) {
+  is(true, 'no renamed pages to redirect yet', 'nothing in _redirects');
+} else {
+  const [from, to] = firstRule.split(/\s+/);
+  const moved = await get(from);
+  is(
+    moved.status === 301 || moved.status === 308,
+    'a renamed page still answers on its old URL',
+    `${from} returned ${moved.status}${moved.status === 200 ? ' — soft 404, the ranking is being thrown away' : ''}`,
+  );
+  is(
+    (moved.headers.get('location') ?? '').endsWith(to),
+    'and lands on where that page lives now',
+    moved.headers.get('location') ?? 'no location',
+  );
+}
+
+/*
  * The exception that took the site down once: hashed bundles are named
  * index-CqG28YpW.js, and a redirect rule on capitals alone 301'd every one of
  * them to a path that does not exist. An asset must keep its capitals.

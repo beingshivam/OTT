@@ -847,6 +847,59 @@ const S10 = 'Crawl rules';
       ? pass(S10, 'robots.txt still points at the sitemap')
       : fail(S10, 'robots.txt still points at the sitemap', 'the Sitemap line is gone');
   }
+
+  /**
+   * A URL this site has published may never simply stop existing.
+   *
+   * Slugs come from titles and TMDB edits titles. When it shortened "Toxic: A
+   * Fairy Tale for Grown-ups" to "Toxic", the page moved and the old URL —
+   * 36% of the site's clicks, 21% of its impressions, four weeks of ranking —
+   * returned 200 and the app shell, because `not_found_handling` is
+   * single-page-application. A soft 404 is the worst of the outcomes: Google
+   * neither follows it nor drops it quickly, it just stops trusting the path.
+   *
+   * Two ways to get this wrong and both are checked. A former URL with no
+   * redirect throws the ranking away. A redirect whose source is a live page
+   * is worse — it points a working page at a different film, permanently.
+   * The first version of the generator produced 8 of those out of 11 rules,
+   * because disambiguation (`don` -> `don-2006`, the bare slug staying with
+   * the other film) looks exactly like a rename in the data.
+   */
+  const redirectFile = await readFile(resolve(DIST, '_redirects'), 'utf8').catch(() => null);
+  const built = new Set(
+    [...(pages?.keys() ?? [])]
+      .filter((p) => p.startsWith('/ott-release-date/'))
+      .map((p) => p.slice('/ott-release-date/'.length)),
+  );
+  const rules = (redirectFile ?? '')
+    .split('\n')
+    .filter((l) => l.startsWith('/'))
+    .map((l) => l.split(/\s+/));
+  const abandoned = [];
+  for (const r of archive?.titles ?? []) {
+    if (!r.slug || !r.slugWas?.length) continue;
+    for (const old of r.slugWas) {
+      if (old === r.slug || built.has(old)) continue;
+      if (!rules.some(([from]) => from === `/ott-release-date/${old}`)) abandoned.push(`${old} (was ${r.title})`);
+    }
+  }
+  const hijacks = rules.filter(([from]) => built.has(from.slice('/ott-release-date/'.length)));
+
+  if (!pages) skip(S10, 'no URL this site published has been abandoned', 'needs dist/');
+  else if (abandoned.length)
+    fail(S10, 'no URL this site published has been abandoned',
+      `${abandoned.length} former URL(s) with no redirect`, abandoned.slice(0, 5))
+  else
+    pass(S10, 'no URL this site published has been abandoned',
+      `${rules.length} redirect(s) for renamed pages`);
+
+  if (!pages) skip(S10, 'no redirect points a live page somewhere else', 'needs dist/');
+  else if (hijacks.length)
+    fail(S10, 'no redirect points a live page somewhere else',
+      `${hijacks.length} redirect(s) would hijack a page that exists`,
+      hijacks.slice(0, 5).map(([from, to]) => `${from} is built, yet 301s to ${to}`))
+  else
+    pass(S10, 'no redirect points a live page somewhere else', `${rules.length} checked`);
 }
 
 const S9 = 'Guessed platforms';
