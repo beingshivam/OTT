@@ -163,7 +163,10 @@ displays it.
 ## Open items
 
 1. **Do not add more pages** until indexing moves. 2,239 published against 9
-   indexed; more URLs dilute rather than help.
+   indexed; more URLs dilute rather than help. Superseded for one case: the
+   owner has decided the mood/vibe collection pages ship alongside the
+   editorial takes rather than after them (item 10). Still the default for
+   anything else.
 2. Backlinks are the real ceiling — a three-week-old domain with none is why
    Google will not spend crawl budget. Outreach, never bought links.
 3. 4 of 13 priority pages still need manual Request Indexing in Search Console.
@@ -181,3 +184,37 @@ displays it.
 9. Budget is about ₹1,000/month. Current advice: spend none of it on ads while
    indexing is the bottleneck — paid traffic does not get pages indexed and is
    not a ranking signal.
+10. **Build-time AI, agreed and not yet started.** Two pieces, to ship
+    together when the owner says go:
+
+    a. *Per-title editorial takes.* The measured problem: a title page carries
+       267 words, 179 of them identical on every page, and of the 88 that are
+       page-specific, 37 are a verbatim TMDB synopsis and the rest are cast,
+       genre, dates and runtime — also TMDB. **Zero words of original prose on
+       2,344 pages**, which is the honest reason Google records 341 of them as
+       "Discovered – currently not indexed". The raw material is already here:
+       2,012 of 2,385 pages (84%) share a lead actor with another page on this
+       site, which is a true, useful sentence no other site has written.
+    b. *Mood/vibe tags into collection pages* — "movies like Drishyam",
+       "Malayalam thrillers on Prime", "under two hours". Queries with volume
+       and no page here. One generation pass can produce both.
+
+    Model: Claude Opus 5.5 (`claude-opus-5-5`). Roughly $12 one-off for the
+    2,385-title backfill and ~$1.50/month after, against a ~$11.50 budget —
+    cost is not the constraint, so do not economise on the model here; these
+    pages have to earn a crawl on the strength of their prose.
+
+    Prerequisite: one new repo secret, `ANTHROPIC_API_KEY`. Nothing runs
+    without it.
+
+    Non-negotiable in the design, or this is scaled content abuse rather than
+    a site: the model may use only fields from the row, never outside
+    knowledge; an eval gate rejects any sentence containing a date, number,
+    platform or person not in that row's data; and **a page with nothing to
+    say gets no prose** — the 175 cinema-only rows with no date and no cast
+    overlap keep the data-only layout.
+
+    Not to be built: a request-time chat or AI search (cost scales with
+    traffic, Google cannot read it, fights the static architecture), and AI
+    OTT-window forecasting (`windows.json` holds 4 observations; an LLM would
+    manufacture confidence).
