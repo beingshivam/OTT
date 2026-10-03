@@ -50,7 +50,8 @@
     "post:ig": "node scripts/publish-instagram.mjs",
     "indexable": "node scripts/indexable.mjs",
     "post:title": "node scripts/build-title-post.mjs",
-    "drishyam": "node scripts/build-drishyam.mjs"
+    "drishyam": "node scripts/build-drishyam.mjs",
+    "future": "SHIFT_DAYS=${SHIFT_DAYS:-35} NODE_OPTIONS=--require=./scripts/timeshift.cjs npm run build && SHIFT_DAYS=${SHIFT_DAYS:-35} NODE_OPTIONS=--require=./scripts/timeshift.cjs npm run eval"
   },
   "dependencies": {
     "react": "^18.3.1",

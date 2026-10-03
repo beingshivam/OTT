@@ -67,6 +67,46 @@ const skip = (s, n, d) => record(s, n, 'SKIP', d);
  */
 const warn = (s, n, d, ex = []) => record(s, n, 'WARN', d, ex);
 
+/**
+ * Severity by blast radius, for the checks that count bad pages.
+ *
+ * A failing gate here does not stop a bad page existing — it stops the whole
+ * calendar updating, and the offending page stays live exactly as it was, now
+ * staler. So withholding can never repair the thing it fired about; it can
+ * only withhold the improvements to every other page.
+ *
+ * That trade was made badly once and it cost two days. One title page out of
+ * 2,190 contradicted its row, the refresh aborted on it, and the site served a
+ * 49-hour-old calendar behind a gate that — on that occasion — was itself
+ * wrong. Three workflows went red over one page nobody could have fixed by
+ * keeping the data frozen.
+ *
+ * So: a handful of pages is a warning, published and reported, because
+ * shipping the other 2,189 fresh is strictly better than shipping none. A
+ * large share is still a hard failure, because that is not an edge case in the
+ * data, it is the generator having broken, and shipping that would replace
+ * good pages with bad ones at scale.
+ *
+ * The line is calibrated against the real regression rather than picked. When
+ * the arrived-sibling code path was broken it produced ten bad pages — 0.46%
+ * of the site — and a first attempt at this rule put the line at 0.5% and 25
+ * pages, which let that exact regression through as a warning. A whole code
+ * path failing has to stop the build, so the line sits below it: five pages,
+ * or a fifth of a percent.
+ *
+ * That is "a few rows have an odd shape", not a budget for known-wrong pages.
+ * Warnings are reported every run and are meant to be spent, not banked.
+ */
+const BOUNDED_SHARE = 0.002;
+const BOUNDED_MAX = 5;
+
+const byBlastRadius = (section, name, bad, total, detail, examples = []) => {
+  const systemic = bad > BOUNDED_MAX || (total > 0 && bad / total > BOUNDED_SHARE);
+  return systemic
+    ? fail(section, name, `${detail} — too many to be an edge case`, examples)
+    : warn(section, name, detail, examples);
+};
+
 const readJson = async (p) => JSON.parse(await readFile(p, 'utf8'));
 const maybe = async (p) => readJson(p).catch(() => null);
 
@@ -1014,7 +1054,8 @@ else {
       wrong.push(`${slug} — releases ${row.releaseDate} but says "Streaming now"`);
   }
   wrong.length
-    ? fail(S5, 'streaming status matches the data', `${wrong.length} pages contradict their row`, wrong.slice(0, 5))
+    ? byBlastRadius(S5, 'streaming status matches the data', wrong.length, titlePages.length,
+        `${wrong.length} of ${titlePages.length} pages contradict their row`, wrong.slice(0, 5))
     : pass(S5, 'streaming status matches the data', `${titlePages.length} title pages`);
   orphan.length
     ? fail(S5, 'every title page has a row behind it', `${orphan.length} orphaned`, orphan.slice(0, 5))

@@ -1,0 +1,72 @@
+# Run the whole suite on a day that has not happened yet.
+#
+# A test that asserted /Sep|week/i on the board heading passed every single
+# time it was ever run, and failed on the 1st of October against a heading that
+# was exactly right. Nothing in a normal run could have found it: the suite was
+# green because of the date, not because of the code.
+#
+# That is a whole class — the 90-day "Streaming since" window, the week the
+# calendar thinks is current, anything comparing a stored date to TODAY — and
+# the only way to test it is to move the clock. So this builds and grades the
+# site as though it were five weeks and then six months from now.
+#
+# Weekly rather than per-push: it is looking for faults that arrive with the
+# calendar, not with a commit, and finding one a month early is early enough.
+name: Future clock
+
+on:
+  schedule:
+    # Monday morning, so a finding lands at the start of a week rather than
+    # into a weekend.
+    - cron: '20 5 * * 1'
+  workflow_dispatch:
+    inputs:
+      days:
+        description: 'How many days ahead to run. Blank runs both 35 and 200.'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  future:
+    runs-on: ubuntu-latest
+    strategy:
+      # Both horizons always run, so a fault at six months is still reported
+      # when five weeks is clean.
+      fail-fast: false
+      matrix:
+        days: [35, 200]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+
+      # The build has to move with the grader. Grading today's pages with a
+      # future clock reports the 90-day streaming window expiring, which is
+      # that window working rather than a fault — the first attempt at this
+      # chased exactly that false positive.
+      - name: Build and grade ${{ matrix.days }} days ahead
+        if: ${{ inputs.days == '' || inputs.days == matrix.days }}
+        env:
+          SHIFT_DAYS: ${{ matrix.days }}
+          NODE_OPTIONS: --require ${{ github.workspace }}/scripts/timeshift.cjs
+        run: |
+          set -o pipefail
+          npm run build | tail -4
+          npm run eval
+          npm run e2e | tail -3
+
+      - name: Say what a future day would see
+        if: always()
+        run: |
+          {
+            echo "## ${{ matrix.days }} days ahead"
+            echo
+            echo 'A failure here is a fault that will arrive on its own, with no'
+            echo 'commit to blame. It is not failing today.'
+          } >> "$GITHUB_STEP_SUMMARY"
