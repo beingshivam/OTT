@@ -28,6 +28,7 @@
 
 import { appendFile, readFile, readdir, stat } from 'node:fs/promises';
 import { slugify } from './slug.mjs';
+import { contradicts, THEATRICAL_FLOOR_DAYS } from './cinema-window.mjs';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -130,6 +131,7 @@ const feed = await maybe(resolve(DIST, 'data/releases.json'));
    looked orphaned because this re-derived the bare slug from the title. */
 const catalogue = await maybe(resolve(DIST, 'data/catalogue.json'));
 const archive = await maybe(resolve(ROOT, 'data/archive.json'));
+const windows = await maybe(resolve(ROOT, 'data/windows.json'));
 const registrySrc = await readFile(resolve(ROOT, 'src/data/platforms.ts'), 'utf8').catch(() => '');
 const workerCfg = await readFile(resolve(ROOT, 'wrangler.jsonc'), 'utf8').catch(() => '');
 /** Read from the app's own source rather than repeated here, so a rename of the
@@ -538,30 +540,60 @@ else {
 const S7 = 'Unreleased titles';
 {
   /**
-   * Nothing can be streaming before it exists.
+   * Nothing in cinemas is also on a subscription service.
    *
    * Reported from the live site: a film opening in cinemas on 2 October also
    * carried a Prime badge. TMDB assigns providers *after* a title is available,
-   * so a provider on a future theatrical row is never a fact about that film —
+   * so a provider on a theatrical row is never a fact about that film —
    * usually it is the franchise's earlier entries, which really are streaming.
    * The cost of getting this wrong is somebody paying for a subscription to
    * watch something that is not there.
+   *
+   * This gate used to test `releaseDate > today` and passed every run while
+   * the contradiction was on the board, because the pass that creates it only
+   * ever touches rows already released. It was the builder's blind spot
+   * copied into the grader, which is worse than no gate at all — it reported
+   * the same wrong rule back as evidence. The rule now lives in one module
+   * that both import, so this can only be wrong in the same way as the
+   * builder by being wrong in the same file.
    */
   const today = new Date().toISOString().slice(0, 10);
-  const contradictions = feedRows.filter(
-    (r) =>
-      r.releaseDate > today &&
-      r.platforms?.includes('theatres') &&
-      r.platforms.some((p) => p !== 'theatres'),
-  );
-  if (!feedRows.length) skip(S7, 'nothing unreleased is also streaming', 'no feed');
+  const inCinemas = feedRows.filter((r) => r.platforms?.includes('theatres'));
+  const contradictions = feedRows.filter((r) => contradicts(r, today));
+  if (!feedRows.length) skip(S7, 'nothing in cinemas is also streaming', 'no feed');
   else
     contradictions.length
-      ? byBlastRadius(S7, 'nothing unreleased is also streaming', contradictions.length, future.length,
+      ? byBlastRadius(S7, 'nothing in cinemas is also streaming', contradictions.length, inCinemas.length,
           `${contradictions.length} in cinemas and streaming at once`,
-          contradictions.slice(0, 5).map((r) => `${r.title} — opens ${r.releaseDate}, listed on ${r.platforms.join(', ')}`))
-      : pass(S7, 'nothing unreleased is also streaming',
-          `${feedRows.filter((r) => r.releaseDate > today).length} future rows checked`);
+          contradictions.slice(0, 5).map((r) => `${r.title} — in cinemas ${r.releaseDate}, listed on ${r.platforms.join(', ')}`))
+      : pass(S7, 'nothing in cinemas is also streaming',
+          `${inCinemas.length} cinema rows checked`);
+
+  /**
+   * The floor has to keep up with what the site actually sees.
+   *
+   * THEATRICAL_FLOOR_DAYS is the shortest cinema-to-OTT window ever observed
+   * here, and it decides which provider claims get suppressed. The moment a
+   * genuine window comes in shorter than it, the constant has started hiding
+   * real platforms — the reader-facing cost of the trade, now being paid for
+   * nothing. The first version of that constant was set from industry lore at
+   * 28 days while windows.json already held two 21-day observations, which is
+   * exactly the drift this watches for.
+   *
+   * A warning rather than a failure: the data is right and the constant is
+   * stale, so nothing on the site is wrong yet and refusing to deploy would
+   * fix nothing. It wants a human to move a number.
+   */
+  const observed = windows?.observations ?? [];
+  const faster = observed.filter((o) => Number(o.days) < THEATRICAL_FLOOR_DAYS);
+  if (!observed.length) skip(S7, 'the theatrical floor matches what we have seen', 'no observations yet');
+  else if (faster.length)
+    warn(S7, 'the theatrical floor matches what we have seen',
+      `${faster.length} real window(s) shorter than the ${THEATRICAL_FLOOR_DAYS}-day floor`,
+      faster.slice(0, 5).map((o) => `${o.title} — ${o.days} days to ${o.platform}`))
+  else
+    pass(S7, 'the theatrical floor matches what we have seen',
+      `${observed.length} observed, shortest ${Math.min(...observed.map((o) => Number(o.days)))} days vs a ${THEATRICAL_FLOOR_DAYS}-day floor`);
 }
 
 // --- the schedule the site advertises ---------------------------------------

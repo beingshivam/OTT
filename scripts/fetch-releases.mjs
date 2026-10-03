@@ -18,6 +18,7 @@ import { writeFile, mkdir, readFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { callCount, requireToken, tmdb } from './tmdb.mjs';
+import { contradicts, outOfCinemas } from './cinema-window.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -743,8 +744,8 @@ async function buildWeek(weekId, platforms, index, cinemaOnly = false) {
    *
    * Runs after the cinema fold on purpose. A film that opens in cinemas this
    * week and streams later is a cinema listing this week — and
-   * unreleasedCannotBeStreaming below strips a streaming claim off any future
-   * theatrical row anyway, which now covers this one too.
+   * inCinemasCannotBeStreaming below strips a streaming claim off any row
+   * still inside its theatrical window anyway, which covers this one too.
    */
   if (!cinemaOnly && to >= TODAY) {
     for (const region of REGIONS) {
@@ -1028,11 +1029,22 @@ async function buildWeek(weekId, platforms, index, cinemaOnly = false) {
    * rails, which are built to overlap. This adds a platform and never removes
    * the cinema listing.
    *
+   * "From five weeks ago" is the whole premise and was never in the condition.
+   * It asked about everything already released, which on the day of release
+   * means asking TMDB whether a film playing in cinemas this morning is also
+   * streaming — a question with no true answer, and TMDB said Prime. That is
+   * how Drishyam: The Conclusion got a Prime badge the day after it opened.
+   * The window below is the premise, written down: a film is asked about once
+   * it is old enough to have plausibly left cinemas, and not before.
+   *
    * Bounded to rows with nothing but a cinema listing, so it costs one call per
    * film actually in question rather than one per row.
    */
   const stale = [...byId.values()].filter(
-    (r) => r.platforms.length === 1 && r.platforms[0] === theatricalId && r.releaseDate <= TODAY,
+    (r) =>
+      r.platforms.length === 1 &&
+      r.platforms[0] === theatricalId &&
+      outOfCinemas(r.releaseDate, TODAY),
   );
   for (const row of stale) {
     const m = /^m-(\d+)$/.exec(row.id);
@@ -1108,43 +1120,50 @@ async function buildWeek(weekId, platforms, index, cinemaOnly = false) {
   }
 
   const releases = [...byId.values()]
-    .map(unreleasedCannotBeStreaming)
+    .map(inCinemasCannotBeStreaming)
     .sort((a, b) => (b.heat ?? 0) - (a.heat ?? 0));
   return { id: weekId, start: from, end: to, releases };
 }
 
 /**
- * A film that opens in cinemas next month is not already on Prime.
+ * A film still playing in cinemas is not also on Prime.
  *
- * Reported from the site: "Drishyam: The Conclusion" showed for 2 October with
- * both a cinema listing and Prime Video. The title, the date and the language
- * were all right — the Prime badge was not, and it was the kind of wrong that
- * costs a reader a subscription they did not need.
+ * Reported from the site twice. The first time — "Drishyam: The Conclusion"
+ * showing for 2 October with both a cinema listing and Prime Video — this
+ * function was written, and it fixed it, and it expired the next morning.
  *
- * The cause is the same property of TMDB this whole calendar is built around:
- * providers are assigned *after* a title is available, which is why theatrical
- * dates have to be fetched separately for upcoming weeks to exist at all. Run
- * that backwards and a provider sitting on a future theatrical row cannot be a
- * fact about that film — there is nothing yet for anyone to stream. In this
- * case it is almost certainly the franchise's earlier entries, which really are
- * on Prime: the Malayalam Drishyam 3 has been streaming there since May, and
- * the site has that right, in the catalogue, where it belongs.
+ * The reason is worth keeping, because the shape of the mistake matters more
+ * than the instance. The guard tested `releaseDate > TODAY`: a provider on a
+ * film that has not opened cannot be a fact, because there is nothing yet for
+ * anyone to stream. True, and useless, because the pass that *adds* those
+ * providers — the re-ask above — only ever runs on rows where
+ * `releaseDate <= TODAY`. Guard and bug were in disjoint sets. It could never
+ * fire on anything the bug could produce, and it passed every test and every
+ * run on the strength of a case that never occurs.
  *
- * Deliberately narrow. A future release with no cinema listing keeps its
- * platform, because a streaming-only title announced for a date is a real
- * thing the calendar should carry. Only the contradiction is removed: in
- * cinemas, not yet out, and somehow also streaming.
+ * So the condition is no longer about whether the film has opened. It is about
+ * whether it has had time to close, which is the thing the provider is
+ * implicitly claiming. Inside the theatrical floor the claim is impossible and
+ * is dropped; outside it, it stands.
+ *
+ * Deliberately narrow, as before. A future release with no cinema listing
+ * keeps its platform — a streaming-only title announced for a date is real and
+ * the calendar should carry it. Only the contradiction is removed: in cinemas
+ * now, and somehow also streaming.
+ *
+ * This repairs as well as prevents. The re-ask gate stops new rows acquiring
+ * the contradiction; this strips it off rows that already have it, including
+ * ones written by an earlier run, so the feed heals on the next refresh rather
+ * than waiting for every bad row to age out.
  */
 const TODAY = new Date().toISOString().slice(0, 10);
 
-function unreleasedCannotBeStreaming(row) {
-  if (row.releaseDate <= TODAY) return row;
-  if (!row.platforms.includes('theatres')) return row;
+function inCinemasCannotBeStreaming(row) {
+  if (!contradicts(row, TODAY)) return row;
   const streaming = row.platforms.filter((p) => p !== 'theatres');
-  if (!streaming.length) return row;
   console.log(
-    `  ${row.title} (${row.releaseDate}) opens in cinemas — dropping ${streaming.join(', ')}, ` +
-      'which TMDB cannot yet know.',
+    `  ${row.title} (${row.releaseDate}) is still in cinemas — dropping ` +
+      `${streaming.join(', ')}, which no provider can yet mean.`,
   );
   return { ...row, platforms: ['theatres'] };
 }

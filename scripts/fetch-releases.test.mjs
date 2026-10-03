@@ -66,11 +66,15 @@ globalThis.fetch = async (url) => {
   if (p.endsWith('/genre/movie/list') || p.endsWith('/genre/tv/list')) return json({ genres: [] });
 
   // Providers: 1 is on Netflix (8); 4 is on Prime (9) and reaches the feed only
-  // through the digital pass; nothing else has a service yet.
+  // through the digital pass; 8 opens in cinemas today and TMDB claims Prime
+  // for it, which is the Drishyam case and must not reach a badge; nothing
+  // else has a service yet.
   if (/\\/watch\\/providers$/.test(p)) {
     const id = p.split('/')[3];
     if (id === '1') return json({ results: { IN: { flatrate: [{ provider_id: 8 }] } } });
     if (id === '4') return json({ results: { IN: { flatrate: [{ provider_id: 9 }] } } });
+    if (id === '8') return json({ results: { IN: { flatrate: [{ provider_id: 9 }] } } });
+    if (id === '9') return json({ results: { IN: { flatrate: [{ provider_id: 8 }] } } });
     return json({ results: {} });
   }
 
@@ -111,7 +115,14 @@ globalThis.fetch = async (url) => {
 
   if (p.endsWith('/discover/movie')) {
     // The theatrical pass asks for types 2|3, the digital one for 4.
-    if (q.with_release_type === '2|3') return json({ results: [movie(2)], total_pages: 1 });
+    // 2 opens later this week; 8 opened today and is the one TMDB already
+    // claims a provider for; 9 opened six weeks ago and has since landed on
+    // Netflix, which is the case the re-ask pass exists to catch.
+    if (q.with_release_type === '2|3')
+      return json({
+        results: [movie(2), movie(8, { release_date: TODAY }), movie(9, { release_date: LONG_AGO })],
+        total_pages: 1,
+      });
     if (q.with_release_type === '4') {
       // 1 is already on Netflix, 2 already in cinemas, 3 is digital-only and
       // still ahead, 4 is a digital date TMDB has already named, 5 has arrived
@@ -158,22 +169,26 @@ globalThis.fetch = async (url) => {
 };
 `;
 
-function run() {
+function run(weeksBack = '0', theatreWeeksBack = '0') {
   const dir = mkdtempSync(join(tmpdir(), 'feed-'));
   const out = join(dir, 'releases.json');
   const today = new Date().toISOString().slice(0, 10);
   // Three days out, so the pre-release case and the arrived case are both in
   // the same week and the same run.
   const soon = new Date(Date.now() + 3 * 86_400_000).toISOString().slice(0, 10);
+  // Six weeks back: past the theatrical floor, so a cinema listing this old is
+  // one the re-ask pass is supposed to go and look up again.
+  const longAgo = new Date(Date.now() - 42 * 86_400_000).toISOString().slice(0, 10);
   const preload = join(dir, 'stub.mjs');
   writeFileSync(
     preload,
-    `const TODAY = ${JSON.stringify(today)};\nconst SOON = ${JSON.stringify(soon)};\n${STUB}`,
+    `const TODAY = ${JSON.stringify(today)};\nconst SOON = ${JSON.stringify(soon)};\n` +
+      `const LONG_AGO = ${JSON.stringify(longAgo)};\n${STUB}`,
   );
 
   const log = execFileSync(
     process.execPath,
-    ['--import', `file://${preload}`, 'scripts/fetch-releases.mjs', '--weeks-back', '0', '--weeks-ahead', '1', '--theatre-weeks-back', '0'],
+    ['--import', `file://${preload}`, 'scripts/fetch-releases.mjs', '--weeks-back', weeksBack, '--weeks-ahead', '1', '--theatre-weeks-back', theatreWeeksBack],
     {
       cwd: ROOT,
       encoding: 'utf8',
@@ -324,6 +339,90 @@ test('a cinema listing is not also "coming to streaming"', () => {
   const cinema = byId.get('m-2');
   assert.ok(cinema, 'the theatrical title vanished');
   assert.deepEqual(cinema.platforms, ['theatres'], `got ${cinema.platforms.join(', ')}`);
+});
+
+test('a film in cinemas today is not also streaming today', () => {
+  /*
+   * Title 8 opened in cinemas this morning and TMDB has a Prime provider on
+   * it. This is Drishyam: The Conclusion, which wore a Prime badge in the "On
+   * OTT" rail the day after it opened — and, because a streaming platform
+   * retires a row from the cinema rail, vanished from "In cinemas" at the same
+   * time. Wrong twice from one bad field.
+   *
+   * The guard that was written the first time this was reported tested
+   * `releaseDate > TODAY`, and the pass that attaches these providers only
+   * runs on rows where `releaseDate <= TODAY`. It could not fire on the bug it
+   * was written for, and no test noticed, because every fixture that exercised
+   * it used a future date. This one does not: that is the whole point of it.
+   *
+   * Every row, not byId.get. The first version of this test used the lookup
+   * and passed against the broken code: the stub answers the theatrical
+   * discover for both weeks, so m-8 lands twice, and a Map built from the feed
+   * keeps the last one — which was the clean row. A test that reads one of two
+   * rows and calls it the answer is the same kind of mistake as the guard it
+   * is here to catch.
+   */
+  const opened = rows.filter((r) => r.id === 'm-8');
+  assert.ok(opened.length, 'the title that opened today vanished');
+  for (const row of opened) {
+    assert.deepEqual(
+      row.platforms,
+      ['theatres'],
+      `a film in cinemas (${row.releaseDate}) claims ${row.platforms.join(', ')}`,
+    );
+  }
+});
+
+test('no row claims to be in cinemas and streaming at once', () => {
+  /*
+   * The rule, not the instance. A row carrying both a cinema listing and a
+   * service while still inside the theatrical window is the contradiction in
+   * whatever form it arrives — from the re-ask pass, the digital fold, a
+   * release note, or a pass not written yet.
+   *
+   * Scoped to the window on purpose: a film four weeks past its opening may
+   * legitimately be both, and this must not start failing the day someone
+   * adds an older fixture.
+   */
+  const floor = Date.now() - 28 * 86_400_000;
+  const bad = rows.filter(
+    (r) =>
+      Date.parse(r.releaseDate) > floor &&
+      r.platforms.includes('theatres') &&
+      r.platforms.some((p) => p !== 'theatres'),
+  );
+  assert.deepEqual(
+    bad.map((r) => `${r.id} ${r.platforms.join('+')}`),
+    [],
+    'rows are in cinemas and streaming at the same time',
+  );
+});
+
+test('a film that has left cinemas still gains the service it landed on', () => {
+  /*
+   * The other direction, and the reason this is a floor and not a ban.
+   *
+   * Title 9 opened six weeks ago and is now on Netflix. That is the single
+   * most valuable row this calendar produces — "it was in cinemas, it is on
+   * Netflix now" — and the re-ask pass is the only thing that finds it.
+   *
+   * This test exists because of a mistake made while fixing the bug above.
+   * Moving the window check into a shared module changed its signature, the
+   * call site kept passing one argument, the comparison went NaN, and the
+   * re-ask pass stopped running entirely. Every test still passed: the suite
+   * only ever checked that platforms were *not* attached. A guard with
+   * nothing testing the permissive side is a guard that can be turned off by
+   * accident and stay off.
+   */
+  const { feed: wide } = run('6', '6');
+  const landed = wide.weeks.flatMap((w) => w.releases).filter((r) => r.id === 'm-9');
+  assert.ok(landed.length, 'the film that opened six weeks ago vanished');
+  assert.ok(
+    landed.some((r) => r.platforms.includes('netflix')),
+    `a film six weeks past its opening never gained its service: ${
+      landed.map((r) => r.platforms.join('+')).join(' | ') || 'no rows'
+    }`,
+  );
 });
 
 test('a digital date asks who has it before saying nobody knows', () => {

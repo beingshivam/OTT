@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-27T11:17:16.707Z",
+  "updatedAt": "2026-10-03T18:30:59.192Z",
   "observations": [
     {
       "id": "m-1685882",
@@ -30,6 +30,16 @@
       "platform": "prime",
       "days": 21,
       "firstRecorded": "2026-09-27"
+    },
+    {
+      "id": "m-1049064",
+      "title": "Mahendragiri Vaaraahi",
+      "language": "te",
+      "cinemaDate": "2026-09-11",
+      "ottDate": "2026-10-02",
+      "platform": "prime",
+      "days": 21,
+      "firstRecorded": "2026-10-03"
     }
   ]
 }
