@@ -895,54 +895,68 @@ else {
    */
   const bySlug = new Map();
   const datedBySlug = new Map();
-  /* The catalogue joins the pool because it now has pages too — 643 of them.
-     Without it every one reads as an orphan, which is the check working from a
-     stale idea of where pages come from rather than a real fault. */
-  for (const r of [...feedRows, ...catRows, ...(archive?.titles ?? [])]) {
-    const key = r.slug ?? slugify(r.title ?? '');
-    if (!key) continue;
-    if (String(r.id ?? '').endsWith('~ott')) {
-      // Region matters here and nowhere else in this map. feedRows is already
-      // scoped to India; the archive is not, and The End of Oak Street carries
-      // a US digital date and no Indian one. Counting that as the film's
-      // streaming date would have failed a page for refusing to publish an
-      // American release date to Indian readers — which is the page being
-      // right.
-      if ((r.regions ?? [REGION]).includes(REGION)) datedBySlug.set(key, r);
-      /* A streaming row is the film's date sibling AND, when the film has no
-         cinema row, the owner of its page — Ghamasaan exists on ZEE5 and
-         nowhere else. Registering it as an owner only when nothing else claims
-         the slug keeps the cinema row winning wherever both exist. */
-      if (!bySlug.has(key)) bySlug.set(key, r);
-      continue;
-    }
-    bySlug.set(key, r);
-  }
 
   /*
-   * The live row wins its own slug, whatever order this loop ran in.
+   * Which row owns a page is the builder's decision, read rather than guessed.
    *
-   * The pool is feed, then catalogue, then archive, and the line above
-   * overwrites unconditionally — so the archive, iterated last, beat the two
-   * sources that are actually current. The archive is a record of what was
-   * true when a row aged off the board, and it is frozen at that moment.
+   * This used to re-derive the answer: key every row by `r.slug ?? slugify(
+   * title)`, let the archive load last, then a second pass to put the live row
+   * back on top. Three rules approximating one decision made somewhere else,
+   * and they disagreed with it the first time a film had two rows.
    *
-   * Two pages failed this gate on it in one refresh, and both were correct
-   * pages judged against a stale copy of themselves. Ramba Oorvasi Menaka had
-   * reached Prime Video: the feed said so, the page said so, and the archive
-   * still remembered it as a cinema listing — "no streaming platform but says
-   * Streaming now". Anbil Avan had picked up a 28-word synopsis that the
-   * archive copy predates, so a page with a synopsis on it was reported as
-   * published thin.
+   * Teenage Sex and Death at Camp Miasma opened in cinemas on 14 August and
+   * reached MUBI on 2 October, so the feed carries both a cinema row and an
+   * ~ott row. The builder gave the page to the MUBI row and the page is right:
+   * it says "Streaming now on MUBI", because the film is. But the cinema row
+   * has no slug — it has no page — and the slugify fallback invented one for
+   * it anyway, so the grader judged a correct page against the row that does
+   * not own it and reported "no streaming platform but says Streaming now".
    *
-   * Both are the same failure this gate exists to prevent, pointed the wrong
-   * way: a check that is confidently wrong about a page that is right teaches
-   * people to ignore it, and then it is worth nothing on the day it is right.
+   * That failure blocked every refresh for two days, and the site went 49
+   * hours stale behind a gate that was wrong. A check confidently wrong about
+   * a page that is right is worse than no check: it teaches people to ignore
+   * it, and then it is worth nothing on the day it is right.
+   *
+   * So: a row owns a page only if it carries a stamped slug, which is exactly
+   * what build-seo writes into the shipped feed for every row it builds a page
+   * for — "one implementation of the rule, and no way for the two to
+   * disagree", as the comment there puts it. Verified against the build: 2,190
+   * pages, every one of them with a stamped row behind it, none orphaned.
+   *
+   * Archive first so the live sources overwrite it. The archive is frozen at
+   * the moment a row aged off the board, and it had been winning: Ramba
+   * Oorvasi Menaka reached Prime Video and the archive still remembered a
+   * cinema listing, Anbil Avan gained a synopsis the archive copy predates.
+   * Both were correct pages judged against a stale copy of themselves.
    */
-  for (const r of [...feedRows, ...catRows]) {
-    if (String(r.id ?? '').endsWith('~ott')) continue;
+  const live = (rows) => [...(archive?.titles ?? []), ...catRows, ...feedRows].filter(rows);
+  const isOtt = (r) => String(r.id ?? '').endsWith('~ott');
+  /* A streaming row shares the film's page rather than owning one — slugFor in
+     build-seo resolves `m-1317872~ott` to the page of `m-1317872`. So it owns a
+     slug only where no cinema row claims it, which is Camp Miasma's case: that
+     cinema row aged out of the candidates and has no page, leaving the MUBI row
+     the only thing the URL can mean. */
+  for (const r of live(isOtt)) if (r.slug) if (!bySlug.has(r.slug)) bySlug.set(r.slug, r);
+  for (const r of live((r) => !isOtt(r))) if (r.slug) bySlug.set(r.slug, r);
+
+  /*
+   * The streaming date, keyed by the page it belongs to.
+   *
+   * Separate from ownership because an ~ott row is the film's date sibling
+   * whether or not it owns the page — when the cinema row holds the slug, the
+   * date still has to reach that page. So this one does fall back to the
+   * title, which is the only link back to a page it does not own.
+   *
+   * Region matters here and nowhere else. feedRows is already scoped to India;
+   * the archive is not, and The End of Oak Street carries a US digital date
+   * and no Indian one. Counting that as the film's streaming date would fail a
+   * page for refusing to publish an American date to Indian readers — which is
+   * the page being right.
+   */
+  for (const r of [...feedRows, ...catRows, ...(archive?.titles ?? [])]) {
+    if (!String(r.id ?? '').endsWith('~ott')) continue;
     const key = r.slug ?? slugify(r.title ?? '');
-    if (key) bySlug.set(key, r);
+    if (key && (r.regions ?? [REGION]).includes(REGION)) datedBySlug.set(key, r);
   }
 
   const titlePages = [...pages].filter(([p]) => p.startsWith('/ott-release-date/'));
@@ -955,8 +969,20 @@ else {
       orphan.push(path);
       continue;
     }
-    const streams = (row.platforms ?? []).some((p) => p !== 'theatres');
     const dated = datedBySlug.get(slug);
+    /*
+     * A film is streaming if its own row says so, or if its streaming row's
+     * date has arrived.
+     *
+     * The grader has to know what the builder knows. A title with an announced
+     * digital date is two rows — the cinema listing and the row for the week it
+     * reaches OTT — and once that second date passes, the page says "Streaming
+     * now on X" because by then it is. Judging that page against the cinema row
+     * alone reports ten correct pages as contradictions, which is how this
+     * check spent two days blocking refreshes over a page that was right.
+     */
+    const arrived = dated?.platforms?.length && dated.releaseDate <= TODAY;
+    const streams = (row.platforms ?? []).some((p) => p !== 'theatres') || Boolean(arrived);
     const saysStreaming = /Streaming now on/.test(html);
     const saysUnannounced = /Not announced yet/.test(html);
     /*

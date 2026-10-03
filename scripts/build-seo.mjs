@@ -1994,7 +1994,44 @@ for (const r of allTitlePages) {
   const slug = slugById.get(r.id);
   if (!slug) continue;
 
-  const streaming = (r.platforms ?? []).filter((p) => p !== 'theatres');
+  /**
+   * The film's own streaming row, which lives under a different id.
+   *
+   * Looked up here rather than further down because the page's whole state
+   * depends on it — see the long note below for why a title with an announced
+   * digital date is two rows in this feed and not one.
+   */
+  const datedRow = titleCandidates.find((x) => x.id === `${r.id}~${DIGITAL_SUFFIX}`);
+
+  /**
+   * And once that date has passed, the film is simply streaming.
+   *
+   * This was the half of the two-row problem that stayed broken. The fix for
+   * it only admitted a sibling dated `>= TODAY`, so a page was right up to the
+   * morning the film arrived and wrong from then on: the date fell out of the
+   * future, the sibling stopped counting, and the page went back to saying
+   * "Not announced yet — no streaming date has been confirmed" on the exact
+   * day people start searching for where to watch it. Seventeen pages were in
+   * that state when this was found, including Toxic: A Fairy Tale for
+   * Grown-ups, on ZEE5 for a week while its page said nothing had been
+   * announced — the same film a reader had already written in about, with the
+   * error pointing the other way.
+   *
+   * So an arrived sibling contributes its platforms to this page, which is
+   * what makes every downstream state — the tag, the lede, the description,
+   * the structured data — say "streaming on" instead of "not announced". They
+   * all read `streaming`, which is why this belongs here and not in any one
+   * of them.
+   */
+  const arrived =
+    datedRow?.platforms?.length && datedRow.releaseDate <= TODAY ? datedRow : null;
+
+  const streaming = [
+    ...new Set([
+      ...(r.platforms ?? []),
+      ...(arrived?.platforms ?? []),
+    ]),
+  ].filter((p) => p !== 'theatres');
   /** Three states, one URL. The page is written for whichever is true today
    *  and rewrites itself on the next build as the film moves through them. */
   const upcoming = r.releaseDate > TODAY;
@@ -2034,9 +2071,7 @@ for (const r of allTitlePages) {
    * written at all. So this answers with both halves, where it used to be able
    * to give only the date.
    */
-  const dated = titleCandidates.find(
-    (x) => x.id === `${r.id}~${DIGITAL_SUFFIX}`,
-  );
+  const dated = datedRow;
   /* Both halves or neither: an archive row predating the rule could still
      carry a date with no service, and half an answer is the thing this page
      refuses to print. */

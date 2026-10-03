@@ -944,7 +944,16 @@ for (const width of [390, 1440]) {
   is(m.searchInHeader, `${label}: search is in the header`, 'it is not');
   is(m.stepper === 2, `${label}: the week stepper is on the board heading`, `${m.stepper} arrows found`);
   is(m.toggle === 2, `${label}: the layout toggle is on the board heading`, `${m.toggle} buttons found`);
-  is(/Sep|week/i.test(m.headingText), `${label}: the heading names the week`, `it says "${m.headingText}"`);
+  /* Any month, not September.
+   *
+   * This read /Sep|week/i and passed for as long as it happened to be
+   * September. It failed on the 1st of October against a heading reading
+   * "2 - 8 Oct 2026 - 23 titles", which is the heading being exactly right —
+   * a test that only holds in one month of the year is a test that will cry
+   * wolf eleven times and be ignored on the twelfth. */
+  const MONTH = /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b/i;
+  is(MONTH.test(m.headingText) || /week/i.test(m.headingText),
+     `${label}: the heading names the week`, `it says "${m.headingText}"`);
 
   /**
    * Content before controls. The first attempt at this rendered the board's
