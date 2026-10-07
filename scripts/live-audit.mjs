@@ -25,6 +25,8 @@
  *        SAMPLE=all node scripts/live-audit.mjs     (every title page, slower)
  */
 
+import { readFile } from 'node:fs/promises';
+
 const SITE = (process.env.SITE ?? 'https://newonott.in').replace(/\/$/, '');
 const SAMPLE = process.env.SAMPLE ?? '60';
 const CONCURRENCY = Number(process.env.CONCURRENCY ?? 10);
@@ -324,27 +326,42 @@ is(
  * the old URL — 36% of the site's clicks — returned 200 and the app shell for
  * a day. A soft 404 looks healthy to every check that only reads a status.
  *
- * Reads the first rule out of the deployed file rather than naming a slug, so
- * it keeps testing the real thing after Toxic stops mattering.
+ * The URL under test comes from the archive in the checkout rather than from
+ * the deployed site. The first version fetched /_redirects and read a rule out
+ * of it, which cannot work and quietly passed: Cloudflare consumes that file
+ * rather than serving it, so the request fell through to the SPA, no line of
+ * the HTML began with "/", and the check concluded there was nothing to
+ * redirect and reported success. A check that reports "all clear" when it
+ * failed to look is worth less than no check — it is the third thing this week
+ * to pass by never reaching the case it was written for.
  */
-const redirectsFile = await get('/_redirects');
-const firstRule = (await redirectsFile.text().catch(() => ''))
-  .split('\n')
-  .find((l) => l.startsWith('/'));
-if (!firstRule) {
-  is(true, 'no renamed pages to redirect yet', 'nothing in _redirects');
+const archiveRows = JSON.parse(
+  await readFile(new URL('../data/archive.json', import.meta.url), 'utf8').catch(() => '{"titles":[]}'),
+).titles ?? [];
+const ownedNow = new Set(archiveRows.map((r) => r.slug).filter(Boolean));
+const renamed = archiveRows
+  .flatMap((r) => (r.slug ? (r.slugWas ?? []).map((old) => ({ from: old, to: r.slug })) : []))
+  // A former slug another film answers to now is not a redirect — see the
+  // generator in build-seo.mjs for the eight that would have been hijacks.
+  .filter((x) => x.from !== x.to && !ownedNow.has(x.from));
+
+if (!renamed.length) {
+  note(true, 'no renamed pages to redirect yet', 'nothing in the archive has a former slug');
 } else {
-  const [from, to] = firstRule.split(/\s+/);
-  const moved = await get(from);
+  const { from, to } = renamed[0];
+  const oldUrl = `/ott-release-date/${from}`;
+  const moved = await get(oldUrl);
   is(
     moved.status === 301 || moved.status === 308,
     'a renamed page still answers on its old URL',
-    `${from} returned ${moved.status}${moved.status === 200 ? ' — soft 404, the ranking is being thrown away' : ''}`,
+    `${oldUrl} returned ${moved.status}${
+      moved.status === 200 ? ' — soft 404, the ranking on that URL is being thrown away' : ''
+    }`,
   );
   is(
-    (moved.headers.get('location') ?? '').endsWith(to),
+    (moved.headers.get('location') ?? '').endsWith(`/ott-release-date/${to}`),
     'and lands on where that page lives now',
-    moved.headers.get('location') ?? 'no location',
+    moved.headers.get('location') ?? 'no location header',
   );
 }
 
