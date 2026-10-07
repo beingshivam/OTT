@@ -363,6 +363,22 @@ if (!renamed.length) {
     'and lands on where that page lives now',
     moved.headers.get('location') ?? 'no location header',
   );
+  /*
+   * Say what was tested, even when it passed.
+   *
+   * Every other check here can be reasoned about from the repo. This one is
+   * the site's answer to a question only the site can answer, and the version
+   * before this passed for four days without asking it. A green run that
+   * cannot show which URL it tried is the same evidence as no run at all, so
+   * the result goes into the annotations where the API can read it.
+   */
+  if (process.env.GITHUB_ACTIONS) {
+    console.log(
+      `::notice title=Renamed URL::${oldUrl} -> ${moved.status} ${
+        moved.headers.get('location') ?? '(no location)'
+      } (${renamed.length} former URL(s) in the archive)`,
+    );
+  }
 }
 
 /*
