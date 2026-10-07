@@ -33,6 +33,25 @@ let checks = 0;
 let failures = 0;
 const failed = [];
 
+/**
+ * A failure has to be readable from outside the job's own log.
+ *
+ * This audit went red on 3 October and stayed red for four days. The report
+ * naming the reason goes to GITHUB_STEP_SUMMARY, which is a page a human opens
+ * — everything else, the API included, could see only "Process completed with
+ * exit code 1". A gate whose reason can only be read by the one person least
+ * likely to be looking is most of the way back to the silence this whole
+ * workflow was built to end.
+ *
+ * `::error::` puts each failure in the run's annotations, where it shows on the
+ * commit, in the checks list, and in the API.
+ */
+const annotate = (label, detail) => {
+  if (!process.env.GITHUB_ACTIONS) return;
+  const flat = `${label}${detail ? ` — ${detail}` : ''}`.replace(/\r?\n/g, ' ').slice(0, 400);
+  console.log(`::error title=Live audit::${flat}`);
+};
+
 function is(ok, label, detail = '') {
   checks += 1;
   if (ok) {
@@ -41,6 +60,7 @@ function is(ok, label, detail = '') {
     failures += 1;
     failed.push({ label, detail });
     console.log(`  FAIL ${label}${detail ? `  — ${detail}` : ''}`);
+    annotate(label, detail);
   }
   return ok;
 }
