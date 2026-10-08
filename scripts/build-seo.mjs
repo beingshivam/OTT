@@ -2455,6 +2455,56 @@ await writeFile(resolve(ROOT, 'dist/sitemap.xml'), sitemap);
  * silent: the page exists, the link points at it, and the app renders nothing.
  */
 await writeFile(FEED, JSON.stringify(feed));
+
+/**
+ * The back catalogue as the browser needs it, which is half of what it is.
+ *
+ * Reported: "the now streaming page lags and is slow". Measured on a
+ * throttled mid-range phone — 86% of this site's traffic is mobile — the
+ * /streaming route pulled 2,475 KB and took 15 seconds to settle, of which
+ * catalogue.json alone was 1,475 KB.
+ *
+ * The loader's own comment said "it is a quarter of a megabyte". It was, once.
+ * The catalogue has since grown to 1,810 titles and nobody re-measured, which
+ * is the whole lesson: the number in the comment was load-bearing and stale.
+ *
+ * What comes out, and why it is safe to drop:
+ *
+ *   synopsis, backdropUrl   738 KB between them, and CatalogueSheet already
+ *                           re-fetches both from /api/title the moment a
+ *                           sheet opens. They were paying 738 KB on every
+ *                           visit to pre-fill one title somebody might tap.
+ *   tiers, popularity,      162 KB that no client code reads at all —
+ *   baseWeek, baseRank,     bookkeeping from the catalogue build that was
+ *   prevPopRank             being shipped to every phone by accident.
+ *
+ * What stays and why: `cast`, because globalSearch matches actor names
+ * against it and dropping it would quietly break searching for a star, which
+ * is exactly the kind of silent regression this file keeps producing.
+ *
+ * Written beside the full file rather than over it. build-seo reads
+ * dist/data/catalogue.json for synopses when it builds title pages, and
+ * eval.mjs grades against it; trimming in place would have starved both and
+ * the damage would have shown up as missing page content, not as an error.
+ */
+const BROWSE_DROP = ['synopsis', 'backdropUrl', 'tiers', 'popularity', 'baseWeek', 'baseRank', 'prevPopRank'];
+if (catalogueFile) {
+  const slim = {
+    ...catalogueFile,
+    titles: catalogueFile.titles.map((r) => {
+      const out = { ...r };
+      for (const k of BROWSE_DROP) delete out[k];
+      return out;
+    }),
+  };
+  const before = JSON.stringify(catalogueFile).length;
+  const after = JSON.stringify(slim).length;
+  await writeFile(resolve(ROOT, 'dist/data/browse.json'), JSON.stringify(slim));
+  console.log(
+    `     browse.json: ${(after / 1024).toFixed(0)} KB for the browser, down from ` +
+      `${(before / 1024).toFixed(0)} KB (${Math.round((1 - after / before) * 100)}% smaller)`,
+  );
+}
 /* And the catalogue, carrying the slugs stamped above. Without this the app
    loads /streaming, finds no slug on any row and renders 658 titles that do
    not link to the pages this build just wrote for them. */

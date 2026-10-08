@@ -34,6 +34,23 @@
 /data/releases.json
   Cache-Control: public, max-age=300, must-revalidate
 
+# The back catalogue, which is the big one and the slowest page to arrive.
+#
+# Reported: "the now streaming page lags and is slow". Measured on a throttled
+# mid-range phone — which is what 86% of this site's traffic is — that route
+# pulled 2,475 KB and took 15 seconds to settle, and it had no caching rule at
+# all, so every visit paid for it again.
+#
+# Longer than the calendar's five minutes because it is a different kind of
+# file: a back catalogue of things already streaming moves when the daily
+# refresh adds a title, not when a date is announced. An hour of staleness here
+# costs a reader nothing they would notice; re-downloading it costs them the
+# page.
+/data/browse.json
+  Cache-Control: public, max-age=3600, must-revalidate
+/data/catalogue.json
+  Cache-Control: public, max-age=3600, must-revalidate
+
 # The whole point of this page is to report what the network in front of it is
 # doing. A cached copy of it would report on a different day's network.
 /diag/*

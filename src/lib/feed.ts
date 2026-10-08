@@ -20,7 +20,21 @@ export async function loadFeed(signal?: AbortSignal): Promise<ReleaseFeed> {
    * pinned ('/' here), which is the same answer from every page.
    */
   const url = new URL(`${import.meta.env.BASE_URL}data/releases.json`, location.origin).href;
-  const res = await fetch(url, { signal, cache: 'no-cache' });
+  /*
+   * No `cache: 'no-cache'`, which was costing a 443 KB download far more
+   * often than once.
+   *
+   * App.tsx loads the feed in an effect keyed on `route`, so every move
+   * between lenses, weeks and title sheets re-ran it — and `no-cache` forces
+   * a revalidation round trip each time, overriding the five-minute
+   * Cache-Control the edge already sends. On the throttled mid-range phone
+   * most of this audience browses on, that is most of a second of nothing
+   * happening on every tap, which is what "lags" describes.
+   *
+   * Freshness is the header's job. It can also be retuned without shipping a
+   * new bundle, which this could not.
+   */
+  const res = await fetch(url, { signal });
   if (!res.ok) throw new Error(`Could not load the release feed (${res.status})`);
   return normalise((await res.json()) as ReleaseFeed);
 }

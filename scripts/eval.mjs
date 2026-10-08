@@ -1013,6 +1013,55 @@ const S9 = 'Guessed platforms';
   }
 }
 
+/**
+ * What the slowest page makes a phone download.
+ *
+ * Reported: "the now streaming page lags and is slow." The cause was not a
+ * slow algorithm — it was data/catalogue.json quietly growing from the
+ * "quarter of a megabyte" its loader's comment still claimed to 1,475 KB, as
+ * the catalogue went to 1,810 titles. Nothing failed, nothing errored, and
+ * the page everyone was told to open got slower every week.
+ *
+ * A ceiling rather than a ratchet. This file grows legitimately as the site
+ * covers more titles, so the honest behaviour is to make somebody look when
+ * it crosses a line — trim another field, or paginate, or raise the line on
+ * purpose — rather than to let it drift until a reader complains again.
+ *
+ * Measured uncompressed, which is what the browser parses and roughly what
+ * decides the delay on a mid-range phone; the wire cost is about a fifth of
+ * it after gzip.
+ */
+const S8b = 'What a phone downloads';
+{
+  const BROWSE_BUDGET_KB = 900;
+  const browse = await stat(resolve(DIST, 'data/browse.json')).catch(() => null);
+  if (!browse) skip(S8b, 'the browse payload stays within budget', 'needs dist/');
+  else {
+    const kb = browse.size / 1024;
+    kb > BROWSE_BUDGET_KB
+      ? fail(S8b, 'the browse payload stays within budget',
+          `${kb.toFixed(0)} KB against a ${BROWSE_BUDGET_KB} KB ceiling — trim a field or paginate`)
+      : pass(S8b, 'the browse payload stays within budget',
+          `${kb.toFixed(0)} KB of ${BROWSE_BUDGET_KB} KB`);
+  }
+
+  /* The slim file is generated from the full one, so a field added to the
+     catalogue arrives in the browser unless it is deliberately dropped. This
+     is what notices. */
+  const full = await maybe(resolve(DIST, 'data/catalogue.json'));
+  const slim = await maybe(resolve(DIST, 'data/browse.json'));
+  if (!full || !slim) skip(S8b, 'the browser copy carries no field it cannot use', 'needs dist/');
+  else {
+    const dropped = ['synopsis', 'backdropUrl', 'tiers', 'popularity', 'baseWeek', 'baseRank', 'prevPopRank'];
+    const leaked = dropped.filter((k) => (slim.titles ?? []).some((r) => r[k] !== undefined));
+    leaked.length
+      ? fail(S8b, 'the browser copy carries no field it cannot use',
+          `${leaked.join(', ')} reached the browser`, leaked)
+      : pass(S8b, 'the browser copy carries no field it cannot use',
+          `${dropped.length} fields held back from ${(slim.titles ?? []).length} rows`);
+  }
+}
+
 const S8 = 'Connection hints';
 {
   /**

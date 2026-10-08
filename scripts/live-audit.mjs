@@ -187,8 +187,13 @@ if (feed?.generatedAt) {
 const rows = (feed?.weeks ?? []).flatMap((w) => w.releases ?? []);
 console.log(`       ${rows.length} rows across ${feed?.weeks?.length ?? 0} weeks`);
 
-const catRes = await get('/data/catalogue.json');
-is(catRes.status === 200, 'the back catalogue is served', `status ${catRes.status}`);
+/* data/browse.json, not data/catalogue.json: the browser stopped fetching the
+   full file when the back catalogue was trimmed for the "now streaming page
+   lags" report. Left pointed at catalogue.json this check would have gone on
+   passing while the file readers actually depend on returned a 404 — a green
+   audit for a page that renders nothing. */
+const catRes = await get('/data/browse.json');
+is(catRes.status === 200, 'the back catalogue the browser asks for is served', `status ${catRes.status}`);
 let catalogue = null;
 try {
   catalogue = JSON.parse(catRes.body);
