@@ -31,6 +31,7 @@ import { BRAND, HEADLINE, INSTAGRAM_URL } from './brand.mjs';
 const TAGLINE_LONG =
   "Everything releasing this week — tap any title to see where it's streaming and open it there. Nothing plays on this page.";
 import { slugify } from './slug.mjs';
+import { inRegion, loadRegistry } from './platform-registry.mjs';
 import { byDay, dayLabel, phrase } from '../src/lib/changes.mjs';
 import { ANALYTICS_TOKEN } from './config.mjs';
 
@@ -138,6 +139,7 @@ const languageName = new Map(
 );
 /** The full rows, not just names: the per-platform pages need to know which
  *  regions a platform serves so an India page never links to a US-only one. */
+const PLATFORM_REGISTRY = await loadRegistry();
 const PLATFORM_ROWS = [
   ...registry.matchAll(/\{\s*id:\s*'([^']+)',\s*name:\s*'([^']+)'[\s\S]*?regions:\s*\[([^\]]*)\]/g),
 ].map(([, id, name, regions]) => ({
@@ -899,11 +901,34 @@ const MONTH_SLUGS = (() => {
   return names;
 })();
 
+/**
+ * Every row, carrying only the services a reader in this region could open.
+ *
+ * A row's `platforms` is the union across every region it was found in, which
+ * is correct data and a wrong page. 41 India title pages were telling readers
+ * a film was on HBO Max, Hulu or Paramount+ — none of which sell a
+ * subscription in India — on a page whose entire job is to answer "where can
+ * I watch this". That is the Prime-badge-on-a-cinema-film mistake once more:
+ * a true field rendered where it is not true.
+ *
+ * Applied once, here, where rows enter the build, rather than at the twenty
+ * downstream places that read `platforms`. The comment on PLATFORM_ROWS above
+ * already said an India page must never link to a US-only service, and that
+ * rule had been implemented for the platform pages alone — one surface, by
+ * hand, while every other surface went on naming them.
+ *
+ * Rows left with nothing keep their page. Dropping them would retire 41 URLs
+ * that are already indexed, and an honest page that gives the date, the cast
+ * and no platform is worth more than a soft 404 — see dist/_redirects for
+ * what abandoning a published URL costs.
+ */
+const inThisRegion = (r) => inRegion(r, REGION, PLATFORM_REGISTRY);
+
 const stockedWeeks = feed.weeks.filter((w) => w.releases.some((r) => r.regions.includes(REGION)));
 /** Stamped with their week on the way out: a release row carries no week id of
  *  its own, and the platform and language pages group by week. */
 const everything = stockedWeeks.flatMap((w) =>
-  w.releases.filter((r) => r.regions.includes(REGION)).map((r) => ({ ...r, weekId: w.id })),
+  w.releases.filter((r) => r.regions.includes(REGION)).map((r) => ({ ...inThisRegion(r), weekId: w.id })),
 );
 
 const TODAY = new Date().toISOString().slice(0, 10);
@@ -944,14 +969,14 @@ const archived = await readFile(resolve(ROOT, 'data/archive.json'), 'utf8')
 const catalogueFile = await readFile(CATALOGUE, 'utf8')
   .then((raw) => JSON.parse(raw))
   .catch(() => null);
-const catalogue = catalogueFile?.titles ?? [];
+const catalogue = (catalogueFile?.titles ?? []).map(inThisRegion);
 
 const liveIds = new Set(everything.map((r) => r.id));
 /** Live rows win: they came from this refresh and the archive may be a run
  *  behind on a platform that has just picked a film up. */
 const titleCandidates = [
   ...everything,
-  ...archived.filter((r) => !liveIds.has(r.id) && (r.regions ?? []).includes(REGION)),
+  ...archived.filter((r) => !liveIds.has(r.id) && (r.regions ?? []).includes(REGION)).map(inThisRegion),
 ];
 
 /**

@@ -29,6 +29,7 @@
 import { appendFile, readFile, readdir, stat } from 'node:fs/promises';
 import { slugify } from './slug.mjs';
 import { contradicts, THEATRICAL_FLOOR_DAYS } from './cinema-window.mjs';
+import { inRegion, loadRegistry } from './platform-registry.mjs';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -157,14 +158,32 @@ async function collectPages(dir = DIST, base = '') {
 }
 const pages = await stat(DIST).then(() => collectPages(), () => null);
 
-const feedRows = feed ? feed.weeks.flatMap((w) => w.releases).filter((r) => r.regions?.includes(REGION)) : [];
-const catRows = catalogue?.titles ?? [];
+/*
+ * Graded as the region sees them, which is how the build renders them.
+ *
+ * build-seo.mjs drops services that do not operate in REGION before it writes
+ * a page — 41 India pages were naming HBO Max, Hulu or Paramount+. Reading the
+ * raw feed here instead reported every one of those corrected pages as
+ * contradicting its own row: the grader holding the builder's old rule and
+ * calling the fix a fault. One definition, imported by both.
+ */
+const PLATFORM_REGISTRY = await loadRegistry();
+const regional = (r) => inRegion(r, REGION, PLATFORM_REGISTRY);
+const feedRows = feed
+  ? feed.weeks.flatMap((w) => w.releases).filter((r) => r.regions?.includes(REGION)).map(regional)
+  : [];
+const catRows = (catalogue?.titles ?? []).map(regional);
 
 // --- data integrity ----------------------------------------------------------
 
 const S1 = 'Data integrity';
 
-for (const [label, rows] of [['feed', feedRows], ['catalogue', catRows], ['archive', archive?.titles ?? []]]) {
+/* Shape is a property of the stored data, so these read the raw rows. The
+   regional projection legitimately empties `platforms` for a title with no
+   service in this region, and that is a presentation fact, not a malformed
+   row. */
+const rawFeedRows = feed ? feed.weeks.flatMap((w) => w.releases).filter((r) => r.regions?.includes(REGION)) : [];
+for (const [label, rows] of [['feed', rawFeedRows], ['catalogue', catalogue?.titles ?? []], ['archive', archive?.titles ?? []]]) {
   if (!rows.length) {
     skip(S1, `${label}: rows present`, 'file missing or empty');
     continue;
@@ -893,6 +912,41 @@ const S10 = 'Crawl rules';
     pass(S10, 'no URL this site published has been abandoned',
       `${rules.length} redirect(s) for renamed pages`);
 
+  /**
+   * No page tells this region to watch something somewhere it cannot.
+   *
+   * Reported: "you have put a lot of crunchyroll content on rails as well as
+   * below… our site primarily caters to Indian taste." Measuring that turned
+   * up a second, worse thing beside the anime: 41 India title pages named HBO
+   * Max, Hulu, Disney+ or Paramount+ — none of which sell a subscription in
+   * India — on pages whose one job is to answer where to watch something.
+   *
+   * A row's `platforms` is the union across every region it was seen in, so
+   * the data is right and the page was wrong. The rule had even been written
+   * down, on PLATFORM_ROWS in build-seo.mjs: "an India page never links to a
+   * US-only one". It was implemented for the platform pages, by hand, and
+   * every other surface went on naming them for months.
+   *
+   * Checks the rendered pages rather than the rows behind them, because the
+   * rows are allowed to carry these services and the pages are not.
+   */
+  const elsewhere = PLATFORM_REGISTRY.filter((p) => !p.regions.includes(REGION));
+  const naming = [];
+  for (const [path, html] of pages ?? []) {
+    if (!path.startsWith('/ott-release-date/')) continue;
+    const body = (html.match(/<main[\s\S]*?<\/main>/) ?? [''])[0].replace(/<[^>]+>/g, ' ');
+    const hit = elsewhere.find((p) => body.includes(p.name));
+    if (hit) naming.push(`${path} names ${hit.name}`);
+  }
+  if (!pages) skip(S10, `no page sends a ${REGION} reader to a service that is not sold there`, 'needs dist/');
+  else
+    naming.length
+      ? byBlastRadius(S10, `no page sends a ${REGION} reader to a service that is not sold there`,
+          naming.length, [...pages.keys()].filter((p) => p.startsWith('/ott-release-date/')).length,
+          `${naming.length} page(s) name a service unavailable here`, naming.slice(0, 5))
+      : pass(S10, `no page sends a ${REGION} reader to a service that is not sold there`,
+          `${elsewhere.length} out-of-region services checked against every title page`);
+
   if (!pages) skip(S10, 'no redirect points a live page somewhere else', 'needs dist/');
   else if (hijacks.length)
     fail(S10, 'no redirect points a live page somewhere else',
@@ -1108,7 +1162,7 @@ else {
   };
 
   const isOtt = (r) => String(r.id ?? '').endsWith('~ott');
-  const everyRow = [...(archive?.titles ?? []), ...catRows, ...feedRows];
+  const everyRow = [...(archive?.titles ?? []).map(regional), ...catRows, ...feedRows];
 
   /* Cinema rows own their page outright; a streaming row only where none does. */
   for (const r of everyRow) {

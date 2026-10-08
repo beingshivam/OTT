@@ -21,6 +21,44 @@ export interface Platform {
   /** TMDB watch-provider ids. */
   tmdb: number[];
   regions: string[];
+  /**
+   * How much of this audience could act on seeing this badge. Lower leads.
+   *
+   * Reported: "you have put a lot of crunchyroll content on rails as well as
+   * below… our site primarily caters to Indian taste". Measured on the day it
+   * was reported, the "On OTT" rail was 13 Crunchyroll anime out of 20 visible
+   * cards, plus two HBO Max and one Hulu — services with no India
+   * subscription at all. Four cards out of twenty were on a platform this
+   * audience is likely to hold.
+   *
+   * Nothing was ranking anything. The rail ordered strictly by date, and
+   * Crunchyroll ships several simulcast episodes every single day while an
+   * Indian service releases a handful a week, so date order hands the row to
+   * whoever publishes most often. Language interleaving could not help: on
+   * most days every row in the group was `ja`, so there was nothing to
+   * interleave with.
+   *
+   * The principle was already written down a few lines above, about MUBI
+   * taking a lead card — "a platform earns its place by being somewhere a
+   * reader can actually watch the thing" — and it was applied by hand, to one
+   * platform, and never became a rule. This is that rule.
+   *
+   *   1  services a mainstream Indian viewer is likely to already pay for
+   *   2  everything else genuinely available in India, regional services
+   *      included — Indian taste is not only the big five
+   *   3  available here but narrow in appeal, so it fills the tail rather
+   *      than the top of a row
+   *
+   * Not a quality judgement and not a filter: a rank 3 row still appears, and
+   * a reader who wants anime still finds it. It decides what leads when the
+   * row cannot show everything.
+   *
+   * Region availability is the separate, harder rule — see `regions`. A
+   * platform absent from the viewer's region is not ranked last, it is not
+   * shown, because a badge for a service somebody cannot buy is worse than no
+   * badge.
+   */
+  rank: 1 | 2 | 3;
   /** Theatrical is not a streamer, but it belongs in the same weekly view. */
   theatrical?: boolean;
   /**
@@ -78,17 +116,17 @@ export const PLATFORMS: Platform[] = [
      one thing on a single screen. There was even a helper rewriting the name
      for browse links, which is the shape of a problem patched at one surface
      instead of at its source. */
-  { id: 'theatres',    name: 'In cinemas',   short: 'Cinemas',   mark: '▶',  accent: '#FFC94A', accent2: '#FF8A3D', tmdb: [],           regions: ['IN', 'US'], theatrical: true, homeUrl: 'https://in.bookmyshow.com/', searchUrl: 'https://in.bookmyshow.com/explore/movies?q={q}' },
-  { id: 'netflix',     name: 'Netflix',      short: 'Netflix',   mark: 'N',    accent: '#E50914', accent2: '#FF3B30', tmdb: [8, 1796, 175], regions: ['IN', 'US'], homeUrl: 'https://www.netflix.com/', searchUrl: 'https://www.netflix.com/search?q={q}' },
-  { id: 'prime',       name: 'Prime Video',  short: 'Prime',     mark: 'pv',   accent: '#00A8E1', accent2: '#48D2FF', tmdb: [9, 119, 613, 2100], regions: ['IN', 'US'], homeUrl: 'https://www.primevideo.com/', searchUrl: 'https://www.primevideo.com/search/ref=atv_nb_sr?phrase={q}' },
-  { id: 'jiohotstar',  name: 'JioHotstar',   short: 'JioHotstar',mark: 'JH',   accent: '#7B5CFF', accent2: '#22B8FF', tmdb: [2336, 122, 970], regions: ['IN'],   homeUrl: 'https://www.hotstar.com/in', searchUrl: 'https://www.hotstar.com/in/search?q={q}' },
-  { id: 'appletv',     name: 'Apple TV+',    short: 'Apple TV+', mark: 'tv+',  accent: '#E8E8ED', accent2: '#9BA0AC', tmdb: [350, 2, 2243], regions: ['IN', 'US'], homeUrl: 'https://tv.apple.com/', searchUrl: 'https://tv.apple.com/search?term={q}' },
-  { id: 'sonyliv',     name: 'SonyLIV',      short: 'SonyLIV',   mark: 'LIV',  accent: '#6C5CE7', accent2: '#00C2FF', tmdb: [237],        regions: ['IN'],       homeUrl: 'https://www.sonyliv.com/', searchUrl: 'https://www.sonyliv.com/search?searchTerm={q}' },
-  { id: 'zee5',        name: 'ZEE5',         short: 'ZEE5',      mark: 'Z5',   accent: '#8A2BE2', accent2: '#C13BFF', tmdb: [232],        regions: ['IN'],       homeUrl: 'https://www.zee5.com/', searchUrl: 'https://www.zee5.com/search?q={q}' },
-  { id: 'sunnxt',      name: 'Sun NXT',      short: 'Sun NXT',   mark: 'SUN',  accent: '#E4002B', accent2: '#FF5C7A', tmdb: [309],        regions: ['IN'],       homeUrl: 'https://www.sunnxt.com/', searchUrl: 'https://www.sunnxt.com/search/?q={q}' },
-  { id: 'hoichoi',     name: 'hoichoi',      short: 'hoichoi',   mark: 'ho',   accent: '#F5333F', accent2: '#FF7A45', tmdb: [315, 2176],  regions: ['IN'],       homeUrl: 'https://www.hoichoi.tv/', searchUrl: 'https://www.hoichoi.tv/search?q={q}' },
-  { id: 'aha',         name: 'aha',          short: 'aha',       mark: 'aha',  accent: '#FF4E3A', accent2: '#FFA23A', tmdb: [532],        regions: ['IN'],       homeUrl: 'https://www.aha.video/', searchUrl: 'https://www.aha.video/search?query={q}' },
-  { id: 'lionsgate',   name: 'Lionsgate Play', short: 'Lionsgate', mark: 'LG', accent: '#C8A24A', accent2: '#F0D488', tmdb: [561, 2074, 2053, 2358], regions: ['IN'], homeUrl: 'https://www.lionsgateplay.com/', searchUrl: 'https://www.lionsgateplay.com/search?q={q}' },
+  { id: 'theatres',    name: 'In cinemas',   short: 'Cinemas',   mark: '▶',  accent: '#FFC94A', accent2: '#FF8A3D', tmdb: [],           regions: ['IN', 'US'], rank: 1, theatrical: true, homeUrl: 'https://in.bookmyshow.com/', searchUrl: 'https://in.bookmyshow.com/explore/movies?q={q}' },
+  { id: 'netflix',     name: 'Netflix',      short: 'Netflix',   mark: 'N',    accent: '#E50914', accent2: '#FF3B30', tmdb: [8, 1796, 175], regions: ['IN', 'US'], rank: 1, homeUrl: 'https://www.netflix.com/', searchUrl: 'https://www.netflix.com/search?q={q}' },
+  { id: 'prime',       name: 'Prime Video',  short: 'Prime',     mark: 'pv',   accent: '#00A8E1', accent2: '#48D2FF', tmdb: [9, 119, 613, 2100], regions: ['IN', 'US'], rank: 1, homeUrl: 'https://www.primevideo.com/', searchUrl: 'https://www.primevideo.com/search/ref=atv_nb_sr?phrase={q}' },
+  { id: 'jiohotstar',  name: 'JioHotstar',   short: 'JioHotstar',mark: 'JH',   accent: '#7B5CFF', accent2: '#22B8FF', tmdb: [2336, 122, 970], regions: ['IN'], rank: 1,   homeUrl: 'https://www.hotstar.com/in', searchUrl: 'https://www.hotstar.com/in/search?q={q}' },
+  { id: 'appletv',     name: 'Apple TV+',    short: 'Apple TV+', mark: 'tv+',  accent: '#E8E8ED', accent2: '#9BA0AC', tmdb: [350, 2, 2243], regions: ['IN', 'US'], rank: 2, homeUrl: 'https://tv.apple.com/', searchUrl: 'https://tv.apple.com/search?term={q}' },
+  { id: 'sonyliv',     name: 'SonyLIV',      short: 'SonyLIV',   mark: 'LIV',  accent: '#6C5CE7', accent2: '#00C2FF', tmdb: [237],        regions: ['IN'], rank: 1,       homeUrl: 'https://www.sonyliv.com/', searchUrl: 'https://www.sonyliv.com/search?searchTerm={q}' },
+  { id: 'zee5',        name: 'ZEE5',         short: 'ZEE5',      mark: 'Z5',   accent: '#8A2BE2', accent2: '#C13BFF', tmdb: [232],        regions: ['IN'], rank: 1,       homeUrl: 'https://www.zee5.com/', searchUrl: 'https://www.zee5.com/search?q={q}' },
+  { id: 'sunnxt',      name: 'Sun NXT',      short: 'Sun NXT',   mark: 'SUN',  accent: '#E4002B', accent2: '#FF5C7A', tmdb: [309],        regions: ['IN'], rank: 2,       homeUrl: 'https://www.sunnxt.com/', searchUrl: 'https://www.sunnxt.com/search/?q={q}' },
+  { id: 'hoichoi',     name: 'hoichoi',      short: 'hoichoi',   mark: 'ho',   accent: '#F5333F', accent2: '#FF7A45', tmdb: [315, 2176],  regions: ['IN'], rank: 2,       homeUrl: 'https://www.hoichoi.tv/', searchUrl: 'https://www.hoichoi.tv/search?q={q}' },
+  { id: 'aha',         name: 'aha',          short: 'aha',       mark: 'aha',  accent: '#FF4E3A', accent2: '#FFA23A', tmdb: [532],        regions: ['IN'], rank: 2,       homeUrl: 'https://www.aha.video/', searchUrl: 'https://www.aha.video/search?query={q}' },
+  { id: 'lionsgate',   name: 'Lionsgate Play', short: 'Lionsgate', mark: 'LG', accent: '#C8A24A', accent2: '#F0D488', tmdb: [561, 2074, 2053, 2358], regions: ['IN'], rank: 2, homeUrl: 'https://www.lionsgateplay.com/', searchUrl: 'https://www.lionsgateplay.com/search?q={q}' },
   /*
    * The regional and free services, measured rather than remembered.
    *
@@ -111,24 +149,24 @@ export const PLATFORMS: Platform[] = [
    * anyway), and the dozens of niche documentary channels that would add
    * platform pages nobody searches for.
    */
-  { id: 'mxplayer',    name: 'MX Player',    short: 'MX Player', mark: 'MX',   accent: '#F5C518', accent2: '#FFE066', tmdb: [515, 1898],  regions: ['IN'],       homeUrl: 'https://www.mxplayer.in/', searchUrl: 'https://www.mxplayer.in/search?q={q}' },
-  { id: 'manoramamax', name: 'ManoramaMAX',  short: 'Manorama', mark: 'MM', accent: '#E8112D', accent2: '#FF5A6E', tmdb: [482, 2177],  regions: ['IN'],       homeUrl: 'https://www.manoramamax.com/', searchUrl: 'https://www.manoramamax.com/search?q={q}' },
-  { id: 'shemaroome',  name: 'ShemarooMe',   short: 'Shemaroo', mark: 'SH',  accent: '#D6252B', accent2: '#FF6B70', tmdb: [474],        regions: ['IN'],       homeUrl: 'https://www.shemaroome.com/', searchUrl: 'https://www.shemaroome.com/search?q={q}' },
-  { id: 'hungama',     name: 'Hungama Play', short: 'Hungama',   mark: 'HP',   accent: '#F7671F', accent2: '#FFA45C', tmdb: [437],        regions: ['IN'],       homeUrl: 'https://www.hungama.com/', searchUrl: 'https://www.hungama.com/search/?q={q}' },
-  { id: 'epicon',      name: 'EPIC ON',      short: 'EPIC ON',   mark: 'EP',   accent: '#B8860B', accent2: '#E8C36A', tmdb: [476],        regions: ['IN'],       homeUrl: 'https://www.epicon.in/', searchUrl: 'https://www.epicon.in/search?q={q}' },
-  { id: 'chaupal',     name: 'Chaupal',      short: 'Chaupal',   mark: 'CH',   accent: '#00A99D', accent2: '#4FD8CC', tmdb: [2178],       regions: ['IN'],       homeUrl: 'https://chaupal.tv/', searchUrl: 'https://chaupal.tv/search?q={q}' },
-  { id: 'apinternational', name: 'AP International', short: 'AP Intl', mark: 'AP', accent: '#7A3FBF', accent2: '#B584E8', tmdb: [2708],  regions: ['IN'],       homeUrl: 'https://www.apinternationalfilms.com/', searchUrl: 'https://www.apinternationalfilms.com/' },
-  { id: 'nammaflix',   name: 'NammaFlix',    short: 'NammaFlix', mark: 'NF',   accent: '#E23E3E', accent2: '#FF7A7A', tmdb: [2185],       regions: ['IN'],       homeUrl: 'https://www.primevideo.com/', searchUrl: 'https://www.primevideo.com/search/ref=atv_nb_sr?phrase={q}' },
-  { id: 'discoveryplus', name: 'Discovery+', short: 'Discovery+', mark: 'D+',  accent: '#2175D9', accent2: '#6BA8F0', tmdb: [510, 584],   regions: ['IN'],       homeUrl: 'https://www.discoveryplus.in/', searchUrl: 'https://www.discoveryplus.in/search?q={q}' },
-  { id: 'mubi',        name: 'MUBI',         short: 'MUBI',      mark: 'MU',   accent: '#001489', accent2: '#4A5FD1', tmdb: [11, 201],    regions: ['IN', 'US'], homeUrl: 'https://mubi.com/', searchUrl: 'https://mubi.com/search/{q}' },
-  { id: 'tataplay',    name: 'Tata Play',    short: 'Tata Play', mark: 'TP',   accent: '#0C2E8A', accent2: '#5470C6', tmdb: [502],        regions: ['IN'],       homeUrl: 'https://www.tataplay.com/', searchUrl: 'https://www.tataplaybinge.com/' },
-  { id: 'crunchyroll', name: 'Crunchyroll',  short: 'Crunchyroll', mark: 'CR', accent: '#F47521', accent2: '#FFA95C', tmdb: [283, 1968], regions: ['IN', 'US'], homeUrl: 'https://www.crunchyroll.com/', searchUrl: 'https://www.crunchyroll.com/search?q={q}' },
-  { id: 'hbomax',      name: 'HBO Max',      short: 'HBO Max',   mark: 'MAX',  accent: '#8A4BFF', accent2: '#2E6BFF', tmdb: [1899, 384],  regions: ['US'],       homeUrl: 'https://www.max.com/', searchUrl: 'https://www.max.com/search?q={q}' },
-  { id: 'hulu',        name: 'Hulu',         short: 'Hulu',      mark: 'hu',   accent: '#1CE783', accent2: '#7CFFC0', tmdb: [15],         regions: ['US'],       homeUrl: 'https://www.hulu.com/', searchUrl: 'https://www.hulu.com/search?q={q}' },
-  { id: 'disney',      name: 'Disney+',      short: 'Disney+',   mark: 'D+',   accent: '#1B44C8', accent2: '#4E8CFF', tmdb: [337],        regions: ['US'],       homeUrl: 'https://www.disneyplus.com/', searchUrl: 'https://www.disneyplus.com/search?q={q}' },
-  { id: 'paramount',   name: 'Paramount+',   short: 'Paramount+',mark: 'P+',   accent: '#0064FF', accent2: '#49A0FF', tmdb: [2616, 2303, 531], regions: ['US'],  homeUrl: 'https://www.paramountplus.com/', searchUrl: 'https://www.paramountplus.com/search/?q={q}' },
-  { id: 'peacock',     name: 'Peacock',      short: 'Peacock',   mark: 'P',    accent: '#00B2E3', accent2: '#FFC800', tmdb: [386],        regions: ['US'],       homeUrl: 'https://www.peacocktv.com/', searchUrl: 'https://www.peacocktv.com/search?q={q}' },
-  { id: 'shudder',     name: 'Shudder',      short: 'Shudder',   mark: 'SH',   accent: '#B31217', accent2: '#E23B3B', tmdb: [99],         regions: ['US'],       homeUrl: 'https://www.shudder.com/', searchUrl: 'https://www.shudder.com/search?q={q}' },
+  { id: 'mxplayer',    name: 'MX Player',    short: 'MX Player', mark: 'MX',   accent: '#F5C518', accent2: '#FFE066', tmdb: [515, 1898],  regions: ['IN'], rank: 1,       homeUrl: 'https://www.mxplayer.in/', searchUrl: 'https://www.mxplayer.in/search?q={q}' },
+  { id: 'manoramamax', name: 'ManoramaMAX',  short: 'Manorama', mark: 'MM', accent: '#E8112D', accent2: '#FF5A6E', tmdb: [482, 2177],  regions: ['IN'], rank: 2,       homeUrl: 'https://www.manoramamax.com/', searchUrl: 'https://www.manoramamax.com/search?q={q}' },
+  { id: 'shemaroome',  name: 'ShemarooMe',   short: 'Shemaroo', mark: 'SH',  accent: '#D6252B', accent2: '#FF6B70', tmdb: [474],        regions: ['IN'], rank: 2,       homeUrl: 'https://www.shemaroome.com/', searchUrl: 'https://www.shemaroome.com/search?q={q}' },
+  { id: 'hungama',     name: 'Hungama Play', short: 'Hungama',   mark: 'HP',   accent: '#F7671F', accent2: '#FFA45C', tmdb: [437],        regions: ['IN'], rank: 2,       homeUrl: 'https://www.hungama.com/', searchUrl: 'https://www.hungama.com/search/?q={q}' },
+  { id: 'epicon',      name: 'EPIC ON',      short: 'EPIC ON',   mark: 'EP',   accent: '#B8860B', accent2: '#E8C36A', tmdb: [476],        regions: ['IN'], rank: 2,       homeUrl: 'https://www.epicon.in/', searchUrl: 'https://www.epicon.in/search?q={q}' },
+  { id: 'chaupal',     name: 'Chaupal',      short: 'Chaupal',   mark: 'CH',   accent: '#00A99D', accent2: '#4FD8CC', tmdb: [2178],       regions: ['IN'], rank: 2,       homeUrl: 'https://chaupal.tv/', searchUrl: 'https://chaupal.tv/search?q={q}' },
+  { id: 'apinternational', name: 'AP International', short: 'AP Intl', mark: 'AP', accent: '#7A3FBF', accent2: '#B584E8', tmdb: [2708],  regions: ['IN'], rank: 2,       homeUrl: 'https://www.apinternationalfilms.com/', searchUrl: 'https://www.apinternationalfilms.com/' },
+  { id: 'nammaflix',   name: 'NammaFlix',    short: 'NammaFlix', mark: 'NF',   accent: '#E23E3E', accent2: '#FF7A7A', tmdb: [2185],       regions: ['IN'], rank: 2,       homeUrl: 'https://www.primevideo.com/', searchUrl: 'https://www.primevideo.com/search/ref=atv_nb_sr?phrase={q}' },
+  { id: 'discoveryplus', name: 'Discovery+', short: 'Discovery+', mark: 'D+',  accent: '#2175D9', accent2: '#6BA8F0', tmdb: [510, 584],   regions: ['IN'], rank: 2,       homeUrl: 'https://www.discoveryplus.in/', searchUrl: 'https://www.discoveryplus.in/search?q={q}' },
+  { id: 'mubi',        name: 'MUBI',         short: 'MUBI',      mark: 'MU',   accent: '#001489', accent2: '#4A5FD1', tmdb: [11, 201],    regions: ['IN', 'US'], rank: 3, homeUrl: 'https://mubi.com/', searchUrl: 'https://mubi.com/search/{q}' },
+  { id: 'tataplay',    name: 'Tata Play',    short: 'Tata Play', mark: 'TP',   accent: '#0C2E8A', accent2: '#5470C6', tmdb: [502],        regions: ['IN'], rank: 2,       homeUrl: 'https://www.tataplay.com/', searchUrl: 'https://www.tataplaybinge.com/' },
+  { id: 'crunchyroll', name: 'Crunchyroll',  short: 'Crunchyroll', mark: 'CR', accent: '#F47521', accent2: '#FFA95C', tmdb: [283, 1968], regions: ['IN', 'US'], rank: 3, homeUrl: 'https://www.crunchyroll.com/', searchUrl: 'https://www.crunchyroll.com/search?q={q}' },
+  { id: 'hbomax',      name: 'HBO Max',      short: 'HBO Max',   mark: 'MAX',  accent: '#8A4BFF', accent2: '#2E6BFF', tmdb: [1899, 384],  regions: ['US'], rank: 2,       homeUrl: 'https://www.max.com/', searchUrl: 'https://www.max.com/search?q={q}' },
+  { id: 'hulu',        name: 'Hulu',         short: 'Hulu',      mark: 'hu',   accent: '#1CE783', accent2: '#7CFFC0', tmdb: [15],         regions: ['US'], rank: 2,       homeUrl: 'https://www.hulu.com/', searchUrl: 'https://www.hulu.com/search?q={q}' },
+  { id: 'disney',      name: 'Disney+',      short: 'Disney+',   mark: 'D+',   accent: '#1B44C8', accent2: '#4E8CFF', tmdb: [337],        regions: ['US'], rank: 2,       homeUrl: 'https://www.disneyplus.com/', searchUrl: 'https://www.disneyplus.com/search?q={q}' },
+  { id: 'paramount',   name: 'Paramount+',   short: 'Paramount+',mark: 'P+',   accent: '#0064FF', accent2: '#49A0FF', tmdb: [2616, 2303, 531], regions: ['US'], rank: 2,  homeUrl: 'https://www.paramountplus.com/', searchUrl: 'https://www.paramountplus.com/search/?q={q}' },
+  { id: 'peacock',     name: 'Peacock',      short: 'Peacock',   mark: 'P',    accent: '#00B2E3', accent2: '#FFC800', tmdb: [386],        regions: ['US'], rank: 2,       homeUrl: 'https://www.peacocktv.com/', searchUrl: 'https://www.peacocktv.com/search?q={q}' },
+  { id: 'shudder',     name: 'Shudder',      short: 'Shudder',   mark: 'SH',   accent: '#B31217', accent2: '#E23B3B', tmdb: [99],         regions: ['US'], rank: 2,       homeUrl: 'https://www.shudder.com/', searchUrl: 'https://www.shudder.com/search?q={q}' },
 ];
 
 export const PLATFORM_BY_ID = new Map(PLATFORMS.map((p) => [p.id, p]));
@@ -143,9 +181,45 @@ export function platform(id: string): Platform {
       accent: '#8A93A6',
       tmdb: [],
       regions: ['IN', 'US'],
+      rank: 2,
       homeUrl: '#',
     }
   );
+}
+
+/**
+ * The services on a row that a reader in this region could actually open,
+ * best first.
+ *
+ * A row's `platforms` is the union across every region it was found in, which
+ * is right for the data and wrong for a reader. A title on Hulu in the US and
+ * JioHotstar in India carries both, and on the day this was written ten rows
+ * in the India rail advertised HBO Max or Hulu — six of them carrying nothing
+ * else, so an Indian reader was being sent to a service that does not sell a
+ * subscription in their country. That is the Prime-badge-on-a-cinema-film
+ * mistake in a different costume: a true field, shown where it is not true.
+ *
+ * Ordering and filtering belong together because callers that do one without
+ * the other are how this went wrong. One call answers "what do I show, and in
+ * what order", and there is no way to take the second without the first.
+ */
+export function platformsFor(ids: string[] | undefined, region: string): string[] {
+  return [...new Set(ids ?? [])]
+    .filter((id) => PLATFORM_BY_ID.get(id)?.regions.includes(region))
+    .sort((a, b) => platform(a).rank - platform(b).rank);
+}
+
+/**
+ * How a row ranks for this region: its best platform, or Infinity when there
+ * is nowhere here to watch it.
+ *
+ * Infinity rather than a large number so a caller that sorts on this puts
+ * unwatchable rows last rather than somewhere in the middle, and so a caller
+ * that filters on `=== Infinity` reads as the question it is asking.
+ */
+export function rowRank(ids: string[] | undefined, region: string): number {
+  const best = platformsFor(ids, region)[0];
+  return best ? platform(best).rank : Infinity;
 }
 
 /**
@@ -166,6 +240,26 @@ export const REGIONS = [
   { code: 'IN', label: 'India', flag: '🇮🇳' },
   { code: 'US', label: 'United States', flag: '🇺🇸' },
 ];
+
+/**
+ * The languages this site is for.
+ *
+ * Needed because "is this title for our audience" could not be answered.
+ * rails.ts asked it as `imported()` — origin data that exists and does not
+ * include IN — which gives the benefit of the doubt to a row carrying no
+ * origin at all, and four of those in one fortnight were things like "Love Is
+ * Blind: Netherlands" and a Spanish thriller. Treated as local, they were
+ * eligible to lead the row and to wear the Trending badge.
+ *
+ * A positive test instead of the absence of a negative one. Scheduled
+ * languages only — Urdu and Assamese included because a reader searching for
+ * them is this audience, English excluded because an English title is as
+ * likely to be American as Indian and `origin` is the better evidence there.
+ */
+export const INDIAN_LANGUAGES = new Set([
+  'hi', 'ta', 'te', 'ml', 'kn', 'bn', 'mr', 'pa', 'gu', 'or', 'ur', 'as',
+  'ks', 'kok', 'mai', 'mni', 'ne', 'sa', 'sd', 'sat', 'doi', 'bho',
+]);
 
 export const LANGUAGES: Record<string, string> = {
   hi: 'Hindi',

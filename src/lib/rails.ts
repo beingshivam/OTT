@@ -1,5 +1,6 @@
 import { interleaveByLanguage } from './rank';
 import { toISODate, weekIdFor } from './week';
+import { INDIAN_LANGUAGES, platformsFor, rowRank } from '../data/platforms';
 import type { Release } from '../types';
 
 /**
@@ -65,26 +66,85 @@ function chronicle(
   opts: { from: string; to: string; newestFirst: boolean; where?: (r: Release) => boolean },
 ): JustLanded {
   const { from, to, newestFirst, where } = opts;
-  const rows = all.filter(
+  /* Projected to the region before anything reads them, so no card downstream
+     can render a service this reader cannot buy. Filtering only whole rows
+     was not enough: a title on JioHotstar *and* Hulu kept both, and a
+     component listing every platform would still have shown Hulu in India. */
+  const rows = all
+    .map((r) => ({ ...r, platforms: platformsFor(r.platforms, region) }))
+    .filter(
     (r) =>
       r.regions?.includes(region) &&
       r.releaseDate >= from &&
       r.releaseDate <= to &&
       (!where || where(r)) &&
-      Boolean(r.posterUrl),
-  );
+      Boolean(r.posterUrl) &&
+      // Nowhere in this region to watch it is not a row, it is a dead end.
+      // Six rows in the India rail were HBO-Max-only on the day this was
+      // added — a poster, a title, and no way to press play.
+      rowRank(r.platforms, region) !== Infinity,
+    );
 
-  const byDay = new Map<string, Release[]>();
-  for (const r of rows) {
-    if (!byDay.has(r.releaseDate)) byDay.set(r.releaseDate, []);
-    byDay.get(r.releaseDate)!.push(r);
-  }
+  /*
+   * Platform first, then the calendar.
+   *
+   * Reported: "you have put a lot of crunchyroll content on rails as well as
+   * below… I want Netflix, Amazon Prime, Jio Hotstar, Mx player, Sony Liv and
+   * all other famous OTT platforms and then last crunchyroll and others."
+   * Measured that day, 13 of the 20 visible "On OTT" cards were Crunchyroll
+   * anime and 4 were on a platform this audience plausibly subscribes to.
+   *
+   * Pure date order caused it and could not have done otherwise: Crunchyroll
+   * simulcasts several episodes every day of the week, an Indian service
+   * releases a handful on a Friday, so ordering by recency alone hands the
+   * row to whichever platform publishes most often. The language interleave
+   * below could not rescue it either — most days every row in the group was
+   * `ja`, so there was nothing left to interleave against.
+   *
+   * So the day groups are ordered within a rank rather than across all rows.
+   * Rank 1 keeps its full chronology, then rank 2, then rank 3: the row still
+   * reads newest-first inside each band, which is what the window is for, and
+   * a reader sees what they can watch before what they probably cannot.
+   */
+  /*
+   * Indian first, then platform, then the calendar.
+   *
+   * Ranking platforms alone was tried and is not enough. It cleared the
+   * anime — 13 of 20 visible cards to none — and filled the row with Netflix
+   * instead: "Love Is Blind: Netherlands", an Indonesian celebrity roast, a
+   * Dutch reality show. Netflix is rank 1 and also publishes daily, so the
+   * same thing that handed the row to Crunchyroll handed it straight on. A
+   * Dutch reality show is no more what this audience came for than anime is,
+   * and sorting by platform cannot tell the difference.
+   *
+   * Meanwhile two Tamil films that fortnight — Mandaadi on Netflix, Promise
+   * on Prime — were not in the visible twenty at all under either ordering.
+   * That is the actual complaint: not that anime exists, but that it was
+   * burying the reason anyone visits.
+   *
+   * So locality outranks platform. An Indian film on ManoramaMAX leads a
+   * Netflix import, which is the whole point of the site. Only 12 of the 63
+   * streaming rows in a typical fortnight are Indian at all, so this is not a
+   * filter that could empty the row — it is a reordering of a row that was
+   * always going to be mostly imports.
+   */
+  const bandOf = (r: Release) => (local(r) ? 0 : 10) + rowRank(r.platforms, region);
+  const bands = [...new Set(rows.map(bandOf))].sort((a, b) => a - b);
 
-  const releases = [...byDay.keys()]
-    .sort((a, b) => (newestFirst ? b.localeCompare(a) : a.localeCompare(b)))
-    .flatMap((day) =>
-      interleaveByLanguage(byDay.get(day)!, (a, b) => (b.heat ?? 0) - (a.heat ?? 0)),
-    )
+  const releases = bands
+    .flatMap((band) => {
+      const inBand = rows.filter((r) => bandOf(r) === band);
+      const byDay = new Map<string, Release[]>();
+      for (const r of inBand) {
+        if (!byDay.has(r.releaseDate)) byDay.set(r.releaseDate, []);
+        byDay.get(r.releaseDate)!.push(r);
+      }
+      return [...byDay.keys()]
+        .sort((a, b) => (newestFirst ? b.localeCompare(a) : a.localeCompare(b)))
+        .flatMap((day) =>
+          interleaveByLanguage(byDay.get(day)!, (a, b) => (b.heat ?? 0) - (a.heat ?? 0)),
+        );
+    })
     .slice(0, MAX_ITEMS);
 
   return { releases, from, to, total: rows.length };
@@ -159,7 +219,26 @@ const confirmed = (r: Release) => !r.namedBy;
  * Indian ones, so an unknown origin is treated as local. And India among several
  * counts as India: Mirzapur: The Movie is IN/US and is not an import.
  */
-const imported = (r: Release) => Boolean(r.origin?.length) && !r.origin!.includes('IN');
+/**
+ * A title this audience came here for.
+ *
+ * Replaces `imported()`, which asked the same question backwards: origin data
+ * that exists and excludes IN. A row carrying no origin at all answered "not
+ * imported" and was therefore treated as local — and in one fortnight four of
+ * those were "Love Is Blind: Netherlands", a Spanish thriller and two English
+ * true-crime shows, all eligible to lead the row and wear the Trending badge.
+ * Absence of evidence was reading as evidence.
+ *
+ * Origin decides whenever there is any, and language only fills the silence.
+ * The order matters and the first version had it as a plain `or`, which the
+ * suite caught: a British-American action picture listed with a Hindi audio
+ * track came back local and was crowned in Indian cinemas — the exact report
+ * ("doesn't make sense mutiny is on #2") that the crowning rule exists for.
+ * A dub is not a provenance. Language is evidence only where TMDB has given
+ * us nothing better.
+ */
+const local = (r: Release) =>
+  r.origin?.length ? r.origin.includes('IN') : INDIAN_LANGUAGES.has(r.languages?.[0] ?? '');
 
 /**
  * How far back a film still counts as showing.
@@ -285,7 +364,7 @@ export function inCinemas(all: Release[], region: string, today: Date = new Date
    * Promoted to the front rather than badged where it sits: a badge landing on
    * card four reads as a bug, and the first card is the one everybody sees.
    */
-  const lead = ranked.filter((r) => !imported(r)).slice(0, TRENDING_IN_CINEMAS);
+  const lead = ranked.filter((r) => local(r)).slice(0, TRENDING_IN_CINEMAS);
   const crowned = new Set(lead.map((r) => r.id));
 
   /*
@@ -429,7 +508,7 @@ export function landedOnOtt(
    * enough local titles to fill the shortlist.
    */
   const lead = [...row.releases]
-    .filter((r) => !imported(r))
+    .filter((r) => local(r))
     .sort((a, b) => (b.heat ?? 0) - (a.heat ?? 0) || b.releaseDate.localeCompare(a.releaseDate))
     .slice(0, TRENDING_IN_CINEMAS);
   if (lead.length < TRENDING_IN_CINEMAS) return row;

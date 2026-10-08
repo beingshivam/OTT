@@ -717,10 +717,18 @@ test('a narrowed streaming row reaches back until it has something to say', () =
    * a subscription is — so "On right now" over it is true and the row may
    * widen. The cinema row may not, and does not: a film that opened in July is
    * not still playing, which is the asymmetry this pair is built on.
+   *
+   * Asserted in US because that is where Shudder exists. It used to run in IN
+   * on a row claiming IN — which is the shape the rails now refuse, since a
+   * reader in India cannot subscribe to Shudder and a badge they cannot act on
+   * is worse than no row at all. The widening behaviour under test is the
+   * same in either region; only the fixture's country was ever wrong.
    */
-  const rows = [row({ releaseDate: iso(120), platforms: ['shudder'], title: 'Months ago' })];
-  assert.equal(landedOnOtt(rows, 'IN', TODAY).releases.length, 0, 'the fortnight moved');
-  const wide = landedOnOtt(rows, 'IN', TODAY, NARROWED_DAYS);
+  const rows = [
+    row({ releaseDate: iso(120), platforms: ['shudder'], regions: ['US'], title: 'Months ago' }),
+  ];
+  assert.equal(landedOnOtt(rows, 'US', TODAY).releases.length, 0, 'the fortnight moved');
+  const wide = landedOnOtt(rows, 'US', TODAY, NARROWED_DAYS);
   assert.equal(wide.releases.length, 1, 'a narrowed reader still gets nothing');
   assert.equal(wide.releases[0].title, 'Months ago');
 });
@@ -759,8 +767,15 @@ test('a selection whose titles are all still ahead still fills the band', () => 
    * So the band falls back to what the selection has coming, reaching as far
    * forward as the streaming row reaches back, under a heading that says so
    * rather than claiming the present tense.
+   *
+   * Lionsgate Play rather than the Peacock this was first written with: both
+   * were named in the report, and Lionsgate Play is the one of the two that
+   * actually sells a subscription in India. A Peacock row in an Indian rail
+   * is now dropped on those grounds, which would have made this test pass for
+   * the wrong reason — an empty band because the row was filtered, not
+   * because the fallback failed.
    */
-  const rows = [row({ releaseDate: iso(-40), platforms: ['peacock'], title: 'Out in October' })];
+  const rows = [row({ releaseDate: iso(-40), platforms: ['lionsgate'], title: 'Out in October' })];
   assert.equal(landedOnOtt(rows, 'IN', TODAY, NARROWED_DAYS).releases.length, 0, 'it is not out yet');
   assert.equal(inCinemas(rows, 'IN', TODAY).releases.length, 0, 'and it is not in cinemas');
   assert.equal(landingSoon(rows, 'IN', TODAY).releases.length, 0, 'the usual horizon is three weeks');

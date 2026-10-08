@@ -111,6 +111,11 @@ async function loadPlatforms() {
     // Cinema is not a watch provider, so it carries no TMDB ids and is filled
     // from the theatrical release dates instead.
     theatrical: /theatrical:\s*true/.test(rest),
+    // How much of this audience could act on the badge — see the field's own
+    // comment in platforms.ts. Defaulting to 2 rather than throwing: a new
+    // platform added without one should rank in the middle, not crash the
+    // refresh or silently lead every row.
+    rank: Number((/\brank:\s*(\d)/.exec(rest) ?? [])[1] ?? 2),
   }));
 }
 
@@ -324,6 +329,9 @@ const DIGITAL_SUFFIX = 'ott';
  * next run answers it instead of me reasoning about it from here.
  */
 const unplaced = [];
+
+/** Platform id -> rank, filled once the registry is read. See bestPlatformFirst. */
+const rankOf = new Map();
 
 /** Cinema listings that turned out to be streaming too, for the run report. */
 const landed = [];
@@ -1121,8 +1129,32 @@ async function buildWeek(weekId, platforms, index, cinemaOnly = false) {
 
   const releases = [...byId.values()]
     .map(inCinemasCannotBeStreaming)
+    .map(bestPlatformFirst)
     .sort((a, b) => (b.heat ?? 0) - (a.heat ?? 0));
   return { id: weekId, start: from, end: to, releases };
+}
+
+/**
+ * Put the service most of this audience holds at the front of the row.
+ *
+ * Nine places in the UI render `platforms[0]` as *the* badge — the card, the
+ * poster rail, the detail sheet, the share image. Until now that was whichever
+ * pass happened to find a provider first, so a film on both Netflix and
+ * Crunchyroll could wear either, decided by the order TMDB answered in.
+ *
+ * Sorting here rather than at those nine call sites, because nine copies of a
+ * rule is nine chances to miss one, and the miss is silent — a wrong badge
+ * still renders. The array is written once and every reader of it inherits
+ * the order.
+ *
+ * This is ordering only. Whether a platform should be shown to a reader at
+ * all is a question about their region, which a shared array cannot answer —
+ * that stays in platformsFor() where the region is known.
+ */
+function bestPlatformFirst(row) {
+  if ((row.platforms?.length ?? 0) < 2) return row;
+  const rank = (id) => rankOf.get(id) ?? 2;
+  return { ...row, platforms: [...row.platforms].sort((a, b) => rank(a) - rank(b)) };
 }
 
 /**
@@ -1232,6 +1264,7 @@ async function buildTrending(index) {
 
 const platforms = await loadPlatforms();
 assertEveryServiceNamed(platforms);
+for (const p of platforms) rankOf.set(p.id, p.rank);
 const index = providerIndex(platforms);
 const theatricalId = platforms.find((p) => p.theatrical)?.id;
 console.log(`Mapped ${index.size} TMDB providers across ${platforms.length} platforms.`);

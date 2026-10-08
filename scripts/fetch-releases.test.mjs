@@ -75,6 +75,8 @@ globalThis.fetch = async (url) => {
     if (id === '4') return json({ results: { IN: { flatrate: [{ provider_id: 9 }] } } });
     if (id === '8') return json({ results: { IN: { flatrate: [{ provider_id: 9 }] } } });
     if (id === '9') return json({ results: { IN: { flatrate: [{ provider_id: 8 }] } } });
+    // Crunchyroll (283) answered before Netflix (8), deliberately.
+    if (id === '10') return json({ results: { IN: { flatrate: [{ provider_id: 283 }, { provider_id: 8 }] } } });
     return json({ results: {} });
   }
 
@@ -142,8 +144,9 @@ globalThis.fetch = async (url) => {
         total_pages: 1,
       });
     }
-    // The provider pass.
-    return json({ results: [movie(1)], total_pages: 1 });
+    // The provider pass. 10 is on both Crunchyroll and Netflix, answered in
+    // that order, which is the case that decides which badge a card wears.
+    return json({ results: [movie(1), movie(10)], total_pages: 1 });
   }
   // The series pass asks by first_air_date and no monetization filter; the
   // provider pass asks with one. Only the former returns the new shows, which
@@ -546,5 +549,31 @@ test('every platform in the registry can be named from free text', () => {
   for (const id of ids) {
     if (id === 'theatres') continue; // Not a streaming service.
     assert.ok(table.includes(`'${id}'`), `SERVICE_NAMES has no pattern for ${id}`);
+  }
+});
+
+test('the badge a card will wear is the one most readers can use', () => {
+  /*
+   * Reported: "you have put a lot of crunchyroll content on rails as well as
+   * below… our site primarily caters to Indian taste."
+   *
+   * Nine places in the UI render `platforms[0]` as the badge, and nothing
+   * decided what went first — it was whichever pass found a provider first,
+   * which is really the order TMDB answered in. Title 10 is on Crunchyroll
+   * and Netflix and the stub answers Crunchyroll first, so without the sort
+   * this row wears a Crunchyroll badge on a film most of this audience would
+   * open on Netflix.
+   *
+   * Asserting the whole array rather than [0]: the point is a total order the
+   * nine call sites can rely on, not one lucky first element.
+   */
+  const both = rows.filter((r) => r.id === 'm-10');
+  assert.ok(both.length, 'the two-platform title vanished');
+  for (const r of both) {
+    assert.deepEqual(
+      r.platforms,
+      ['netflix', 'crunchyroll'],
+      `got ${r.platforms.join(', ')}`,
+    );
   }
 });
