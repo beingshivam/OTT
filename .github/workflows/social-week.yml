@@ -47,10 +47,15 @@ jobs:
       # Built fresh every week on purpose: the whole point of these two is that
       # their figures are computed from the current feed rather than typed once
       # and left to go stale.
+      # social:posters needs image.tmdb.org, which the weekly runner can reach
+      # and a sandbox generally cannot — it is the only one of the three that
+      # puts real artwork on the image rather than type, so it is also the one
+      # that cannot be verified anywhere without a network.
       - name: Build the creative
         run: |
           npm run social
           npm run angles
+          npm run social:posters
 
       - name: Choose the week's three
         run: npm run plan:ig
