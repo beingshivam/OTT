@@ -168,23 +168,26 @@ const page = (size, tiles) => {
   .foot{flex:none}
   h1 em{font-style:normal;color:#ffb03a}
 
-  .hero{position:relative;display:flex;gap:30px;align-items:stretch;flex:none;height:${heroH}px}
-  .hero .fallback{font-size:26px}
-  .hero .art{width:${Math.round(heroH / 1.5)}px;flex:none;aspect-ratio:auto;height:${heroH}px}
-  .hero .meta{display:flex;flex-direction:column;justify-content:flex-end;gap:14px;padding-bottom:6px;min-width:0}
-  .hero .tag{font-size:20px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#ff6b6b}
-  .hero h2{font-size:${size.h2}px;font-weight:900;letter-spacing:-.03em;line-height:1.02}
-  .hero p{font-size:26px;font-weight:600;color:#b9c0d0}
+  /* The hero is a cell of the same grid, two across and two down, rather
+     than a separate block above it. Kept apart, the two had to be balanced by
+     hand and left a quarter of the frame empty; in the grid the artwork fills
+     the space it is given and nothing has to add up. */
+  .tile.big{grid-column:span 2;grid-row:span 2}
+  .tile.big .fallback{font-size:30px}
+  .tile.big figcaption strong{font-size:40px;letter-spacing:-.025em;white-space:normal}
+  .tile.big figcaption span{font-size:24px}
+  .tag{font-size:19px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#ff6b6b;margin-bottom:2px}
 
-  /* The grid takes whatever height is left and divides it, rather than being
-     sized by arithmetic that has to be redone every time a row is added. The
-     first version computed tile heights from an aspect ratio and overflowed
-     the frame by a row; posters crop under object-fit, so letting the box
-     decide is both simpler and impossible to get wrong. */
+  /* 2:3, which is the shape every film poster is drawn to.
+     A first pass let the grid divide the leftover height instead, so it could
+     never overflow — and the tiles came out landscape. Cropping a poster to
+     landscape throws away the composition it was made for, which on a post
+     whose whole premise is the artwork is the one thing not worth trading.
+     So the shape is fixed and the tile count is chosen to fit it. */
   .grid{position:relative;display:grid;grid-template-columns:repeat(${grid},1fr);
-        grid-auto-rows:1fr;gap:22px;flex:1 1 auto;min-height:0}
-  .tile{display:flex;flex-direction:column;gap:10px;min-width:0;min-height:0}
-  .art{position:relative;flex:1 1 auto;min-height:0;border-radius:18px;overflow:hidden;
+        gap:22px 20px;flex:none}
+  .tile{display:flex;flex-direction:column;gap:10px;min-width:0}
+  .art{position:relative;aspect-ratio:2/3;border-radius:18px;overflow:hidden;
        background:linear-gradient(160deg,#1b2033,#10131f);
        box-shadow:0 18px 40px rgba(0,0,0,.45)}
   .art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
@@ -207,22 +210,25 @@ const page = (size, tiles) => {
   <div class="kicker">${esc(dateOf(week.start))} – ${esc(dateOf(week.end))}</div>
 </div>
 <h1>Out this week<br><em>in cinemas &amp; on OTT</em></h1>
-<div class="hero">
-  ${art(hero)}
-  <div class="meta">
-    <div class="tag">Biggest this week</div>
-    <h2>${esc(hero.title)}</h2>
-    <p>${esc(where(hero))} · ${esc(dayOf(hero.releaseDate))} ${esc(dateOf(hero.releaseDate))}</p>
-  </div>
-</div>
-<div class="grid">${tiles.map(tile).join('')}</div>
+<div class="grid">
+  <figure class="tile big">${art(hero)}
+    <figcaption>
+      <div class="tag">Biggest this week</div>
+      <strong>${esc(hero.title)}</strong>
+      <span>${esc(where(hero))} · ${esc(dayOf(hero.releaseDate))} ${esc(dateOf(hero.releaseDate))}</span>
+    </figcaption>
+  </figure>${tiles.map(tile).join('')}</div>
 <div class="foot"><span class="url">${esc(SITE)}</span><span class="say">every platform, one page</span></div>
 `;
 };
 
 const SIZES = [
-  { name: 'week-posters', w: 1080, h: 1350, grid: 3, heroH: 300, h1: 56, h2: 46, take: 6 },
-  { name: 'week-posters-story', w: 1080, h: 1920, grid: 3, heroH: 430, h1: 70, h2: 56, take: 9 },
+  /* `take` is bounded by what fits at 2:3, not by what is available: four
+     across on the feed crop, two rows of three on the taller story crop. */
+  /* `take` is the number of small tiles beside the 2x2 hero: four on the feed
+     crop (one row beside it, one below), eight on the taller story crop. */
+  { name: 'week-posters', w: 1080, h: 1350, grid: 4, h1: 56, take: 4 },
+  { name: 'week-posters-story', w: 1080, h: 1920, grid: 4, h1: 70, take: 8 },
 ];
 
 await mkdir(OUT, { recursive: true });
