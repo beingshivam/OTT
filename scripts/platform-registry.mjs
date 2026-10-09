@@ -33,11 +33,15 @@ export async function loadRegistry() {
   const src = await readFile(resolve(ROOT, 'src/data/platforms.ts'), 'utf8');
   const rows = [
     ...src.matchAll(
-      /\{\s*id:\s*'([^']+)',\s*name:\s*'([^']+)'[\s\S]*?regions:\s*\[([^\]]*)\],\s*rank:\s*(\d)/g,
+      /\{\s*id:\s*'([^']+)',\s*name:\s*'([^']+)',\s*short:\s*'([^']+)'[\s\S]*?regions:\s*\[([^\]]*)\],\s*rank:\s*(\d)/g,
     ),
-  ].map(([, id, name, regions, rank]) => ({
+  ].map(([, id, name, short, regions, rank]) => ({
     id,
     name,
+    /* The label for somewhere a full name will not fit. A poster tile is
+       225px wide and "In cinemas · from 15 Oct" truncated to "from 15…",
+       which loses the only part of the line that carries the tense. */
+    short,
     regions: regions.split(',').map((x) => x.trim().replace(/'/g, '')).filter(Boolean),
     rank: Number(rank),
   }));

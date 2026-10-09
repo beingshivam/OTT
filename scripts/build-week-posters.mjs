@@ -35,6 +35,7 @@ import { fileURLToPath } from 'node:url';
 import { BRAND, INSTAGRAM } from './brand.mjs';
 import { launchChromium } from './browser.mjs';
 import { loadRegistry } from './platform-registry.mjs';
+import { dateOf, dayOf, releaseLabel, upcoming } from './release-label.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = resolve(ROOT, 'social');
@@ -42,14 +43,11 @@ const SITE = (process.env.SITE_URL ?? 'https://newonott.in').replace(/^https?:\/
 const REGION = (process.env.REGIONS ?? 'IN').split(',')[0].trim() || 'IN';
 const TODAY = process.env.TODAY ?? new Date().toISOString().slice(0, 10);
 
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-const dayOf = (iso) => DAYS[new Date(`${iso}T00:00:00Z`).getUTCDay()];
-const dateOf = (iso) => `${Number(iso.slice(8, 10))} ${MONTHS[Number(iso.slice(5, 7)) - 1]}`;
 
 const registry = await loadRegistry();
 const pname = new Map(registry.map((p) => [p.id, p.name]));
+const pshort = new Map(registry.map((p) => [p.id, p.short]));
 const servesHere = (id) => registry.find((p) => p.id === id)?.regions.includes(REGION);
 
 const feed = JSON.parse(await readFile(resolve(ROOT, 'public/data/releases.json'), 'utf8'));
@@ -119,10 +117,15 @@ function seats(count) {
   return picked.sort(best);
 }
 
-const where = (r) =>
-  r.platforms.includes('theatres') && !r.platforms.some((p) => p !== 'theatres')
-    ? 'In cinemas'
-    : (pname.get(r.platforms.find((p) => p !== 'theatres' && servesHere(p))) ?? 'Streaming');
+/* `short` on a tile, the full name on the hero: a tile is 225px wide and the
+   long form truncated to "from 15…", dropping the one word that carries the
+   tense the whole fix is about. */
+const where = (r, { brief = false } = {}) => {
+  const names = brief ? pshort : pname;
+  return r.platforms.includes('theatres') && !r.platforms.some((p) => p !== 'theatres')
+    ? (brief ? 'Cinemas' : 'In cinemas')
+    : (names.get(r.platforms.find((p) => p !== 'theatres' && servesHere(p))) ?? 'Streaming');
+};
 
 /* An <img>, not a background-image. A background that fails to load leaves
    the element painted over whatever sits behind it, so the fallback title was
@@ -138,7 +141,7 @@ const tile = (r) => `
   <figure class="tile">${art(r)}
     <figcaption>
       <strong>${esc(r.title)}</strong>
-      <span>${esc(where(r))} · ${esc(dateOf(r.releaseDate))}</span>
+      <span>${esc(releaseLabel(where(r, { brief: true }), r.releaseDate, TODAY))}</span>
     </figcaption>
   </figure>`;
 
@@ -213,9 +216,9 @@ const page = (size, tiles) => {
 <div class="grid">
   <figure class="tile big">${art(hero)}
     <figcaption>
-      <div class="tag">Biggest this week</div>
+      <div class="tag">${upcoming(hero.releaseDate, TODAY) ? 'Biggest still to come' : 'Biggest this week'}</div>
       <strong>${esc(hero.title)}</strong>
-      <span>${esc(where(hero))} · ${esc(dayOf(hero.releaseDate))} ${esc(dateOf(hero.releaseDate))}</span>
+      <span>${esc(releaseLabel(where(hero), hero.releaseDate, TODAY, { long: true }))}</span>
     </figcaption>
   </figure>${tiles.map(tile).join('')}</div>
 <div class="foot"><span class="url">${esc(SITE)}</span><span class="say">every platform, one page</span></div>
@@ -280,11 +283,16 @@ try {
  */
 const langs = [...new Set([hero, ...seats(6)].map((r) => r.languages?.[0]).filter(Boolean))];
 const LANG_NAME = { hi: 'Hindi', ta: 'Tamil', te: 'Telugu', ml: 'Malayalam', kn: 'Kannada', bn: 'Bengali', mr: 'Marathi', pa: 'Punjabi', en: 'English' };
+const outAlready = [...cinema, ...streaming].filter((r) => !upcoming(r.releaseDate, TODAY)).length;
+const stillToCome = [...cinema, ...streaming].filter((r) => upcoming(r.releaseDate, TODAY)).length;
+const heroLine = upcoming(hero.releaseDate, TODAY)
+  ? `${hero.title} is the big one — ${where(hero).toLowerCase()} from ${dayOf(hero.releaseDate)} ${dateOf(hero.releaseDate)}.`
+  : `${hero.title} is the big one: ${where(hero).toLowerCase()} since ${dayOf(hero.releaseDate)} ${dateOf(hero.releaseDate)}.`;
 const caption = `${dateOf(week.start)} – ${dateOf(week.end)} — everything worth knowing about this week. 🎬
 
-${hero.title} is the big one: ${where(hero).toLowerCase()} ${dayOf(hero.releaseDate)} ${dateOf(hero.releaseDate)}.
+${heroLine}
 
-${cinema.length} in cinemas, ${streaming.length} landing on OTT, across ${langs.map((l) => LANG_NAME[l] ?? l).join(', ')}.
+${cinema.length} in cinemas and ${streaming.length} on OTT this week — ${outAlready} out already, ${stillToCome} still to come — across ${langs.map((l) => LANG_NAME[l] ?? l).join(', ')}.
 
 Full list with dates, platforms and where to watch each one — ${SITE}. Updated every single day, so the OTT date appears the day it is announced.
 
