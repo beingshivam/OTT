@@ -35,7 +35,25 @@ export const upcoming = (releaseDate, today) => Boolean(releaseDate) && releaseD
  * 17th is still being told something true, which matters when a post is
  * forwarded days later.
  */
-export function releaseLabel(where, releaseDate, today, { long = false } = {}) {
+export function releaseLabel(where, releaseDate, today, { long = false, guessed = false } = {}) {
   const when = long ? `${dayOf(releaseDate)} ${dateOf(releaseDate)}` : dateOf(releaseDate);
+  /*
+   * "expected", when the service came from a release note rather than a
+   * watch provider.
+   *
+   * DetailSheet has said "Expected on ZEE5" instead of "Watch on ZEE5" since
+   * Toxic was badged on the day a contributor's note claimed, with no India
+   * provider behind it. The poster builder had no such middle setting — a row
+   * was confirmed and shown or unconfirmed and dropped — so the week three
+   * Indian titles landed on ZEE5, Prime and Sun NXT, the OTT card showed none
+   * of them and led on a French documentary instead.
+   *
+   * Dropping them was the wrong half of the trade. Walking this repo's own
+   * history: of 180 rows ever carrying a guessed platform, 33 later gained a
+   * real provider and all 33 agreed with the guess. None contradicted it. The
+   * guesses are not noise; they are early. Toxic itself still has no TMDB
+   * provider and is the site's best-performing page.
+   */
+  if (guessed) return `${where} · expected ${when}`;
   return upcoming(releaseDate, today) ? `${where} · from ${when}` : `${where} · ${when}`;
 }

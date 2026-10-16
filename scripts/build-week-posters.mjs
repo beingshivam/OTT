@@ -273,6 +273,34 @@ const landed = feed.weeks
   .filter((r) => r.releaseDate >= ottSince && r.releaseDate <= TODAY)
   .sort(best);
 
+/**
+ * Announced, not yet confirmed — and shown as such rather than dropped.
+ *
+ * "Did nothing release on Jio, Prime, SonyLIV, ZEE5?" Three Indian titles had
+ * that week: Aasha on ZEE5, Lenin Pandiyan on Prime, Oru Anweshanathinte
+ * Thudakkam on Sun NXT. The card showed none of them and led on a French
+ * documentary, because the only row with a TMDB watch provider behind it that
+ * week was the French documentary.
+ *
+ * TMDB's provider feed lags Indian services badly, and dropping everything it
+ * has not caught up with hands the card to whoever it covers best — which is
+ * Netflix and the American services. The measurement, walked out of this
+ * repo's own history: 180 rows have carried a guessed platform; 33 later
+ * gained a real provider; all 33 agreed with the guess and none contradicted
+ * it. Toxic still has no TMDB provider, did land on ZEE5, and is the single
+ * best-performing page on the site.
+ *
+ * So they appear, labelled "expected" — the same word DetailSheet has used
+ * since the Toxic report. The hero stays confirmed-only: the biggest claim on
+ * the card is the one that has to be solid.
+ */
+const announced = feed.weeks
+  .flatMap((w) => w.releases ?? [])
+  .filter(inRegion)
+  .filter((r) => r.namedBy && mainstream(r) && local(r))
+  .filter((r) => r.releaseDate >= week.start && r.releaseDate <= week.end)
+  .sort(best);
+
 const where = (r, { brief = false } = {}) => {
   const names = brief ? pshort : pname;
   return r.platforms.includes('theatres') && !r.platforms.some((p) => p !== 'theatres')
@@ -288,6 +316,7 @@ const art = (r, cls = '') => `
     <div class="art ${cls}">
       <span class="fallback">${esc(r.title)}</span>
       <img src="${esc(r.posterUrl)}" alt="">
+      ${r.namedBy ? '<span class="chip">Expected</span>' : ''}
     </div>`;
 
 const star = STAR ? await starSubject() : null;
@@ -394,6 +423,14 @@ const page = (size, deck) => {
                     white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   figcaption span{font-size:18px;font-weight:600;color:#9aa3b6;
                   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* "Expected" as a chip on the artwork rather than a word in the line.
+     "ZEE5 · expected 16 Oct" is a character or two too long for a 225px tile:
+     truncated it drops the date, wrapped it makes one tile taller than its
+     neighbours. A chip cannot truncate, reads before the text does, and
+     leaves the line to say the two things a reader wants — where, and when. */
+  .chip{position:absolute;top:10px;left:10px;z-index:2;
+        padding:5px 10px;border-radius:8px;background:rgba(10,12,20,.82);
+        font-size:14px;font-weight:800;letter-spacing:.09em;color:#ffb03a;text-transform:uppercase}
 
   .foot{position:relative;margin-top:auto;display:flex;align-items:baseline;gap:14px;flex:none}
   .foot .url{font-size:30px;font-weight:800;letter-spacing:-.02em}
@@ -464,11 +501,16 @@ const decks = star
         ? [{
             name: 'week-ott',
             kicker: `Last ${OTT_WINDOW} days`,
-            headline: 'Just landed<br><em>on streaming</em>',
+            headline: 'New this month<br><em>on streaming</em>',
             heroRow: ottHero,
             tag: 'Newest on OTT',
             heroLine: `${everywhere(ottHero)} · since ${dateOf(ottHero.releaseDate)}`,
-            pick: (n) => landed.slice(1, n + 1),
+            /* This week's announced Indian titles first — they are the
+               answer to "what is new on Indian OTT" — then the confirmed
+               arrivals behind them. */
+            pick: (n) => [...announced, ...landed.slice(1)].slice(0, n),
+            /* The chip on the artwork carries "expected"; the line stays
+               where and when. */
             line: (r) => `${everywhere(r)} · ${dateOf(r.releaseDate)}`,
           }]
         : []),

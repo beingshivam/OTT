@@ -54,3 +54,27 @@ test('a missing date is never described as upcoming', () => {
   assert.equal(upcoming(undefined, TODAY), false);
   assert.equal(upcoming('', TODAY), false);
 });
+
+test('a platform the site only inferred says so', () => {
+  /*
+   * "Did nothing release on Jio, Prime, SonyLIV, ZEE5?" — three Indian titles
+   * had, and the OTT card showed none of them, because a platform taken from
+   * a release note was dropped rather than qualified. DetailSheet has had the
+   * middle setting since the Toxic report; the poster builder had not.
+   */
+  assert.equal(
+    releaseLabel('ZEE5', '2026-10-16', '2026-10-16', { guessed: true }),
+    'ZEE5 · expected 16 Oct',
+  );
+});
+
+test('an inferred platform is never dressed up as confirmed', () => {
+  // The whole point: a guess must not render identically to a provider, in
+  // either tense. That identical rendering is what sent a reader to a
+  // subscription for a film that was not there yet.
+  const guess = releaseLabel('ZEE5', '2026-10-20', '2026-10-16', { guessed: true });
+  const fact = releaseLabel('ZEE5', '2026-10-20', '2026-10-16');
+  assert.notEqual(guess, fact);
+  assert.match(guess, /expected/);
+  assert.doesNotMatch(fact, /expected/);
+});
