@@ -32,6 +32,7 @@ const TAGLINE_LONG =
   "Everything releasing this week — tap any title to see where it's streaming and open it there. Nothing plays on this page.";
 import { slugify } from './slug.mjs';
 import { inRegion, loadRegistry } from './platform-registry.mjs';
+import { onlyGuessed } from './platform-claim.mjs';
 import { byDay, dayLabel, phrase } from '../src/lib/changes.mjs';
 import { ANALYTICS_TOKEN } from './config.mjs';
 
@@ -2113,8 +2114,42 @@ for (const r of allTitlePages) {
   /* Upcoming first, for the reason given at the title tag below: a streaming
      row dated in the future is not available, and "Streaming now" about it is
      the one sentence on this page that would be a lie. */
+  /**
+   * "Expected on", when the service came from a release note rather than a
+   * watch provider.
+   *
+   * Reported as a question about the site: "did nothing release on Jio,
+   * Prime, SonyLIV, ZEE5?" Three Indian titles had, and chasing where they
+   * went turned up the opposite fault from the one expected. `namedBy` marks
+   * a platform taken from free text — a release note, a production company,
+   * a broadcaster — and this file never read it once. Ten published pages
+   * were saying "Streaming now on SonyLIV", "Streaming now on Prime Video"
+   * on nothing but a contributor's note.
+   *
+   * That is precisely the Toxic report, still live. It was fixed in
+   * DetailSheet, which has said "Expected on ZEE5" rather than "Watch on
+   * ZEE5" ever since — and DetailSheet is the sheet inside the app, while
+   * this is the prerendered page Google indexes and a search visitor lands
+   * on. The fix went to the surface with the fewest readers.
+   *
+   * One word, and it is the difference between telling somebody where to
+   * watch a film and telling them where it is expected to turn up.
+   */
+  /* Both rows, because `streaming` is the union of the cinema row and its
+     arrived `~ott` sibling and either can be the one carrying the guess.
+     Checking only `r` left Aasha saying "Streaming now on ZEE5" — its
+     platform comes from the sibling — which is the same bug one row along,
+     and the reason this is computed from the rows that actually supplied a
+     platform rather than from whichever happened to be in hand.
+
+     Any confirmed provider among them is enough to say "streaming now": one
+     real provider is evidence, and a second, weaker source beside it does
+     not take that away. */
+  const guessedPlatform = onlyGuessed([r, arrived]);
   const answer = streaming.length && upcoming
     ? `Streaming on ${streaming.map(pname).join(', ')} from ${opensOn}.`
+    : streaming.length && guessedPlatform
+    ? `Expected on ${streaming.map(pname).join(', ')} — announced, not yet confirmed by the platform. This page updates automatically when it is.`
     : streaming.length
     ? `Streaming now on ${streaming.map(pname).join(', ')}.`
     : streamsOn

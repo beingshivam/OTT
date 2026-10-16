@@ -30,6 +30,7 @@ import { appendFile, readFile, readdir, stat } from 'node:fs/promises';
 import { slugify } from './slug.mjs';
 import { contradicts, THEATRICAL_FLOOR_DAYS } from './cinema-window.mjs';
 import { inRegion, loadRegistry } from './platform-registry.mjs';
+import { onlyGuessed } from './platform-claim.mjs';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -977,6 +978,52 @@ const S9 = 'Guessed platforms';
    * the row has to say where its platform came from, and the guess has to be
    * a guess about a real service rather than an empty badge.
    */
+  /**
+   * And marked on the page, not just in the data.
+   *
+   * The check below passes when a `namedBy` row carries a valid source
+   * string. It has always passed. Meanwhile build-seo.mjs did not read
+   * `namedBy` once, and ten published pages said "Streaming now on SonyLIV",
+   * "Streaming now on Prime Video" on the strength of a contributor's note —
+   * the exact Toxic report, fixed in DetailSheet and never here, which is to
+   * say fixed on the surface with the fewest readers and left broken on the
+   * one Google indexes.
+   *
+   * A gate whose name promises a page claim and whose body inspects a field
+   * is worse than no gate: it answers the question nobody was worried about
+   * and reports it as the one they were.
+   */
+  const marked = (() => {
+    if (!pages || !feed) return null;
+    /* Every row behind a slug, not one of them. The first version kept a
+       single row per slug and the Map's last writer won — which was the
+       `~ott` sibling, guessed, on titles whose base row carries a real
+       provider. It called eight correct pages faults. */
+    const bySlug = new Map();
+    for (const r of [...(archive?.titles ?? []), ...feedRows]) {
+      if (!r.slug) continue;
+      if (!bySlug.has(r.slug)) bySlug.set(r.slug, []);
+      bySlug.get(r.slug).push(r);
+    }
+    const over = [];
+    for (const [path, html] of pages) {
+      if (!path.startsWith('/ott-release-date/')) continue;
+      const rows = bySlug.get(path.slice('/ott-release-date/'.length)) ?? [];
+      if (!onlyGuessed(rows)) continue;
+      const body = (html.match(/<main[\s\S]*?<\/main>/) ?? [''])[0].replace(/<[^>]+>/g, ' ');
+      if (/Streaming now on/i.test(body)) over.push(`${path} — a guess rendered as fact`);
+    }
+    return over;
+  })();
+  if (!marked) skip(S9, 'no page states a guessed platform as fact', 'needs dist/ and the feed');
+  else
+    marked.length
+      ? byBlastRadius(S9, 'no page states a guessed platform as fact', marked.length,
+          [...pages.keys()].filter((p) => p.startsWith('/ott-release-date/')).length,
+          `${marked.length} page(s) say "Streaming now" on a guess`, marked.slice(0, 5))
+      : pass(S9, 'no page states a guessed platform as fact',
+          `${feedRows.filter((r) => r.namedBy).length} guessed rows checked against every title page`);
+
   if (!feed) skip(S9, 'a guessed platform is still marked as one', 'needs the feed');
   else {
     const all = feed.weeks.flatMap((w) => w.releases);
