@@ -88,9 +88,57 @@ if (!cinema.length && !streaming.length) {
   process.exit(1);
 }
 
-/* The hero is whichever side has the week's biggest title, so a quiet cinema
-   week leads on a streaming drop rather than on a film nobody is waiting for. */
-const hero = [...cinema, ...streaming].sort(best)[0];
+/**
+ * The hero is the biggest thing a reader can see right now, which is not
+ * always something that opened this week.
+ *
+ * Jailer 2 opened on the 15th — the last day of the previous week — and by
+ * the 16th it was the biggest film in Indian cinemas by a distance, heat 50
+ * against this week's best at 28. A "this week" post that ignored it to lead
+ * on a title a third its size would be technically scoped and obviously
+ * wrong to anyone holding a phone.
+ *
+ * So the hero may be a holdover, and it has to out-rank this week's best to
+ * take the place. The grid stays strictly this week's releases: the hero
+ * answers "what is on", the grid answers "what is new", and conflating those
+ * is how a roundup stops being a roundup.
+ *
+ * One week back, not the six the cinema rail allows, and the reason is that
+ * heat is not comparable across ages. Measured on this week's board: Mirzapur
+ * at 42 days carries 95, Resident Evil at 29 days 86, Jailer 2 at one day 50.
+ * Ranked over six weeks the hero came out as a film from early September —
+ * still playing, in no sense this week's news. A week back is the longest
+ * window in which the candidates are the same age as the week's own releases
+ * and the number means the same thing for all of them.
+ *
+ * HERO overrides the lot by title, because this is an editorial call and the
+ * ranking should not have the final word on a post somebody is putting their
+ * name to.
+ */
+const HERO = (process.env.HERO ?? '').trim().toLowerCase();
+const CINEMA_RUN = 7;
+const holdovers = feed.weeks
+  .flatMap((w) => w.releases ?? [])
+  .filter(inRegion)
+  .filter((r) => r.platforms.includes('theatres') && !r.platforms.some((p) => p !== 'theatres'))
+  .filter((r) => !rows.some((x) => x.id === r.id))
+  .filter(
+    (r) =>
+      r.releaseDate &&
+      r.releaseDate <= TODAY &&
+      Date.parse(TODAY) - Date.parse(r.releaseDate) <= CINEMA_RUN * 86_400_000,
+  );
+/* A holdover is not "this week's biggest", it is the biggest thing on. The
+   tag has to say which, or the post claims a film opened on a day it did
+   not — the same mistake as labelling an unreleased film "in cinemas". */
+const candidates = [...cinema, ...streaming, ...holdovers];
+const hero =
+  (HERO && candidates.find((r) => (r.title ?? '').toLowerCase().includes(HERO))) ||
+  candidates.sort(best)[0];
+if (HERO && !candidates.some((r) => (r.title ?? '').toLowerCase().includes(HERO))) {
+  console.error(`HERO="${process.env.HERO}" matches nothing on or just off this week's board. Nothing has been written.`);
+  process.exit(1);
+}
 
 /**
  * Both halves get seats, because the post says "cinemas & on OTT".
@@ -107,15 +155,38 @@ const hero = [...cinema, ...streaming].sort(best)[0];
  * blocks.
  */
 function seats(count) {
-  const pool = { cinema: cinema.filter((r) => r.id !== hero.id), ott: streaming.filter((r) => r.id !== hero.id) };
-  const wantOtt = Math.min(pool.ott.length, Math.max(1, Math.round(count / 3)));
-  const picked = [...pool.ott.slice(0, wantOtt), ...pool.cinema.slice(0, count - wantOtt)];
+  const free = (list) => list.filter((r) => r.id !== hero.id);
+  /*
+   * A quota, not a ban.
+   *
+   * Locality outranks everything in the rails, and it should: that rule
+   * exists because thirteen of twenty cards were anime. But a roundup of the
+   * week's releases is a different job, and applied whole it shut out Street
+   * Fighter — the single biggest title opening in Indian cinemas this week,
+   * heat 56 against the best Indian release at 28 — because fifteen local
+   * titles came first. Reported as exactly that: "what about Street Fighter
+   * and others which are actually on rail".
+   *
+   * One big import among eight tiles is not the problem the locality rule
+   * was written for. Thirteen of twenty was. So imports take at most a
+   * quarter of the seats, by heat, and Indian releases keep the rest.
+   */
+  const indian = free([...cinema, ...streaming]).filter(local);
+  const imports = free([...cinema, ...streaming])
+    .filter((r) => !local(r))
+    .sort((a, b) => (b.heat ?? 0) - (a.heat ?? 0));
+  const importSeats = Math.min(imports.length, Math.floor(count / 4));
+
+  const localSeats = count - importSeats;
+  const pool = { cinema: indian.filter((r) => !streaming.includes(r)), ott: indian.filter((r) => streaming.includes(r)) };
+  const wantOtt = Math.min(pool.ott.length, Math.max(1, Math.round(localSeats / 3)));
+  const picked = [...pool.ott.slice(0, wantOtt), ...pool.cinema.slice(0, localSeats - wantOtt)];
   /* Short on one side: top up from the other rather than publish a gap. */
-  if (picked.length < count) {
+  if (picked.length < localSeats) {
     const used = new Set(picked.map((r) => r.id));
-    picked.push(...[...pool.cinema, ...pool.ott].filter((r) => !used.has(r.id)).slice(0, count - picked.length));
+    picked.push(...indian.filter((r) => !used.has(r.id)).slice(0, localSeats - picked.length));
   }
-  return picked.sort(best);
+  return [...picked, ...imports.slice(0, importSeats)].sort(best);
 }
 
 /**
@@ -194,6 +265,17 @@ if (STAR && !star.hero) {
   process.exit(1);
 }
 const subject = star ?? { hero, library: null };
+
+/* A holdover is not "this week's biggest", it is the biggest thing on. The
+   tag has to say which, or the post claims a film opened in a week it did
+   not — the same mistake as labelling an unreleased film "in cinemas". */
+const heroTag = star
+  ? 'In cinemas now'
+  : holdovers.some((r) => r.id === hero.id)
+    ? 'Biggest on right now'
+    : upcoming(hero.releaseDate, TODAY)
+      ? 'Biggest still to come'
+      : 'Biggest this week';
 
 /* Every service the row has here, best-ranked first — on a back-catalogue
    tile "where can I watch this" is the whole question, and naming only one of
@@ -295,10 +377,10 @@ const page = (size, tiles) => {
 <div class="grid">
   <figure class="tile big">${art(subject.hero)}
     <figcaption>
-      <div class="tag">${star ? 'In cinemas now' : (upcoming(subject.hero.releaseDate, TODAY) ? 'Biggest still to come' : 'Biggest this week')}</div>
+      <div class="tag">${esc(heroTag)}</div>
       <strong>${esc(subject.hero.title)}</strong>
-      <span>${esc(star
-        ? `In cinemas · since ${dateOf(subject.hero.releaseDate)}`
+      <span>${esc(star || heroTag === 'Biggest on right now'
+        ? `${where(subject.hero)} · since ${dateOf(subject.hero.releaseDate)}`
         : releaseLabel(where(subject.hero), subject.hero.releaseDate, TODAY, { long: true }))}</span>
     </figcaption>
   </figure>${tiles.map(tile).join('')}</div>
@@ -393,6 +475,13 @@ Which one are you rewatching first? 👇
 `;
 };
 
+/* Named, not just counted. Asked for directly — "do justice to these new
+   releases as well" — and the complaint was fair: the hero is a holdover, so
+   without this the caption could carry a week's releases without naming one
+   of them. The grid's own picks, in the grid's own order, so the words and
+   the image cannot disagree. */
+const named = seats(8).map((r) => r.title).join(', ');
+
 const outAlready = [...cinema, ...streaming].filter((r) => !upcoming(r.releaseDate, TODAY)).length;
 const stillToCome = [...cinema, ...streaming].filter((r) => upcoming(r.releaseDate, TODAY)).length;
 const heroLine = upcoming(hero.releaseDate, TODAY)
@@ -401,6 +490,8 @@ const heroLine = upcoming(hero.releaseDate, TODAY)
 const caption = `${dateOf(week.start)} – ${dateOf(week.end)} — everything worth knowing about this week. 🎬
 
 ${heroLine}
+
+New this week: ${named}.
 
 ${cinema.length} in cinemas and ${streaming.length} on OTT this week — ${outAlready} out already, ${stillToCome} still to come — across ${langs.map((l) => LANG_NAME[l] ?? l).join(', ')}.
 
