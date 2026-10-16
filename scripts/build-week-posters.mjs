@@ -242,6 +242,37 @@ async function starSubject() {
 /* `short` on a tile, the full name on the hero: a tile is 225px wide and the
    long form truncated to "from 15…", dropping the one word that carries the
    tense the whole fix is about. */
+/**
+ * The OTT card, which needs a longer memory than the cinema card.
+ *
+ * Asked for as its own image, and measuring it explained why it has to be:
+ * confirmed Indian OTT arrivals in the last fortnight number one. Over
+ * thirty days, eight. Over forty-five, twenty-five. Cinema releases land in
+ * a batch every Friday; streaming arrives in a trickle, so the same window
+ * that fills a cinema grid leaves an OTT grid with a single title on it.
+ *
+ * Thirty days, then — long enough to have something to show, short enough
+ * that "new on OTT" is still true of everything on it.
+ *
+ * Rank 3 services are left out entirely. "No one watches MUBI here" is the
+ * second time that judgement has been made in this repo — the registry's own
+ * comment records MUBI once taking the lead card of a poster row, and
+ * Crunchyroll filling thirteen of twenty — and a weekly post is a curation,
+ * not the catalogue. The site still carries them, because they are genuinely
+ * available and a page that denied it would be lying; the post simply does
+ * not lead with a service this audience does not hold.
+ */
+const OTT_WINDOW = 30;
+const ottSince = new Date(Date.parse(TODAY) - (OTT_WINDOW - 1) * 86_400_000).toISOString().slice(0, 10);
+const mainstream = (r) =>
+  (r.platforms ?? []).some((p) => p !== 'theatres' && servesHere(p) && (prank.get(p) ?? 2) < 3);
+const landed = feed.weeks
+  .flatMap((w) => w.releases ?? [])
+  .filter(inRegion)
+  .filter((r) => !r.namedBy && mainstream(r))
+  .filter((r) => r.releaseDate >= ottSince && r.releaseDate <= TODAY)
+  .sort(best);
+
 const where = (r, { brief = false } = {}) => {
   const names = brief ? pshort : pname;
   return r.platforms.includes('theatres') && !r.platforms.some((p) => p !== 'theatres')
@@ -296,15 +327,16 @@ const tileLine = (r) =>
     ? `${r.rating ? `★ ${r.rating.toFixed(1)} · ` : ''}${everywhere(r) || 'In cinemas'}`
     : releaseLabel(where(r, { brief: true }), r.releaseDate, TODAY);
 
-const tile = (r) => `
+const tile = (r, deck) => `
   <figure class="tile">${art(r)}
     <figcaption>
       <strong>${esc(r.title)}</strong>
-      <span>${esc(tileLine(r))}</span>
+      <span>${esc(deck.line(r))}</span>
     </figcaption>
   </figure>`;
 
-const page = (size, tiles) => {
+const page = (size, deck) => {
+  const { tiles, heroRow, kicker, headline, tag, heroLine } = deck;
   const { w, h, grid, heroH } = size;
   return `<!doctype html><meta charset="utf-8">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -369,21 +401,17 @@ const page = (size, tiles) => {
 </style>
 <div class="top">
   <div class="mark">N</div><div class="brand">${esc(BRAND)}</div>
-  <div class="kicker">${star ? esc(STAR) : `${esc(dateOf(week.start))} – ${esc(dateOf(week.end))}`}</div>
+  <div class="kicker">${esc(kicker)}</div>
 </div>
-<h1>${star
-  ? `${esc(star.hero.title)} is in cinemas.<br><em>${star.library.length} more, streaming tonight.</em>`
-  : 'Out this week<br><em>in cinemas &amp; on OTT</em>'}</h1>
+<h1>${headline}</h1>
 <div class="grid">
-  <figure class="tile big">${art(subject.hero)}
+  <figure class="tile big">${art(heroRow)}
     <figcaption>
-      <div class="tag">${esc(heroTag)}</div>
-      <strong>${esc(subject.hero.title)}</strong>
-      <span>${esc(star || heroTag === 'Biggest on right now'
-        ? `${where(subject.hero)} · since ${dateOf(subject.hero.releaseDate)}`
-        : releaseLabel(where(subject.hero), subject.hero.releaseDate, TODAY, { long: true }))}</span>
+      <div class="tag">${esc(tag)}</div>
+      <strong>${esc(heroRow.title)}</strong>
+      <span>${esc(heroLine)}</span>
     </figcaption>
-  </figure>${tiles.map(tile).join('')}</div>
+  </figure>${tiles.map((r) => tile(r, deck)).join('')}</div>
 <div class="foot"><span class="url">${esc(SITE)}</span><span class="say">every platform, one page</span></div>
 `;
 };
@@ -397,17 +425,67 @@ const SIZES = [
   { name: 'week-posters-story', w: 1080, h: 1920, grid: 4, h1: 70, take: 8 },
 ];
 
+/**
+ * What gets rendered: one deck in star mode, two otherwise.
+ *
+ * Splitting cinemas from OTT was asked for and it is the right shape anyway.
+ * A combined card has to rank two things against each other that a reader
+ * never chooses between in the same moment — a ticket this weekend and
+ * something to put on tonight — and the losing half gets a token tile. Two
+ * cards let each be the whole image.
+ */
+const ottHero = landed[0];
+const decks = star
+  ? [{
+      name: 'star-posters',
+      kicker: STAR,
+      headline: `${esc(star.hero.title)} is in cinemas.<br><em>${star.library.length} more, streaming tonight.</em>`,
+      heroRow: star.hero,
+      tag: 'In cinemas now',
+      heroLine: `${where(star.hero)} · since ${dateOf(star.hero.releaseDate)}`,
+      pick: (n) => star.library.slice(0, n),
+      line: (r) => `${r.rating ? `★ ${r.rating.toFixed(1)} · ` : ''}${everywhere(r) || 'In cinemas'}`,
+    }]
+  : [
+      {
+        name: 'week-posters',
+        kicker: `${dateOf(week.start)} – ${dateOf(week.end)}`,
+        headline: 'Out this week<br><em>in cinemas</em>',
+        heroRow: hero,
+        tag: heroTag,
+        heroLine:
+          heroTag === 'Biggest on right now'
+            ? `${where(hero)} · since ${dateOf(hero.releaseDate)}`
+            : releaseLabel(where(hero), hero.releaseDate, TODAY, { long: true }),
+        pick: (n) => seats(n),
+        line: (r) => releaseLabel(where(r, { brief: true }), r.releaseDate, TODAY),
+      },
+      ...(ottHero
+        ? [{
+            name: 'week-ott',
+            kicker: `Last ${OTT_WINDOW} days`,
+            headline: 'Just landed<br><em>on streaming</em>',
+            heroRow: ottHero,
+            tag: 'Newest on OTT',
+            heroLine: `${everywhere(ottHero)} · since ${dateOf(ottHero.releaseDate)}`,
+            pick: (n) => landed.slice(1, n + 1),
+            line: (r) => `${everywhere(r)} · ${dateOf(r.releaseDate)}`,
+          }]
+        : []),
+    ];
+
 await mkdir(OUT, { recursive: true });
-const NAME = star ? 'star-posters' : 'week-posters';
-const browser = await launchChromium(NAME);
+const browser = await launchChromium('posters');
 try {
+ for (const deck of decks) {
   for (const size of SIZES) {
-    const tiles = star ? star.library.slice(0, size.take) : seats(size.take);
+    const tiles = deck.pick(size.take);
+    if (!tiles.length) continue;
     const p = await browser.newPage({
       viewport: { width: size.w, height: size.h },
       deviceScaleFactor: 1,
     });
-    await p.setContent(page(size, tiles), { waitUntil: 'networkidle' });
+    await p.setContent(page(size, { ...deck, tiles }), { waitUntil: 'networkidle' });
     /* The grid is background-image, which `networkidle` does not wait for on
        its own. Resolved rather than awaited forever: in CI one slow poster
        must not hold the week's post, and the tile behind it already says the
@@ -426,14 +504,13 @@ try {
           setTimeout(done, 8000);
         }),
     );
-    await writeFile(resolve(OUT, `${size.name.replace('week-posters', NAME)}.png`), await p.screenshot({ type: 'png' }));
-    await writeFile(
-      resolve(OUT, `${size.name.replace('week-posters', NAME)}.jpg`),
-      await p.screenshot({ type: 'jpeg', quality: 92 }),
-    );
+    const file = size.name.replace('week-posters', deck.name);
+    await writeFile(resolve(OUT, `${file}.png`), await p.screenshot({ type: 'png' }));
+    await writeFile(resolve(OUT, `${file}.jpg`), await p.screenshot({ type: 'jpeg', quality: 92 }));
     await p.close();
-    console.log(`  ${size.name.replace('week-posters', NAME)}.png / .jpg   ${size.w}x${size.h}  (hero + ${tiles.length})`);
+    console.log(`  ${file}.png / .jpg   ${size.w}x${size.h}  (hero + ${tiles.length})`);
   }
+ }
 } finally {
   await browser.close();
 }
@@ -504,7 +581,33 @@ Which one are you watching first? 👇
 #NewOnOTT #OTTIndia #OTTReleases #WhatToWatch #KyaDekhein #ThisWeekOnOTT
 #NewReleases #IndianCinema #MoviesThisWeek #OTTUpdate #${(INSTAGRAM ?? 'newonott').replace(/[^A-Za-z0-9]/g, '')}
 `;
-await writeFile(resolve(OUT, `${NAME}-caption.txt`), star ? starCaption() : caption);
+await writeFile(resolve(OUT, `${star ? 'star-posters' : 'week-posters'}-caption.txt`), star ? starCaption() : caption);
+
+/* The OTT card gets its own words. Sharing the week's caption would have it
+   claiming cinema releases under an image of streaming titles. */
+if (ottHero) {
+  const names = landed.slice(0, 8).map((r) => r.title);
+  const services = [...new Set(landed.flatMap((r) => (r.platforms ?? [])
+    .filter((p) => p !== 'theatres' && servesHere(p) && (prank.get(p) ?? 2) < 3).map((p) => pshort.get(p) ?? p)))];
+  await writeFile(
+    resolve(OUT, 'week-ott-caption.txt'),
+    `Already streaming — no ticket needed. 🍿
+
+${landed.length} titles have landed on ${services.join(', ')} in the last ${OTT_WINDOW} days.
+
+${names.join(', ')}${landed.length > names.length ? `, and ${landed.length - names.length} more.` : '.'}
+
+Every one with the platform it is actually on, at ${SITE}. Search the name, get the answer.
+
+🔗 link in bio
+
+Saving any of these for the weekend? 👇
+
+#NewOnOTT #OTTIndia #OTTReleases #NowStreaming #WhatToWatch #KyaDekhein
+#Netflix #PrimeVideo #JioHotstar #StreamingNow #OTTUpdate
+`,
+  );
+}
 
 if (star) {
   console.log(`\n  ${STAR}: hero ${star.hero.title} (in cinemas since ${star.hero.releaseDate})`);
@@ -514,4 +617,5 @@ if (star) {
   console.log(`  Hero: ${hero.title} (${where(hero)}, ${hero.releaseDate})`);
   console.log(`  ${cinema.length} in cinemas, ${streaming.length} confirmed on OTT`);
 }
-console.log(`  social/${NAME}-caption.txt`);
+console.log(`  social/${star ? 'star-posters' : 'week-posters'}-caption.txt`);
+if (ottHero) console.log(`  social/week-ott-caption.txt   (${landed.length} landed in ${OTT_WINDOW}d)`);
