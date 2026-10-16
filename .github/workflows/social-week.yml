@@ -21,6 +21,14 @@ on:
     # feed, and well before the 19:30 IST slot the plan's first post lands in.
     - cron: '30 4 * * 5'
   workflow_dispatch:
+    inputs:
+      star:
+        description: >-
+          Also build a star post for this actor, e.g. "Rajinikanth". Their film
+          in cinemas now becomes the hero and the rest of their catalogue the
+          grid. Blank builds only the week.
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -56,6 +64,15 @@ jobs:
           npm run social
           npm run angles
           npm run social:posters
+
+      # Only on request, and only with a name: a star post hangs off whatever
+      # of theirs is in cinemas, so it is worth making the week a big release
+      # lands and pointless the rest of the time.
+      - name: Build the star post
+        if: ${{ inputs.star != '' }}
+        env:
+          STAR: ${{ inputs.star }}
+        run: npm run social:star
 
       - name: Choose the week's three
         run: npm run plan:ig

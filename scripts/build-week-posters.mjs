@@ -48,6 +48,7 @@ const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').
 const registry = await loadRegistry();
 const pname = new Map(registry.map((p) => [p.id, p.name]));
 const pshort = new Map(registry.map((p) => [p.id, p.short]));
+const prank = new Map(registry.map((p) => [p.id, p.rank]));
 const servesHere = (id) => registry.find((p) => p.id === id)?.regions.includes(REGION);
 
 const feed = JSON.parse(await readFile(resolve(ROOT, 'public/data/releases.json'), 'utf8'));
@@ -117,6 +118,56 @@ function seats(count) {
   return picked.sort(best);
 }
 
+/**
+ * Star mode: one actor's back catalogue, hung off whatever of theirs is in
+ * cinemas now.
+ *
+ * Asked for after Jailer 2 opened, and the week it opened into made the case
+ * on its own: this week's own slate is thirteen small cinema titles and a
+ * single confirmed OTT arrival, a French documentary on MUBI. A grid of that
+ * is honest and nobody shares it. Meanwhile the biggest film in Indian
+ * cinemas is a Rajinikanth picture and the site already knows where sixteen
+ * of his others stream — which is the thing this site is *for*, and it was
+ * sitting in the data unsaid.
+ *
+ * The back catalogue is read from the archive and the catalogue rather than
+ * the week, because that is where films older than the calendar live. Sorted
+ * by rating rather than by year: the reason to open this post is "what should
+ * I watch tonight", and Thalapathi at 8.0 answers that better than whatever
+ * came out most recently.
+ */
+const STAR = (process.env.STAR ?? '').trim();
+
+async function starSubject() {
+  const [catalogue, archive] = await Promise.all([
+    readFile(resolve(ROOT, 'public/data/catalogue.json'), 'utf8').then((x) => JSON.parse(x).titles).catch(() => []),
+    readFile(resolve(ROOT, 'data/archive.json'), 'utf8').then((x) => JSON.parse(x).titles).catch(() => []),
+  ]);
+  /* Merged by id so a film the calendar carries and the catalogue also has
+     does not appear twice under two half-filled rows. */
+  const merged = new Map();
+  for (const r of [...archive, ...catalogue, ...feed.weeks.flatMap((w) => w.releases ?? [])]) {
+    merged.set(String(r.id), { ...(merged.get(String(r.id)) ?? {}), ...r });
+  }
+  const needle = STAR.toLowerCase();
+  const theirs = [...merged.values()].filter(
+    (r) => r.posterUrl && (r.cast ?? []).some((c) => String(typeof c === 'string' ? c : (c?.name ?? '')).toLowerCase().includes(needle)),
+  );
+  const watchable = (r) => (r.platforms ?? []).some((p) => p !== 'theatres' && servesHere(p));
+  /* In cinemas, and recently enough to still be playing — the reason the post
+     exists at all. CINEMA_RUN mirrors the site's own six-week window. */
+  const CINEMA_RUN = 42;
+  const playing = theirs
+    .filter((r) => (r.platforms ?? []).includes('theatres') && !watchable(r))
+    .filter((r) => r.releaseDate && r.releaseDate <= TODAY &&
+      Date.parse(TODAY) - Date.parse(r.releaseDate) <= CINEMA_RUN * 86_400_000)
+    .sort((a, b) => (b.heat ?? 0) - (a.heat ?? 0));
+  const library = theirs
+    .filter((r) => watchable(r) && r.id !== playing[0]?.id)
+    .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
+  return { hero: playing[0] ?? library[0], library, playingCount: playing.length };
+}
+
 /* `short` on a tile, the full name on the hero: a tile is 225px wide and the
    long form truncated to "from 15…", dropping the one word that carries the
    tense the whole fix is about. */
@@ -137,11 +188,37 @@ const art = (r, cls = '') => `
       <img src="${esc(r.posterUrl)}" alt="">
     </div>`;
 
+const star = STAR ? await starSubject() : null;
+if (STAR && !star.hero) {
+  console.error(`No film with ${STAR} in the cast has artwork. Nothing has been written.`);
+  process.exit(1);
+}
+const subject = star ?? { hero, library: null };
+
+/* Every service the row has here, best-ranked first — on a back-catalogue
+   tile "where can I watch this" is the whole question, and naming only one of
+   three places is a worse answer than naming three. */
+const everywhere = (r) =>
+  (r.platforms ?? [])
+    .filter((p) => p !== 'theatres' && servesHere(p))
+    .sort((a, b) => (prank.get(a) ?? 2) - (prank.get(b) ?? 2))
+    .map((p) => pshort.get(p) ?? p)
+    .slice(0, 2)
+    .join(', ');
+
+/* A back-catalogue tile answers a different question from a calendar tile. A
+   date is the point when a film is new; for one that has been streaming for
+   years the useful facts are how good it is and where it is. */
+const tileLine = (r) =>
+  star
+    ? `${r.rating ? `★ ${r.rating.toFixed(1)} · ` : ''}${everywhere(r) || 'In cinemas'}`
+    : releaseLabel(where(r, { brief: true }), r.releaseDate, TODAY);
+
 const tile = (r) => `
   <figure class="tile">${art(r)}
     <figcaption>
       <strong>${esc(r.title)}</strong>
-      <span>${esc(releaseLabel(where(r, { brief: true }), r.releaseDate, TODAY))}</span>
+      <span>${esc(tileLine(r))}</span>
     </figcaption>
   </figure>`;
 
@@ -210,15 +287,19 @@ const page = (size, tiles) => {
 </style>
 <div class="top">
   <div class="mark">N</div><div class="brand">${esc(BRAND)}</div>
-  <div class="kicker">${esc(dateOf(week.start))} – ${esc(dateOf(week.end))}</div>
+  <div class="kicker">${star ? esc(STAR) : `${esc(dateOf(week.start))} – ${esc(dateOf(week.end))}`}</div>
 </div>
-<h1>Out this week<br><em>in cinemas &amp; on OTT</em></h1>
+<h1>${star
+  ? `${esc(star.hero.title)} is in cinemas.<br><em>${star.library.length} more, streaming tonight.</em>`
+  : 'Out this week<br><em>in cinemas &amp; on OTT</em>'}</h1>
 <div class="grid">
-  <figure class="tile big">${art(hero)}
+  <figure class="tile big">${art(subject.hero)}
     <figcaption>
-      <div class="tag">${upcoming(hero.releaseDate, TODAY) ? 'Biggest still to come' : 'Biggest this week'}</div>
-      <strong>${esc(hero.title)}</strong>
-      <span>${esc(releaseLabel(where(hero), hero.releaseDate, TODAY, { long: true }))}</span>
+      <div class="tag">${star ? 'In cinemas now' : (upcoming(subject.hero.releaseDate, TODAY) ? 'Biggest still to come' : 'Biggest this week')}</div>
+      <strong>${esc(subject.hero.title)}</strong>
+      <span>${esc(star
+        ? `In cinemas · since ${dateOf(subject.hero.releaseDate)}`
+        : releaseLabel(where(subject.hero), subject.hero.releaseDate, TODAY, { long: true }))}</span>
     </figcaption>
   </figure>${tiles.map(tile).join('')}</div>
 <div class="foot"><span class="url">${esc(SITE)}</span><span class="say">every platform, one page</span></div>
@@ -235,10 +316,11 @@ const SIZES = [
 ];
 
 await mkdir(OUT, { recursive: true });
-const browser = await launchChromium('week-posters');
+const NAME = star ? 'star-posters' : 'week-posters';
+const browser = await launchChromium(NAME);
 try {
   for (const size of SIZES) {
-    const tiles = seats(size.take);
+    const tiles = star ? star.library.slice(0, size.take) : seats(size.take);
     const p = await browser.newPage({
       viewport: { width: size.w, height: size.h },
       deviceScaleFactor: 1,
@@ -262,13 +344,13 @@ try {
           setTimeout(done, 8000);
         }),
     );
-    await writeFile(resolve(OUT, `${size.name}.png`), await p.screenshot({ type: 'png' }));
+    await writeFile(resolve(OUT, `${size.name.replace('week-posters', NAME)}.png`), await p.screenshot({ type: 'png' }));
     await writeFile(
-      resolve(OUT, `${size.name}.jpg`),
+      resolve(OUT, `${size.name.replace('week-posters', NAME)}.jpg`),
       await p.screenshot({ type: 'jpeg', quality: 92 }),
     );
     await p.close();
-    console.log(`  ${size.name}.png / .jpg   ${size.w}x${size.h}  (hero + ${tiles.length})`);
+    console.log(`  ${size.name.replace('week-posters', NAME)}.png / .jpg   ${size.w}x${size.h}  (hero + ${tiles.length})`);
   }
 } finally {
   await browser.close();
@@ -283,6 +365,34 @@ try {
  */
 const langs = [...new Set([hero, ...seats(6)].map((r) => r.languages?.[0]).filter(Boolean))];
 const LANG_NAME = { hi: 'Hindi', ta: 'Tamil', te: 'Telugu', ml: 'Malayalam', kn: 'Kannada', bn: 'Bengali', mr: 'Marathi', pa: 'Punjabi', en: 'English' };
+/*
+ * Star captions carry the swagger the subject is owed; the figures under it
+ * stay computed. "16 more streaming tonight" is counted from the data on
+ * every run, so a caption cannot survive into a week where it is no longer
+ * true — the failure that still keeps build-feature.mjs out of the rotation.
+ */
+const starCaption = () => {
+  const top = star.library.slice(0, 5).map((r) => r.title);
+  const services = [...new Set(star.library.flatMap((r) => (r.platforms ?? [])
+    .filter((p) => p !== 'theatres' && servesHere(p)).map((p) => pshort.get(p) ?? p)))];
+  return `${star.hero.title}. In cinemas. That is the whole announcement. 🕶️
+
+Thalaivar doesn't do trailers for his entry — he just arrives.
+
+And when you walk out still buzzing, ${star.library.length} more ${STAR} films are streaming tonight across ${services.length} services: ${services.join(', ')}.
+
+${top.join(' · ')}${star.library.length > top.length ? ` — and ${star.library.length - top.length} more.` : '.'}
+
+Every one of them, with the platform it is actually on, at ${SITE}. Search the name, get the answer. No "available in your region?" nonsense.
+
+🔗 link in bio
+
+Which one are you rewatching first? 👇
+
+#${STAR.replace(/[^A-Za-z0-9]/g, '')} #Thalaivar #${(star.hero.title || '').replace(/[^A-Za-z0-9]/g, '')} #TamilCinema #NewOnOTT #OTTIndia #WhatToWatch #KyaDekhein #OTTReleases #SunNXT #PrimeVideo
+`;
+};
+
 const outAlready = [...cinema, ...streaming].filter((r) => !upcoming(r.releaseDate, TODAY)).length;
 const stillToCome = [...cinema, ...streaming].filter((r) => upcoming(r.releaseDate, TODAY)).length;
 const heroLine = upcoming(hero.releaseDate, TODAY)
@@ -303,9 +413,14 @@ Which one are you watching first? 👇
 #NewOnOTT #OTTIndia #OTTReleases #WhatToWatch #KyaDekhein #ThisWeekOnOTT
 #NewReleases #IndianCinema #MoviesThisWeek #OTTUpdate #${(INSTAGRAM ?? 'newonott').replace(/[^A-Za-z0-9]/g, '')}
 `;
-await writeFile(resolve(OUT, 'week-posters-caption.txt'), caption);
+await writeFile(resolve(OUT, `${NAME}-caption.txt`), star ? starCaption() : caption);
 
-console.log(`\n  Week ${week.start} – ${week.end}`);
-console.log(`  Hero: ${hero.title} (${where(hero)}, ${hero.releaseDate})`);
-console.log(`  ${cinema.length} in cinemas, ${streaming.length} confirmed on OTT`);
-console.log(`  social/week-posters-caption.txt`);
+if (star) {
+  console.log(`\n  ${STAR}: hero ${star.hero.title} (in cinemas since ${star.hero.releaseDate})`);
+  console.log(`  ${star.library.length} of their films streaming in ${REGION}`);
+} else {
+  console.log(`\n  Week ${week.start} – ${week.end}`);
+  console.log(`  Hero: ${hero.title} (${where(hero)}, ${hero.releaseDate})`);
+  console.log(`  ${cinema.length} in cinemas, ${streaming.length} confirmed on OTT`);
+}
+console.log(`  social/${NAME}-caption.txt`);
