@@ -32,7 +32,7 @@ const TAGLINE_LONG =
   "Everything releasing this week — tap any title to see where it's streaming and open it there. Nothing plays on this page.";
 import { slugify } from './slug.mjs';
 import { inRegion, loadRegistry } from './platform-registry.mjs';
-import { onlyGuessed } from './platform-claim.mjs';
+import { onlyGuessed, suppliers, stated } from '../src/lib/platform-claim.mjs';
 import { byDay, dayLabel, phrase } from '../src/lib/changes.mjs';
 import { ANALYTICS_TOKEN } from './config.mjs';
 
@@ -512,8 +512,45 @@ function aggregateRatingFor(r) {
   };
 }
 
+/**
+ * Which board a title page hangs under.
+ *
+ * Decided once because it was decided twice. The JSON-LD trail was fixed when
+ * streaming-only titles got pages — it had hardcoded /theatres, "which was
+ * right while every title page was a cinema listing and became a claim the
+ * page does not keep" — and the crumb trail a reader actually sees kept the
+ * hardcoded version. Gajab Raat, a Netflix film, was rendered as "New on OTT ›
+ * In cinemas › Gajab Raat" above a sentence saying it was streaming on
+ * Netflix, and the structured data on the same page said Streaming. One rule,
+ * two copies, one of them fixed: the shape of fault this file keeps repeating.
+ */
+const titleLens = (page) => {
+  const platforms = page.rows?.[0]?.platforms ?? [];
+  if (platforms.includes('theatres')) return { name: 'In cinemas', href: '/theatres' };
+  /* The service, not the word "streaming", because this trail is rendered
+     twice: once here for the crawler and the first paint, and again by
+     components/ReleaseDatePage when React mounts over it. That one links the
+     platform page, so anything else here is a crumb that changes under the
+     reader a second after they arrive. */
+  /* Only a platform that has a page. Tata Play carries fewer titles than
+     MIN_PAGE_ROWS, so /tataplay is not published, and linking it put a dead
+     internal link on every Tata Play title — caught by the grader on the
+     first build after this changed, which is the gate earning its keep. */
+  const service = platforms.find(
+    (p) => p !== 'theatres' && platformsPresent.some((x) => x.id === p),
+  );
+  return service
+    ? { name: pname(service), href: `/${service}` }
+    : { name: 'Streaming', href: '/streaming' };
+};
+
 function movieNode(r, canonical) {
-  const streamingOn = (r.platforms ?? []).filter((p) => p !== 'theatres');
+  /* A WatchAction says "you can watch this here, now". A row dated in the
+     future cannot support that, whatever its platform list says — so the
+     offer waits for the date, the same way the lede does. The prose states
+     the tense; the structured data used to ignore it. */
+  const streamingOn =
+    r.releaseDate > TODAY ? [] : (r.platforms ?? []).filter((p) => p !== 'theatres');
   return {
     '@type': r.kind === 'series' || r.kind === 'anime' ? 'TVSeries' : 'Movie',
     '@id': `${canonical}#title`,
@@ -678,19 +715,12 @@ async function renderPage(page, pages) {
                          /theatres, which was right while every title page was a
                          cinema listing and became a claim the page does not keep
                          the day streaming-only titles got pages. */
-                      page.rows[0]?.platforms?.includes('theatres')
-                        ? {
-                            '@type': 'ListItem',
-                            position: 2,
-                            name: 'In cinemas',
-                            item: `${SITE_URL}/theatres`,
-                          }
-                        : {
-                            '@type': 'ListItem',
-                            position: 2,
-                            name: 'Streaming',
-                            item: `${SITE_URL}/streaming`,
-                          },
+                      {
+                        '@type': 'ListItem',
+                        position: 2,
+                        name: titleLens(page).name,
+                        item: `${SITE_URL}${titleLens(page).href}`,
+                      },
                     ]
                   : []),
                 {
@@ -791,7 +821,9 @@ async function renderPage(page, pages) {
    *  <span>, so 80 of 81 pages had no way back at all. */
   const crumbs = page.path
     ? `<nav class="crumbs"><a href="/">${esc(BRAND)}</a> › ` +
-      (page.group === 'title' ? `<a href="/theatres">In cinemas</a> › ` : '') +
+      (page.group === 'title'
+        ? `<a href="${titleLens(page).href}">${esc(titleLens(page).name)}</a> › `
+        : '') +
       `<span>${esc(page.crumb)}</span></nav>`
     : '';
 
@@ -2146,14 +2178,45 @@ for (const r of allTitlePages) {
      real provider is evidence, and a second, weaker source beside it does
      not take that away. */
   const guessedPlatform = onlyGuessed([r, arrived]);
+  /**
+   * A guess about next month and a guess about this morning are not the same
+   * claim, and the first version of this treated them as one.
+   *
+   * The rule itself is `stated` in src/lib/platform-claim.mjs, with the
+   * reasoning and the measurement behind it; what is decided here is which of
+   * this page's five states it applies to.
+   *
+   * Whichever it is, every surface has to say the same thing. This page spent
+   * a day hedging in its answer sentence while its own title tag read "Watch
+   * Gajab Raat on Netflix" and the facts beneath it read "Watch on: Netflix" —
+   * one rule applied to one of four places that state it. `hedged` is that
+   * decision, made once here and read by the tag, the description and the
+   * facts list below; scripts/eval.mjs fails the build if they disagree.
+   */
+  /* An arrived guess states the platform and names its source in the same
+     breath, which is neither a denial nor a bare claim. Every supplying row
+     has to have come due, not just one: a page carrying a confirmed row and a
+     note about next month is still hedging about the note. */
+  const sourced = Boolean(
+    streaming.length && guessedPlatform && suppliers([r, arrived]).every((x) => stated(x, TODAY)),
+  );
+  const hedged = Boolean(
+    (streaming.length && guessedPlatform && !sourced) ||
+      (!streaming.length && streamsOn && onlyGuessed([dated])),
+  );
+
   const answer = streaming.length && upcoming
-    ? `Streaming on ${streaming.map(pname).join(', ')} from ${opensOn}.`
-    : streaming.length && guessedPlatform
-    ? `Expected on ${streaming.map(pname).join(', ')} — announced, not yet confirmed by the platform. This page updates automatically when it is.`
+    ? hedged
+      ? `Expected on ${streaming.map(pname).join(', ')} from ${opensOn} — announced, not yet confirmed by the platform. This page updates automatically when it is.`
+      : `Streaming on ${streaming.map(pname).join(', ')} from ${opensOn}.`
     : streaming.length
-    ? `Streaming now on ${streaming.map(pname).join(', ')}.`
+    ? sourced
+      ? `Streaming now on ${streaming.map(pname).join(', ')}, per the title's own release announcement — the platform's listing is re-checked every day.`
+      : `Streaming now on ${streaming.map(pname).join(', ')}.`
     : streamsOn
-      ? `Streaming on ${landsOn} from ${landsDate}.`
+      ? hedged
+        ? `Expected on ${landsOn} from ${landsDate} — announced, not yet confirmed by the platform. This page updates automatically when it is.`
+        : `Streaming on ${landsOn} from ${landsDate}.`
       : upcoming
         ? `In cinemas from ${opensOn}. No streaming date yet — a film is normally picked up by a platform after its theatrical run, and this page updates automatically when one announces.`
         : `Not announced yet — no streaming date has been confirmed. This page updates automatically; every platform is re-checked every day.`;
@@ -2296,13 +2359,17 @@ for (const r of allTitlePages) {
      * says there are more without claiming there are not. The page itself
      * lists them all, which is where somebody who cares will look.
      */
+    /* "Expected on" where the lede hedges. A tag reading "Watch X on Netflix"
+       above a page saying the platform has not confirmed it is the
+       contradiction a reader meets first, in the search result, before they
+       ever reach the page. See `hedged`. */
     title:
       streaming.length && !upcoming
         ? `Watch ${r.title} on ${lead}${alsoOn}${suffix}`
         : streaming.length
-          ? `${r.title} on ${lead}${alsoOn} from ${opensOn}${suffix}`
+          ? `${r.title} ${hedged ? 'expected on' : 'on'} ${lead}${alsoOn} from ${opensOn}${suffix}`
           : streamsOn
-            ? `${qualified} OTT release date — ${landsOn} from ${landsDate}`
+            ? `${qualified} OTT release date — ${hedged ? 'expected on ' : ''}${landsOn} from ${landsDate}`
             : upcoming
               ? `${qualified} release date — in cinemas ${opensOn}`
               : `${qualified} OTT release date — where to watch online`,
@@ -2327,9 +2394,9 @@ for (const r of allTitlePages) {
       streaming.length && !upcoming
         ? `${named} is streaming now on ${on} in India — cast, runtime, certificate and trailer. ${BRAND}.`
         : streaming.length
-          ? `${named} lands on ${on} in India on ${opensOn} — cast, runtime, certificate and trailer. ${BRAND}.`
+          ? `${named} ${hedged ? 'is expected on' : 'lands on'} ${on} in India on ${opensOn} — cast, runtime, certificate and trailer. ${BRAND}.`
           : streamsOn
-            ? `${named} starts streaming on ${landsOn} from ${landsDate}, after cinemas on ${opensOn}. Cast, runtime and trailer. ${BRAND}.`
+            ? `${named} ${hedged ? 'is expected to start streaming on' : 'starts streaming on'} ${landsOn} from ${landsDate}, after cinemas on ${opensOn}. Cast, runtime and trailer. ${BRAND}.`
             : upcoming
             ? `${named} opens in Indian cinemas on ${opensOn} — cast, runtime, certificate and trailer, plus its OTT date the day it lands. ${BRAND}.`
             : `${named} — in cinemas ${opensOn}. Cast, runtime, certificate and trailer, and the OTT release date here the day it is announced. ${BRAND}.`,
@@ -2362,7 +2429,10 @@ for (const r of allTitlePages) {
                 ? 'First aired'
                 : 'Released'
       }:</strong> ${esc(opensOn)}</p>` +
-      (inCinemas ? '' : `<p><strong>Watch on:</strong> ${esc(on || 'streaming')}</p>`) +
+      /* "Expected on" in the facts list too, where the lede hedges: this line
+         is the one a reader scans for the answer, and it read "Watch on:
+         Netflix" under a sentence saying the platform had not confirmed it. */
+      (inCinemas ? '' : `<p><strong>${hedged ? 'Expected on' : 'Watch on'}:</strong> ${esc(on || 'streaming')}</p>`) +
       (langs.length ? `<p><strong>Language:</strong> ${esc(langs.join(', '))}</p>` : '') +
       (r.genres?.length ? `<p><strong>Genre:</strong> ${esc(r.genres.join(', '))}</p>` : '') +
       (r.certification ? `<p><strong>Certificate:</strong> ${esc(r.certification)}</p>` : '') +

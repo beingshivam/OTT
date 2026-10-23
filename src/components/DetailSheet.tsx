@@ -8,6 +8,7 @@ import { runtimeLabel } from '../lib/format';
 import { formatDay } from '../lib/week';
 import { scoreOf, scoreTitle } from '../lib/score';
 import { shareLine, shareUrl } from '../lib/share';
+import { stated } from '../lib/platform-claim.mjs';
 import type { Release } from '../types';
 import { ShareButtons } from './ShareButtons';
 import { MoreLikeThis, useSimilar, type SimilarHit } from './MoreLikeThis';
@@ -25,6 +26,20 @@ export function DetailSheet({ release, onClose, onPickSimilar }: Props) {
   const closeRef = useRef<HTMLButtonElement>(null);
   const similar = useSimilar(release.id);
   const p = platform(release.platforms[0]);
+  /*
+   * Whether this row's guessed platform may be stated outright.
+   *
+   * The sheet has hedged every `namedBy` row since the Toxic report, which was
+   * right for a note about a date still ahead and wrong the moment the date
+   * arrived: "Gajab Raat is already on Netflix, still you're saying OTT
+   * release date not confirmed." The rule and the measurement behind it are in
+   * src/lib/platform-claim.mjs, imported rather than restated because the
+   * prerendered page says this too and the two have drifted before — the hedge
+   * went into this file and not into that one, so for weeks the sheet was
+   * careful and the page Google indexes was not.
+   */
+  const pending =
+    Boolean(release.namedBy) && !stated(release, new Date().toISOString().slice(0, 10));
   const day = formatDay(release.releaseDate);
   const drop = release.drop;
   const dropText = dropLabel(release);
@@ -272,7 +287,7 @@ export function DetailSheet({ release, onClose, onPickSimilar }: Props) {
                   */}
                   {target.theatrical
                     ? 'Book tickets'
-                    : `${release.namedBy ? 'Expected on' : 'Watch on'} ${target.short}`}
+                    : `${pending ? 'Expected on' : 'Watch on'} ${target.short}`}
                 </a>
               );
             })}
@@ -281,8 +296,9 @@ export function DetailSheet({ release, onClose, onPickSimilar }: Props) {
                 about any one service. */}
             {release.namedBy && !release.platforms.includes('theatres') && (
               <p className="sheet__pending">
-                Announced, not yet confirmed — the film database has no listing for it on this
-                service.
+                {pending
+                  ? 'Announced, not yet confirmed — the film database has no listing for it on this service.'
+                  : "From the title's own release announcement — the film database has not caught up yet. Re-checked daily."}
               </p>
             )}
             {release.trailerUrl && (

@@ -30,7 +30,7 @@ import { appendFile, readFile, readdir, stat } from 'node:fs/promises';
 import { slugify } from './slug.mjs';
 import { contradicts, THEATRICAL_FLOOR_DAYS } from './cinema-window.mjs';
 import { inRegion, loadRegistry } from './platform-registry.mjs';
-import { onlyGuessed } from './platform-claim.mjs';
+import { onlyGuessed } from '../src/lib/platform-claim.mjs';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -1011,7 +1011,15 @@ const S9 = 'Guessed platforms';
       const rows = bySlug.get(path.slice('/ott-release-date/'.length)) ?? [];
       if (!onlyGuessed(rows)) continue;
       const body = (html.match(/<main[\s\S]*?<\/main>/) ?? [''])[0].replace(/<[^>]+>/g, ' ');
-      if (/Streaming now on/i.test(body)) over.push(`${path} — a guess rendered as fact`);
+      /* A bare "Streaming now on X" is the fault. The same sentence naming
+         where the claim came from is not: once the announced date has
+         arrived the claim is testable, and the page saying "per the title's
+         own release announcement" is telling the reader exactly what it
+         knows. See build-seo's `sourced` for why the hedge was wrong on the
+         one day it mattered most. */
+      if (/Streaming now on/i.test(body) && !/release announcement/i.test(body)) {
+        over.push(`${path} — a guess rendered as fact`);
+      }
     }
     return over;
   })();
@@ -1023,6 +1031,50 @@ const S9 = 'Guessed platforms';
           `${marked.length} page(s) say "Streaming now" on a guess`, marked.slice(0, 5))
       : pass(S9, 'no page states a guessed platform as fact',
           `${feedRows.filter((r) => r.namedBy).length} guessed rows checked against every title page`);
+
+  /**
+   * And one page says one thing.
+   *
+   * Reported: "Gajab Raat is already on Netflix, still you're saying OTT
+   * release date not confirmed." The page said both. Its answer sentence read
+   * "Expected on Netflix — announced, not yet confirmed by the platform",
+   * while its own title tag read "Watch Gajab Raat on Netflix", its meta
+   * description read "is streaming now on Netflix in India", and the facts
+   * list beneath the hedge read "Watch on: Netflix". One rule, applied to one
+   * of the four places on the page that state it — the same shape of fault as
+   * the gate above, which promised a claim about pages and inspected a field.
+   *
+   * This reads the page as published and asks only that it not argue with
+   * itself. It needs nothing from the feed, which is the point: a check that
+   * re-derives the builder's decision can agree with a wrong decision, and
+   * this one cannot.
+   */
+  const split = (() => {
+    if (!pages) return null;
+    const bad = [];
+    for (const [path, html] of pages) {
+      if (!path.startsWith('/ott-release-date/')) continue;
+      const main = (html.match(/<main[\s\S]*?<\/main>/) ?? [''])[0].replace(/<[^>]+>/g, ' ');
+      if (!/not yet confirmed by the platform/i.test(main)) continue;
+      const tag = (html.match(/<title>([\s\S]*?)<\/title>/) ?? ['', ''])[1];
+      const desc = (html.match(/<meta name="description" content="([^"]*)"/) ?? ['', ''])[1];
+      const says = [
+        /^Watch /i.test(tag) && 'the title tag says "Watch …"',
+        /is streaming now on|lands on /i.test(desc) && 'the description claims it outright',
+        /Watch on:/i.test(main) && 'the facts list says "Watch on:"',
+      ].filter(Boolean);
+      if (says.length) bad.push(`${path} — hedges, but ${says.join('; ')}`);
+    }
+    return bad;
+  })();
+  if (!split) skip(S9, 'a page that hedges hedges everywhere', 'needs dist/');
+  else
+    split.length
+      ? byBlastRadius(S9, 'a page that hedges hedges everywhere', split.length,
+          [...pages.keys()].filter((p) => p.startsWith('/ott-release-date/')).length,
+          `${split.length} page(s) hedge in one place and assert in another`, split.slice(0, 5))
+      : pass(S9, 'a page that hedges hedges everywhere',
+          'every hedged page hedges in its tag, its description and its facts');
 
   if (!feed) skip(S9, 'a guessed platform is still marked as one', 'needs the feed');
   else {

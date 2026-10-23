@@ -30,3 +30,25 @@ export function onlyGuessed(rows) {
   const supplying = suppliers(rows);
   return supplying.length > 0 && supplying.every((r) => Boolean(r.namedBy));
 }
+
+/**
+ * And whether a guess may be stated rather than hedged.
+ *
+ * Reported: "Gajab Raat is already on Netflix, still you're saying OTT release
+ * date not confirmed." It was on Netflix. The row's platform came from a
+ * release note, the note's date was that morning, and both the page and the
+ * sheet answered "announced, not yet confirmed by the platform" on the one day
+ * the reader could see for themselves that it was there.
+ *
+ * A note about next month is a claim nobody can check; a note whose date has
+ * arrived is a claim that has come due. The record on the second kind is good —
+ * of 180 guessed rows measured, 33 were later confirmed by a provider and all
+ * 33 agreed, none wrong — so once the date is here the honest thing is to say
+ * where the film is and say where that came from, rather than to deny it and
+ * be wrong in front of somebody holding the evidence.
+ *
+ * `today` is passed in rather than read, so the page build, the grader and the
+ * sheet can all be asked about the same day.
+ */
+export const stated = (row, today) =>
+  Boolean(row?.namedBy) && Boolean(row?.releaseDate) && row.releaseDate <= today;

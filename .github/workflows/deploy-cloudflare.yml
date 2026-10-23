@@ -84,6 +84,12 @@ jobs:
           npm run test:changes
           npm run test:backfill
           npm run test:windows
+          # And the same omission twice more: the tense on a poster, written
+          # after a post went out saying a film was in cinemas five days before
+          # it opened, and the OMDb client's quota and retry handling. Both ran
+          # only by hand, which is the same as not running.
+          npm run test:label
+          npm run test:omdb
           # The shared TMDB client's pacing and pooling. Worth a gate because a
           # limiter that does not limit looks fine until TMDB answers 429, and
           # a pool that drops an item looks fine until a title loses its page.

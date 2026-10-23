@@ -31,20 +31,31 @@ const SHOTS = join(ROOT, '.e2e');
 const KEEP = process.argv.includes('--keep');
 
 /*
- * How many cards at the head of a rail are the ranking rather than the news,
- * read from the app rather than written down here. A literal 3 in this file is
- * how the row came to be three cards of week-old ranking on a screen that
- * shows three cards.
+ * The rail's own selection, compiled from the app rather than restated here.
+ *
+ * LEAD_CARDS is how many cards at the head of a rail are the ranking rather
+ * than the news: a literal 3 in this file is how the row came to be three
+ * cards of week-old ranking on a screen that shows three cards. `inCinemas`
+ * is here for the same reason one step further on — the row's leader was
+ * written down as "Mirzapur: The Movie", which was true the week it was
+ * written and red by the week after, so a correct site failed its own deploy.
+ * The expectation is computed from the feed the page fetches, by the function
+ * the page calls.
  */
-const LEAD_CARDS = await (async () => {
+const { TRENDING_IN_CINEMAS: LEAD_CARDS, inCinemas } = await (async () => {
   const d = mkdtempSync(join(tmpdir(), 'e2e-rails-'));
   execFileSync(
     'npx',
     ['--yes', 'esbuild', 'src/lib/rails.ts', '--bundle', '--format=esm', `--outfile=${join(d, 'rails.mjs')}`],
     { stdio: 'pipe' },
   );
-  return (await import(join(d, 'rails.mjs'))).TRENDING_IN_CINEMAS;
+  return import(join(d, 'rails.mjs'));
 })();
+
+/** The feed, flattened the way App.tsx flattens it. */
+const FEED_ROWS = JSON.parse(await readFile(join(DIST, 'data/releases.json'), 'utf8')).weeks.flatMap(
+  (w) => w.releases,
+);
 
 const TYPES = {
   '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css',
@@ -466,6 +477,11 @@ for (const [width, height] of [[360, 780], [390, 844], [1280, 900]]) {
       firstUnmarked: cells.findIndex((c) => !c.querySelector('.landed__hot')),
       names: cells.slice(0, 4).map((c) => c.querySelector('.landed__name')?.textContent?.trim()),
       dates: cells.slice(0, 4).map((c) => c.querySelector('.landed__meta')?.textContent?.trim()),
+      /* Which region's board this is. The row's pool is region-scoped, so the
+         expectation below has to be computed for the region the page settled
+         on — guessed from the browser locale, not fixed — and the picker is
+         where the page says which that is. */
+      region: document.querySelector('.region select')?.value,
     };
   });
   /*
@@ -574,11 +590,24 @@ for (const [width, height] of [[360, 780], [390, 844], [1280, 900]]) {
     `${width}px: and the chips run from the front without a gap`,
     `first card without a chip is ${hot.firstUnmarked}, expected ${LEAD_CARDS}`,
   );
-  is(
-    hot.names[0] === 'Mirzapur: The Movie',
-    `${width}px: the biggest film in cinemas leads the row`,
-    `the row opens with "${hot.names[0]}"`,
-  );
+  /*
+   * And the card at the front is the one the app's own ranking puts there.
+   *
+   * This was a title literal, which made the check a test of the week rather
+   * than of the page: Jailer 2 opened, took the lead correctly, and the deploy
+   * went red on a site with nothing wrong with it. The same rail function the
+   * page calls is run here over the same feed the page fetched, so what is
+   * asserted is that the rendered row agrees with the selection — which is the
+   * thing a browser can check and a unit test cannot.
+   */
+  {
+    const expected = inCinemas(FEED_ROWS, hot.region ?? 'IN', new Date()).releases[0]?.title;
+    is(
+      Boolean(expected) && hot.names[0] === expected,
+      `${width}px: the biggest film in cinemas leads the row`,
+      `the row opens with "${hot.names[0]}", the ranking leads with "${expected}"`,
+    );
+  }
   /*
    * And the rest of what a phone can see is news rather than more ranking.
    * This is the reported bug in its observable form — three times reported,
