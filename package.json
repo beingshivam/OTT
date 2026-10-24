@@ -55,7 +55,8 @@
     "perf": "node scripts/perf-probe.mjs /streaming /",
     "social:posters": "node scripts/build-week-posters.mjs",
     "test:label": "node --test scripts/release-label.test.mjs",
-    "social:star": "node scripts/build-week-posters.mjs"
+    "social:star": "node scripts/build-week-posters.mjs",
+    "hook:trend": "node scripts/build-trend-hook.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
