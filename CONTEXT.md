@@ -180,7 +180,13 @@ displays it.
    the feed so figures cannot go stale) but publishes nothing: it needs
    `IG_USER_ID` and `IG_ACCESS_TOKEN` as repo secrets and `IG_PUBLISH=1` as a
    repo variable. The account must be Business or Creator, linked to a Facebook
-   Page.
+   Page. Every image the builders write is a native Instagram shape — 1080x1350
+   for the feed (4:5, the tallest it takes uncropped, and what the profile grid
+   now shows), 1080x1920 for stories, 1080x1080 for WhatsApp — and a story also
+   keeps 250px clear at each end, because the app draws its own profile row and
+   reply bar over those. Asked for as a standing rule: "always give images that
+   can fit well on Instagram without cropping." Both poster builders assert it
+   before writing a file rather than trusting the layout to still fit.
 9. Budget is about ₹1,000/month. Current advice: spend none of it on ads while
    indexing is the bottleneck — paid traffic does not get pages indexed and is
    not a ranking signal.

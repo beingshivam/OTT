@@ -410,7 +410,7 @@ const page = (size, deck) => {
   *{margin:0;padding:0;box-sizing:border-box}
   body{width:${w}px;height:${h}px;position:relative;overflow:hidden;
        background:#06070a;color:#f2f4f9;font-family:Inter,system-ui,sans-serif;
-       display:flex;flex-direction:column;padding:64px 56px;gap:30px}
+       display:flex;flex-direction:column;padding:${size.padY ?? 64}px ${size.padX ?? 56}px;gap:30px}
   /* The same two-corner wash as every other image this project makes, so a
      forwarded screenshot and the page it points at read as one product. */
   body::before,body::after{content:'';position:absolute;width:1100px;height:1100px;border-radius:50%;pointer-events:none}
@@ -494,8 +494,26 @@ const SIZES = [
      across on the feed crop, two rows of three on the taller story crop. */
   /* `take` is the number of small tiles beside the 2x2 hero: four on the feed
      crop (one row beside it, one below), eight on the taller story crop. */
-  { name: 'week-posters', w: 1080, h: 1350, grid: 4, h1: 56, take: 4 },
-  { name: 'week-posters-story', w: 1080, h: 1920, grid: 4, h1: 70, take: 8 },
+  /*
+   * `padY`/`padX` keep the composition out of Instagram's own furniture.
+   *
+   * A story is not cropped — 9:16 is its native shape — but the app draws
+   * over it at both ends: the avatar, the account name and the close button
+   * across the top, the reply field and any link sticker across the bottom.
+   * Meta's own guidance is to keep anything that has to be read inside a
+   * 250px margin top and bottom, and this image did not: the "New on OTT"
+   * mark sat at y=70, under the profile row, and "newonott.in" at y=1855,
+   * under the reply bar. The two things the post exists to carry were the
+   * two it hid.
+   *
+   * The wider side inset on the story is what pays for those margins. The
+   * grid is three rows of 2:3 artwork and its height follows the column
+   * width, so the only way to fit the same nine titles into 1,370px of safe
+   * height rather than 1,792px of raw height is narrower columns. 185px
+   * against 227px, and nothing leaves the image.
+   */
+  { name: 'week-posters', w: 1080, h: 1350, grid: 4, h1: 56, take: 4, padY: 64, padX: 56 },
+  { name: 'week-posters-story', w: 1080, h: 1920, grid: 4, h1: 70, take: 8, padY: 250, padX: 140 },
 ];
 
 /**
@@ -582,6 +600,33 @@ try {
           setTimeout(done, 8000);
         }),
     );
+    /*
+     * Nothing may sit under Instagram's furniture, or outside the frame.
+     *
+     * `body` is `overflow:hidden`, so a composition that no longer fits does
+     * not spill — it is silently cut, and the first anyone knows is a posted
+     * image with no address on it. Measured here instead: every element the
+     * post has to be read for has to land inside the safe box, which on the
+     * feed crop is the whole image and on a story is 250px in from each end.
+     * The margins are the reason the story grid is narrower; this is what
+     * stops a later tile count quietly spending them.
+     */
+    const out = await p.evaluate(
+      ({ top, bottom, h }) =>
+        ['.top', 'h1', '.grid', '.foot']
+          .map((sel) => [sel, document.querySelector(sel)?.getBoundingClientRect()])
+          .filter(([, r]) => r)
+          .filter(([, r]) => r.top < top || r.bottom > h - bottom)
+          .map(([sel, r]) => `${sel} spans ${Math.round(r.top)}–${Math.round(r.bottom)}`),
+      { top: size.padY ?? 64, bottom: size.padY ?? 64, h: size.h },
+    );
+    if (out.length) {
+      console.error(
+        `${size.name}: outside the safe area of a ${size.w}x${size.h} image — ${out.join('; ')}.\n` +
+          'Nothing has been written. Narrow the columns or carry fewer tiles.',
+      );
+      process.exit(1);
+    }
     const file = size.name.replace('week-posters', deck.name);
     await writeFile(resolve(OUT, `${file}.png`), await p.screenshot({ type: 'png' }));
     await writeFile(resolve(OUT, `${file}.jpg`), await p.screenshot({ type: 'jpeg', quality: 92 }));

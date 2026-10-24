@@ -30,8 +30,19 @@ export const SIZES = [
   // WhatsApp chat. A 9:16 gets aggressively cropped in the message thumbnail
   // and the URL is what gets cut, so forwards get a square that cannot lose it.
   { name: 'whatsapp-1x1', w: 1080, h: 1080, items: 6, title: 40, head: 84 },
-  // Stories, Reels covers, WhatsApp status.
-  { name: 'story-9x16', w: 1080, h: 1920, items: 11, title: 42, head: 104 },
+  /*
+   * Stories, Reels covers, WhatsApp status.
+   *
+   * `padY` overrides the proportional padding because a story is not cropped
+   * but is drawn over: the avatar, the account name and the close button
+   * across the top, the reply field and any link sticker across the bottom.
+   * Meta's guidance is a 250px margin at each end, and at h*0.062 this image
+   * used 119 — so the "New on OTT" mark and the newonott.in line underneath
+   * it, which is the only thing the post is really for, both sat under the
+   * app's own furniture. Nine rows rather than eleven is what pays for the
+   * margins; build-social asserts the result lands inside them.
+   */
+  { name: 'story-9x16', w: 1080, h: 1920, items: 9, title: 42, head: 104, padY: 250 },
 ];
 
 /**
@@ -57,7 +68,7 @@ export function card({ size, kicker, headline, standfirst, rows, more = '', foot
     background:#06070a; color:#f2f4f9;
     font-family:Inter,system-ui,sans-serif;
     display:flex; flex-direction:column;
-    padding:${Math.round(h * 0.062)}px 72px;
+    padding:${size.padY ?? Math.round(h * 0.062)}px 72px;
   }
   /* The same two-corner wash as the site and the share card, so a poster and
      the page it points at read as one product. */

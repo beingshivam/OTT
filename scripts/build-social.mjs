@@ -81,11 +81,16 @@ const range =
 
 const platformCount = new Set(rows.flatMap((r) => r.platforms)).size;
 
-function page({ w, h, items, title, head, name }) {
+/* The whole size object, not a copy of the fields somebody remembered.
+   Rebuilding it here silently dropped `padY` the day it was added, so the
+   story kept its old padding and the safe-area check below failed on an
+   image the SIZES table said was fixed. */
+function page(size) {
+  const { items } = size;
   const list = rows.slice(0, items);
   const rest = rows.length - list.length;
   return card({
-    size: { w, h, items, title, head, name },
+    size,
     kicker: range,
     headline: "Out this<br><em>week</em>.",
     standfirst: `${rows.length} releases · ${platformCount} platforms · one page`,
@@ -105,6 +110,26 @@ try {
     // Webfonts can resolve after networkidle; without this the poster renders in
     // a fallback face and the whole thing looks like a draft.
     await p.evaluate(() => document.fonts.ready);
+    /* Inside the safe area, or nothing is written. `body` is overflow:hidden,
+       so a card that stops fitting is cut rather than spilling, and the first
+       sign of it is a posted story with the address missing under the reply
+       bar. See `padY` in social-card for the margins and why they exist. */
+    const out = await p.evaluate(
+      ({ pad, h }) =>
+        ['.top', 'h1', '.foot']
+          .map((sel) => [sel, document.querySelector(sel)?.getBoundingClientRect()])
+          .filter(([, r]) => r)
+          .filter(([, r]) => r.top < pad || r.bottom > h - pad)
+          .map(([sel, r]) => `${sel} spans ${Math.round(r.top)}–${Math.round(r.bottom)}`),
+      { pad: size.padY ?? Math.round(size.h * 0.062), h: size.h },
+    );
+    if (out.length) {
+      console.error(
+        `${size.name}: outside the safe area of a ${size.w}x${size.h} image — ${out.join('; ')}.\n` +
+          'Nothing has been written. Carry fewer rows.',
+      );
+      process.exit(1);
+    }
     await writeFile(resolve(OUT, `${size.name}.png`), await p.screenshot({ type: 'png' }));
     /* Instagram's publishing API takes JPEG and rejects PNG. PNG stays the
        master — it is what WhatsApp and the stories use — and this is the copy
