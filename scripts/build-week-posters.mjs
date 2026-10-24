@@ -36,6 +36,7 @@ import { BRAND, INSTAGRAM } from './brand.mjs';
 import { launchChromium } from './browser.mjs';
 import { loadRegistry } from './platform-registry.mjs';
 import { dateOf, dayOf, releaseLabel, upcoming } from './release-label.mjs';
+import { stated } from '../src/lib/platform-claim.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = resolve(ROOT, 'social');
@@ -76,11 +77,19 @@ const rows = (week.releases ?? []).filter(inRegion);
 const cinema = rows
   .filter((r) => r.platforms.includes('theatres') && !r.platforms.some((p) => p !== 'theatres'))
   .sort(best);
-/* Confirmed only. A platform inferred from a note on a release date is an
-   announcement, and putting one on a poster that says "streaming now" is the
-   claim that sends somebody to a subscription they did not need. */
+/* Confirmed, or announced for a date that has arrived.
+   A platform inferred from a note is an announcement, and putting one on a
+   poster that says "streaming now" would be the claim that sends somebody to
+   a subscription they did not need — while the date is still ahead. Once it
+   is here the claim has come due, and the site's own pages now state it; see
+   `stated` in src/lib/platform-claim.mjs, imported so the post and the page
+   cannot answer the same question two ways. */
 const streaming = rows
-  .filter((r) => !r.namedBy && r.platforms.some((p) => p !== 'theatres' && servesHere(p)))
+  .filter(
+    (r) =>
+      (!r.namedBy || stated(r, TODAY)) &&
+      r.platforms.some((p) => p !== 'theatres' && servesHere(p)),
+  )
   .sort(best);
 
 if (!cinema.length && !streaming.length) {
@@ -131,7 +140,13 @@ const holdovers = feed.weeks
 /* A holdover is not "this week's biggest", it is the biggest thing on. The
    tag has to say which, or the post claims a film opened on a day it did
    not — the same mistake as labelling an unreleased film "in cinemas". */
-const candidates = [...cinema, ...streaming, ...holdovers];
+/* Cinema and holdovers only. This hero leads the card headed "Out this week
+   in cinemas", so a streaming title cannot be it however big — the OTT card
+   has its own hero, `ottHero`, drawn from what has actually landed. Before
+   the two cards were split this pool was the whole board, and it stayed that
+   way after, which put a Netflix film one heat point from leading a poster
+   about cinemas. */
+const candidates = [...cinema, ...holdovers];
 const hero =
   (HERO && candidates.find((r) => (r.title ?? '').toLowerCase().includes(HERO))) ||
   candidates.sort(best)[0];
@@ -154,7 +169,21 @@ if (HERO && !candidates.some((r) => (r.title ?? '').toLowerCase().includes(HERO)
  * leaving a hole. Interleaved so the two read as one week rather than two
  * blocks.
  */
-function seats(count) {
+/*
+ * `ott: false` is the cinema card, which has to be cinema.
+ *
+ * This function predates the split into two images. One card headed "Out this
+ * week — in cinemas & on OTT" wanted both halves in the grid, and the quota
+ * below is how it got them. Splitting the OTT half onto its own card was
+ * asked for and left this unchanged, so the cinema card kept reserving a
+ * third of its tiles for streaming — under a headline that now reads "Out
+ * this week in cinemas". It went unnoticed for a week because no local
+ * confirmed OTT row qualified; the morning Chaar Yaar landed on Prime, the
+ * cinema card showed a Prime tile. The captions still call `seats()` with
+ * both, because a caption that says "15 in cinemas and 3 on OTT" is
+ * describing the week rather than the image.
+ */
+function seats(count, { ott = true } = {}) {
   const free = (list) => list.filter((r) => r.id !== hero.id);
   /*
    * A quota, not a ban.
@@ -171,8 +200,9 @@ function seats(count) {
    * was written for. Thirteen of twenty was. So imports take at most a
    * quarter of the seats, by heat, and Indian releases keep the rest.
    */
-  const indian = free([...cinema, ...streaming]).filter(local);
-  const imports = free([...cinema, ...streaming])
+  const eligible = ott ? [...cinema, ...streaming] : cinema;
+  const indian = free(eligible).filter(local);
+  const imports = free(eligible)
     .filter((r) => !local(r))
     .sort((a, b) => (b.heat ?? 0) - (a.heat ?? 0));
   const importSeats = Math.min(imports.length, Math.floor(count / 4));
@@ -269,7 +299,7 @@ const mainstream = (r) =>
 const landed = feed.weeks
   .flatMap((w) => w.releases ?? [])
   .filter(inRegion)
-  .filter((r) => !r.namedBy && mainstream(r))
+  .filter((r) => (!r.namedBy || stated(r, TODAY)) && mainstream(r))
   .filter((r) => r.releaseDate >= ottSince && r.releaseDate <= TODAY)
   .sort(best);
 
@@ -293,11 +323,17 @@ const landed = feed.weeks
  * So they appear, labelled "expected" — the same word DetailSheet has used
  * since the Toxic report. The hero stays confirmed-only: the biggest claim on
  * the card is the one that has to be solid.
+ *
+ * Only while the date is still ahead. Once it arrives the announcement has
+ * come due and the row joins `landed` above, which is where it belongs: the
+ * card carried "EXPECTED" over Gajab Raat the morning after it was on
+ * Netflix, while the site's page for it said "Streaming now on Netflix". Two
+ * surfaces, one question, two answers — see `stated`.
  */
 const announced = feed.weeks
   .flatMap((w) => w.releases ?? [])
   .filter(inRegion)
-  .filter((r) => r.namedBy && mainstream(r) && local(r))
+  .filter((r) => r.namedBy && !stated(r, TODAY) && mainstream(r) && local(r))
   .filter((r) => r.releaseDate >= week.start && r.releaseDate <= week.end)
   .sort(best);
 
@@ -316,7 +352,7 @@ const art = (r, cls = '') => `
     <div class="art ${cls}">
       <span class="fallback">${esc(r.title)}</span>
       <img src="${esc(r.posterUrl)}" alt="">
-      ${r.namedBy ? '<span class="chip">Expected</span>' : ''}
+      ${r.namedBy && !stated(r, TODAY) ? '<span class="chip">Expected</span>' : ''}
     </div>`;
 
 const star = STAR ? await starSubject() : null;
@@ -494,7 +530,7 @@ const decks = star
           heroTag === 'Biggest on right now'
             ? `${where(hero)} · since ${dateOf(hero.releaseDate)}`
             : releaseLabel(where(hero), hero.releaseDate, TODAY, { long: true }),
-        pick: (n) => seats(n),
+        pick: (n) => seats(n, { ott: false }),
         line: (r) => releaseLabel(where(r, { brief: true }), r.releaseDate, TODAY),
       },
       ...(ottHero
@@ -598,8 +634,11 @@ Which one are you rewatching first? 👇
    releases as well" — and the complaint was fair: the hero is a holdover, so
    without this the caption could carry a week's releases without naming one
    of them. The grid's own picks, in the grid's own order, so the words and
-   the image cannot disagree. */
-const named = seats(8).map((r) => r.title).join(', ');
+   the image cannot disagree — which means the same `ott: false` the cinema
+   deck uses, or the caption opens by naming two streaming titles under a
+   picture of five cinema posters. The counts below still cover both halves,
+   because they say which is which. */
+const named = seats(8, { ott: false }).map((r) => r.title).join(', ');
 
 const outAlready = [...cinema, ...streaming].filter((r) => !upcoming(r.releaseDate, TODAY)).length;
 const stillToCome = [...cinema, ...streaming].filter((r) => upcoming(r.releaseDate, TODAY)).length;
