@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-30T03:42:43.414Z",
+  "generatedAt": "2026-10-30T15:10:31.406Z",
   "source": "tmdb",
   "weeks": [
     {
@@ -27,7 +27,7 @@
             "US"
           ],
           "rating": 7.3,
-          "votes": 1092,
+          "votes": 1094,
           "heat": 77,
           "synopsis": "Medical courier Bryan unwittingly finds himself fighting for survival as one fateful, horrifying night collapses around him in chaos.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/i7UyjfPio0VFHB9rBUZSFyhOoM8.jpg",
@@ -113,8 +113,8 @@
           "regions": [
             "US"
           ],
-          "rating": 6.8,
-          "votes": 78,
+          "rating": 6.7,
+          "votes": 79,
           "heat": 61,
           "synopsis": "When Samuel is torn from his daughter and sent to a brutal prison, Warden Clancy offers him a high-stakes proposition: smuggle gold out of a remote mine with a dangerous crew of prisoners and he’ll win his freedom.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/8i5iZV50CoEtmDCFM7RSxCkpE8h.jpg",
@@ -154,8 +154,8 @@
           "regions": [
             "US"
           ],
-          "rating": 6.8,
-          "votes": 121,
+          "rating": 6.9,
+          "votes": 124,
           "heat": 59,
           "synopsis": "A struggling primary school teacher is forced to take drastic action because of a foul-mouthed, violent student, and uncovers how her community will turn a blind eye to the most outrageous events to preserve harmony and their sense of safety.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/pcPLnxCThCIo9JFQIMFX4kAE5Yz.jpg",
@@ -172,7 +172,8 @@
           "director": "Jonatan Etzler",
           "trailerUrl": "https://www.youtube.com/watch?v=4nhu80EmVQE",
           "origin": [
-            "GB"
+            "GB",
+            "US"
           ],
           "imdbRating": 7.2,
           "imdbVotes": 1165
@@ -241,7 +242,7 @@
           "votes": 40,
           "heat": 44,
           "synopsis": "On Halloween Eve at Mossy Bottom Farm, excitement turns to dismay when the clumsy Farmer ruins the pumpkin patch. Shaun tries fixing it with science experiments, but things go awry when a wild beast appears in the woods.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/mMOptSPBVGUA9GHgnpsC35GzZ7e.jpg",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/gayX49siwXf8eNs16rtk1fI91Ey.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/mG8tVv1RPAKnARWxKTND5dRgMpw.jpg",
           "imdbId": "tt36841161",
           "runtimeMinutes": 81,
@@ -686,45 +687,6 @@
           ]
         },
         {
-          "id": "m-1280015",
-          "title": "Sunny Dancer",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Drama",
-            "Comedy"
-          ],
-          "releaseDate": "2026-09-18",
-          "regions": [
-            "US"
-          ],
-          "rating": 7,
-          "votes": 24,
-          "heat": 20,
-          "synopsis": "Reluctantly sent to a summer retreat for young cancer survivors, a teenager in remission unexpectedly finds deep connections and new beginnings among fellow campers.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/mXdejPfToSVFlEzv1QYoIh2N53e.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/hRsl1RMijpUCtLH3nZzRMnTjFYl.jpg",
-          "imdbId": "tt32212403",
-          "runtimeMinutes": 106,
-          "cast": [
-            "Bella Ramsey",
-            "Daniel Quinn-Toye",
-            "Ruby Stokes",
-            "Earl Cave",
-            "Conrad Khan"
-          ],
-          "director": "George Jaques",
-          "trailerUrl": "https://www.youtube.com/watch?v=-W_a2oCFNOY",
-          "origin": [
-            "GB"
-          ]
-        },
-        {
           "id": "m-1355388",
           "title": "Concessions",
           "kind": "film",
@@ -763,6 +725,45 @@
           ],
           "imdbRating": 7.1,
           "imdbVotes": 54
+        },
+        {
+          "id": "m-1280015",
+          "title": "Sunny Dancer",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Drama",
+            "Comedy"
+          ],
+          "releaseDate": "2026-09-18",
+          "regions": [
+            "US"
+          ],
+          "rating": 7,
+          "votes": 24,
+          "heat": 20,
+          "synopsis": "Reluctantly sent to a summer retreat for young cancer survivors, a teenager in remission unexpectedly finds deep connections and new beginnings among fellow campers.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/mXdejPfToSVFlEzv1QYoIh2N53e.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/hRsl1RMijpUCtLH3nZzRMnTjFYl.jpg",
+          "imdbId": "tt32212403",
+          "runtimeMinutes": 106,
+          "cast": [
+            "Bella Ramsey",
+            "Daniel Quinn-Toye",
+            "Ruby Stokes",
+            "Earl Cave",
+            "Conrad Khan"
+          ],
+          "director": "George Jaques",
+          "trailerUrl": "https://www.youtube.com/watch?v=-W_a2oCFNOY",
+          "origin": [
+            "GB"
+          ]
         },
         {
           "id": "m-1801309",
@@ -885,45 +886,6 @@
           "imdbVotes": 550
         },
         {
-          "id": "m-1588472",
-          "title": "L&O - Law and Order",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "ml"
-          ],
-          "genres": [
-            "Crime",
-            "Thriller"
-          ],
-          "releaseDate": "2026-09-18",
-          "regions": [
-            "IN"
-          ],
-          "heat": 17,
-          "synopsis": "After losing his son to a drug empire, DYSP Balagopal joins four fearless recruits to take down the ruthless Pacha and his cartel. The return of legendary gangster Karikkamuri Shanmughan sets the stage for an explosive final showdown",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/mZ3lbnM9I9FZBzZzZAYHykBWBVn.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/bd8A5P7NtBRme88OW86hGNY0TdY.jpg",
-          "imdbId": "tt43625955",
-          "runtimeMinutes": 157,
-          "cast": [
-            "Prakash Varma",
-            "Abhirami",
-            "Joy Mathew",
-            "Anand Manmadhan",
-            "Rithudev Ayyappan"
-          ],
-          "director": "Ranjith",
-          "theatrical": "wide",
-          "origin": [
-            "IN"
-          ],
-          "imdbRating": 6.7,
-          "imdbVotes": 1147
-        },
-        {
           "id": "m-1772904",
           "title": "Happy Journey",
           "kind": "film",
@@ -967,40 +929,43 @@
           "imdbVotes": 532
         },
         {
-          "id": "m-1740257",
-          "title": "NCT 127 5TH TOUR ‘NEO CITY  SEOUL - THE REDLINE’ in CINEMAS",
+          "id": "m-1588472",
+          "title": "L&O - Law and Order",
           "kind": "film",
           "platforms": [
             "theatres"
           ],
           "languages": [
-            "ko"
+            "ml"
           ],
           "genres": [
-            "Music"
+            "Crime",
+            "Thriller"
           ],
-          "releaseDate": "2026-09-20",
+          "releaseDate": "2026-09-18",
           "regions": [
             "IN"
           ],
-          "heat": 16,
-          "synopsis": "Back after almost two years, NCT 127's fifth tour,  NCT 127 5TH TOUR ‘NEO CITY : SEOUL - THE REDLINE’, is coming live to cinemas!  Experience the explosive energy, world-class performances, and electrifying atmosphere of KSPO DOME brought to life on the big screen with immersive sound.  NCTzens, join us for the spectacular kickoff of 'THE REDLINE'!",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/yvD0TWLNHlyP9dNHStjFV8v68nP.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/lqDLtZ8pdSPZZR6k8S2pqGTfuZz.jpg",
-          "imdbId": "tt44568569",
-          "runtimeMinutes": 180,
+          "heat": 17,
+          "synopsis": "After losing his son to a drug empire, DYSP Balagopal joins four fearless recruits to take down the ruthless Pacha and his cartel. The return of legendary gangster Karikkamuri Shanmughan sets the stage for an explosive final showdown",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/mZ3lbnM9I9FZBzZzZAYHykBWBVn.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/bd8A5P7NtBRme88OW86hGNY0TdY.jpg",
+          "imdbId": "tt43625955",
+          "runtimeMinutes": 157,
           "cast": [
-            "Johnny Suh",
-            "Taeyong",
-            "Yuta",
-            "Jaehyun",
-            "Haechan"
+            "Prakash Varma",
+            "Abhirami",
+            "Joy Mathew",
+            "Anand Manmadhan",
+            "Rithudev Ayyappan"
           ],
-          "director": "Kyung Chan Kim",
-          "trailerUrl": "https://www.youtube.com/watch?v=nWZ_UY9voL4",
-          "theatrical": "limited",
-          "imdbRating": 9.2,
-          "imdbVotes": 7
+          "director": "Ranjith",
+          "theatrical": "wide",
+          "origin": [
+            "IN"
+          ],
+          "imdbRating": 6.7,
+          "imdbVotes": 1147
         },
         {
           "id": "m-1070172",
@@ -1038,6 +1003,42 @@
           "origin": [
             "IN"
           ]
+        },
+        {
+          "id": "m-1740257",
+          "title": "NCT 127 5TH TOUR ‘NEO CITY  SEOUL - THE REDLINE’ in CINEMAS",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "ko"
+          ],
+          "genres": [
+            "Music"
+          ],
+          "releaseDate": "2026-09-20",
+          "regions": [
+            "IN"
+          ],
+          "heat": 16,
+          "synopsis": "Back after almost two years, NCT 127's fifth tour,  NCT 127 5TH TOUR ‘NEO CITY : SEOUL - THE REDLINE’, is coming live to cinemas!  Experience the explosive energy, world-class performances, and electrifying atmosphere of KSPO DOME brought to life on the big screen with immersive sound.  NCTzens, join us for the spectacular kickoff of 'THE REDLINE'!",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/yvD0TWLNHlyP9dNHStjFV8v68nP.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/lqDLtZ8pdSPZZR6k8S2pqGTfuZz.jpg",
+          "imdbId": "tt44568569",
+          "runtimeMinutes": 180,
+          "cast": [
+            "Johnny Suh",
+            "Taeyong",
+            "Yuta",
+            "Jaehyun",
+            "Haechan"
+          ],
+          "director": "Kyung Chan Kim",
+          "trailerUrl": "https://www.youtube.com/watch?v=nWZ_UY9voL4",
+          "theatrical": "limited",
+          "imdbRating": 9.2,
+          "imdbVotes": 7
         },
         {
           "id": "m-1774540",
@@ -1081,8 +1082,8 @@
           "imdbVotes": 2455
         },
         {
-          "id": "m-1576223",
-          "title": "Rage",
+          "id": "m-1758603",
+          "title": "BeeP",
           "kind": "film",
           "platforms": [
             "theatres"
@@ -1091,30 +1092,30 @@
             "ta"
           ],
           "genres": [
-            "Thriller"
+            "Crime",
+            "Thriller",
+            "Drama"
           ],
           "releaseDate": "2026-09-18",
           "regions": [
             "IN"
           ],
-          "heat": 13,
-          "synopsis": "Anbu, a taxi driver from Kannagi Nagar, meets Regina, a mute IT employee, during his regular trips and falls for her. When he learns about her troubled personal life, he suppresses his feelings. One night, Regina dies in what appears to be an accident—but soon, it’s revealed to be a planned murder. Shockingly, multiple unconnected people are involved. RAGE follows Anbu’s journey to uncover the truth behind Regina’s death and the tangled motives that led to it.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/AkHcgW99FWcbJWKh7zmbxQaIDMf.jpg",
-          "imdbId": "tt38891015",
-          "runtimeMinutes": 132,
+          "heat": 14,
+          "synopsis": "BeeP is a mind-bending crime-fantasy about Ilandevan, a young man who can step inside photographs and uncover the thoughts hidden behind them. But when a life-changing event leaves his extraordinary ability useless, he must find another way to uncover the truth while two seemingly unrelated worlds of college dreams, drugs and murder collide.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/kZq0kfFErlzl30J5NlfnjxwH3ni.jpg",
+          "imdbId": "tt44420904",
           "cast": [
-            "Shan",
-            "Shirley Babithra",
-            "Saravanan",
-            "Munishkanth",
-            "Ramachandran Durairaj"
+            "Raaghav",
+            "Prerna Khanna",
+            "Yamini Lakshmanan",
+            "Priyadarshini Rajkumar",
+            "L Shanmuga Sundar"
           ],
-          "director": "Sivanesan",
-          "certification": "UA",
+          "director": "L Shanmuga Sundar",
+          "trailerUrl": "https://www.youtube.com/watch?v=8NbUdNRtujw",
           "theatrical": "wide",
-          "origin": [
-            "IN"
-          ]
+          "imdbRating": 9.3,
+          "imdbVotes": 120
         },
         {
           "id": "m-1453317",
@@ -1228,6 +1229,42 @@
           ]
         },
         {
+          "id": "m-1576223",
+          "title": "Rage",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "ta"
+          ],
+          "genres": [
+            "Thriller"
+          ],
+          "releaseDate": "2026-09-18",
+          "regions": [
+            "IN"
+          ],
+          "heat": 13,
+          "synopsis": "Anbu, a taxi driver from Kannagi Nagar, meets Regina, a mute IT employee, during his regular trips and falls for her. When he learns about her troubled personal life, he suppresses his feelings. One night, Regina dies in what appears to be an accident—but soon, it’s revealed to be a planned murder. Shockingly, multiple unconnected people are involved. RAGE follows Anbu’s journey to uncover the truth behind Regina’s death and the tangled motives that led to it.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/AkHcgW99FWcbJWKh7zmbxQaIDMf.jpg",
+          "imdbId": "tt38891015",
+          "runtimeMinutes": 132,
+          "cast": [
+            "Shan",
+            "Shirley Babithra",
+            "Saravanan",
+            "Munishkanth",
+            "Ramachandran Durairaj"
+          ],
+          "director": "Sivanesan",
+          "certification": "UA",
+          "theatrical": "wide",
+          "origin": [
+            "IN"
+          ]
+        },
+        {
           "id": "m-1771300",
           "title": "Amartha",
           "kind": "film",
@@ -1298,50 +1335,6 @@
           ]
         },
         {
-          "id": "m-1307733",
-          "title": "Four Rivers Six Ranges: The Untold Story of Tibet",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "History",
-            "Drama",
-            "Action"
-          ],
-          "releaseDate": "2026-09-18",
-          "regions": [
-            "IN"
-          ],
-          "heat": 11,
-          "synopsis": "4 Rivers 6 Ranges is based on the book “Flight at the Cuckoos Behest”  by Dorjee Wangdi Dewatshang",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/sjEFq0qO5WJTgOmo60TWDuhsFJ3.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/oz0gVekL1bRV1niBZW4hyuVFO7b.jpg",
-          "imdbId": "tt31442238",
-          "runtimeMinutes": 132,
-          "cast": [
-            "Tenzin Dhondup",
-            "Thupten Chukhatsang",
-            "Tashi Kalden",
-            "Palden Dikhang",
-            "Tamding Tseten"
-          ],
-          "director": "Shenpenn Khymsar",
-          "trailerUrl": "https://www.youtube.com/watch?v=aO45Tm-TRiQ",
-          "certification": "U/A 13+",
-          "theatrical": "wide",
-          "origin": [
-            "NP",
-            "IN",
-            "CA"
-          ],
-          "imdbRating": 9,
-          "imdbVotes": 64
-        },
-        {
           "id": "hand-lust-stories-3",
           "title": "Lust Stories 3",
           "kind": "film",
@@ -1409,8 +1402,8 @@
             "IN",
             "US"
           ],
-          "rating": 7.6,
-          "votes": 126,
+          "rating": 7.7,
+          "votes": 130,
           "heat": 76,
           "synopsis": "While celebrating their last night together, high school graduates and best friends Jo and Raissa stumble upon a mysterious portal that transports them to the fantastical island of Nakali. When they discover that the memories of their entire friendship are the price for returning home, Jo and Raissa must race to find a way to leave the island before they forget each other forever.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/myd1K3gefdNAWFsGNRDdMeiK9Qg.jpg",
@@ -1453,7 +1446,7 @@
             "IN"
           ],
           "rating": 8.3,
-          "votes": 754,
+          "votes": 757,
           "heat": 75,
           "synopsis": "A former soldier is thrown into a brutal race against time when a critical medical delivery makes him and his unlikely partner the targets of a ruthless cartel. As the mission spirals into a deadly manhunt, every detour, delay, and bullet pushes them closer to failure. With betrayal closing in from every side, they must survive the chase and deliver their cargo to save the life of a little girl.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/vJk2TW1QZAmBiD7oj9ZF9EPTYY1.jpg",
@@ -1499,7 +1492,7 @@
             "US"
           ],
           "rating": 7.3,
-          "votes": 363,
+          "votes": 365,
           "heat": 70,
           "synopsis": "After a harrowing plane crash, Special Forces officer James Belmont and his combat dog, Odin, find themselves stranded deep in the Alaskan wilderness. Together, they are forced into a brutal fight for survival against the elements.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/1ApfSA8JTqeha3GTFEY8syV4auq.jpg",
@@ -1542,7 +1535,7 @@
             "IN"
           ],
           "rating": 7.5,
-          "votes": 486,
+          "votes": 487,
           "heat": 70,
           "synopsis": "The most powerful man in the world embarks on a frantic mission to prove he is humanity's savior before the disaster he's unleashed destroys everything.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/1ATXKrIPJyKNwnJ6lcG088Sa6zi.jpg",
@@ -1584,7 +1577,7 @@
             "US"
           ],
           "rating": 6.8,
-          "votes": 243,
+          "votes": 245,
           "heat": 66,
           "synopsis": "In 2006, To Catch a Predator host Chris Hansen sets out to make television history. When a high stakes operation goes fatally wrong, his veneered dream of fame curdles into a nightmare of performative justice.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/lmrulvLbmaejTix1YaMxo1oGhH1.jpg",
@@ -1714,7 +1707,7 @@
           "votes": 6,
           "heat": 43,
           "synopsis": "In 1986 Madras, a timid eight-year-old boy accidentally traps a feared gangster inside a deserted school toilet. As the gangster is forced to confront hunger, loneliness and his own vulnerability, an unlikely bond begins to grow between the two, changing their lives forever.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/7wHBYs8HHmTGe4nXLpMEAoDSK2o.jpg",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/cWY636zXGECkRHbrqhQdFyP9n69.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/5sBnZMT1aJ6cBvehKOzOOLdI6bz.jpg",
           "imdbId": "tt44090278",
           "runtimeMinutes": 159,
@@ -1785,7 +1778,7 @@
             "US"
           ],
           "rating": 7.2,
-          "votes": 24,
+          "votes": 25,
           "heat": 43,
           "synopsis": "On an Orkney isle, siblings Isla and Sandy survive by hunting seabirds, retelling the stories of their ancestors, and defending the isle from dreaded \"Incomers\". Their world is upended with the arrival of an awkward council worker who has come to uproot them from their homeland.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/nGnI5tT7qstkld94S8m4c68noZt.jpg",
@@ -2086,7 +2079,7 @@
             "IN",
             "US"
           ],
-          "votes": 3,
+          "votes": 4,
           "heat": 28,
           "synopsis": "On the morning of his wedding, 36-year-old Kuttan wakes from a disturbing dream about his own death. As the day unfolds, familiar moments begin to repeat, and reality becomes increasingly difficult to distinguish from memory. Realising that something is terribly wrong, Kuttan races to uncover the truth before the day repeats itself.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/bxUSscHMoCkPFRrF40Vtncmcpdw.jpg",
@@ -2266,44 +2259,6 @@
           ]
         },
         {
-          "id": "m-1285815",
-          "title": "Mahakavya: Shri Ramayan Katha",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "hi"
-          ],
-          "genres": [
-            "Drama",
-            "Fantasy"
-          ],
-          "releaseDate": "2026-09-25",
-          "regions": [
-            "IN"
-          ],
-          "heat": 15,
-          "synopsis": "A futuristic drama based on the story of the great epic Ramayana with the emotional filming and presentation of the events of Shri Ram's life which has never been seen on screen till now.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/fgaQz1gJDi2ZSPKDVUtc7fGuFk0.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/vTcqKLKy8AL7nzfY21fAkLlyXGg.jpg",
-          "imdbId": "tt32296379",
-          "runtimeMinutes": 176,
-          "cast": [
-            "Dev Sharma",
-            "Anjali Arora",
-            "Rajneesh Duggal",
-            "Sheel Verma",
-            "Nirbhay Wadhwa"
-          ],
-          "director": "Abhishek Singh",
-          "trailerUrl": "https://www.youtube.com/watch?v=dJvOekjPSdU",
-          "theatrical": "wide",
-          "origin": [
-            "IN"
-          ]
-        },
-        {
           "id": "m-1754121",
           "title": "Spark",
           "kind": "film",
@@ -2338,6 +2293,44 @@
           "director": "Mahantesh Handral",
           "trailerUrl": "https://www.youtube.com/watch?v=BeqnHmTBJ7E",
           "certification": "U/A 16+",
+          "theatrical": "wide",
+          "origin": [
+            "IN"
+          ]
+        },
+        {
+          "id": "m-1285815",
+          "title": "Mahakavya: Shri Ramayan Katha",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "hi"
+          ],
+          "genres": [
+            "Drama",
+            "Fantasy"
+          ],
+          "releaseDate": "2026-09-25",
+          "regions": [
+            "IN"
+          ],
+          "heat": 15,
+          "synopsis": "A futuristic drama based on the story of the great epic Ramayana with the emotional filming and presentation of the events of Shri Ram's life which has never been seen on screen till now.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/fgaQz1gJDi2ZSPKDVUtc7fGuFk0.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/vTcqKLKy8AL7nzfY21fAkLlyXGg.jpg",
+          "imdbId": "tt32296379",
+          "runtimeMinutes": 176,
+          "cast": [
+            "Dev Sharma",
+            "Anjali Arora",
+            "Rajneesh Duggal",
+            "Sheel Verma",
+            "Nirbhay Wadhwa"
+          ],
+          "director": "Abhishek Singh",
+          "trailerUrl": "https://www.youtube.com/watch?v=dJvOekjPSdU",
           "theatrical": "wide",
           "origin": [
             "IN"
@@ -2457,6 +2450,39 @@
           "imdbVotes": 27
         },
         {
+          "id": "m-1736398",
+          "title": "Autobi",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "bn"
+          ],
+          "genres": [
+            "Mystery",
+            "Thriller"
+          ],
+          "releaseDate": "2026-09-25",
+          "regions": [
+            "IN"
+          ],
+          "heat": 12,
+          "synopsis": "A woman searching for her missing sister enters a cursed forest, where buried trauma and terrifying secrets blur the line between reality and nightmare.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/p1CpVsaIJQ9wLGeiQEHZkb8mPqV.jpg",
+          "imdbId": "tt43739520",
+          "cast": [
+            "Madhumita Sarkar",
+            "Rahul Arunoday Banerjee",
+            "Saheb Chatterjee",
+            "Aryann Bhowmick",
+            "Inaaya Mahnoor Chowdhury"
+          ],
+          "director": "Soumava Banerjee",
+          "trailerUrl": "https://www.youtube.com/watch?v=4rQA4uniS5M",
+          "theatrical": "wide"
+        },
+        {
           "id": "m-1339654",
           "title": "Village Rockstars 2",
           "kind": "film",
@@ -2496,42 +2522,6 @@
             "SG",
             "CN"
           ]
-        },
-        {
-          "id": "m-1329084",
-          "title": "The Grand Master",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "ta"
-          ],
-          "genres": [
-            "Drama"
-          ],
-          "releaseDate": "2026-09-25",
-          "regions": [
-            "IN"
-          ],
-          "heat": 11,
-          "synopsis": "Based on the game of Chess that delves into the conflicts and confrontations of people between the rich and poor class and high and low strata of society. How does an ordinary boy, from the community of sanitation workers, become a grandmaster?",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/yAODU8KudiJnmBQM39dY6llyLnT.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/oyivw6V38NAF7LyNYC3w01wnndf.jpg",
-          "imdbId": "tt32729899",
-          "runtimeMinutes": 131,
-          "cast": [
-            "Abarnathi",
-            "Lingesh",
-            "Suresh Chandra Menon",
-            "Master Ashwin"
-          ],
-          "director": "Vettri Cheliyan",
-          "trailerUrl": "https://www.youtube.com/watch?v=Qnw8ezJYb-0",
-          "theatrical": "wide",
-          "origin": [
-            "IN"
-          ]
         }
       ]
     },
@@ -2559,8 +2549,8 @@
             "IN",
             "US"
           ],
-          "rating": 6.4,
-          "votes": 321,
+          "rating": 6.5,
+          "votes": 335,
           "heat": 79,
           "synopsis": "Lowen Ashleigh, hired to ghostwrite for best-selling author Verity Crawford, uncovers Verity's autobiographical notes, and becomes involved in what may prove to be a lethal conspiracy.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/rmaNMA1seHqpjtnYKzyynFAr1g8.jpg",
@@ -2644,8 +2634,8 @@
           "regions": [
             "US"
           ],
-          "rating": 6.8,
-          "votes": 177,
+          "rating": 6.7,
+          "votes": 179,
           "heat": 66,
           "synopsis": "After a chance encounter sparks a sweeping romance, Maya's future is suddenly upended, sending her on an unexpected journey to love and live again.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/dL3Tcv4FU2K85bgnGRBgLjFSrLr.jpg",
@@ -2825,6 +2815,40 @@
           "imdbVotes": 29
         },
         {
+          "id": "m-1783073",
+          "title": "Repo",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Crime",
+            "Action",
+            "Comedy",
+            "Adventure"
+          ],
+          "releaseDate": "2026-10-02",
+          "regions": [
+            "US"
+          ],
+          "votes": 1,
+          "heat": 42,
+          "synopsis": "After his last job went wrong, local fixer John is trying to get out of the game. His criminal boss, Indiana Slim, refuses to give John his final payment unless he does one final job, leaving John with two options: complete one last job, or leave empty handed",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/xKp4mHSksjDamItoF7sI132S26J.jpg",
+          "runtimeMinutes": 20,
+          "cast": [
+            "John McClean",
+            "Abraham Hernandez Rocha",
+            "Evan Klamar",
+            "Sam Janasik",
+            "Brandon Cooper"
+          ],
+          "director": "Sam Janasik"
+        },
+        {
           "id": "m-1790284",
           "title": "The Opera!",
           "kind": "film",
@@ -2860,40 +2884,6 @@
           ]
         },
         {
-          "id": "m-1783073",
-          "title": "Repo",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Crime",
-            "Action",
-            "Comedy",
-            "Adventure"
-          ],
-          "releaseDate": "2026-10-02",
-          "regions": [
-            "US"
-          ],
-          "votes": 1,
-          "heat": 42,
-          "synopsis": "After his last job went wrong, local fixer John is trying to get out of the game. His criminal boss, Indiana Slim, refuses to give John his final payment unless he does one final job, leaving John with two options: complete one last job, or leave empty handed",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/xKp4mHSksjDamItoF7sI132S26J.jpg",
-          "runtimeMinutes": 20,
-          "cast": [
-            "John McClean",
-            "Abraham Hernandez Rocha",
-            "Evan Klamar",
-            "Sam Janasik",
-            "Brandon Cooper"
-          ],
-          "director": "Sam Janasik"
-        },
-        {
           "id": "m-1610703",
           "title": "Infirmary",
           "kind": "film",
@@ -2912,7 +2902,7 @@
             "US"
           ],
           "rating": 4.9,
-          "votes": 24,
+          "votes": 25,
           "heat": 34,
           "synopsis": "A guard vanished on his first night at an old psych hospital in 2023. His bodycam footage shows unexplainable incidents that continue to baffle investigators.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/bHiAp8WWHgfUrJmRnoiw4URYGcq.jpg",
@@ -3105,7 +3095,8 @@
           "title": "Avaraachan & Sons",
           "kind": "film",
           "platforms": [
-            "theatres"
+            "theatres",
+            "netflix"
           ],
           "languages": [
             "ml"
@@ -3167,7 +3158,8 @@
             "Fahadh Faasil",
             "Ssara Palekar",
             "Saurabh Sachdeva",
-            "Venkatesh Kakumanu"
+            "Venkatesh Kakumanu",
+            "Subbaraju"
           ],
           "director": "Shashank Yeleti",
           "trailerUrl": "https://www.youtube.com/watch?v=CyuQsFP1Jww",
@@ -3182,7 +3174,8 @@
           "title": "Sigma",
           "kind": "film",
           "platforms": [
-            "theatres"
+            "theatres",
+            "netflix"
           ],
           "languages": [
             "ta"
@@ -3332,41 +3325,6 @@
           ]
         },
         {
-          "id": "m-1771882",
-          "title": "Impure",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [],
-          "releaseDate": "2026-10-02",
-          "regions": [
-            "IN"
-          ],
-          "heat": 14,
-          "synopsis": "A dramedy about a woman whose wedding gets called off once her in-laws find out she’s not a virgin",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/1AFpyDUFNDrEf0LieNJtOQA0wiy.jpg",
-          "imdbId": "tt43596570",
-          "runtimeMinutes": 94,
-          "cast": [
-            "Yashna Muthuluri",
-            "Varahi Mallipamula",
-            "Sai Krishna",
-            "Kireeti Damaraju",
-            "Abhijith Sreenath"
-          ],
-          "director": "Nishanti Evani",
-          "trailerUrl": "https://www.youtube.com/watch?v=J_h9zykIBg8",
-          "theatrical": "wide",
-          "origin": [
-            "IN",
-            "US"
-          ]
-        },
-        {
           "id": "m-1715215",
           "title": "Almari",
           "kind": "film",
@@ -3402,6 +3360,41 @@
           "theatrical": "wide",
           "origin": [
             "IN"
+          ]
+        },
+        {
+          "id": "m-1771882",
+          "title": "Impure",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [],
+          "releaseDate": "2026-10-02",
+          "regions": [
+            "IN"
+          ],
+          "heat": 14,
+          "synopsis": "A dramedy about a woman whose wedding gets called off once her in-laws find out she’s not a virgin",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/1AFpyDUFNDrEf0LieNJtOQA0wiy.jpg",
+          "imdbId": "tt43596570",
+          "runtimeMinutes": 94,
+          "cast": [
+            "Yashna Muthuluri",
+            "Varahi Mallipamula",
+            "Sai Krishna",
+            "Kireeti Damaraju",
+            "Abhijith Sreenath"
+          ],
+          "director": "Nishanti Evani",
+          "trailerUrl": "https://www.youtube.com/watch?v=J_h9zykIBg8",
+          "theatrical": "wide",
+          "origin": [
+            "IN",
+            "US"
           ]
         },
         {
@@ -3514,6 +3507,45 @@
           ]
         },
         {
+          "id": "m-1728829",
+          "title": "Bhootu Aaya Bhago",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "bn"
+          ],
+          "genres": [
+            "Comedy",
+            "Horror"
+          ],
+          "releaseDate": "2026-10-02",
+          "regions": [
+            "IN"
+          ],
+          "heat": 10,
+          "synopsis": "Three friends find themselves trapped in a series of mysterious and supernatural incidents inside a hospital.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/sGmqZuh9ONa5rZL4SRhQg5RmjXZ.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/liMS0IxVeNfHJhHrkenxeQNaJQZ.jpg",
+          "imdbId": "tt44123210",
+          "runtimeMinutes": 116,
+          "cast": [
+            "Rahul Arunoday Banerjee",
+            "Debraj Bhattacharya",
+            "Aryann Bhowmick",
+            "Sreelekha Mitra",
+            "Shreema Bhattacherjee"
+          ],
+          "director": "Manaranjan Jena",
+          "trailerUrl": "https://www.youtube.com/watch?v=nBZuLxxxPNI",
+          "certification": "U/A 16+",
+          "theatrical": "wide",
+          "origin": [
+            "IN"
+          ]
+        },
+        {
           "id": "m-1776596",
           "title": "Izhakalkkappuram",
           "kind": "film",
@@ -3546,38 +3578,6 @@
           "origin": [
             "IN"
           ]
-        },
-        {
-          "id": "m-1726972",
-          "title": "Pinaka",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "kn"
-          ],
-          "genres": [
-            "Action",
-            "Drama"
-          ],
-          "releaseDate": "2026-10-02",
-          "regions": [
-            "IN"
-          ],
-          "heat": 9,
-          "synopsis": "Pinaka (2026), Action Drama Fantasy Period Thriller in Kannada language",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/nQpYdc2i4PyUfSK6W9oJamNYQDo.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/aAWOH2VWweGm3eTtHb17AiCoOAb.jpg",
-          "imdbId": "tt35180499",
-          "cast": [
-            "Ganesh"
-          ],
-          "director": "B. Dhananjay",
-          "theatrical": "wide",
-          "origin": [
-            "IN"
-          ]
         }
       ]
     },
@@ -3606,8 +3606,8 @@
             "IN",
             "US"
           ],
-          "rating": 8.6,
-          "votes": 221,
+          "rating": 8.7,
+          "votes": 226,
           "heat": 89,
           "synopsis": "With a bounty on his head, Vision must confront his nature and resist Ultron's influence to survive.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/WGyAyBPncfuu8MZhLY9RtfZPM0.jpg",
@@ -3650,7 +3650,7 @@
             "US"
           ],
           "rating": 9.7,
-          "votes": 346,
+          "votes": 354,
           "heat": 83,
           "synopsis": "When Beerus, the God of Destruction, awakens in search of a worthy rival, Goku and his friends face an epic battle to stop him from destroying Earth.\n\nRemastered and re-edited version of Dragon Ball Super.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/AojgldgsOlzZV8ahyOzaiAjJWvV.jpg",
@@ -3688,7 +3688,7 @@
             "IN"
           ],
           "rating": 8.7,
-          "votes": 281,
+          "votes": 285,
           "heat": 80,
           "synopsis": "Single mother Pam Voorhees has been unable to shake her grief after her young, sickly son Jason tragically drowned in the town lake almost a year before. When two strangers arrive at Pam's door digging into her past, a disturbing chain of events is set into motion, leaving the townspeople of Crystal Lake wondering: just who is Pam Voorhees?",
           "posterUrl": "https://image.tmdb.org/t/p/w500/3ENhExiD2fcjk5FX0AcAXcvLu9N.jpg",
@@ -3731,7 +3731,7 @@
             "US"
           ],
           "rating": 9,
-          "votes": 135,
+          "votes": 136,
           "heat": 76,
           "synopsis": "In a world shattered by a devastating cataclysm, a young Earthbender discovers she's the new Avatar after Korra. But in this dangerous era, that title marks her as humanity's destroyer, not its savior. Hunted by both human and spirit enemies, she and her long-lost twin must uncover their mysterious origins and save the Seven Havens before civilization's last strongholds collapse.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/u62d0BPqsdv2TUDifcMmoePbHPL.jpg",
@@ -3769,8 +3769,8 @@
             "US"
           ],
           "rating": 8.2,
-          "votes": 6406,
-          "heat": 75,
+          "votes": 6410,
+          "heat": 76,
           "synopsis": "After breaking the mysterious \"One Wish Willow\" to win his crush's heart, a hopeless romantic finds himself getting exactly what he asked for but soon discovers that some desires come at a dark, sinister price.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/bRwnj8WEKBCvmfeUNOukJPwB43K.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/5lTZyuBTNOfawsfPT8Q0cIg6qAF.jpg",
@@ -3817,7 +3817,7 @@
             "US"
           ],
           "rating": 7,
-          "votes": 637,
+          "votes": 643,
           "heat": 73,
           "synopsis": "When the son of an L.A. mayoral candidate is kidnapped, he and his wife have a few hours to come up with the ransom payment. With most of their money spent on his political campaign, they have to get their hands dirty and expose a side of their lives they never intended to see the light of day.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/iISM36voS1E8gX9BM0DVK0kgi3E.jpg",
@@ -3857,7 +3857,7 @@
             "US"
           ],
           "rating": 7.4,
-          "votes": 96,
+          "votes": 97,
           "heat": 72,
           "synopsis": "A charming, witty, and deeply relatable story of love and sisterhood.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/czsyPHosFNbh4PPqXfqWu1aBXnA.jpg",
@@ -3901,7 +3901,7 @@
             "US"
           ],
           "rating": 8.3,
-          "votes": 218,
+          "votes": 219,
           "heat": 68,
           "synopsis": "A determined man embarks on a high-stakes quest—and defies seemingly impossible odds—to fulfill his dream of being the first to reach the summit of Mount Everest.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/eI0QW02PYqhnmIvLRdn9vrfVVP7.jpg",
@@ -3943,8 +3943,8 @@
           "regions": [
             "US"
           ],
-          "rating": 5.8,
-          "votes": 173,
+          "rating": 5.9,
+          "votes": 172,
           "heat": 68,
           "synopsis": "Young Bela forms a relationship with a sinister entity in her home that looks uncannily like her own mother, drawing her into a terrifying and increasingly dark world.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/fGRNCssTRrhYZxNzykGGCoMsAVq.jpg",
@@ -4272,8 +4272,8 @@
             "IN",
             "US"
           ],
-          "rating": 9.3,
-          "votes": 29,
+          "rating": 9.4,
+          "votes": 31,
           "heat": 47,
           "synopsis": "In a hospital dominated by ego and corruption, an enigmatic but brilliant surgeon arrives — taking on seemingly impossible cases amid fierce opposition.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/nDDVzQfv95PGwj9nV2fJvUrkcvU.jpg",
@@ -4436,8 +4436,8 @@
             "IN",
             "US"
           ],
-          "rating": 6.8,
-          "votes": 36,
+          "rating": 6.9,
+          "votes": 37,
           "heat": 43,
           "synopsis": "Young Jim Hawkins and his mother Bess come into possession of a legendary pirate’s treasure map and are drawn into a deadly voyage across the Atlantic, where Jim is forced to navigate mutiny, violence and betrayal, leaving him forever changed.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/xZQ5ABJF1iLjGq9xR4MthpgQEFF.jpg",
@@ -4622,45 +4622,6 @@
           "imdbVotes": 73
         },
         {
-          "id": "t-320909",
-          "title": "Firefly Wedding",
-          "kind": "anime",
-          "platforms": [
-            "crunchyroll"
-          ],
-          "languages": [
-            "ja"
-          ],
-          "genres": [
-            "Animation",
-            "Drama"
-          ],
-          "releaseDate": "2026-10-09",
-          "regions": [
-            "IN",
-            "US"
-          ],
-          "rating": 9.7,
-          "votes": 18,
-          "heat": 38,
-          "synopsis": "Satoko Kirigaya has everything a noblewoman could want—except time. With her life running out, she’s determined to marry well and make her father proud. But when a ruthless assassin kidnaps her, she makes a desperate offer: “Marry me, and we’ll have it all.” Shinpei Goto accepts, only to become dangerously obsessed. Now Satoko must choose between duty and a love that could consume them both.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/954dt0dTqoUhIW0EvMFZ0KvVQmk.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/3zmB6PLnjf7rNNC2lnvinQtlJMx.jpg",
-          "imdbId": "tt39394153",
-          "runtimeMinutes": 23,
-          "cast": [
-            "Lynn",
-            "Koki Uchiyama",
-            "Kent Ito",
-            "Kenjiro Tsuda",
-            "Haruhi Nanao"
-          ],
-          "trailerUrl": "https://www.youtube.com/watch?v=kLfQNqd_NA0",
-          "origin": [
-            "JP"
-          ]
-        },
-        {
           "id": "t-295420",
           "title": "The Vermilion Mask",
           "kind": "anime",
@@ -4736,6 +4697,45 @@
           "trailerUrl": "https://www.youtube.com/watch?v=lYowvljL9T8",
           "origin": [
             "KR"
+          ]
+        },
+        {
+          "id": "t-320909",
+          "title": "Firefly Wedding",
+          "kind": "anime",
+          "platforms": [
+            "crunchyroll"
+          ],
+          "languages": [
+            "ja"
+          ],
+          "genres": [
+            "Animation",
+            "Drama"
+          ],
+          "releaseDate": "2026-10-09",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "rating": 9.7,
+          "votes": 18,
+          "heat": 38,
+          "synopsis": "Satoko Kirigaya has everything a noblewoman could want—except time. With her life running out, she’s determined to marry well and make her father proud. But when a ruthless assassin kidnaps her, she makes a desperate offer: “Marry me, and we’ll have it all.” Shinpei Goto accepts, only to become dangerously obsessed. Now Satoko must choose between duty and a love that could consume them both.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/954dt0dTqoUhIW0EvMFZ0KvVQmk.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/3zmB6PLnjf7rNNC2lnvinQtlJMx.jpg",
+          "imdbId": "tt39394153",
+          "runtimeMinutes": 23,
+          "cast": [
+            "Lynn",
+            "Koki Uchiyama",
+            "Kent Ito",
+            "Kenjiro Tsuda",
+            "Haruhi Nanao"
+          ],
+          "trailerUrl": "https://www.youtube.com/watch?v=kLfQNqd_NA0",
+          "origin": [
+            "JP"
           ]
         },
         {
@@ -4891,46 +4891,6 @@
           ]
         },
         {
-          "id": "t-337806",
-          "title": "Least Eligible Bachelor",
-          "kind": "series",
-          "platforms": [
-            "netflix"
-          ],
-          "languages": [
-            "te"
-          ],
-          "genres": [
-            "Comedy",
-            "Drama"
-          ],
-          "releaseDate": "2026-10-09",
-          "regions": [
-            "IN",
-            "US"
-          ],
-          "votes": 2,
-          "heat": 33,
-          "synopsis": "A bachelor struggling to find a bride because of his looks moves to Hyderabad for a fresh start, only to discover that his potential match is his colleague at work.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/92JTzrsDpqPlXCv6O1u3DIxDAso.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/y7jCp3fZuKEyw6F3I8tseyJyl2L.jpg",
-          "imdbId": "tt48242205",
-          "cast": [
-            "Harsha Chemudu",
-            "Hyper Adhi",
-            "Jeevan Kumar",
-            "Aishwarya Holakkal",
-            "Sravya Chowdary"
-          ],
-          "director": "Babu Degala",
-          "trailerUrl": "https://www.youtube.com/watch?v=oxvsaLPuQFc",
-          "origin": [
-            "IN"
-          ],
-          "imdbRating": 6.5,
-          "imdbVotes": 235
-        },
-        {
           "id": "t-286183",
           "title": "Hollywood Arts",
           "kind": "series",
@@ -4971,37 +4931,44 @@
           ]
         },
         {
-          "id": "t-335536",
-          "title": "TYSON",
-          "kind": "documentary",
+          "id": "t-337806",
+          "title": "Least Eligible Bachelor",
+          "kind": "series",
           "platforms": [
             "netflix"
           ],
           "languages": [
-            "en"
+            "te"
           ],
           "genres": [
-            "Documentary"
+            "Comedy",
+            "Drama"
           ],
-          "releaseDate": "2026-10-13",
+          "releaseDate": "2026-10-09",
           "regions": [
             "IN",
             "US"
           ],
-          "rating": 8.5,
-          "votes": 15,
-          "heat": 32,
-          "synopsis": "Explore the explosive life of Mike Tyson — one of the most feared and fascinating figures in sports history.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/mdtpJEWW1j5Ns7bIcbw1UeIdvhp.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/qFNAWAHCXWtS4EMlLxTAetTpZAR.jpg",
-          "imdbId": "tt35051210",
+          "votes": 2,
+          "heat": 33,
+          "synopsis": "A bachelor struggling to find a bride because of his looks moves to Hyderabad for a fresh start, only to discover that his potential match is his colleague at work.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/92JTzrsDpqPlXCv6O1u3DIxDAso.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/y7jCp3fZuKEyw6F3I8tseyJyl2L.jpg",
+          "imdbId": "tt48242205",
           "cast": [
-            "Mike Tyson"
+            "Harsha Chemudu",
+            "Hyper Adhi",
+            "Jeevan Kumar",
+            "Aishwarya Holakkal",
+            "Sravya Chowdary"
           ],
-          "trailerUrl": "https://www.youtube.com/watch?v=o1S5LsYhfEg",
+          "director": "Babu Degala",
+          "trailerUrl": "https://www.youtube.com/watch?v=oxvsaLPuQFc",
           "origin": [
-            "US"
-          ]
+            "IN"
+          ],
+          "imdbRating": 6.5,
+          "imdbVotes": 235
         },
         {
           "id": "t-307903",
@@ -5040,6 +5007,39 @@
           ],
           "imdbRating": 8.1,
           "imdbVotes": 7
+        },
+        {
+          "id": "t-335536",
+          "title": "TYSON",
+          "kind": "documentary",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Documentary"
+          ],
+          "releaseDate": "2026-10-13",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "rating": 8.5,
+          "votes": 15,
+          "heat": 32,
+          "synopsis": "Explore the explosive life of Mike Tyson — one of the most feared and fascinating figures in sports history.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/mdtpJEWW1j5Ns7bIcbw1UeIdvhp.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/qFNAWAHCXWtS4EMlLxTAetTpZAR.jpg",
+          "imdbId": "tt35051210",
+          "cast": [
+            "Mike Tyson"
+          ],
+          "trailerUrl": "https://www.youtube.com/watch?v=o1S5LsYhfEg",
+          "origin": [
+            "US"
+          ]
         },
         {
           "id": "t-306565",
@@ -5409,6 +5409,7 @@
           "title": "Comrade Kalyan",
           "kind": "film",
           "platforms": [
+            "prime",
             "theatres"
           ],
           "languages": [
@@ -5421,7 +5422,8 @@
           ],
           "releaseDate": "2026-10-09",
           "regions": [
-            "IN"
+            "IN",
+            "US"
           ],
           "heat": 20,
           "synopsis": "In a naxal-dominated village on the Andhra-Odisha border, a theatre owner uses communist sentiment to keep his old cinema running. He joins the naxals and kidnaps a leader, setting off a chain of events.",
@@ -5875,41 +5877,36 @@
           ]
         },
         {
-          "id": "m-1010608",
-          "title": "Thaainilam",
+          "id": "m-1792167",
+          "title": "Only Me",
           "kind": "film",
           "platforms": [
             "theatres"
           ],
           "languages": [
-            "ta"
+            "hi"
           ],
           "genres": [
-            "Family",
+            "Thriller",
             "Drama",
-            "War"
+            "Mystery"
           ],
           "releaseDate": "2026-10-09",
           "regions": [
             "IN"
           ],
           "heat": 12,
-          "synopsis": "A father and his daughter came to India as refugees post-war in their country. Few good hands help them to rebuild their lifestyle.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/gAEtUjdFleJGelsOG2OE3XKoiyF.jpg",
-          "imdbId": "tt32986244",
-          "runtimeMinutes": 90,
+          "synopsis": "A disoriented man wakes up in a car in the middle of nowhere, with a gun, a cryptic note and a bound woman. As events unfold, he is drawn into the disturbing world of a Mumbai model whose carefully constructed rituals blur the lines between victim and predator. Through violence, deception and haunting memories, the film explores trauma, control and the struggle to reclaim one's agency.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/9wBJWjhIr6R6b4ml6IVlTpnK1kF.jpg",
+          "runtimeMinutes": 28,
           "cast": [
-            "Amar Ramachandran",
-            "Bala Singh",
-            "Neha Amar",
-            "Nimisha Nambiar"
+            "Gayatri Bhardwaj",
+            "Rishabh Sawhney",
+            "Sarfaraz Ali Mirza"
           ],
-          "director": "Abilash.G.Devan",
-          "certification": "U",
-          "theatrical": "wide",
-          "origin": [
-            "IN"
-          ]
+          "director": "Subho Basu",
+          "trailerUrl": "https://www.youtube.com/watch?v=fZsekMKSpkY",
+          "theatrical": "wide"
         },
         {
           "id": "m-1794441",
@@ -5953,38 +5950,6 @@
           "imdbVotes": 13
         },
         {
-          "id": "m-1792167",
-          "title": "Only Me",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "hi"
-          ],
-          "genres": [
-            "Thriller",
-            "Drama",
-            "Mystery"
-          ],
-          "releaseDate": "2026-10-09",
-          "regions": [
-            "IN"
-          ],
-          "heat": 12,
-          "synopsis": "A disoriented man wakes up in a car in the middle of nowhere, with a gun, a cryptic note and a bound woman. As events unfold, he is drawn into the disturbing world of a Mumbai model whose carefully constructed rituals blur the lines between victim and predator. Through violence, deception and haunting memories, the film explores trauma, control and the struggle to reclaim one's agency.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/9wBJWjhIr6R6b4ml6IVlTpnK1kF.jpg",
-          "runtimeMinutes": 28,
-          "cast": [
-            "Gayatri Bhardwaj",
-            "Rishabh Sawhney",
-            "Sarfaraz Ali Mirza"
-          ],
-          "director": "Subho Basu",
-          "trailerUrl": "https://www.youtube.com/watch?v=fZsekMKSpkY",
-          "theatrical": "wide"
-        },
-        {
           "id": "m-1778302",
           "title": "Chiram",
           "kind": "film",
@@ -6016,6 +5981,43 @@
             "Geethi Sangeetha"
           ],
           "director": "Sindhu Paradayil",
+          "theatrical": "wide",
+          "origin": [
+            "IN"
+          ]
+        },
+        {
+          "id": "m-1010608",
+          "title": "Thaainilam",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "ta"
+          ],
+          "genres": [
+            "Family",
+            "Drama",
+            "War"
+          ],
+          "releaseDate": "2026-10-09",
+          "regions": [
+            "IN"
+          ],
+          "heat": 12,
+          "synopsis": "A father and his daughter came to India as refugees post-war in their country. Few good hands help them to rebuild their lifestyle.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/gAEtUjdFleJGelsOG2OE3XKoiyF.jpg",
+          "imdbId": "tt32986244",
+          "runtimeMinutes": 90,
+          "cast": [
+            "Amar Ramachandran",
+            "Bala Singh",
+            "Neha Amar",
+            "Nimisha Nambiar"
+          ],
+          "director": "Abilash.G.Devan",
+          "certification": "U",
           "theatrical": "wide",
           "origin": [
             "IN"
@@ -6094,41 +6096,6 @@
           "theatrical": "wide"
         },
         {
-          "id": "m-1790417",
-          "title": "Dhanushkodiyilekku",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "ml"
-          ],
-          "genres": [
-            "Family",
-            "Drama"
-          ],
-          "releaseDate": "2026-10-09",
-          "regions": [
-            "IN"
-          ],
-          "heat": 10,
-          "synopsis": "The starkly different lives of two families intertwine across decades of shifting history. While one group barely survived the catastrophic 1964 Dhanushkodi cyclone, the other has only ever known immense wealth.",
-          "runtimeMinutes": 122,
-          "cast": [
-            "Lenaa",
-            "Sudheer Karamana",
-            "Nisthar Ahamed",
-            "Ardra Gopakumar",
-            "M R Gopakumar"
-          ],
-          "director": "Jahangir Ummar",
-          "certification": "U/A 13+",
-          "theatrical": "wide",
-          "origin": [
-            "IN"
-          ]
-        },
-        {
           "id": "m-1555215",
           "title": "Baa Baa Black Sheep",
           "kind": "film",
@@ -6159,6 +6126,41 @@
             "Karthikeya Dev"
           ],
           "director": "Guni Manchikanti",
+          "theatrical": "wide",
+          "origin": [
+            "IN"
+          ]
+        },
+        {
+          "id": "m-1790417",
+          "title": "Dhanushkodiyilekku",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "ml"
+          ],
+          "genres": [
+            "Family",
+            "Drama"
+          ],
+          "releaseDate": "2026-10-09",
+          "regions": [
+            "IN"
+          ],
+          "heat": 10,
+          "synopsis": "The starkly different lives of two families intertwine across decades of shifting history. While one group barely survived the catastrophic 1964 Dhanushkodi cyclone, the other has only ever known immense wealth.",
+          "runtimeMinutes": 122,
+          "cast": [
+            "Lenaa",
+            "Sudheer Karamana",
+            "Nisthar Ahamed",
+            "Ardra Gopakumar",
+            "M R Gopakumar"
+          ],
+          "director": "Jahangir Ummar",
+          "certification": "U/A 13+",
           "theatrical": "wide",
           "origin": [
             "IN"
@@ -6275,8 +6277,8 @@
           "regions": [
             "US"
           ],
-          "rating": 9,
-          "votes": 60,
+          "rating": 9.1,
+          "votes": 66,
           "heat": 77,
           "synopsis": "Thirty-four days before she's sent to prison, notorious Silicon Valley founder Elizabeth Holmes invites a skeptical film crew to document her every move. What begins as an intimate portrait of an enigmatic felon becomes a mind-bending three-year journey into the abyss.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/Ap8QwmKfSjYbWC4XIP8w9pdn72O.jpg",
@@ -6318,7 +6320,7 @@
             "US"
           ],
           "rating": 6.9,
-          "votes": 198,
+          "votes": 200,
           "heat": 75,
           "synopsis": "When a legendary thief sets his sights on the Mona Lisa, he recruits two young strangers to help him before revealing they are long-lost siblings… and oh yes, by the way, he is their father. Thrown into a chaotic reunion they never asked for, this new family must learn to work together — and try not to kill each other — if they want any chance at pulling off the heist of the century.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/5xmXVd7nCK3tAo34XkO58SxUCip.jpg",
@@ -6358,8 +6360,8 @@
             "IN",
             "US"
           ],
-          "rating": 6.4,
-          "votes": 197,
+          "rating": 6.3,
+          "votes": 199,
           "heat": 72,
           "synopsis": "In 1993, estranged Street Fighters Ryu and Ken Masters are thrown back into combat when the mysterious Chun-Li recruits them for the next World Warrior Tournament: a brutal clash of fists, fate, and fury. But behind this battle royale lies a deadly conspiracy that forces them to face off against each other and the demons of their past. And if they don't, it's GAME OVER!",
           "posterUrl": "https://image.tmdb.org/t/p/w500/ccxdepKqORLwccbzvO4eAGkN0IC.jpg",
@@ -6402,9 +6404,9 @@
             "IN",
             "US"
           ],
-          "rating": 5.9,
-          "votes": 44,
-          "heat": 70,
+          "rating": 6.2,
+          "votes": 63,
+          "heat": 71,
           "synopsis": "After twenty years spent \"chillin', tokin' and bonin'\", Ali G is shocked to discover that his long-term girlfriend, Julie, is 8 months pregnant. Faced with an extra mouth to feed, he gets off his batty and heads to America to reclaim his former glory… but soon encounters adversaries who will ultimately threaten his and his child's very existence.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/uTyVxPeWX8Ai30IQoyDDQONNcq.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/hJcGJLi34zE4RhzsiDR6f7pw50K.jpg",
@@ -6443,7 +6445,7 @@
             "US"
           ],
           "rating": 8,
-          "votes": 144,
+          "votes": 145,
           "heat": 70,
           "synopsis": "The intertwined lives of three men in three different eras, three lives intimately linked by sexuality and desire, pain, and legacy.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/jT5SR5qc9KvVg7HUEmjMWEUYMce.jpg",
@@ -6522,8 +6524,8 @@
           "regions": [
             "US"
           ],
-          "rating": 6.1,
-          "votes": 35,
+          "rating": 6.2,
+          "votes": 36,
           "heat": 55,
           "synopsis": "Tenants at Paradiso Palms apartments fight a deadly spider invasion while the cunning building manager might be their only hope for survival.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/lNXeEpg4yLSRwXwOeR5lbPgwbqL.jpg",
@@ -6603,8 +6605,8 @@
             "IN",
             "US"
           ],
-          "rating": 9.1,
-          "votes": 29,
+          "rating": 9.2,
+          "votes": 32,
           "heat": 53,
           "synopsis": "Taekang Group's successor, Yoon Yi-jun, is the prime suspect of a shocking murder. To uncover the truth, Kang Jae-hee goes undercover as a male secretary to keep an eye on Yi-jun. The closer they get to what really happened, the closer Yi-jun and Jae-hee become. Will Jae-hee, who is hiding her identity, and Yi-jun, who is hiding a secret, be able to let their true feelings be known to one another?",
           "posterUrl": "https://image.tmdb.org/t/p/w500/kSAXIAovLC4z7Wp2Hy8oqLmpkox.jpg",
@@ -6757,8 +6759,8 @@
             "IN",
             "US"
           ],
-          "rating": 7.8,
-          "votes": 20,
+          "rating": 7.5,
+          "votes": 21,
           "heat": 40,
           "synopsis": "When a giant T-Rex threatens Hot Wheels City, it's up to Coop and his friends to race to the rescue and save the day.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/iIc0OkYnf06kv5Zp0IYVwuvffgh.jpg",
@@ -6804,7 +6806,7 @@
           "heat": 38,
           "synopsis": "After waking up from a freak car accident, Sonny discovers that his mother has been replaced by an impostor.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/iCyQc8cSSHkxUHbkvzbC77owALt.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/AdFlgN6pKI6C481z2KshrQL204w.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/roUD5m2nj6k88azMFsiqBae29cr.jpg",
           "imdbId": "tt21952924",
           "cast": [
             "Connie Britton",
@@ -7092,39 +7094,6 @@
           ]
         },
         {
-          "id": "t-339010",
-          "title": "Madam Inspector",
-          "kind": "series",
-          "platforms": [
-            "netflix"
-          ],
-          "languages": [
-            "hi"
-          ],
-          "genres": [
-            "Crime"
-          ],
-          "releaseDate": "2026-10-17",
-          "regions": [
-            "IN",
-            "US"
-          ],
-          "votes": 1,
-          "heat": 31,
-          "synopsis": "When brides preparing to remarry begin dying in eerily similar ways, Inspector Chitra races to find the hidden link connecting their deaths.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/u0jPkIWFTO3D51h44gXkOz6H5PK.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/ir3psM2BKntiO3ShYsJQKvpuKN5.jpg",
-          "runtimeMinutes": 23,
-          "cast": [
-            "Sandipta Sen",
-            "Niranjan Mondal",
-            "Pratik Dutta",
-            "Aditya Sengupta",
-            "Anirban Bhattacharya"
-          ],
-          "director": "Nirjhar Mitra"
-        },
-        {
           "id": "t-332713",
           "title": "Extraordinary Attorney Minami",
           "kind": "series",
@@ -7160,6 +7129,39 @@
           ],
           "imdbRating": 6.3,
           "imdbVotes": 65
+        },
+        {
+          "id": "t-339010",
+          "title": "Madam Inspector",
+          "kind": "series",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "hi"
+          ],
+          "genres": [
+            "Crime"
+          ],
+          "releaseDate": "2026-10-17",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "votes": 1,
+          "heat": 31,
+          "synopsis": "When brides preparing to remarry begin dying in eerily similar ways, Inspector Chitra races to find the hidden link connecting their deaths.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/u0jPkIWFTO3D51h44gXkOz6H5PK.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/ir3psM2BKntiO3ShYsJQKvpuKN5.jpg",
+          "runtimeMinutes": 23,
+          "cast": [
+            "Sandipta Sen",
+            "Niranjan Mondal",
+            "Pratik Dutta",
+            "Aditya Sengupta",
+            "Anirban Bhattacharya"
+          ],
+          "director": "Nirjhar Mitra"
         },
         {
           "id": "m-1773759",
@@ -7503,7 +7505,7 @@
           "regions": [
             "US"
           ],
-          "votes": 1,
+          "votes": 2,
           "heat": 23,
           "synopsis": "A celebration of the artist, songwriter, entertainer, humanitarian and entrepreneur whose music and generosity carried her from the mountains of east Tennessee into the hearts of generations around the world.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/tlNqQwhyta5j1oJDISCPFId15EX.jpg",
@@ -7671,6 +7673,43 @@
           ],
           "imdbRating": 5.5,
           "imdbVotes": 26
+        },
+        {
+          "id": "m-1632305",
+          "title": "Her Song",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Drama",
+            "Comedy"
+          ],
+          "releaseDate": "2026-10-16",
+          "regions": [
+            "US"
+          ],
+          "heat": 21,
+          "synopsis": "Olivia, a Franco-American writer, returns to her ancestral village in the south of France to write the story of her grandmother, who fled Paris during the Nazi invasion during World War II. There, she meets Madeline, a talented local artist, who quickly replaces her grandmother as the face of the novel. As a number of strange coincidences ensue, fiction and reality intermingle uncannily, and Olivia starts to ask whether she's part of history's unfolding story, or vice-versa.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/8lbdVpNZ56RFc9YFKdDDG5DigmK.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/iVrLaYa8UV1quEy7mqkkj9H3Gop.jpg",
+          "imdbId": "tt32397787",
+          "runtimeMinutes": 105,
+          "cast": [
+            "Kalki Koechlin",
+            "Eléa Clair",
+            "Zach Grenier",
+            "Marie-Christine Adam",
+            "Thais Sobreira"
+          ],
+          "director": "John M. Keller",
+          "trailerUrl": "https://www.youtube.com/watch?v=_vXdYDzZ-CM",
+          "origin": [
+            "US"
+          ]
         },
         {
           "id": "m-1702350",
@@ -7865,8 +7904,8 @@
             "IN",
             "US"
           ],
-          "rating": 7.7,
-          "votes": 13,
+          "rating": 7.8,
+          "votes": 14,
           "heat": 19,
           "synopsis": "Go down a wormhole in this documentary on master of deadpan humor Norm Macdonald, whose life and career were uncompromising yet full of contradictions.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/sQw3m4hl1xyoT9zr7shnNCHDKI3.jpg",
@@ -7927,34 +7966,6 @@
           ]
         },
         {
-          "id": "m-1801137",
-          "title": "Devices",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Horror"
-          ],
-          "releaseDate": "2026-10-16",
-          "regions": [
-            "US"
-          ],
-          "heat": 19,
-          "synopsis": "With his wife gone for the night, a new father's first solo parenting venture becomes a nightmare.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/ehBwyR37sp3ABOy843z0ahkPgXu.jpg",
-          "runtimeMinutes": 14,
-          "cast": [
-            "Matt Jones",
-            "Anna Rajo",
-            "Cathryn Mudon"
-          ],
-          "director": "Justin Ridge"
-        },
-        {
           "id": "t-296466",
           "title": "Marília Mendonça: All the Feels",
           "kind": "documentary",
@@ -7987,6 +7998,42 @@
           "director": "Susanna Lira",
           "origin": [
             "BR"
+          ]
+        },
+        {
+          "id": "m-1803837",
+          "title": "Summer Holidays",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "te"
+          ],
+          "genres": [
+            "Comedy",
+            "Drama",
+            "Family"
+          ],
+          "releaseDate": "2026-10-16",
+          "regions": [
+            "IN"
+          ],
+          "heat": 18,
+          "synopsis": "A city boy's summer at his grandparents' Godavari village transforms when he befriends a spirited local paper boy. Together they explore rural life through adventures that forge an unforgettable childhood bond.",
+          "imdbId": "tt43089752",
+          "runtimeMinutes": 144,
+          "cast": [
+            "G Rohan Roy",
+            "Vasuki Anand",
+            "Ramana Bhargava",
+            "Mahesh Chintala",
+            "Harsha Vardhan"
+          ],
+          "director": "Srikar Nayan G",
+          "theatrical": "wide",
+          "origin": [
+            "IN"
           ]
         },
         {
@@ -8028,42 +8075,6 @@
           ],
           "imdbRating": 9.5,
           "imdbVotes": 507
-        },
-        {
-          "id": "m-1803837",
-          "title": "Summer Holidays",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "te"
-          ],
-          "genres": [
-            "Comedy",
-            "Drama",
-            "Family"
-          ],
-          "releaseDate": "2026-10-16",
-          "regions": [
-            "IN"
-          ],
-          "heat": 18,
-          "synopsis": "A city boy's summer at his grandparents' Godavari village transforms when he befriends a spirited local paper boy. Together they explore rural life through adventures that forge an unforgettable childhood bond.",
-          "imdbId": "tt43089752",
-          "runtimeMinutes": 144,
-          "cast": [
-            "G Rohan Roy",
-            "Vasuki Anand",
-            "Ramana Bhargava",
-            "Mahesh Chintala",
-            "Harsha Vardhan"
-          ],
-          "director": "Srikar Nayan G",
-          "theatrical": "wide",
-          "origin": [
-            "IN"
-          ]
         },
         {
           "id": "m-1771844",
@@ -8171,36 +8182,6 @@
           ]
         },
         {
-          "id": "t-339213",
-          "title": "Sony Vizha Grand Launch",
-          "kind": "reality",
-          "platforms": [
-            "sonyliv"
-          ],
-          "languages": [
-            "ta"
-          ],
-          "genres": [
-            "Reality"
-          ],
-          "releaseDate": "2026-10-19",
-          "regions": [
-            "IN"
-          ],
-          "heat": 14,
-          "synopsis": "A grand channel launch event unveiling Sony Vizha’s exciting programming lineup, showcasing its upcoming Non-Fiction offerings, Celebrity MasterChef and Tamil Idol.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/e74hLaaqy25cDzo3UKfiza3htWj.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/AiU13p95yGV7KVnGcTq4InrXPLF.jpg",
-          "cast": [
-            "A.R. Rahman",
-            "Samantha Ruth Prabhu",
-            "Mirchi Vijay",
-            "Sandy",
-            "Chef Venkatesh Bhat"
-          ],
-          "certification": "U/A 7+"
-        },
-        {
           "id": "t-336973",
           "title": "Hometown Giants",
           "kind": "documentary",
@@ -8231,6 +8212,36 @@
           "origin": [
             "US"
           ]
+        },
+        {
+          "id": "t-339213",
+          "title": "Sony Vizha Grand Launch",
+          "kind": "reality",
+          "platforms": [
+            "sonyliv"
+          ],
+          "languages": [
+            "ta"
+          ],
+          "genres": [
+            "Reality"
+          ],
+          "releaseDate": "2026-10-19",
+          "regions": [
+            "IN"
+          ],
+          "heat": 14,
+          "synopsis": "A grand channel launch event unveiling Sony Vizha’s exciting programming lineup, showcasing its upcoming Non-Fiction offerings, Celebrity MasterChef and Tamil Idol.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/e74hLaaqy25cDzo3UKfiza3htWj.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/AiU13p95yGV7KVnGcTq4InrXPLF.jpg",
+          "cast": [
+            "A.R. Rahman",
+            "Samantha Ruth Prabhu",
+            "Mirchi Vijay",
+            "Sandy",
+            "Chef Venkatesh Bhat"
+          ],
+          "certification": "U/A 7+"
         },
         {
           "id": "t-332204",
@@ -8321,6 +8332,40 @@
           ]
         },
         {
+          "id": "m-1787082",
+          "title": "Poniiy",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "hi"
+          ],
+          "genres": [
+            "Adventure",
+            "Drama"
+          ],
+          "releaseDate": "2026-10-16",
+          "regions": [
+            "IN"
+          ],
+          "heat": 14,
+          "synopsis": "A young local girl's family cares for a dog named Poniiy, whose true owner, a kind-hearted man, has mysteriously gone missing. Determined to reunite them, the girl and Poniiy set out on a heartfelt journey to find him.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/b7q35IfsMqW5K85pM9C98I4MOYW.jpg",
+          "cast": [
+            "Kunal Singh",
+            "Ananya Raava Basu",
+            "Raju Kher",
+            "Garima Agrawal",
+            "Rahul Roy"
+          ],
+          "director": "Shibesh motilal",
+          "theatrical": "wide",
+          "origin": [
+            "IN"
+          ]
+        },
+        {
           "id": "m-1715257",
           "title": "B-Town",
           "kind": "film",
@@ -8354,40 +8399,6 @@
           "origin": [
             "IN",
             "CA"
-          ]
-        },
-        {
-          "id": "m-1787082",
-          "title": "Poniiy",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "hi"
-          ],
-          "genres": [
-            "Adventure",
-            "Drama"
-          ],
-          "releaseDate": "2026-10-16",
-          "regions": [
-            "IN"
-          ],
-          "heat": 14,
-          "synopsis": "A young local girl's family cares for a dog named Poniiy, whose true owner, a kind-hearted man, has mysteriously gone missing. Determined to reunite them, the girl and Poniiy set out on a heartfelt journey to find him.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/b7q35IfsMqW5K85pM9C98I4MOYW.jpg",
-          "cast": [
-            "Kunal Singh",
-            "Ananya Raava Basu",
-            "Raju Kher",
-            "Garima Agrawal",
-            "Rahul Roy"
-          ],
-          "director": "Shibesh motilal",
-          "theatrical": "wide",
-          "origin": [
-            "IN"
           ]
         },
         {
@@ -8431,6 +8442,40 @@
           ]
         },
         {
+          "id": "m-1805031",
+          "title": "Sippiyan Sitaare",
+          "kind": "film",
+          "platforms": [
+            "chaupal"
+          ],
+          "languages": [
+            "pa"
+          ],
+          "genres": [
+            "Drama",
+            "Romance"
+          ],
+          "releaseDate": "2026-10-22",
+          "regions": [
+            "IN"
+          ],
+          "heat": 13,
+          "synopsis": "Determined to become a top fashion designer, small-town dreamer Jagga moves to the bustling city and joins quiet tailor Samar. When sudden hardships threaten their venture, the duo must unite to rebuild their shared dream.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/y1qNTEGLlPs3pIYDDmjXaXDGPVe.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/p5JfiZiSQ1rvn7eid8SLXVRJchz.jpg",
+          "runtimeMinutes": 99,
+          "cast": [
+            "Avrinder Kaur",
+            "Inderjeet",
+            "Sukhwinder Raj",
+            "Saniya Pannu",
+            "Anita Meet"
+          ],
+          "director": "Simmi Dhiman",
+          "trailerUrl": "https://www.youtube.com/watch?v=zd69CX9f49g",
+          "certification": "U/A 13+"
+        },
+        {
           "id": "m-435987",
           "title": "A Dessert for Constance",
           "kind": "film",
@@ -8468,40 +8513,6 @@
           ],
           "imdbRating": 7.8,
           "imdbVotes": 26
-        },
-        {
-          "id": "m-1805031",
-          "title": "Sippiyan Sitaare",
-          "kind": "film",
-          "platforms": [
-            "chaupal"
-          ],
-          "languages": [
-            "pa"
-          ],
-          "genres": [
-            "Drama",
-            "Romance"
-          ],
-          "releaseDate": "2026-10-22",
-          "regions": [
-            "IN"
-          ],
-          "heat": 13,
-          "synopsis": "Determined to become a top fashion designer, small-town dreamer Jagga moves to the bustling city and joins quiet tailor Samar. When sudden hardships threaten their venture, the duo must unite to rebuild their shared dream.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/y1qNTEGLlPs3pIYDDmjXaXDGPVe.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/p5JfiZiSQ1rvn7eid8SLXVRJchz.jpg",
-          "runtimeMinutes": 99,
-          "cast": [
-            "Avrinder Kaur",
-            "Inderjeet",
-            "Sukhwinder Raj",
-            "Saniya Pannu",
-            "Anita Meet"
-          ],
-          "director": "Simmi Dhiman",
-          "trailerUrl": "https://www.youtube.com/watch?v=zd69CX9f49g",
-          "certification": "U/A 13+"
         },
         {
           "id": "t-337718",
@@ -9023,7 +9034,7 @@
             "US"
           ],
           "rating": 8.6,
-          "votes": 108,
+          "votes": 109,
           "heat": 100,
           "synopsis": "Prue and her classmate Curtis are drawn into a magical forest filled with enchanted creatures, loyal allies, and formidable adversaries as they embark on a desperate quest to rescue Prue's abducted baby brother from a murder of crows led by a mysterious woman named Alexandra.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/8g7q6o54WfKWRmUQ0Ye8OskevUY.jpg",
@@ -9063,7 +9074,7 @@
             "IN"
           ],
           "rating": 6.8,
-          "votes": 391,
+          "votes": 393,
           "heat": 90,
           "synopsis": "In the remote South Korean village of Hope Harbor, police chief Bum-seok and officer Sung-ae are called to investigate a mysterious creature wreaking havoc on the community. But all is not as it seems, and perceptions can be misleading. What begins as ignorance plants the seed of disaster, escalating through human conflict into a tragedy of cosmic proportions.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/6VY1ZKgpsc8CfGsQcCGiYEgHdH0.jpg",
@@ -9108,7 +9119,7 @@
             "US"
           ],
           "rating": 7.5,
-          "votes": 274,
+          "votes": 279,
           "heat": 82,
           "synopsis": "Matt Hagen's meteoric rise from Gotham street kid to Hollywood leading man is tragically cut short when a local crime boss's actions leave him horribly disfigured. Abandoned by his team and with nothing left, Matt seeks out a cutting edge treatment that miraculously returns him to his former self… but also unexpectedly affects his grip on reality, spiraling him down a destructive path of all-consuming revenge.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/9l1NuFjel2j89hiuiJbsxfblqjy.jpg",
@@ -9152,11 +9163,11 @@
           "regions": [
             "IN"
           ],
-          "rating": 6.7,
-          "votes": 44,
+          "rating": 6.5,
+          "votes": 47,
           "heat": 78,
           "synopsis": "An elite military unit on a mission in the South American jungle encounters a deadly supernatural force revealing an ancient presence that continues to claim anyone who dares enter its domain.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/vNvHT0v9xt7dDTqYue2fWXePKi7.jpg",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/u8v2kjcb5AHARPh0ZHmCHczWPuZ.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/4pYKqctQvvdyhuGjiK4szH9jEv9.jpg",
           "imdbId": "tt39120306",
           "runtimeMinutes": 96,
@@ -9191,9 +9202,9 @@
             "IN",
             "US"
           ],
-          "rating": 7.1,
-          "votes": 63,
-          "heat": 72,
+          "rating": 7.3,
+          "votes": 69,
+          "heat": 73,
           "synopsis": "Two estranged brothers struggle to survive Hurricane Otis in Acapulco, where their bond and courage turn adversity into hope.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/chZa8Jd9kSDj11bekGjwwotFPEw.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/cpNMIRCrDl0sxDL1tHBzfWi0UZC.jpg",
@@ -9229,9 +9240,9 @@
           "regions": [
             "US"
           ],
-          "rating": 5.9,
-          "votes": 44,
-          "heat": 70,
+          "rating": 6.2,
+          "votes": 63,
+          "heat": 71,
           "synopsis": "After twenty years spent \"chillin', tokin' and bonin'\", Ali G is shocked to discover that his long-term girlfriend, Julie, is 8 months pregnant. Faced with an extra mouth to feed, he gets off his batty and heads to America to reclaim his former glory… but soon encounters adversaries who will ultimately threaten his and his child's very existence.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/uTyVxPeWX8Ai30IQoyDDQONNcq.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/hJcGJLi34zE4RhzsiDR6f7pw50K.jpg",
@@ -9270,8 +9281,8 @@
             "IN",
             "US"
           ],
-          "rating": 7.7,
-          "votes": 26,
+          "rating": 7.9,
+          "votes": 35,
           "heat": 66,
           "synopsis": "A young race car mechanic fakes an engagement with racing's most scandalous star - officially for his reputation, secretly for her own shot behind the wheel. But soon the lie threatens to destroy everything - including what's already become so much more than just a deal.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/s9syckECnUYhKePQ1A0DC0mFVZ9.jpg",
@@ -9439,8 +9450,8 @@
           "regions": [
             "US"
           ],
-          "rating": 8,
-          "votes": 15,
+          "rating": 7.9,
+          "votes": 16,
           "heat": 51,
           "synopsis": "On the outskirts of a village by the sea, lives a Fisherwoman; smelly, single and perpetually ridiculed. One day, fed up with her stuffy, small-minded neighbours, she commissions herself a husband to be made from wicker. In an otherwise conservative town, this unconventional romance sparks outrage, jealousy and chaos.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/6FcBZOKvyrLCKGCyBG0ySCR4okt.jpg",
@@ -9639,7 +9650,6 @@
           "platforms": [
             "netflix"
           ],
-          "namedBy": "network",
           "languages": [
             "tl"
           ],
@@ -9667,6 +9677,42 @@
           "trailerUrl": "https://www.youtube.com/watch?v=InDO8Vbr02M",
           "origin": [
             "PH"
+          ]
+        },
+        {
+          "id": "t-334700",
+          "title": "The Gift of Deceit",
+          "kind": "series",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "pt"
+          ],
+          "genres": [
+            "Drama"
+          ],
+          "releaseDate": "2026-10-28",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 37,
+          "synopsis": "Desperate to find a cure for the unknown illness affecting her daughter, art collector Lúcia Rossetti turns to a spiritual healer. When Lúcia falls victim to a scam, a series of secrets is revealed, intertwining two families marked by love, control, resentment, and guilt.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/mAfYj5ZtR2V5ad6uham1PwAh0mc.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/gSlWzjRk1QarsB2PrJemCd88wJc.jpg",
+          "imdbId": "tt45854934",
+          "runtimeMinutes": 45,
+          "cast": [
+            "Marieta Severo",
+            "Alice Wegmann",
+            "Nanda Costa",
+            "José de Abreu",
+            "Felipe Camargo"
+          ],
+          "director": "Mauro Mendonça Filho",
+          "origin": [
+            "BR"
           ]
         },
         {
@@ -9708,42 +9754,6 @@
           ]
         },
         {
-          "id": "t-334700",
-          "title": "The Gift of Deceit",
-          "kind": "series",
-          "platforms": [
-            "netflix"
-          ],
-          "languages": [
-            "pt"
-          ],
-          "genres": [
-            "Drama"
-          ],
-          "releaseDate": "2026-10-28",
-          "regions": [
-            "IN",
-            "US"
-          ],
-          "heat": 37,
-          "synopsis": "Desperate to find a cure for the unknown illness affecting her daughter, art collector Lúcia Rossetti turns to a spiritual healer. When Lúcia falls victim to a scam, a series of secrets is revealed, intertwining two families marked by love, control, resentment, and guilt.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/mAfYj5ZtR2V5ad6uham1PwAh0mc.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/gSlWzjRk1QarsB2PrJemCd88wJc.jpg",
-          "imdbId": "tt45854934",
-          "runtimeMinutes": 45,
-          "cast": [
-            "Marieta Severo",
-            "Alice Wegmann",
-            "Nanda Costa",
-            "José de Abreu",
-            "Felipe Camargo"
-          ],
-          "director": "Mauro Mendonça Filho",
-          "origin": [
-            "BR"
-          ]
-        },
-        {
           "id": "t-292741",
           "title": "Nocturne",
           "kind": "series",
@@ -9764,11 +9774,12 @@
             "IN",
             "US"
           ],
-          "votes": 2,
+          "rating": 6.1,
+          "votes": 7,
           "heat": 37,
           "synopsis": "When a victim of notorious serial killer Jurek Walter unexpectedly turns up alive, detective Jonah Lynn races against time to find the one person still missing, while his protégé Saga Bauer goes undercover to get answers from the killer himself.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/nyvXVcPnHEwVmqCdzjjCsu1jqhm.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/kn6ZSYuyeSymOp0gqJVBOMAJrTC.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/614k6C9doThoMe6GyH0nTnGgLXt.jpg",
           "imdbId": "tt26598805",
           "cast": [
             "Liev Schreiber",
@@ -10028,7 +10039,7 @@
             "IN",
             "US"
           ],
-          "votes": 1,
+          "votes": 2,
           "heat": 30,
           "synopsis": "A mature romance about a free-spirited woman and a reserved professor who marry quickly after a brief, passionate courtship.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/9ZAPU2IRSdI9xdVb42z2F1momJc.jpg",
@@ -10145,7 +10156,8 @@
             "IN",
             "US"
           ],
-          "votes": 4,
+          "rating": 7.9,
+          "votes": 5,
           "heat": 28,
           "synopsis": "The aircraft carrier *Charles de Gaulle* has just set sail for a strategic mission in the Eastern Mediterranean, a region where the situation is volatile. Shortly after departure, however, a female crew member is found dead and another is reported missing. Despite the danger, the operation continues, and a military investigator is urgently dispatched on board. When a new victim is discovered, the *Charles*—a veritable floating city of 1,800 men and 240 women—turns into a trap where a killer, mounting tensions, and unfolding events threaten the crew and perhaps even the country itself.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/iyyuWPLJAwEMKfhcApA6h1TUFjW.jpg",
@@ -10187,7 +10199,7 @@
           "heat": 28,
           "synopsis": "Co-founder of the Sinaloa Cartel, longtime partner of \"El Chapo\", and a ghost to authorities for over three decades. The documentary that tells the story of his downfall.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/zp5lT15wR0cfCYcR12DXcVNsrnh.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/8yRS45wcnw7HAMGa5cvntumNOX6.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/yiElAOM1OD09YCuCUbim4QMyvtJ.jpg",
           "imdbId": "tt49250618",
           "runtimeMinutes": 60,
           "trailerUrl": "https://www.youtube.com/watch?v=e5ExUsk6-OE",
@@ -10463,11 +10475,11 @@
             "Documentary",
             "Comedy"
           ],
-          "releaseDate": "2026-10-23",
+          "releaseDate": "2026-10-25",
           "regions": [
             "US"
           ],
-          "votes": 2,
+          "votes": 3,
           "heat": 21,
           "synopsis": "Bill Murray and friends go on an unpredictable road trip around the Republic of Ireland and Northern Ireland, playing their way across some of the island’s most legendary golf courses.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/fqry4uxJuyFcSR3locllFwxES3K.jpg",
@@ -10559,6 +10571,40 @@
           "origin": [
             "IN"
           ]
+        },
+        {
+          "id": "m-1809199",
+          "title": "Zainab Johnson: Toxically Optimistic",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Comedy"
+          ],
+          "releaseDate": "2026-10-27",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "votes": 1,
+          "heat": 19,
+          "synopsis": "Zainab Johnson has a gun revelation, a Tesla crisis and an unshakable belief that she can find the upside in everything in this sharp stand-up hour.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/45aRvdvuLz2mooiHAe3j1bCFfHL.jpg",
+          "imdbId": "tt46670803",
+          "runtimeMinutes": 64,
+          "cast": [
+            "Zainab Johnson"
+          ],
+          "director": "Zainab Johnson",
+          "origin": [
+            "US"
+          ],
+          "imdbRating": 8.2,
+          "imdbVotes": 27
         },
         {
           "id": "t-322232",
@@ -10789,7 +10835,7 @@
             "IN"
           ],
           "heat": 15,
-          "synopsis": "Haiku is a heartfelt romantic drama about second chances and healing. Mano, once an immature and possessive college boy, loses his first love Kodi, a bold and caring girl from a traditional Coimbatore family, after his insecurities and long-distance struggles ruin their relationship. Years later, Mano, now more mature, meets Nivi, an independent, lower-middle-class girl raised by a single mother, who is recovering from a toxic relationship with Arul. Mano helps Nivi rediscover what true love means, while Nivi gives Mano a chance to love without control and without fear. But when Nivi learns about Mano’s toxic past with Kodi, doubts and insecurities threaten their bond. HAIKU beautifully explores how first love may break us, but second love teaches us to heal, forgive, and love better.",
+          "synopsis": "A charismatic young man uses poetry to navigate the complex maze of modern romance to protect his fragile relationship. Later, he must overcome deep generational divides to keep his love alive.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/thZGedKvZnnvuLpNWEA1nmalM7K.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/40bzHa8LA48yUbXeh6TACnUcOu3.jpg",
           "imdbId": "tt39239818",
@@ -10885,43 +10931,6 @@
           ]
         },
         {
-          "id": "m-1740967",
-          "title": "Orijinal",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "ml"
-          ],
-          "genres": [
-            "Drama",
-            "Thriller"
-          ],
-          "releaseDate": "2026-10-23",
-          "regions": [
-            "IN"
-          ],
-          "votes": 1,
-          "heat": 14,
-          "posterUrl": "https://image.tmdb.org/t/p/w500/6awkjiQxV4y8R19cDuHvBg85iyK.jpg",
-          "imdbId": "tt43986787",
-          "runtimeMinutes": 132,
-          "cast": [
-            "Sreenath Bhasi",
-            "Abhiram Radhakrishnan",
-            "Rajesh Madhavan",
-            "Safwan",
-            "Binu Pappu"
-          ],
-          "director": "Ramees Mohamed",
-          "certification": "U/A 13+",
-          "theatrical": "wide",
-          "origin": [
-            "IN"
-          ]
-        },
-        {
           "id": "m-1788020",
           "title": "Crime 302",
           "kind": "film",
@@ -10991,6 +11000,43 @@
           "theatrical": "wide",
           "imdbRating": 8.5,
           "imdbVotes": 3055
+        },
+        {
+          "id": "m-1740967",
+          "title": "Orijinal",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "ml"
+          ],
+          "genres": [
+            "Drama",
+            "Thriller"
+          ],
+          "releaseDate": "2026-10-23",
+          "regions": [
+            "IN"
+          ],
+          "votes": 1,
+          "heat": 14,
+          "posterUrl": "https://image.tmdb.org/t/p/w500/6awkjiQxV4y8R19cDuHvBg85iyK.jpg",
+          "imdbId": "tt43986787",
+          "runtimeMinutes": 132,
+          "cast": [
+            "Sreenath Bhasi",
+            "Abhiram Radhakrishnan",
+            "Rajesh Madhavan",
+            "Safwan",
+            "Binu Pappu"
+          ],
+          "director": "Ramees Mohamed",
+          "certification": "U/A 13+",
+          "theatrical": "wide",
+          "origin": [
+            "IN"
+          ]
         },
         {
           "id": "m-1770836",
@@ -11154,6 +11200,34 @@
           ]
         },
         {
+          "id": "t-340106",
+          "title": "Love Island Australia: Unseen. Uncut.",
+          "kind": "reality",
+          "platforms": [
+            "hulu"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Reality"
+          ],
+          "releaseDate": "2026-10-26",
+          "regions": [
+            "US"
+          ],
+          "heat": 8,
+          "synopsis": "This season of Love Island Australia is getting VillaMaxxed with this new companion series. Direct from the Villa, drops of unseen and exclusive footage will give you VIP access to the Islanders - in real time, unfiltered and unpredictable.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/e6VN49hyQGuY5oQ1ZRQWX9aHhJ5.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/5W4YFMyUgQszrTwFbPNEOXamaaj.jpg",
+          "cast": [
+            "Sophie Monk"
+          ],
+          "origin": [
+            "AU"
+          ]
+        },
+        {
           "id": "m-1807926",
           "title": "LARA - The Man Who Took on Escobar",
           "kind": "documentary",
@@ -11261,8 +11335,8 @@
             "IN"
           ],
           "rating": 8.2,
-          "votes": 6406,
-          "heat": 75,
+          "votes": 6410,
+          "heat": 76,
           "synopsis": "After breaking the mysterious \"One Wish Willow\" to win his crush's heart, a hopeless romantic finds himself getting exactly what he asked for but soon discovers that some desires come at a dark, sinister price.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/bRwnj8WEKBCvmfeUNOukJPwB43K.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/5lTZyuBTNOfawsfPT8Q0cIg6qAF.jpg",
@@ -11306,7 +11380,7 @@
           ],
           "rating": 6.7,
           "votes": 7,
-          "heat": 58,
+          "heat": 59,
           "synopsis": "A falsely accused war hero with nothing to lose leads police on an epic televised cross-country car chase, helped by members of his former Special Forces Army battalion and closely monitored by a fascinated public rooting for his safe getaway.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/eSS5mvSG84UUuvtbHel5Yu3Wik4.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/iRIhPqqoUHiFBxn8oYf3gCQnaKk.jpg",
@@ -11345,7 +11419,7 @@
             "US"
           ],
           "rating": 6.7,
-          "votes": 22073,
+          "votes": 22074,
           "heat": 52,
           "synopsis": "Twenty-two years after the events of Jurassic Park, Isla Nublar now features a fully functioning dinosaur theme park, Jurassic World, as originally envisioned by John Hammond.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/rhr4y79GpxQF9IsfJItRXVaoGs4.jpg",
@@ -11394,7 +11468,7 @@
           "posterUrl": "https://image.tmdb.org/t/p/w500/hz2Hv8tPToHvQ7HaxzqeLvahmcJ.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/prbMZ3DPf8taS6JYQd6igPnm2mA.jpg",
           "imdbId": "tt27988879",
-          "runtimeMinutes": 195,
+          "runtimeMinutes": 167,
           "cast": [
             "Ranbir Kapoor",
             "Yash",
@@ -11430,7 +11504,7 @@
           "regions": [
             "US"
           ],
-          "heat": 36,
+          "heat": 37,
           "synopsis": "War reduced Japan to zero, and Godzilla plunged it into minus. Two years have passed since then, and the country has faced agonizing struggles to achieve recovery and finally reclaim its daily life. Just as humanity managed to cling to a hard-won peace, a new threat strikes, crushing hope in an instant. There is no third time. Everything ends here.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/hSmIJluOJmTWvJs4d7kHRxjc8s8.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/oqrYIDH4tvfEzPe1yqT4jzmAWHQ.jpg",
@@ -11469,18 +11543,19 @@
             "IN",
             "US"
           ],
-          "votes": 1,
+          "votes": 4,
           "heat": 32,
           "synopsis": "When a debtor is lured by a strange agency with the promise of lucrative gigs, he is soon thrust into a hellish world of terror and unpredictability.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/1yobke0bpfNOazuF9wW7QbM2GER.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/gWedDgBsZkuOho2qe3q2sTQmbpO.jpg",
           "imdbId": "tt36458668",
+          "runtimeMinutes": 8,
           "cast": [
             "Lee Jae-wook",
             "Go Min-si",
             "Kim Min-ha",
             "Lee Hee-jun",
-            "Yoon Byung-hee"
+            "Choi Hyun-wook"
           ],
           "director": "Kim Da-min",
           "trailerUrl": "https://www.youtube.com/watch?v=Sn2ZCxOxsN0",
@@ -11528,6 +11603,45 @@
           ]
         },
         {
+          "id": "m-1021848",
+          "title": "Queen at Sea",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Drama"
+          ],
+          "releaseDate": "2026-10-30",
+          "regions": [
+            "US"
+          ],
+          "votes": 4,
+          "heat": 27,
+          "synopsis": "As advanced dementia erodes an older woman's ability to communicate her inner life, her husband and daughter struggle to act in her best interests, navigating love and the fragile boundaries between care, protection and autonomy.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/ueYawr1nldKchzyP8Q9KJpn31SK.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/308iVAhH5ByQb0wvaJmY3o79apn.jpg",
+          "imdbId": "tt27541205",
+          "runtimeMinutes": 121,
+          "cast": [
+            "Juliette Binoche",
+            "Tom Courtenay",
+            "Anna Calder-Marshall",
+            "Florence Hunt",
+            "Steven Cree"
+          ],
+          "director": "Lance Hammer",
+          "trailerUrl": "https://www.youtube.com/watch?v=UVyH8QYENxI",
+          "origin": [
+            "GB"
+          ],
+          "imdbRating": 7.9,
+          "imdbVotes": 52
+        },
+        {
           "id": "t-307478",
           "title": "The Perfect Lie",
           "kind": "series",
@@ -11551,7 +11665,7 @@
           "heat": 26,
           "synopsis": "After a heart-fluttering date, Joonho, a heart surgeon with a perfect smile, and Jisun, a free-spirited teacher-librarian, share a special night. The next day, they meet at a police station with completely different memories. A shocking polygraph result turns their lives upside down.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/thXJkiBByDitV7iFSv1hU1sg7ij.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/hglYTJIswg5p3YA3V85B2dhvnNj.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/5V7scQ0nVkNcz8dcHRfZIiHECcc.jpg",
           "cast": [
             "Yoo Yeon-seok",
             "Seo Hyun-jin",
@@ -11566,8 +11680,8 @@
           ]
         },
         {
-          "id": "m-1021848",
-          "title": "Queen at Sea",
+          "id": "m-939541",
+          "title": "Christmas at the Kringles",
           "kind": "film",
           "platforms": [
             "theatres"
@@ -11576,33 +11690,33 @@
             "en"
           ],
           "genres": [
-            "Drama"
+            "Action",
+            "Horror",
+            "Comedy"
           ],
           "releaseDate": "2026-10-30",
           "regions": [
             "US"
           ],
-          "votes": 4,
+          "votes": 2,
           "heat": 26,
-          "synopsis": "As advanced dementia erodes an older woman's ability to communicate her inner life, her husband and daughter struggle to act in her best interests, navigating love and the fragile boundaries between care, protection and autonomy.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/ueYawr1nldKchzyP8Q9KJpn31SK.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/308iVAhH5ByQb0wvaJmY3o79apn.jpg",
-          "imdbId": "tt27541205",
-          "runtimeMinutes": 121,
+          "synopsis": "The Severson family move to a suburban neighborhood where their next-door neighbors, the Kringles, celebrate Christmas year-round. But when their son becomes increasingly attached to the unusual family, Mark and Julie begin to suspect that their neighbors aren't quite what they seem.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/oVxkhheRVWSacimUZBuMemQX85E.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/yZq46gEwwXKzJRemlC0qPPBJmvt.jpg",
+          "imdbId": "tt42588704",
+          "runtimeMinutes": 100,
           "cast": [
-            "Juliette Binoche",
-            "Tom Courtenay",
-            "Anna Calder-Marshall",
-            "Florence Hunt",
-            "Steven Cree"
+            "Ron Livingston",
+            "Rachel Bilson",
+            "Rob Riggle",
+            "Arden Myrin",
+            "Thomas Lennon"
           ],
-          "director": "Lance Hammer",
-          "trailerUrl": "https://www.youtube.com/watch?v=UVyH8QYENxI",
+          "director": "Kevin Lewis",
+          "trailerUrl": "https://www.youtube.com/watch?v=IsGccGqcNNE",
           "origin": [
-            "GB"
-          ],
-          "imdbRating": 7.9,
-          "imdbVotes": 52
+            "US"
+          ]
         },
         {
           "id": "m-1473148",
@@ -11650,13 +11764,51 @@
           "imdbVotes": 85
         },
         {
+          "id": "m-1458300",
+          "title": "The Mosquito Bowl",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "History",
+            "Drama",
+            "War"
+          ],
+          "releaseDate": "2026-10-30",
+          "regions": [
+            "US"
+          ],
+          "votes": 1,
+          "heat": 24,
+          "synopsis": "In the aftermath of Pearl Harbor, four college football stars enlist in the US Marines, discovering the strength of brotherhood and the cost of war.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/zbT4sxoCEeFWlQG4SC5X9Q8v6PC.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/6BQf817glhR9motzKeCPynPGySi.jpg",
+          "imdbId": "tt36413910",
+          "runtimeMinutes": 128,
+          "cast": [
+            "Nicholas Galitzine",
+            "Bill Skarsgård",
+            "Ray Nicholson",
+            "Tom Francis",
+            "Brent Comer"
+          ],
+          "director": "Peter Berg",
+          "trailerUrl": "https://www.youtube.com/watch?v=F6YDzPfjH4I",
+          "origin": [
+            "US"
+          ]
+        },
+        {
           "id": "m-1378537~ott",
           "title": "Mirzapur: The Movie",
           "kind": "film",
           "platforms": [
             "prime"
           ],
-          "namedBy": "note",
           "languages": [
             "hi"
           ],
@@ -11705,17 +11857,19 @@
             "es"
           ],
           "genres": [
-            "Horror",
-            "Thriller"
+            "Action",
+            "Thriller",
+            "Horror"
           ],
           "releaseDate": "2026-10-30",
           "regions": [
             "US"
           ],
+          "votes": 3,
           "heat": 24,
           "synopsis": "The Canary Islands have become Europe’s last refuge following the outbreak of the TSJ virus. When a special mission sets out for the mainland in search of vital supplies, Roberto joins the team with questionable intentions. The dangerous operation turns into a desperate race for survival, and Roberto and his companions find themselves caught between hordes of infected and divided loyalties.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/plu8tTviVZDO5jP7nzNXsDHLu8P.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/w6Jfwtn82wGMfo0ejgRvCM9w2xE.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/o3XwuDUj0n8qnK91p6q8LKfr6rj.jpg",
           "imdbId": "tt37522541",
           "runtimeMinutes": 96,
           "cast": [
@@ -11771,52 +11925,12 @@
           ]
         },
         {
-          "id": "m-939541",
-          "title": "Christmas at the Kringles",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Action",
-            "Horror",
-            "Comedy"
-          ],
-          "releaseDate": "2026-10-30",
-          "regions": [
-            "US"
-          ],
-          "votes": 2,
-          "heat": 23,
-          "synopsis": "The Severson family move to a suburban neighborhood where their next-door neighbors, the Kringles, celebrate Christmas year-round. But when their son becomes increasingly attached to the unusual family, Mark and Julie begin to suspect that their neighbors aren't quite what they seem.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/oVxkhheRVWSacimUZBuMemQX85E.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/yZq46gEwwXKzJRemlC0qPPBJmvt.jpg",
-          "imdbId": "tt42588704",
-          "runtimeMinutes": 100,
-          "cast": [
-            "Ron Livingston",
-            "Rachel Bilson",
-            "Rob Riggle",
-            "Arden Myrin",
-            "Thomas Lennon"
-          ],
-          "director": "Kevin Lewis",
-          "trailerUrl": "https://www.youtube.com/watch?v=IsGccGqcNNE",
-          "origin": [
-            "US"
-          ]
-        },
-        {
           "id": "m-1290035~ott",
           "title": "Avaraachan & Sons",
           "kind": "film",
           "platforms": [
             "netflix"
           ],
-          "namedBy": "note",
           "languages": [
             "ml"
           ],
@@ -11845,44 +11959,6 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ]
-        },
-        {
-          "id": "m-1458300",
-          "title": "The Mosquito Bowl",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "History",
-            "Drama",
-            "War"
-          ],
-          "releaseDate": "2026-10-30",
-          "regions": [
-            "US"
-          ],
-          "heat": 22,
-          "synopsis": "In the aftermath of Pearl Harbor, four college football stars enlist in the US Marines, discovering the strength of brotherhood and the cost of war.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/zbT4sxoCEeFWlQG4SC5X9Q8v6PC.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/6BQf817glhR9motzKeCPynPGySi.jpg",
-          "imdbId": "tt36413910",
-          "runtimeMinutes": 128,
-          "cast": [
-            "Nicholas Galitzine",
-            "Bill Skarsgård",
-            "Ray Nicholson",
-            "Tom Francis",
-            "Brent Comer"
-          ],
-          "director": "Peter Berg",
-          "trailerUrl": "https://www.youtube.com/watch?v=F6YDzPfjH4I",
-          "origin": [
-            "US"
           ]
         },
         {
@@ -11956,7 +12032,8 @@
             "Fahadh Faasil",
             "Ssara Palekar",
             "Saurabh Sachdeva",
-            "Venkatesh Kakumanu"
+            "Venkatesh Kakumanu",
+            "Subbaraju"
           ],
           "director": "Shashank Yeleti",
           "trailerUrl": "https://www.youtube.com/watch?v=CyuQsFP1Jww",
@@ -12026,6 +12103,7 @@
           "regions": [
             "US"
           ],
+          "votes": 1,
           "heat": 22,
           "synopsis": "Spain, 2013. After robbing a bank, a getaway crash reveals the hidden side of each thief, exposing betrayals and lies that began long before the heist.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/s2eAK0uiODjlNUSIiOBwdp3at2u.jpg",
@@ -12051,7 +12129,6 @@
           "platforms": [
             "netflix"
           ],
-          "namedBy": "note",
           "languages": [
             "ta"
           ],
@@ -12106,7 +12183,7 @@
           ],
           "heat": 21,
           "synopsis": "Follows a family in crisis where a teenager, her grandfather, and his trusty basset hound struggle to keep the household together at Christmas.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/gKKwnZS3BGPSPw59V7VP4cob6uW.jpg",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/TSsdfaD0gGlVqBuy2xYxr3RTaL.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/jfLE82CCfSCkkmutPXHpydSKY6w.jpg",
           "imdbId": "tt38515310",
           "runtimeMinutes": 99,
@@ -12280,6 +12357,46 @@
           "imdbVotes": 41
         },
         {
+          "id": "m-1428295~ott",
+          "title": "Comrade Kalyan",
+          "kind": "film",
+          "platforms": [
+            "prime"
+          ],
+          "languages": [
+            "te"
+          ],
+          "genres": [
+            "Romance",
+            "Action",
+            "Drama"
+          ],
+          "releaseDate": "2026-10-30",
+          "regions": [
+            "IN"
+          ],
+          "heat": 20,
+          "synopsis": "In a naxal-dominated village on the Andhra-Odisha border, a theatre owner uses communist sentiment to keep his old cinema running. He joins the naxals and kidnaps a leader, setting off a chain of events.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/pvRJWA4WnaoPeQ7Fs7G9P7EKu6h.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/zsAbkmTkGE3l98Jhvdiy7ybNFo8.jpg",
+          "imdbId": "tt32089596",
+          "runtimeMinutes": 145,
+          "cast": [
+            "Sree Vishnu",
+            "Mahima Nambiar",
+            "Upendra Limaye",
+            "Shine Tom Chacko",
+            "Radhika Sarathkumar"
+          ],
+          "director": "Janakiram Marella",
+          "trailerUrl": "https://www.youtube.com/watch?v=KwTUn9PTCAk",
+          "certification": "UA",
+          "theatrical": "wide",
+          "origin": [
+            "IN"
+          ]
+        },
+        {
           "id": "m-1802464~ott",
           "title": "Meethe Mein Kya Hai",
           "kind": "film",
@@ -12422,43 +12539,6 @@
           ]
         },
         {
-          "id": "m-1636410",
-          "title": "Castration Movie Chapter iii.ii Junior Ghosts—Premorphic Drift; a fragmentary passage",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Comedy",
-            "Drama"
-          ],
-          "releaseDate": "2026-10-30",
-          "regions": [
-            "US"
-          ],
-          "heat": 18,
-          "synopsis": "Izzy does everything in her power to stop her partner from transitioning.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/yrtTSMW3qP84MEMQiYI8GJkTOAE.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/3n1YILG3Dlz8RkwrpntCfHDvHwM.jpg",
-          "imdbId": "tt40123429",
-          "runtimeMinutes": 127,
-          "cast": [
-            "Henri Gillespi",
-            "Avalon Fast",
-            "Dionne Copland",
-            "Louise Weard",
-            "Sepi Mashiahof"
-          ],
-          "director": "Louise Weard",
-          "trailerUrl": "https://www.youtube.com/watch?v=BSY6Xr8HHoE",
-          "origin": [
-            "CA"
-          ]
-        },
-        {
           "id": "m-1310387",
           "title": "The Irregular at Magic High School THE MOVIE - Yotsuba Succession Arc -",
           "kind": "film",
@@ -12499,6 +12579,76 @@
           ]
         },
         {
+          "id": "m-1733243",
+          "title": "Sight & Sound Presents: JOSHUA—Live!",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Music",
+            "Family"
+          ],
+          "releaseDate": "2026-10-30",
+          "regions": [
+            "US"
+          ],
+          "heat": 18,
+          "synopsis": "Journey alongside the people of Israel as they navigate their new-found freedom in an unforgiving wilderness. When Joshua is called to replace Moses as their faithful leader, tensions mount in the midst of dwindling supplies and approaching armies. With one last fortified city standing between the Israelites and the Promised Land, unexpected help emerges from behind enemy lines and Joshua's trust in God's plan is put to the ultimate test.  Filmed in front of a live audience, this special event invites you to experience one of the most redemptive stories of the Bible come to life like never before!",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/tAJJBIUQyXFSFs0JdwHx2VnUikL.jpg",
+          "imdbId": "tt43622757",
+          "runtimeMinutes": 145,
+          "cast": [
+            "Hope Klessig",
+            "Carl MJ Anderson"
+          ],
+          "director": "Ryan Miller",
+          "trailerUrl": "https://www.youtube.com/watch?v=G2UnTTQGh58",
+          "origin": [
+            "US"
+          ]
+        },
+        {
+          "id": "m-1636410",
+          "title": "Castration Movie Chapter iii.ii Junior Ghosts—Premorphic Drift; a fragmentary passage",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Comedy",
+            "Drama"
+          ],
+          "releaseDate": "2026-10-30",
+          "regions": [
+            "US"
+          ],
+          "heat": 17,
+          "synopsis": "Izzy does everything in her power to stop her partner from transitioning.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/yrtTSMW3qP84MEMQiYI8GJkTOAE.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/3n1YILG3Dlz8RkwrpntCfHDvHwM.jpg",
+          "imdbId": "tt40123429",
+          "runtimeMinutes": 127,
+          "cast": [
+            "Henri Gillespi",
+            "Avalon Fast",
+            "Dionne Copland",
+            "Louise Weard",
+            "Sepi Mashiahof"
+          ],
+          "director": "Louise Weard",
+          "trailerUrl": "https://www.youtube.com/watch?v=BSY6Xr8HHoE",
+          "origin": [
+            "CA"
+          ]
+        },
+        {
           "id": "m-1307474",
           "title": "On Behalf of My Son",
           "kind": "film",
@@ -12531,40 +12681,6 @@
           "director": "Gabriel Martins",
           "origin": [
             "BR"
-          ]
-        },
-        {
-          "id": "m-1784178",
-          "title": "Silt",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Horror",
-            "Science Fiction"
-          ],
-          "releaseDate": "2026-10-31",
-          "regions": [
-            "US"
-          ],
-          "heat": 17,
-          "synopsis": "Hadria, haunted by guilt she cannot explain, is talked into a weekend at an exclusive lakeside sanctuary by her best friend Sierra, and Sierra’s boyfriend Scott. She has never warmed to the hosts, Rick and Anna, but she goes for a shot at something with Mike Warner, a pro athlete sidelined by a knee injury. The property sits behind three locked gates, where hundreds of deer assemble, watching. The lake comes with lore, the kind that makes a good firepit story, and Bartleby, the eccentric owner, tells them it carries the genes of the Gods. Hadria doesn’t buy any of it, right up until the water starts proving Bartleby right.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/wyihUaanZs8kT9eHhfIIht764GP.jpg",
-          "imdbId": "tt35855318",
-          "cast": [
-            "Malcolm Goodwin",
-            "Olivia Grace Applegate",
-            "Tommy Wiseau",
-            "David Anders",
-            "Michael Papajohn"
-          ],
-          "director": "Aaron Jay Rome",
-          "origin": [
-            "US"
           ]
         },
         {
@@ -12638,6 +12754,38 @@
           ],
           "director": "Kasper Barfoed",
           "trailerUrl": "https://www.youtube.com/watch?v=ARYGWtBnQEA"
+        },
+        {
+          "id": "t-312006",
+          "title": "Anaesthesia",
+          "kind": "series",
+          "platforms": [
+            "netflix"
+          ],
+          "namedBy": "network",
+          "languages": [
+            "pl"
+          ],
+          "genres": [
+            "Drama"
+          ],
+          "releaseDate": "2026-11-04",
+          "regions": [
+            "IN"
+          ],
+          "heat": 17,
+          "synopsis": "After a bold but unsuccessful surgery, a talented doctor swaps a prestigious clinic for a local hospital as he tries to get his life back on track.",
+          "imdbId": "tt38681812",
+          "cast": [
+            "Leszek Lichota",
+            "Aleksandra Popławska",
+            "Filip Kowalewicz",
+            "Karolina Gruszka",
+            "Dorota Kolak"
+          ],
+          "origin": [
+            "PL"
+          ]
         },
         {
           "id": "m-1637705",
@@ -12716,8 +12864,8 @@
           ]
         },
         {
-          "id": "m-1733243",
-          "title": "Sight & Sound Presents: JOSHUA—Live!",
+          "id": "m-1784178",
+          "title": "Silt",
           "kind": "film",
           "platforms": [
             "theatres"
@@ -12726,24 +12874,25 @@
             "en"
           ],
           "genres": [
-            "Music",
-            "Family"
+            "Horror",
+            "Science Fiction"
           ],
-          "releaseDate": "2026-10-30",
+          "releaseDate": "2026-10-31",
           "regions": [
             "US"
           ],
           "heat": 16,
-          "synopsis": "Journey alongside the people of Israel as they navigate their new-found freedom in an unforgiving wilderness. When Joshua is called to replace Moses as their faithful leader, tensions mount in the midst of dwindling supplies and approaching armies. With one last fortified city standing between the Israelites and the Promised Land, unexpected help emerges from behind enemy lines and Joshua's trust in God's plan is put to the ultimate test.  Filmed in front of a live audience, this special event invites you to experience one of the most redemptive stories of the Bible come to life like never before!",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/tAJJBIUQyXFSFs0JdwHx2VnUikL.jpg",
-          "imdbId": "tt43622757",
-          "runtimeMinutes": 145,
+          "synopsis": "Hadria, haunted by guilt she cannot explain, is talked into a weekend at an exclusive lakeside sanctuary by her best friend Sierra, and Sierra’s boyfriend Scott. She has never warmed to the hosts, Rick and Anna, but she goes for a shot at something with Mike Warner, a pro athlete sidelined by a knee injury. The property sits behind three locked gates, where hundreds of deer assemble, watching. The lake comes with lore, the kind that makes a good firepit story, and Bartleby, the eccentric owner, tells them it carries the genes of the Gods. Hadria doesn’t buy any of it, right up until the water starts proving Bartleby right.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/wyihUaanZs8kT9eHhfIIht764GP.jpg",
+          "imdbId": "tt35855318",
           "cast": [
-            "Hope Klessig",
-            "Carl MJ Anderson"
+            "Malcolm Goodwin",
+            "Olivia Grace Applegate",
+            "Tommy Wiseau",
+            "David Anders",
+            "Michael Papajohn"
           ],
-          "director": "Ryan Miller",
-          "trailerUrl": "https://www.youtube.com/watch?v=G2UnTTQGh58",
+          "director": "Aaron Jay Rome",
           "origin": [
             "US"
           ]
@@ -12767,9 +12916,9 @@
             "US"
           ],
           "heat": 16,
-          "synopsis": "Through intimate interviews with surviving members of its legendary cast and an emotional reunion in Toronto, the film explores the creative partnership that transformed a small Canadian television production into a cultural phenomenon that launched some of comedy’s most celebrated icons.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/dSp528gsiCTMEth1DrJcxIXBXim.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/9bYNkPxyrWifcRd0ZXd03ccpbvD.jpg",
+          "synopsis": "Legendary \"SCTV\" cast members reunite in this documentary for a funny and heartfelt celebration of how a scrappy Canadian sketch show made comedy history.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/vBqVyTpzv5RzHSsQdu8ECxAqSvd.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/4EKa1ordKkch7bAYlV4e3fwsVCj.jpg",
           "imdbId": "tt44825373",
           "runtimeMinutes": 88,
           "cast": [
@@ -12780,7 +12929,7 @@
             "Rick Moranis"
           ],
           "director": "Jason Hehir",
-          "trailerUrl": "https://www.youtube.com/watch?v=24skSoZsJv0"
+          "trailerUrl": "https://www.youtube.com/watch?v=5vri0LVrMIE"
         },
         {
           "id": "m-1584779",
@@ -13033,35 +13182,6 @@
           ]
         },
         {
-          "id": "m-1804941~ott",
-          "title": "Mike Tyson: Return of the Mike",
-          "kind": "film",
-          "platforms": [
-            "netflix"
-          ],
-          "namedBy": "note",
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Comedy"
-          ],
-          "releaseDate": "2026-11-03",
-          "regions": [
-            "US"
-          ],
-          "heat": 11,
-          "synopsis": "The former heavyweight champion returns to the stage for a raw one-man show, turning his wildest life stories into comedy gold at Seminole Hard Rock Hotel and Casino.",
-          "imdbId": "tt46068179",
-          "cast": [
-            "Mike Tyson"
-          ],
-          "director": "Kiki Tyson",
-          "origin": [
-            "US"
-          ]
-        },
-        {
           "id": "m-1688459",
           "title": "KillR",
           "kind": "film",
@@ -13235,6 +13355,43 @@
           "origin": [
             "IN"
           ]
+        },
+        {
+          "id": "m-1811964~ott",
+          "title": "SI Yugandhar",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "namedBy": "note",
+          "languages": [
+            "te"
+          ],
+          "genres": [
+            "Action",
+            "Crime",
+            "Thriller"
+          ],
+          "releaseDate": "2026-10-30",
+          "regions": [
+            "IN"
+          ],
+          "heat": 5,
+          "synopsis": "An honest cop's discovery of a mysterious body launches a high-stakes investigation, forcing him to uncover a dark web of secrets hidden beneath the city's surface.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/mIK5YnqQWKZxyQgaeDDVywUxNWo.jpg",
+          "imdbId": "tt47421307",
+          "runtimeMinutes": 151,
+          "cast": [
+            "Aadi Saikumar",
+            "Megha Lekha",
+            "Rakendu Mouli",
+            "Lavannya Sahukara",
+            "Pavan Tej Konidela"
+          ],
+          "director": "Raghavendra Katari",
+          "trailerUrl": "https://www.youtube.com/watch?v=7exx6Nv-L0o",
+          "certification": "U/A 16+",
+          "theatrical": "wide"
         }
       ]
     },
@@ -13263,8 +13420,8 @@
             "US"
           ],
           "rating": 7.8,
-          "votes": 259,
-          "heat": 53,
+          "votes": 260,
+          "heat": 54,
           "synopsis": "June, 1940. France collapses and signs the armistice. In the midst of the chaos, one man refuses to give up. Alone against the odds, this unknown general flees to London to save what remains of freedom.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/ylXQDz9eAQuC785UQaz5wum2GSe.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/mu930fAteJp5tqiXZbxiONTBPnK.jpg",
@@ -13305,8 +13462,8 @@
             "US"
           ],
           "rating": 8,
-          "votes": 857,
-          "heat": 45,
+          "votes": 858,
+          "heat": 46,
           "synopsis": "In 1920s China, 19-year-old Songlian becomes a concubine of a powerful lord and is forced to compete with his three wives for the privileges gained.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/j6MGZpg55cTqlHHwahBtzI2qQg1.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/9UCHfC9tYojD4mMVBm0boyzYEQq.jpg",
@@ -13457,6 +13614,48 @@
           ]
         },
         {
+          "id": "m-1117898",
+          "title": "The Cat in the Hat",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Animation",
+            "Comedy",
+            "Adventure",
+            "Fantasy",
+            "Family"
+          ],
+          "releaseDate": "2026-11-06",
+          "regions": [
+            "US"
+          ],
+          "votes": 1,
+          "heat": 36,
+          "synopsis": "Assigned his toughest mission yet, the Cat must cheer up siblings Gabby and Sebastian as they adjust to life in a new town. Known for pushing boundaries, this agent of chaos must prove himself or risk losing his magical hat forever.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/mWN6knIVJ2o7eGwSm7mOgSCwNUc.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/9y9o686DsQg0KzPtERzcW7Cf8IE.jpg",
+          "imdbId": "tt2321555",
+          "runtimeMinutes": 108,
+          "cast": [
+            "Bill Hader",
+            "Xochitl Gomez",
+            "Tiago Martinez",
+            "Matt Berry",
+            "Quinta Brunson"
+          ],
+          "director": "Erica Rivinoja",
+          "trailerUrl": "https://www.youtube.com/watch?v=tkZpcypT8Z4",
+          "origin": [
+            "GB",
+            "US"
+          ]
+        },
+        {
           "id": "m-1096228~ott",
           "title": "Musk",
           "kind": "documentary",
@@ -13540,48 +13739,6 @@
           ]
         },
         {
-          "id": "m-1117898",
-          "title": "The Cat in the Hat",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Animation",
-            "Comedy",
-            "Adventure",
-            "Fantasy",
-            "Family"
-          ],
-          "releaseDate": "2026-11-06",
-          "regions": [
-            "US"
-          ],
-          "votes": 1,
-          "heat": 35,
-          "synopsis": "Assigned his toughest mission yet, the Cat must cheer up siblings Gabby and Sebastian as they adjust to life in a new town. Known for pushing boundaries, this agent of chaos must prove himself or risk losing his magical hat forever.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/mWN6knIVJ2o7eGwSm7mOgSCwNUc.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/9y9o686DsQg0KzPtERzcW7Cf8IE.jpg",
-          "imdbId": "tt2321555",
-          "runtimeMinutes": 108,
-          "cast": [
-            "Bill Hader",
-            "Xochitl Gomez",
-            "Tiago Martinez",
-            "Matt Berry",
-            "Quinta Brunson"
-          ],
-          "director": "Erica Rivinoja",
-          "trailerUrl": "https://www.youtube.com/watch?v=tkZpcypT8Z4",
-          "origin": [
-            "GB",
-            "US"
-          ]
-        },
-        {
           "id": "m-1286656",
           "title": "I Play Rocky",
           "kind": "film",
@@ -13618,45 +13775,6 @@
             "US",
             "AU"
           ]
-        },
-        {
-          "id": "m-1585239",
-          "title": "Club Kid",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Comedy",
-            "Drama"
-          ],
-          "releaseDate": "2026-11-06",
-          "regions": [
-            "US"
-          ],
-          "heat": 28,
-          "synopsis": "A hard-partying New York City club promoter sees his whirlwind lifestyle upended by the arrival of the 10-year-old son he never knew he had.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/o1qMU0ZB5XDX8IXJFFu3AkhOqjh.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/AjrgF2JZb8WAeIFTvUjJK6VA2CG.jpg",
-          "imdbId": "tt38058097",
-          "runtimeMinutes": 126,
-          "cast": [
-            "Jordan Firstman",
-            "Reggie Absolom",
-            "Cara Delevingne",
-            "Diego Calva",
-            "Kirby Howell-Baptiste"
-          ],
-          "director": "Jordan Firstman",
-          "trailerUrl": "https://www.youtube.com/watch?v=guKEdb_iRXw",
-          "origin": [
-            "US"
-          ],
-          "imdbRating": 8.1,
-          "imdbVotes": 427
         },
         {
           "id": "m-1483525~ott",
@@ -13702,6 +13820,82 @@
           "imdbVotes": 23
         },
         {
+          "id": "m-1585239",
+          "title": "Club Kid",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Comedy",
+            "Drama"
+          ],
+          "releaseDate": "2026-11-06",
+          "regions": [
+            "US"
+          ],
+          "heat": 27,
+          "synopsis": "A hard-partying New York City club promoter sees his whirlwind lifestyle upended by the arrival of the 10-year-old son he never knew he had.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/o1qMU0ZB5XDX8IXJFFu3AkhOqjh.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/AjrgF2JZb8WAeIFTvUjJK6VA2CG.jpg",
+          "imdbId": "tt38058097",
+          "runtimeMinutes": 126,
+          "cast": [
+            "Jordan Firstman",
+            "Reggie Absolom",
+            "Cara Delevingne",
+            "Diego Calva",
+            "Kirby Howell-Baptiste"
+          ],
+          "director": "Jordan Firstman",
+          "trailerUrl": "https://www.youtube.com/watch?v=guKEdb_iRXw",
+          "origin": [
+            "US"
+          ],
+          "imdbRating": 8.1,
+          "imdbVotes": 427
+        },
+        {
+          "id": "m-1131943",
+          "title": "Madden",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Drama",
+            "History"
+          ],
+          "releaseDate": "2026-11-11",
+          "regions": [
+            "US"
+          ],
+          "heat": 27,
+          "synopsis": "Chronicles John Madden's incredible journey alongside best friend and true original Al Davis—from a Super Bowl-winning partnership with the Raiders, to becoming football’s most recognizable voice, to building the worldwide Madden NFL video game.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/bRa83oPFFPqaAF3wrpVWPqqfFel.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/iNKyRudHcd2oXV5eaWE0LbixkX3.jpg",
+          "imdbId": "tt24818230",
+          "runtimeMinutes": 110,
+          "cast": [
+            "Nicolas Cage",
+            "Christian Bale",
+            "John Mulaney",
+            "Kathryn Hahn",
+            "Sienna Miller"
+          ],
+          "director": "David O. Russell",
+          "trailerUrl": "https://www.youtube.com/watch?v=xzh7HzLXXpk",
+          "origin": [
+            "US"
+          ]
+        },
+        {
           "id": "t-306179",
           "title": "Awkwafina: The Unlikely Cook",
           "kind": "documentary",
@@ -13723,7 +13917,7 @@
           "heat": 27,
           "synopsis": "Hollywood actor and comedian Nora Lum (a.k.a. Awkwafina) is the descendant of restaurant royalty...but she can't cook. Join the star on an inspiring culinary road trip as she learns the craft and attempts to revive her family's beloved Chinese eatery.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/nToXQbpoLsotbo0bspL7mTnRmMx.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/hdp5nhOXYd2OmO62a2hZgADEfsK.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/vSMW22GgtzgsRaAmZaTM6xtPdNP.jpg",
           "imdbId": "tt38992068",
           "cast": [
             "Awkwafina"
@@ -13772,8 +13966,8 @@
           ]
         },
         {
-          "id": "m-1131943",
-          "title": "Madden",
+          "id": "m-1697911",
+          "title": "Drummer Boy",
           "kind": "film",
           "platforms": [
             "theatres"
@@ -13782,28 +13976,29 @@
             "en"
           ],
           "genres": [
-            "Drama",
-            "History"
+            "War",
+            "Romance",
+            "Music"
           ],
-          "releaseDate": "2026-11-11",
+          "releaseDate": "2026-11-06",
           "regions": [
             "US"
           ],
           "heat": 26,
-          "synopsis": "Chronicles John Madden's incredible journey alongside best friend and true original Al Davis—from a Super Bowl-winning partnership with the Raiders, to becoming football’s most recognizable voice, to building the worldwide Madden NFL video game.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/bRa83oPFFPqaAF3wrpVWPqqfFel.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/iNKyRudHcd2oXV5eaWE0LbixkX3.jpg",
-          "imdbId": "tt24818230",
-          "runtimeMinutes": 110,
+          "synopsis": "As America’s fight for independence begins, a young drummer boy, an enslaved woman, and a divided family each search for freedom in a world built to deny it. With music carrying hope through battle and loss, Drummer Boy turns the Revolution into a deeply human story of faith, forgiveness, and the belief that no person is born to live in chains or be forgotten.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/bhjdgMm2fFrysSzVqv5RwRwIbVf.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/5KF459N6jOfRV7kV9XV7ZQdCLKK.jpg",
+          "imdbId": "tt10098420",
+          "runtimeMinutes": 129,
           "cast": [
-            "Nicolas Cage",
-            "Christian Bale",
-            "John Mulaney",
-            "Kathryn Hahn",
-            "Sienna Miller"
+            "Joel Smallbone",
+            "Beth Easdown",
+            "Kenneth Barry",
+            "Charles Esten",
+            "Iain Glen"
           ],
-          "director": "David O. Russell",
-          "trailerUrl": "https://www.youtube.com/watch?v=xzh7HzLXXpk",
+          "director": "Ben Smallbone",
+          "trailerUrl": "https://www.youtube.com/watch?v=rXaR4nXRvOY",
           "origin": [
             "US"
           ]
@@ -13887,44 +14082,6 @@
           ]
         },
         {
-          "id": "m-1697911",
-          "title": "Drummer Boy",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "War",
-            "Romance",
-            "Music"
-          ],
-          "releaseDate": "2026-11-06",
-          "regions": [
-            "US"
-          ],
-          "heat": 25,
-          "synopsis": "As America’s fight for independence begins, a young drummer boy, an enslaved woman, and a divided family each search for freedom in a world built to deny it. With music carrying hope through battle and loss, Drummer Boy turns the Revolution into a deeply human story of faith, forgiveness, and the belief that no person is born to live in chains or be forgotten.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/bhjdgMm2fFrysSzVqv5RwRwIbVf.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/5KF459N6jOfRV7kV9XV7ZQdCLKK.jpg",
-          "imdbId": "tt10098420",
-          "runtimeMinutes": 129,
-          "cast": [
-            "Joel Smallbone",
-            "Beth Easdown",
-            "Kenneth Barry",
-            "Charles Esten",
-            "Iain Glen"
-          ],
-          "director": "Ben Smallbone",
-          "trailerUrl": "https://www.youtube.com/watch?v=rXaR4nXRvOY",
-          "origin": [
-            "US"
-          ]
-        },
-        {
           "id": "m-1655419",
           "title": "Everytime",
           "kind": "film",
@@ -13943,7 +14100,7 @@
           ],
           "rating": 7.4,
           "votes": 11,
-          "heat": 25,
+          "heat": 24,
           "synopsis": "A tragedy brings a mother, daughter, and teenage boy together. Struggling with blame and forgiveness, the unlikely trio take a trip to Tenerife for a family holiday that never happened. Under the glow of the sun, past and present quietly start to overlap.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/lbZ7ltgw8xiKfCEXme8GO5HcV9z.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/bRkk5HjNLQMWB3LlZdxySSzxVLi.jpg",
@@ -13964,44 +14121,6 @@
           ],
           "imdbRating": 6.3,
           "imdbVotes": 30
-        },
-        {
-          "id": "m-1287365",
-          "title": "The Liberation",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Drama",
-            "Thriller"
-          ],
-          "releaseDate": "2026-11-06",
-          "regions": [
-            "US"
-          ],
-          "heat": 24,
-          "synopsis": "Rita is entranced by the mesmeric Leader and renounces her family to embrace the world of the enigmatic Harmonia commune. Her daughters Ella and Jo put everything on the line to infiltrate the cult and bring their mother home. Yet, once immersed in the commune, they find themselves inexorably drawn into the Leader’s labyrinthine web of psycho-spiritual manipulation.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/cjbHYvJz9j5H3BSBfoaOiGMEHeZ.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/9hrTg5I0cH4kCtlEfdtsb9krxtS.jpg",
-          "imdbId": "tt8613988",
-          "runtimeMinutes": 124,
-          "cast": [
-            "Carrie Coon",
-            "Lily James",
-            "Bella Ramsey",
-            "Odessa Young",
-            "Tracy Letts"
-          ],
-          "director": "Guy Nattiv",
-          "origin": [
-            "US",
-            "AE",
-            "HK"
-          ]
         },
         {
           "id": "t-291507",
@@ -14042,6 +14161,44 @@
           ]
         },
         {
+          "id": "m-1287365",
+          "title": "The Liberation",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Drama",
+            "Thriller"
+          ],
+          "releaseDate": "2026-11-06",
+          "regions": [
+            "US"
+          ],
+          "heat": 23,
+          "synopsis": "Rita is entranced by the mesmeric Leader and renounces her family to embrace the world of the enigmatic Harmonia commune. Her daughters Ella and Jo put everything on the line to infiltrate the cult and bring their mother home. Yet, once immersed in the commune, they find themselves inexorably drawn into the Leader’s labyrinthine web of psycho-spiritual manipulation.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/cjbHYvJz9j5H3BSBfoaOiGMEHeZ.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/9hrTg5I0cH4kCtlEfdtsb9krxtS.jpg",
+          "imdbId": "tt8613988",
+          "runtimeMinutes": 124,
+          "cast": [
+            "Carrie Coon",
+            "Lily James",
+            "Bella Ramsey",
+            "Odessa Young",
+            "Tracy Letts"
+          ],
+          "director": "Guy Nattiv",
+          "origin": [
+            "US",
+            "AE",
+            "HK"
+          ]
+        },
+        {
           "id": "m-1612811",
           "title": "Disco",
           "kind": "film",
@@ -14073,6 +14230,43 @@
           "theatrical": "wide",
           "origin": [
             "IN"
+          ]
+        },
+        {
+          "id": "m-1050981",
+          "title": "Being Heumann",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Drama",
+            "History"
+          ],
+          "releaseDate": "2026-11-06",
+          "regions": [
+            "US"
+          ],
+          "heat": 22,
+          "synopsis": "Scrappy, defiant, and done being treated like a burden, Judy Heumann turns her outrage into a revolution. In 1977, she and more than 100 disability rights protestors send a very loud message: The system is broken—not us.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/ouGH1PS0xjDyfTQOhppn7QzJqQZ.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/oBnXYbdvloYAHttptpASZYmztft.jpg",
+          "imdbId": "tt15095848",
+          "runtimeMinutes": 127,
+          "cast": [
+            "Ruth Madeley",
+            "Mark Ruffalo",
+            "Dylan O'Brien",
+            "Madeline Delp",
+            "Rob Delaney"
+          ],
+          "director": "Sian Heder",
+          "trailerUrl": "https://www.youtube.com/watch?v=CQp2pUXLvJk",
+          "origin": [
+            "US"
           ]
         },
         {
@@ -14154,8 +14348,8 @@
           "imdbVotes": 40
         },
         {
-          "id": "m-1050981",
-          "title": "Being Heumann",
+          "id": "m-1241478",
+          "title": "Jimmy",
           "kind": "film",
           "platforms": [
             "theatres"
@@ -14172,20 +14366,20 @@
             "US"
           ],
           "heat": 21,
-          "synopsis": "Scrappy, defiant, and done being treated like a burden, Judy Heumann turns her outrage into a revolution. In 1977, she and more than 100 disability rights protestors send a very loud message: The system is broken—not us.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/ouGH1PS0xjDyfTQOhppn7QzJqQZ.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/oBnXYbdvloYAHttptpASZYmztft.jpg",
-          "imdbId": "tt15095848",
-          "runtimeMinutes": 127,
+          "synopsis": "A look into the life of American actor James Stewart, whose inspiring tale of valor, purpose and faith will win over everyone.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/c3fWnsg5VEP5EhYZ4oY2NpFrrU1.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/2q3oieEIadF90wOtm9WGX5vrqUR.jpg",
+          "imdbId": "tt31179962",
+          "runtimeMinutes": 120,
           "cast": [
-            "Ruth Madeley",
-            "Mark Ruffalo",
-            "Dylan O'Brien",
-            "Madeline Delp",
-            "Rob Delaney"
+            "KJ Apa",
+            "Jason Alexander",
+            "Max Casella",
+            "Sarah Drew",
+            "Julian Works"
           ],
-          "director": "Sian Heder",
-          "trailerUrl": "https://www.youtube.com/watch?v=CQp2pUXLvJk",
+          "director": "Aaron Burns",
+          "trailerUrl": "https://www.youtube.com/watch?v=4nrB_T3F53Y",
           "origin": [
             "US"
           ]
@@ -14223,80 +14417,6 @@
           ],
           "imdbRating": 6.7,
           "imdbVotes": 9
-        },
-        {
-          "id": "m-1241478",
-          "title": "Jimmy",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Drama",
-            "History"
-          ],
-          "releaseDate": "2026-11-06",
-          "regions": [
-            "US"
-          ],
-          "heat": 20,
-          "synopsis": "A look into the life of American actor James Stewart, whose inspiring tale of valor, purpose and faith will win over everyone.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/c3fWnsg5VEP5EhYZ4oY2NpFrrU1.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/2q3oieEIadF90wOtm9WGX5vrqUR.jpg",
-          "imdbId": "tt31179962",
-          "runtimeMinutes": 120,
-          "cast": [
-            "KJ Apa",
-            "Jason Alexander",
-            "Max Casella",
-            "Sarah Drew",
-            "Julian Works"
-          ],
-          "director": "Aaron Burns",
-          "trailerUrl": "https://www.youtube.com/watch?v=4nrB_T3F53Y",
-          "origin": [
-            "US"
-          ]
-        },
-        {
-          "id": "m-1632305",
-          "title": "Her Song",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Drama",
-            "Comedy"
-          ],
-          "releaseDate": "2026-11-06",
-          "regions": [
-            "US"
-          ],
-          "heat": 20,
-          "synopsis": "Olivia, a Franco-American writer, returns to her ancestral village in the south of France to write the story of her grandmother, who fled Paris during the Nazi invasion during World War II. There, she meets Madeline, a talented local artist, who quickly replaces her grandmother as the face of the novel. As a number of strange coincidences ensue, fiction and reality intermingle uncannily, and Olivia starts to ask whether she's part of history's unfolding story, or vice-versa.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/8lbdVpNZ56RFc9YFKdDDG5DigmK.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/iVrLaYa8UV1quEy7mqkkj9H3Gop.jpg",
-          "imdbId": "tt32397787",
-          "runtimeMinutes": 105,
-          "cast": [
-            "Kalki Koechlin",
-            "Eléa Clair",
-            "Zach Grenier",
-            "Marie-Christine Adam",
-            "Thais Sobreira"
-          ],
-          "director": "John M. Keller",
-          "trailerUrl": "https://www.youtube.com/watch?v=_vXdYDzZ-CM",
-          "origin": [
-            "US"
-          ]
         },
         {
           "id": "t-338562",
@@ -14439,40 +14559,6 @@
           ]
         },
         {
-          "id": "m-1518204~ott",
-          "title": "Allen",
-          "kind": "film",
-          "platforms": [
-            "netflix"
-          ],
-          "namedBy": "note",
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Science Fiction"
-          ],
-          "releaseDate": "2026-11-12",
-          "regions": [
-            "US"
-          ],
-          "heat": 17,
-          "posterUrl": "https://image.tmdb.org/t/p/w500/alhhrpj1PSAn5bfz4Os1k7Bweoj.jpg",
-          "imdbId": "tt37675123",
-          "cast": [
-            "T.J. Power",
-            "Charlotte Nicdao",
-            "Josh Helman",
-            "Benedict Hardie",
-            "Emily Barclay"
-          ],
-          "director": "Daley Pearson",
-          "trailerUrl": "https://www.youtube.com/watch?v=P8G5Y25W3eA",
-          "origin": [
-            "AU"
-          ]
-        },
-        {
           "id": "m-1616419~ott",
           "title": "The Good Lawyer",
           "kind": "film",
@@ -14509,6 +14595,40 @@
           ]
         },
         {
+          "id": "m-1518204~ott",
+          "title": "Allen",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "namedBy": "note",
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Science Fiction"
+          ],
+          "releaseDate": "2026-11-12",
+          "regions": [
+            "US"
+          ],
+          "heat": 17,
+          "posterUrl": "https://image.tmdb.org/t/p/w500/alhhrpj1PSAn5bfz4Os1k7Bweoj.jpg",
+          "imdbId": "tt37675123",
+          "cast": [
+            "T.J. Power",
+            "Charlotte Nicdao",
+            "Josh Helman",
+            "Benedict Hardie",
+            "Emily Barclay"
+          ],
+          "director": "Daley Pearson",
+          "trailerUrl": "https://www.youtube.com/watch?v=P8G5Y25W3eA",
+          "origin": [
+            "AU"
+          ]
+        },
+        {
           "id": "t-336478",
           "title": "Doozie's Doghouse",
           "kind": "anime",
@@ -14537,6 +14657,45 @@
             "Aaliyah Butler",
             "Kimiko Glenn",
             "Kari Wahlgren"
+          ]
+        },
+        {
+          "id": "m-1381221~ott",
+          "title": "Misty Green",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "namedBy": "note",
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Drama",
+            "Comedy"
+          ],
+          "releaseDate": "2026-11-09",
+          "regions": [
+            "US"
+          ],
+          "votes": 2,
+          "heat": 16,
+          "synopsis": "Years after her Hollywood breakthrough, a talented actress whose career has stalled fights for her second act.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/dUFtfnSfUK5IUfC5XMlMEY36EAp.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/vb8ynrTs7xp7gaEIplf0zcjJZeh.jpg",
+          "imdbId": "tt34385184",
+          "runtimeMinutes": 103,
+          "cast": [
+            "Rosalind Eleazar",
+            "Adam Driver",
+            "Daniel Kaluuya",
+            "Anna Kendrick",
+            "Chris Rock"
+          ],
+          "director": "Chris Rock",
+          "trailerUrl": "https://www.youtube.com/watch?v=5SohUK9E_eo",
+          "origin": [
+            "US"
           ]
         },
         {
@@ -14581,45 +14740,6 @@
           "imdbVotes": 25
         },
         {
-          "id": "m-1381221~ott",
-          "title": "Misty Green",
-          "kind": "film",
-          "platforms": [
-            "netflix"
-          ],
-          "namedBy": "note",
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Drama",
-            "Comedy"
-          ],
-          "releaseDate": "2026-11-09",
-          "regions": [
-            "US"
-          ],
-          "votes": 2,
-          "heat": 16,
-          "synopsis": "Years after her Hollywood breakthrough, a talented actress whose career has stalled fights for her second act.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/dUFtfnSfUK5IUfC5XMlMEY36EAp.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/vb8ynrTs7xp7gaEIplf0zcjJZeh.jpg",
-          "imdbId": "tt34385184",
-          "runtimeMinutes": 103,
-          "cast": [
-            "Rosalind Eleazar",
-            "Adam Driver",
-            "Daniel Kaluuya",
-            "Anna Kendrick",
-            "Chris Rock"
-          ],
-          "director": "Chris Rock",
-          "trailerUrl": "https://www.youtube.com/watch?v=5SohUK9E_eo",
-          "origin": [
-            "US"
-          ]
-        },
-        {
           "id": "m-1616687~ott",
           "title": "Never Surrender",
           "kind": "film",
@@ -14657,43 +14777,6 @@
           "trailerUrl": "https://www.youtube.com/watch?v=CALwAlglPIc",
           "origin": [
             "ID"
-          ]
-        },
-        {
-          "id": "t-306936",
-          "title": "Oxytoxin",
-          "kind": "series",
-          "platforms": [
-            "netflix"
-          ],
-          "namedBy": "network",
-          "languages": [
-            "th"
-          ],
-          "genres": [
-            "Drama"
-          ],
-          "releaseDate": "2026-11-07",
-          "regions": [
-            "IN",
-            "US"
-          ],
-          "heat": 16,
-          "synopsis": "At St. Cecilia, there's an influential and feared high school friend group known as Toxxxxin led by Aidao, Gale, Chelsea, and Meimei. When bullied scholarship student Junjai comes into their orbit, Aidao finds her to bear a striking resemblance to the girl haunting her dreams. The girls take her in and elevate her social status as they pursue dreams of modelling and designing. The real world, however, is no dream, and the girls are plunged into trials they've never had to face before.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/mcjgiKrhHldOqRs7bmfIyCc3cfJ.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/yXkRoVxzXRl23nZcLABWfiAlTye.jpg",
-          "imdbId": "tt39044730",
-          "cast": [
-            "Chanitsiri Ratananimit",
-            "Nonthakarn Kaewobchoey",
-            "Jittanan Sirisamrit",
-            "Yosita Wasuphiruk",
-            "Sabsima Payakharn"
-          ],
-          "director": "Patha Thongpan",
-          "trailerUrl": "https://www.youtube.com/watch?v=whry_7Bh1a8",
-          "origin": [
-            "TH"
           ]
         },
         {
@@ -15864,43 +15947,6 @@
           ]
         },
         {
-          "id": "m-1241052",
-          "title": "Mouse",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Drama",
-            "Comedy"
-          ],
-          "releaseDate": "2026-11-13",
-          "regions": [
-            "US"
-          ],
-          "heat": 17,
-          "synopsis": "When her closest friendship is suddenly disrupted the summer before senior year, a teenager struggles to find her footing and develops an unexpected, complicated bond with her best friend’s mother.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/iKBFfOCdeu21lxxLxWaSAXxkmJ5.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/1pR6uu0e9h4tJiSuYLuiRm7id6x.jpg",
-          "imdbId": "tt13652154",
-          "runtimeMinutes": 120,
-          "cast": [
-            "Sophie Okonedo",
-            "Katherine Mallen Kupferer",
-            "Chloe Coleman",
-            "David Hyde Pierce",
-            "Tara Mallen"
-          ],
-          "director": "Alex Thompson",
-          "trailerUrl": "https://www.youtube.com/watch?v=sfvh4VZsFuY",
-          "origin": [
-            "US"
-          ]
-        },
-        {
           "id": "m-1710024",
           "title": "Remember",
           "kind": "film",
@@ -15934,6 +15980,43 @@
           "trailerUrl": "https://www.youtube.com/watch?v=zN2jvnH4yoQ",
           "origin": [
             "PH"
+          ]
+        },
+        {
+          "id": "m-1241052",
+          "title": "Mouse",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Drama",
+            "Comedy"
+          ],
+          "releaseDate": "2026-11-13",
+          "regions": [
+            "US"
+          ],
+          "heat": 17,
+          "synopsis": "When her closest friendship is suddenly disrupted the summer before senior year, a teenager struggles to find her footing and develops an unexpected, complicated bond with her best friend’s mother.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/iKBFfOCdeu21lxxLxWaSAXxkmJ5.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/1pR6uu0e9h4tJiSuYLuiRm7id6x.jpg",
+          "imdbId": "tt13652154",
+          "runtimeMinutes": 120,
+          "cast": [
+            "Sophie Okonedo",
+            "Katherine Mallen Kupferer",
+            "Chloe Coleman",
+            "David Hyde Pierce",
+            "Tara Mallen"
+          ],
+          "director": "Kelly O'Sullivan",
+          "trailerUrl": "https://www.youtube.com/watch?v=sfvh4VZsFuY",
+          "origin": [
+            "US"
           ]
         },
         {
@@ -16156,36 +16239,6 @@
           ]
         },
         {
-          "id": "m-1590846",
-          "title": "V. Shantaram",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "hi"
-          ],
-          "genres": [
-            "Drama"
-          ],
-          "releaseDate": "2026-11-18",
-          "regions": [
-            "IN"
-          ],
-          "heat": 15,
-          "synopsis": "Chronicles Shantaram Rajaram Vankudre, aka V. Shantaram, on his remarkable journey from the silent era through the advent of sound and colour, showcasing his evolution as one of India’s most influential filmmakers.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/cary9HR1kSMzbPYXJeKqsposXZp.jpg",
-          "cast": [
-            "Siddhant Chaturvedi",
-            "Tamannaah Bhatia"
-          ],
-          "director": "Abhijeet Deshpande",
-          "theatrical": "wide",
-          "origin": [
-            "IN"
-          ]
-        },
-        {
           "id": "m-1641520",
           "title": "Donga Naa Koduku",
           "kind": "film",
@@ -16216,6 +16269,36 @@
             "Rajitha"
           ],
           "director": "Sreenu Kambala",
+          "theatrical": "wide",
+          "origin": [
+            "IN"
+          ]
+        },
+        {
+          "id": "m-1590846",
+          "title": "V. Shantaram",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "hi"
+          ],
+          "genres": [
+            "Drama"
+          ],
+          "releaseDate": "2026-11-18",
+          "regions": [
+            "IN"
+          ],
+          "heat": 15,
+          "synopsis": "Chronicles Shantaram Rajaram Vankudre, aka V. Shantaram, on his remarkable journey from the silent era through the advent of sound and colour, showcasing his evolution as one of India’s most influential filmmakers.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/cary9HR1kSMzbPYXJeKqsposXZp.jpg",
+          "cast": [
+            "Siddhant Chaturvedi",
+            "Tamannaah Bhatia"
+          ],
+          "director": "Abhijeet Deshpande",
           "theatrical": "wide",
           "origin": [
             "IN"
@@ -16330,6 +16413,35 @@
           ]
         },
         {
+          "id": "t-305245",
+          "title": "Silent Night",
+          "kind": "series",
+          "platforms": [
+            "hbomax"
+          ],
+          "namedBy": "network",
+          "languages": [
+            "pl"
+          ],
+          "genres": [
+            "Crime",
+            "Drama",
+            "Mystery"
+          ],
+          "releaseDate": "2026-11-13",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 14,
+          "posterUrl": "https://image.tmdb.org/t/p/w500/avV8XpBHNSnqYHzUNskv9LVVTFu.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/1G36FygY3hPf3qBJXJn7oxllJSS.jpg",
+          "imdbId": "tt38961437",
+          "origin": [
+            "PL"
+          ]
+        },
+        {
           "id": "t-315222",
           "title": "Infamia",
           "kind": "series",
@@ -16428,59 +16540,6 @@
           ]
         },
         {
-          "id": "t-339407",
-          "title": "He Said, She Said: Till Death Do Us Part",
-          "kind": "documentary",
-          "platforms": [
-            "paramount"
-          ],
-          "namedBy": "network",
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Documentary"
-          ],
-          "releaseDate": "2026-11-17",
-          "regions": [
-            "IN",
-            "US"
-          ],
-          "heat": 13,
-          "synopsis": "Follows a no-holds-barred custody battle between two high-powered lawyers, which extends beyond the courtroom into social media and the court of public opinion.",
-          "origin": [
-            "US"
-          ]
-        },
-        {
-          "id": "m-1361326",
-          "title": "Miasmata",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "pt"
-          ],
-          "genres": [
-            "Thriller",
-            "Horror",
-            "Fantasy"
-          ],
-          "releaseDate": "2026-11-17",
-          "regions": [
-            "US"
-          ],
-          "heat": 12,
-          "posterUrl": "https://image.tmdb.org/t/p/w500/xNz3Dum4WjxRVrOGYKUh0XAQvqI.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/scI8m1H37P0RaA8DSOmRFwLXTKR.jpg",
-          "cast": [
-            "Catarina Melo",
-            "Catarina Melo"
-          ],
-          "director": "Thiago Ramos"
-        },
-        {
           "id": "m-1652946",
           "title": "Top",
           "kind": "film",
@@ -16509,6 +16568,34 @@
           ],
           "director": "Jake Morgan-Scharhon",
           "theatrical": "limited"
+        },
+        {
+          "id": "m-1361326",
+          "title": "Miasmata",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "pt"
+          ],
+          "genres": [
+            "Thriller",
+            "Horror",
+            "Fantasy"
+          ],
+          "releaseDate": "2026-11-17",
+          "regions": [
+            "US"
+          ],
+          "heat": 12,
+          "posterUrl": "https://image.tmdb.org/t/p/w500/xNz3Dum4WjxRVrOGYKUh0XAQvqI.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/scI8m1H37P0RaA8DSOmRFwLXTKR.jpg",
+          "cast": [
+            "Catarina Melo",
+            "Catarina Melo"
+          ],
+          "director": "Thiago Ramos"
         },
         {
           "id": "m-1505424",
@@ -17122,7 +17209,7 @@
             "US"
           ],
           "rating": 7.7,
-          "votes": 26,
+          "votes": 27,
           "heat": 26,
           "synopsis": "When Gleb, a successful company director, finds himself under siege from mounting corporate pressures, an increasingly unstable world, and the discovery of his wife's affair, the collapse of his carefully ordered life accelerates toward violence.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/bM37B5CuMWrPyGPpNsKzTGict4Q.jpg",
@@ -17983,40 +18070,6 @@
           ]
         },
         {
-          "id": "m-1611767~ott",
-          "title": "Clashing Through the Snow",
-          "kind": "film",
-          "platforms": [
-            "prime"
-          ],
-          "namedBy": "note",
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Comedy"
-          ],
-          "releaseDate": "2026-11-25",
-          "regions": [
-            "US"
-          ],
-          "heat": 15,
-          "synopsis": "After weather grounds all flights east for the holidays, two work rivals competing for the same job begrudgingly embark on a cross-country road trip that brings them closer together in ways they never imagined.",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/r7lqFWOrHLUw5LKDheRV7y4JV6A.jpg",
-          "imdbId": "tt39316936",
-          "cast": [
-            "Christopher Briney",
-            "Michelle Randolph",
-            "Lukas Gage",
-            "Paris Hilton",
-            "Julia Fox"
-          ],
-          "director": "Carlson Young",
-          "origin": [
-            "US"
-          ]
-        },
-        {
           "id": "m-1632599~ott",
           "title": "The Slightest Touch",
           "kind": "documentary",
@@ -18050,6 +18103,40 @@
           "origin": [
             "GB",
             "IE",
+            "US"
+          ]
+        },
+        {
+          "id": "m-1611767~ott",
+          "title": "Clashing Through the Snow",
+          "kind": "film",
+          "platforms": [
+            "prime"
+          ],
+          "namedBy": "note",
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Comedy"
+          ],
+          "releaseDate": "2026-11-25",
+          "regions": [
+            "US"
+          ],
+          "heat": 15,
+          "synopsis": "After weather grounds all flights east for the holidays, two work rivals competing for the same job begrudgingly embark on a cross-country road trip that brings them closer together in ways they never imagined.",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/r7lqFWOrHLUw5LKDheRV7y4JV6A.jpg",
+          "imdbId": "tt39316936",
+          "cast": [
+            "Christopher Briney",
+            "Michelle Randolph",
+            "Lukas Gage",
+            "Paris Hilton",
+            "Julia Fox"
+          ],
+          "director": "Carlson Young",
+          "origin": [
             "US"
           ]
         },
@@ -18200,6 +18287,7 @@
             "IN"
           ],
           "heat": 12,
+          "synopsis": "Follows a cheerful lawyer whose life turns upside down when she takes up a major case while navigating her own emotional pain and fighting for social justice.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/6CTZmOW9YrHxxaYjK56rB8DvefR.jpg",
           "imdbId": "tt38123579",
           "cast": [
@@ -18307,6 +18395,34 @@
           "origin": [
             "US"
           ]
+        },
+        {
+          "id": "m-1804628",
+          "title": "Errand Guy",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [],
+          "releaseDate": "2026-11-21",
+          "regions": [
+            "US"
+          ],
+          "heat": 9,
+          "synopsis": "Brad, a middle-aged errand runner, gets guilt-tripped by his dead Jewish Grandmother into believing his passive life embarrasses his ancestors, so he steals a Ferrari and tries to buy a minor league baseball team behind his wife's back.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/gu651wxH85EMChwOAiHfWSG9I8B.jpg",
+          "imdbId": "tt37275724",
+          "runtimeMinutes": 76,
+          "cast": [
+            "Jason Levinson",
+            "Cooper Shaw",
+            "Ashley Pearson",
+            "Carol Kenley"
+          ],
+          "director": "Jason Levinson"
         },
         {
           "id": "m-1733594",
@@ -18443,39 +18559,6 @@
           "origin": [
             "IN"
           ]
-        },
-        {
-          "id": "m-1808541",
-          "title": "Tales of Ardenmore",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Fantasy",
-            "Adventure"
-          ],
-          "releaseDate": "2026-11-20",
-          "regions": [
-            "US"
-          ],
-          "heat": 6,
-          "synopsis": "A brash knight-in-training must partner with the woman he spurned, on a quest to save his brother from an undead sorcerer. Together they must overcome rogue warriors, monsters and magic.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/r9motiet8QZHfRZJB4O6talIE5b.jpg",
-          "imdbId": "tt43335977",
-          "runtimeMinutes": 82,
-          "cast": [
-            "David Duplechin",
-            "Bridgett Mistrot",
-            "Joe Coffey",
-            "Hondo Hendricks",
-            "Tylor Christiansen"
-          ],
-          "director": "Lance B. Witmer",
-          "trailerUrl": "https://www.youtube.com/watch?v=zR3UyJ7lEqo"
         }
       ]
     },
@@ -18504,7 +18587,7 @@
             "US"
           ],
           "rating": 8,
-          "votes": 144,
+          "votes": 145,
           "heat": 70,
           "synopsis": "The intertwined lives of three men in three different eras, three lives intimately linked by sexuality and desire, pain, and legacy.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/jT5SR5qc9KvVg7HUEmjMWEUYMce.jpg",
@@ -19046,7 +19129,9 @@
             "FR",
             "BE",
             "US"
-          ]
+          ],
+          "imdbRating": 6,
+          "imdbVotes": 24
         },
         {
           "id": "m-1405200",
@@ -19084,6 +19169,39 @@
             "NO",
             "RW",
             "FR"
+          ],
+          "imdbRating": 6.7,
+          "imdbVotes": 16
+        },
+        {
+          "id": "m-1715686~ott",
+          "title": "Mickey's Home Alone",
+          "kind": "film",
+          "platforms": [
+            "disney"
+          ],
+          "namedBy": "note",
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Animation",
+            "Family",
+            "TV Movie",
+            "Comedy"
+          ],
+          "releaseDate": "2026-11-27",
+          "regions": [
+            "US"
+          ],
+          "heat": 15,
+          "synopsis": "Looking forward to spending Christmas at home, Mickey's plans take a turn when Minnie surprises him and the gang with tickets to spend Christmas at a world-famous Ice Palace. In the morning rush to make it out the door, Mickey and Pluto are left behind and home alone. They find themselves protecting their home from two feisty villains, a raccoon and a weasel who are after their Christmas dinner, while Minnie and the gang desperately try to make their way back home.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/mxfOMsknN6ihwCHS7leiQ4OnUeY.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/2VWwc7jnjy6jQcmg0ALEWba8zkd.jpg",
+          "imdbId": "tt43589736",
+          "director": "Shane Prigmore",
+          "origin": [
+            "US"
           ]
         },
         {
@@ -19118,37 +19236,6 @@
             "Jill Talley"
           ],
           "director": "Dave Cunningham",
-          "origin": [
-            "US"
-          ]
-        },
-        {
-          "id": "m-1715686~ott",
-          "title": "Mickey's Home Alone",
-          "kind": "film",
-          "platforms": [
-            "disney"
-          ],
-          "namedBy": "note",
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Animation",
-            "Family",
-            "TV Movie",
-            "Comedy"
-          ],
-          "releaseDate": "2026-11-27",
-          "regions": [
-            "US"
-          ],
-          "heat": 15,
-          "synopsis": "Looking forward to spending Christmas at home, Mickey's plans take a turn when Minnie surprises him and the gang with tickets to spend Christmas at a world-famous Ice Palace. In the morning rush to make it out the door, Mickey and Pluto are left behind and home alone. They find themselves protecting their home from two feisty villains, a raccoon and a weasel who are after their Christmas dinner, while Minnie and the gang desperately try to make their way back home.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/mxfOMsknN6ihwCHS7leiQ4OnUeY.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/2VWwc7jnjy6jQcmg0ALEWba8zkd.jpg",
-          "imdbId": "tt43589736",
-          "director": "Shane Prigmore",
           "origin": [
             "US"
           ]
@@ -19415,39 +19502,6 @@
           ]
         },
         {
-          "id": "m-1424261",
-          "title": "UK Holiday",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [],
-          "releaseDate": "2026-12-01",
-          "regions": [
-            "IN",
-            "US"
-          ],
-          "heat": 10,
-          "synopsis": "A UK Holiday is not just a journey; it’s an adventure filled with love, laughter, and unforgettable memories. The story revolves around Aakash, a kind-hearted and adventurous young man, who invites his sister Rekha from the USA to visit the UK for a long-awaited family reunion. Rekha, excited to escape her routine, is thrilled to meet their mother, Subhadra, and sisters Priyanka and Deepika, who already reside in the UK. Aakash ensures this holiday becomes a truly special experience. Together, they explore London’s iconic landmarks like the London Eye and Tower Bridge. The journey takes them to the natural wonder of Durdle Door in Dorset and the charming town of Aldershot. Along the way, they share stories, laughter, and moments of deep connection. This feature film captures the essence of holidays—taking a break, reconnecting with loved ones, and creating memories that last a lifetime. UK Holiday is a celebration of family, adventure, and the joy of togetherness.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/4y6dhG9XPTMeO8IcaMjROJp5gGU.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/h4UtXeYGHyMjQB930nRN8nteHTF.jpg",
-          "imdbId": "tt29298079",
-          "runtimeMinutes": 120,
-          "cast": [
-            "Kumud Pant",
-            "Atul Sharma",
-            "Bharat Mistri",
-            "Nilu Pant",
-            "Bidhyabati Pant"
-          ],
-          "director": "Kumud Pant",
-          "trailerUrl": "https://www.youtube.com/watch?v=mtSbZPd9IA4",
-          "theatrical": "limited"
-        },
-        {
           "id": "m-1654912",
           "title": "Mayan - Chapter 1",
           "kind": "film",
@@ -19516,6 +19570,39 @@
           ]
         },
         {
+          "id": "m-1424261",
+          "title": "UK Holiday",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [],
+          "releaseDate": "2026-12-01",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 10,
+          "synopsis": "A UK Holiday is not just a journey; it’s an adventure filled with love, laughter, and unforgettable memories. The story revolves around Aakash, a kind-hearted and adventurous young man, who invites his sister Rekha from the USA to visit the UK for a long-awaited family reunion. Rekha, excited to escape her routine, is thrilled to meet their mother, Subhadra, and sisters Priyanka and Deepika, who already reside in the UK. Aakash ensures this holiday becomes a truly special experience. Together, they explore London’s iconic landmarks like the London Eye and Tower Bridge. The journey takes them to the natural wonder of Durdle Door in Dorset and the charming town of Aldershot. Along the way, they share stories, laughter, and moments of deep connection. This feature film captures the essence of holidays—taking a break, reconnecting with loved ones, and creating memories that last a lifetime. UK Holiday is a celebration of family, adventure, and the joy of togetherness.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/4y6dhG9XPTMeO8IcaMjROJp5gGU.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/h4UtXeYGHyMjQB930nRN8nteHTF.jpg",
+          "imdbId": "tt29298079",
+          "runtimeMinutes": 120,
+          "cast": [
+            "Kumud Pant",
+            "Atul Sharma",
+            "Bharat Mistri",
+            "Nilu Pant",
+            "Bidhyabati Pant"
+          ],
+          "director": "Kumud Pant",
+          "trailerUrl": "https://www.youtube.com/watch?v=mtSbZPd9IA4",
+          "theatrical": "limited"
+        },
+        {
           "id": "m-951018",
           "title": "A Fox Under a Pink Moon",
           "kind": "documentary",
@@ -19578,6 +19665,40 @@
           "trailerUrl": "https://www.youtube.com/watch?v=uu4RsAm0uBM"
         },
         {
+          "id": "m-1553480",
+          "title": "Niram",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "ta"
+          ],
+          "genres": [
+            "Thriller",
+            "Drama"
+          ],
+          "releaseDate": "2026-11-27",
+          "regions": [
+            "IN"
+          ],
+          "heat": 9,
+          "posterUrl": "https://image.tmdb.org/t/p/w500/fFZwdY8GDMhJGfuszV5rJv5bW9B.jpg",
+          "imdbId": "tt38677070",
+          "cast": [
+            "Mugen Rao",
+            "Preethi Asrani",
+            "Tanya Hope",
+            "Nithin Sathya",
+            "Surekha Vani"
+          ],
+          "director": "Krishna Balaram",
+          "theatrical": "wide",
+          "origin": [
+            "IN"
+          ]
+        },
+        {
           "id": "m-1504630",
           "title": "Mysaa",
           "kind": "film",
@@ -19611,40 +19732,6 @@
             "Rao Ramesh"
           ],
           "director": "Rawindra Pulle",
-          "theatrical": "wide",
-          "origin": [
-            "IN"
-          ]
-        },
-        {
-          "id": "m-1553480",
-          "title": "Niram",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "ta"
-          ],
-          "genres": [
-            "Thriller",
-            "Drama"
-          ],
-          "releaseDate": "2026-11-27",
-          "regions": [
-            "IN"
-          ],
-          "heat": 9,
-          "posterUrl": "https://image.tmdb.org/t/p/w500/fFZwdY8GDMhJGfuszV5rJv5bW9B.jpg",
-          "imdbId": "tt38677070",
-          "cast": [
-            "Mugen Rao",
-            "Preethi Asrani",
-            "Tanya Hope",
-            "Nithin Sathya",
-            "Surekha Vani"
-          ],
-          "director": "Krishna Balaram",
           "theatrical": "wide",
           "origin": [
             "IN"
@@ -19838,8 +19925,8 @@
         "IN",
         "US"
       ],
-      "rating": 8.6,
-      "votes": 222,
+      "rating": 8.7,
+      "votes": 226,
       "heat": 89,
       "synopsis": "With a bounty on his head, Vision must confront his nature and resist Ultron's influence to survive.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/WGyAyBPncfuu8MZhLY9RtfZPM0.jpg",
@@ -19866,38 +19953,39 @@
         "US"
       ],
       "rating": 8.6,
-      "votes": 1124,
+      "votes": 1128,
       "heat": 88,
       "synopsis": "Two mob families clash in a war that threatens to topple empires and lives.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/5Xc7WpWsgflfgEMoBlf9TmWhfbH.jpg",
       "backdropUrl": "https://image.tmdb.org/t/p/w780/h0OC7ouop8YLwbAVfS3UUE2Lw4T.jpg"
     },
     {
-      "id": "trend-t-120911",
-      "title": "The Terminal List",
+      "id": "trend-t-153312",
+      "title": "Tulsa King",
       "kind": "series",
       "platforms": [
-        "prime",
-        "mxplayer"
+        "jiohotstar",
+        "paramount"
       ],
       "languages": [
         "en"
       ],
       "genres": [
-        "Action & Adventure",
-        "Drama"
+        "Crime",
+        "Drama",
+        "Comedy"
       ],
-      "releaseDate": "2022-06-30",
+      "releaseDate": "2022-11-13",
       "regions": [
         "IN",
         "US"
       ],
-      "rating": 8,
-      "votes": 1295,
-      "heat": 83,
-      "synopsis": "Navy SEAL Commander James Reece turns to vengeance as he investigates the mysterious forces behind the murder of his entire platoon. Free from the military's command structure, Reece applies the lessons he's learned from nearly two decades of warfare to hunt down the people responsible.",
-      "posterUrl": "https://image.tmdb.org/t/p/w500/xyFAzP7RKK8cARCSalIZ9A9T0jV.jpg",
-      "backdropUrl": "https://image.tmdb.org/t/p/w780/2qS2LGqsAyT1NEDeIj24Hp2IR10.jpg"
+      "rating": 8.3,
+      "votes": 2893,
+      "heat": 86,
+      "synopsis": "New York mafia capo Dwight \"The General\" Manfredi is released from prison after 25 years and exiled by his boss to set up shop in Tulsa, Oklahoma. Realizing that his mob family may not have his best interests in mind, Dwight slowly builds a crew.",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/rOYLWCdAifpUtPlTf1WHxyaxeMt.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w780/mNHRGO1gFpR2CYZdANe72kcKq7G.jpg"
     },
     {
       "id": "trend-t-96677",
@@ -19920,43 +20008,11 @@
         "US"
       ],
       "rating": 7.7,
-      "votes": 2750,
+      "votes": 2754,
       "heat": 82,
       "synopsis": "Inspired by the adventures of Arsène Lupin, gentleman thief Assane Diop sets out to avenge his father for an injustice inflicted by a wealthy family.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/h6Z2oogE4mJk2uffdtIlLhb0EHx.jpg",
       "backdropUrl": "https://image.tmdb.org/t/p/w780/aY7zv2pfk9H0QxaaL3PBjvalbKQ.jpg"
-    },
-    {
-      "id": "trend-t-30984",
-      "title": "Bleach",
-      "kind": "anime",
-      "platforms": [
-        "netflix",
-        "crunchyroll",
-        "sonyliv",
-        "mxplayer",
-        "prime",
-        "hulu"
-      ],
-      "languages": [
-        "ja"
-      ],
-      "genres": [
-        "Action & Adventure",
-        "Animation",
-        "Sci-Fi & Fantasy"
-      ],
-      "releaseDate": "2004-10-05",
-      "regions": [
-        "IN",
-        "US"
-      ],
-      "rating": 8.4,
-      "votes": 2322,
-      "heat": 81,
-      "synopsis": "For as long as he can remember, Ichigo Kurosaki has been able to see ghosts. But when he meets Rukia, a Soul Reaper who battles evil spirits known as Hollows, he finds his life is changed forever. Now, with a newfound wealth of spiritual energy, Ichigo discovers his true calling: to protect the living and the dead from evil.",
-      "posterUrl": "https://image.tmdb.org/t/p/w500/2EewmxXe72ogD0EaWM8gqa0ccIw.jpg",
-      "backdropUrl": "https://image.tmdb.org/t/p/w780/o0NsbcIvsllg6CJX0FBFY8wWbsn.jpg"
     },
     {
       "id": "trend-t-220542",
@@ -20010,63 +20066,11 @@
         "US"
       ],
       "rating": 8.5,
-      "votes": 2108,
+      "votes": 2115,
       "heat": 77,
       "synopsis": "In a dystopia riddled with corruption and cybernetic implants, a talented but reckless street kid strives to become a mercenary outlaw — an edgerunner.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/v3JuB15WybKmxDeT1hWdK3j6eSJ.jpg",
       "backdropUrl": "https://image.tmdb.org/t/p/w780/4NmCfWHzytiKM3riCMcbVYBJhlB.jpg"
-    },
-    {
-      "id": "trend-m-1339713",
-      "title": "Obsession",
-      "kind": "film",
-      "platforms": [
-        "peacock"
-      ],
-      "languages": [
-        "en"
-      ],
-      "genres": [
-        "Horror",
-        "Thriller"
-      ],
-      "releaseDate": "2026-05-13",
-      "regions": [
-        "US"
-      ],
-      "rating": 8.2,
-      "votes": 6406,
-      "heat": 75,
-      "synopsis": "After breaking the mysterious \"One Wish Willow\" to win his crush's heart, a hopeless romantic finds himself getting exactly what he asked for but soon discovers that some desires come at a dark, sinister price.",
-      "posterUrl": "https://image.tmdb.org/t/p/w500/bRwnj8WEKBCvmfeUNOukJPwB43K.jpg",
-      "backdropUrl": "https://image.tmdb.org/t/p/w780/5lTZyuBTNOfawsfPT8Q0cIg6qAF.jpg"
-    },
-    {
-      "id": "trend-m-1290418",
-      "title": "The Cycle",
-      "kind": "film",
-      "platforms": [
-        "shudder"
-      ],
-      "languages": [
-        "en"
-      ],
-      "genres": [
-        "Crime",
-        "Horror",
-        "Thriller",
-        "Mystery"
-      ],
-      "releaseDate": "2026-09-24",
-      "regions": [
-        "US"
-      ],
-      "rating": 6.8,
-      "votes": 66,
-      "heat": 71,
-      "synopsis": "A daughter unravels her father's dark past after his body, missing for 36 years, is found at a horrific crime scene.",
-      "posterUrl": "https://image.tmdb.org/t/p/w500/n5gSNf55KWfDc9hqP4H1KCCSutE.jpg",
-      "backdropUrl": "https://image.tmdb.org/t/p/w780/bgHW6AJl2SdKzxglvf9tshXbI84.jpg"
     },
     {
       "id": "trend-m-1727734",
@@ -20086,14 +20090,68 @@
         "IN",
         "US"
       ],
-      "rating": 6.1,
-      "votes": 55,
-      "heat": 70,
+      "rating": 6.2,
+      "votes": 68,
+      "heat": 71,
       "synopsis": "After twenty years spent \"chillin', tokin' and bonin'\", Ali G is shocked to discover that his long-term girlfriend, Julie, is 8 months pregnant. Faced with an extra mouth to feed, he gets off his batty and heads to America to reclaim his former glory… but soon encounters adversaries who will ultimately threaten his and his child's very existence.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/uTyVxPeWX8Ai30IQoyDDQONNcq.jpg",
       "backdropUrl": "https://image.tmdb.org/t/p/w780/hJcGJLi34zE4RhzsiDR6f7pw50K.jpg"
+    },
+    {
+      "id": "trend-t-259909",
+      "title": "Dexter: Resurrection",
+      "kind": "series",
+      "platforms": [
+        "prime",
+        "paramount"
+      ],
+      "languages": [
+        "en"
+      ],
+      "genres": [
+        "Crime",
+        "Drama",
+        "Mystery"
+      ],
+      "releaseDate": "2025-07-13",
+      "regions": [
+        "IN",
+        "US"
+      ],
+      "rating": 8.5,
+      "votes": 700,
+      "heat": 66,
+      "synopsis": "Set 10 weeks after Dexter: New Blood, Dexter Morgan chases a missing Harrison to New York City, where Captain Angel Batista is hot on their trail from way down in Miami.",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/o2Oyi3boT100bY5kCP4MBiTeetO.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w780/vcpj6rRDS93ImHCLPY8bwBuFGjR.jpg"
+    },
+    {
+      "id": "trend-m-1596275",
+      "title": "Drive - The Pretenders",
+      "kind": "film",
+      "platforms": [
+        "prime"
+      ],
+      "languages": [
+        "de"
+      ],
+      "genres": [
+        "Romance",
+        "Thriller"
+      ],
+      "releaseDate": "2026-10-27",
+      "regions": [
+        "IN",
+        "US"
+      ],
+      "rating": 7.9,
+      "votes": 35,
+      "heat": 66,
+      "synopsis": "A young race car mechanic fakes an engagement with racing's most scandalous star - officially for his reputation, secretly for her own shot behind the wheel. But soon the lie threatens to destroy everything - including what's already become so much more than just a deal.",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/s9syckECnUYhKePQ1A0DC0mFVZ9.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w780/hbz4aeVsjnKb2HRoFbbr46Egh8y.jpg"
     }
   ],
-  "enrichedAt": "2026-10-30T03:43:09.240Z",
-  "ratedAt": "2026-10-30T03:43:30.227Z"
+  "enrichedAt": "2026-10-30T15:11:24.282Z",
+  "ratedAt": "2026-10-30T15:11:52.391Z"
 }
