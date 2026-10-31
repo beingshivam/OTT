@@ -56,7 +56,8 @@
     "social:posters": "node scripts/build-week-posters.mjs",
     "test:label": "node --test scripts/release-label.test.mjs",
     "social:star": "node scripts/build-week-posters.mjs",
-    "hook:trend": "node scripts/build-trend-hook.mjs"
+    "hook:trend": "node scripts/build-trend-hook.mjs",
+    "post:epic": "node scripts/build-epic-post.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

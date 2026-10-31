@@ -29,6 +29,20 @@ on:
           grid. Blank builds only the week.
         required: false
         default: ''
+      epic:
+        description: >-
+          Also build a single-title post for this film, e.g. "Ramayana". Its
+          poster fills the frame instead of sitting in the week's grid. Blank
+          builds only the week.
+        required: false
+        default: ''
+      booking:
+        description: >-
+          Put "Advance booking open" on the epic post. Ticketing is not in the
+          feed and the builder cannot check it, so this says a person has.
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: write
@@ -73,6 +87,16 @@ jobs:
         env:
           STAR: ${{ inputs.star }}
         run: npm run social:star
+
+      # Same deal as the star post: only on request, and only with a name. A
+      # frame that gives one film the whole image is worth making for a
+      # release people are already talking about and nothing the rest of the
+      # time.
+      - name: Build the single-title post
+        if: ${{ inputs.epic != '' }}
+        env:
+          BOOKING: ${{ inputs.booking && '1' || '' }}
+        run: npm run post:epic -- "${{ inputs.epic }}"
 
       - name: Choose the week's three
         run: npm run plan:ig
