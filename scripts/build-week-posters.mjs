@@ -525,7 +525,44 @@ const SIZES = [
  * something to put on tonight — and the losing half gets a token tile. Two
  * cards let each be the whole image.
  */
-const ottHero = landed[0];
+/**
+ * This week's arrival leads, if the week has one.
+ *
+ * The same fault the cinema rail was built to fix, one surface along, and it
+ * showed up the first week it could: Mirzapur: The Movie landed on Prime on
+ * the Friday — the biggest Indian title to reach streaming all week — and the
+ * card led on Gajab Raat from the week before. Neither the rank nor the code
+ * was wrong. TMDB attention is earned *after* a release, so a title that
+ * arrived this morning scores near zero by construction and a title with a
+ * week behind it wins on a number that is mostly age. Mirzapur carried 31
+ * against Gajab Raat's 38, and the same Mirzapur carried 95 once it had six
+ * weeks on it.
+ *
+ * So the hero is the biggest thing that landed *this week* when the week has
+ * anything at all, and the thirty-day ranking only decides it in a week with
+ * no arrivals of its own. The grid behind it stays the month, which is what
+ * the headline promises.
+ */
+const thisWeek = landed.filter((r) => r.releaseDate >= week.start && r.releaseDate <= week.end);
+/* OTT_HERO is the same editorial override the cinema card has in HERO, and
+   exists for the same reason: the ranking should not have the final word on a
+   post somebody is putting their name to. Attention is a fair comparison
+   between two titles that landed the same morning, which is why it decides by
+   default — but it cannot know that one of them is Mirzapur. */
+/* Whether the card and its caption talk about the week or the month. Decided
+   once: the headline said "New this month" over nine posters all dated the
+   same Friday while the caption counted 104 titles and opened on one from the
+   week before. Both describe the card now, or neither does. */
+const ottWeekCard = thisWeek.length > Math.max(...SIZES.map((s) => s.take));
+const OTT_HERO = (process.env.OTT_HERO ?? '').trim().toLowerCase();
+const ottHero =
+  (OTT_HERO && landed.find((r) => (r.title ?? '').toLowerCase().includes(OTT_HERO))) ||
+  thisWeek[0] ||
+  landed[0];
+if (OTT_HERO && !landed.some((r) => (r.title ?? '').toLowerCase().includes(OTT_HERO))) {
+  console.error(`OTT_HERO="${process.env.OTT_HERO}" matches nothing that has landed in the last ${OTT_WINDOW} days. Nothing has been written.`);
+  process.exit(1);
+}
 const decks = star
   ? [{
       name: 'star-posters',
@@ -554,15 +591,36 @@ const decks = star
       ...(ottHero
         ? [{
             name: 'week-ott',
-            kicker: `Last ${OTT_WINDOW} days`,
-            headline: 'New this month<br><em>on streaming</em>',
+            /* The card says which span it is actually showing. In a week like
+               this one, seventeen Indian titles landed and every tile on both
+               crops is from it — "New this month · Last 30 days" over nine
+               posters all dated the same Friday is the card describing a
+               different card. The month wording is kept for the weeks that
+               need it, which is most of them: confirmed Indian arrivals are
+               usually too few to fill the story crop on their own. */
+            ...(ottWeekCard
+              ? {
+                  kicker: `${dateOf(week.start)} – ${dateOf(week.end)}`,
+                  headline: 'New this week<br><em>on streaming</em>',
+                }
+              : {
+                  kicker: `Last ${OTT_WINDOW} days`,
+                  headline: 'New this month<br><em>on streaming</em>',
+                }),
             heroRow: ottHero,
-            tag: 'Newest on OTT',
+            tag: thisWeek.length ? 'Landed this week' : 'Newest on OTT',
             heroLine: `${everywhere(ottHero)} · since ${dateOf(ottHero.releaseDate)}`,
-            /* This week's announced Indian titles first — they are the
-               answer to "what is new on Indian OTT" — then the confirmed
-               arrivals behind them. */
-            pick: (n) => [...announced, ...landed.slice(1)].slice(0, n),
+            /* This week's arrivals first — they are the answer to "what is
+               new on Indian OTT" — then the announced ones, then the rest of
+               the month. Filtered by id rather than sliced: the hero is no
+               longer always the head of `landed`, so slicing the first entry
+               dropped a title that was still on the card and left the hero on
+               it twice. */
+            pick: (n) =>
+              [...thisWeek, ...announced, ...landed]
+                .filter((r) => r.id !== ottHero.id)
+                .filter((r, i, all) => all.findIndex((x) => x.id === r.id) === i)
+                .slice(0, n),
             /* The chip on the artwork carries "expected"; the line stays
                where and when. */
             line: (r) => `${everywhere(r)} · ${dateOf(r.releaseDate)}`,
@@ -712,16 +770,21 @@ await writeFile(resolve(OUT, `${star ? 'star-posters' : 'week-posters'}-caption.
 /* The OTT card gets its own words. Sharing the week's caption would have it
    claiming cinema releases under an image of streaming titles. */
 if (ottHero) {
-  const names = landed.slice(0, 8).map((r) => r.title);
-  const services = [...new Set(landed.flatMap((r) => (r.platforms ?? [])
+  /* The same span the card is showing — see `ottWeekCard`. A caption counting
+     a month under an image headed "New this week" is the words and the
+     picture disagreeing, which is the one thing this file keeps being fixed
+     for. */
+  const pool = ottWeekCard ? thisWeek : landed;
+  const names = pool.slice(0, 8).map((r) => r.title);
+  const services = [...new Set(pool.flatMap((r) => (r.platforms ?? [])
     .filter((p) => p !== 'theatres' && servesHere(p) && (prank.get(p) ?? 2) < 3).map((p) => pshort.get(p) ?? p)))];
   await writeFile(
     resolve(OUT, 'week-ott-caption.txt'),
     `Already streaming — no ticket needed. 🍿
 
-${landed.length} titles have landed on ${services.join(', ')} in the last ${OTT_WINDOW} days.
+${pool.length} titles landed on ${services.join(', ')} ${ottWeekCard ? 'this week' : `in the last ${OTT_WINDOW} days`}.
 
-${names.join(', ')}${landed.length > names.length ? `, and ${landed.length - names.length} more.` : '.'}
+${names.join(', ')}${pool.length > names.length ? `, and ${pool.length - names.length} more.` : '.'}
 
 Every one with the platform it is actually on, at ${SITE}. Search the name, get the answer.
 
