@@ -228,6 +228,9 @@ const displayed = (r) => {
     return { value: r.imdbRating, source: 'IMDb', votes: r.imdbVotes };
   }
   if (r.rating == null || r.rating > MAX_CREDIBLE) return null;
+  /* Changed deliberately with lib/score.ts: a TMDB score under the vote floor
+     is no longer shown grey, it is not shown (Ramayana, 6.6 from 8 votes). */
+  if (r.votes != null && r.votes < TMDB_MIN_VOTES) return null;
   return { value: r.rating, source: 'TMDB', votes: r.votes };
 };
 

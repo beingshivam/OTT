@@ -806,7 +806,8 @@ async function titleFromTmdb(request, url, env, ctx) {
     genres: (b.genres ?? []).map((g) => g.name).slice(0, 4),
     languages: [b.original_language].filter(Boolean),
     certification,
-    rating: typeof b.vote_average === 'number' && b.vote_count > 0
+    // Same floor as lib/score.ts: under 50 votes a TMDB average is noise.
+    rating: typeof b.vote_average === 'number' && b.vote_count >= 50
       ? Math.round(b.vote_average * 10) / 10
       : null,
     cast: (credits.cast ?? []).slice(0, 8).map((c) => c.name).filter(Boolean),
