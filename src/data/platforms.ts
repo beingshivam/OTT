@@ -361,8 +361,18 @@ function fromIntl(code: string): string | null {
   }
 }
 
+/**
+ * Codes TMDB uses that are not languages, so neither the table nor Intl can
+ * name them. Named here rather than in LANGUAGES because membership there
+ * means "/<name> is a page", and there is no page of films without dialogue.
+ * `xx` is TMDB's "No Language": silent films, wordless shorts, music pieces.
+ */
+const NON_LANGUAGES: Record<string, string> = {
+  xx: 'No dialogue',
+};
+
 export function languageName(code: string): string {
-  return LANGUAGES[code] ?? fromIntl(code) ?? code.toUpperCase();
+  return LANGUAGES[code] ?? NON_LANGUAGES[code] ?? fromIntl(code) ?? code.toUpperCase();
 }
 
 /**
