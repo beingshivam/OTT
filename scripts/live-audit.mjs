@@ -678,7 +678,62 @@ is(
  * front of a crawler than the one in the repo, and none of them would show up
  * in a build.
  */
-const disallows = [...robots.body.matchAll(/^Disallow:\s*(\S+)\s*$/gm)].map((m) => m[1]);
+/*
+ * Read as Googlebot reads it (RFC 9309), not as a flat list of lines.
+ *
+ * This used to collect every Disallow in the file, whoever it was addressed
+ * to. Cloudflare's managed robots.txt then prepended a block of
+ * "User-agent: GPTBot / Disallow: /" groups for AI-training crawlers, and the
+ * audit reported all 3,229 sitemap URLs as blocked — every day from 1 Nov —
+ * while Googlebot, which none of those groups name, was allowed everywhere.
+ * A red that cries wolf is the one nobody reads when it is real.
+ *
+ * So: split the file into groups, take every group naming the crawler (or,
+ * if none does, every "*" group — same-agent groups are merged), and decide
+ * each path by the longest matching rule, Allow winning a tie.
+ */
+function robotsGroups(text) {
+  const groups = [];
+  let current = null;
+  let lastWasAgent = false;
+  for (const raw of text.split(/\r?\n/)) {
+    const line = raw.replace(/#.*/, '').trim();
+    const m = line.match(/^([A-Za-z-]+)\s*:\s*(.*)$/);
+    if (!m) continue;
+    const field = m[1].toLowerCase();
+    const value = m[2].trim();
+    if (field === 'user-agent') {
+      if (!lastWasAgent) groups.push((current = { agents: [], rules: [] }));
+      current.agents.push(value.toLowerCase());
+      lastWasAgent = true;
+    } else {
+      lastWasAgent = false;
+      if (current && (field === 'allow' || field === 'disallow')) {
+        current.rules.push({ allow: field === 'allow', path: value });
+      }
+    }
+  }
+  return groups;
+}
+
+function rulesFor(groups, crawler) {
+  const named = groups.filter((g) => g.agents.includes(crawler));
+  const chosen = named.length ? named : groups.filter((g) => g.agents.includes('*'));
+  return chosen.flatMap((g) => g.rules).filter((r) => r.path !== '');
+}
+
+function allowed(rules, path) {
+  let best = null;
+  for (const r of rules) {
+    if (!path.startsWith(r.path)) continue;
+    if (!best || r.path.length > best.path.length || (r.path.length === best.path.length && r.allow)) best = r;
+  }
+  return !best || best.allow;
+}
+
+const groups = robotsGroups(robots.body);
+const google = rulesFor(groups, 'googlebot');
+const disallows = google.filter((r) => !r.allow).map((r) => r.path);
 for (const rule of ['/api/', '/diag']) {
   is(disallows.includes(rule), `and keeps ${rule} out of the index`, disallows.join(' ') || 'no rules');
 }
@@ -688,14 +743,23 @@ for (const rule of ['/api/', '/diag']) {
  * a character too short silently outranks "Allow: /" and deletes real pages
  * from the index — "/d" would take /documentaries with it. Checked against
  * the live sitemap because both files have to be right *together*, and they
- * are served independently.
+ * are served independently. Googlebot and Bingbot are the two that matter.
  */
-const blocked = paths.filter((p) => disallows.some((d) => p.startsWith(d)));
-is(
-  blocked.length === 0,
-  'and blocks nothing the sitemap publishes',
-  `${blocked.length} blocked, e.g. ${blocked.slice(0, 3).join(' ')}`,
-);
+for (const [crawler, name] of [['googlebot', 'Google'], ['bingbot', 'Bing']]) {
+  const rules = rulesFor(groups, crawler);
+  const blocked = paths.filter((p) => !allowed(rules, p));
+  is(
+    blocked.length === 0,
+    `and lets ${name} crawl everything the sitemap publishes`,
+    `${blocked.length} blocked, e.g. ${blocked.slice(0, 3).join(' ')}`,
+  );
+}
+
+/* Who is shut out entirely — a choice made in Cloudflare, so a note, not a fault. */
+const shut = groups
+  .filter((g) => !g.agents.includes('*') && g.rules.some((r) => !r.allow && r.path === '/'))
+  .flatMap((g) => g.agents);
+if (shut.length) console.log(`       crawlers refused the whole site: ${shut.join(', ')}`);
 
 /* --------------------------------------------------------------------------- */
 console.log(`\n${checks - failures} passed, ${failures} failed`);
