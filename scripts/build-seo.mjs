@@ -33,7 +33,7 @@ const TAGLINE_LONG =
 import { slugify } from './slug.mjs';
 import { inRegion, loadRegistry } from './platform-registry.mjs';
 import { onlyGuessed, suppliers, stated } from '../src/lib/platform-claim.mjs';
-import { INDIAN_LANGUAGES, estimateCopy, estimateFor, gapPairs, windowStats } from '../src/lib/ott-estimate.mjs';
+import { INDIAN_LANGUAGES, estimateCopy, estimateFor, gapPairs, weeksLabel, windowStats } from '../src/lib/ott-estimate.mjs';
 import { byDay, dayLabel, phrase } from '../src/lib/changes.mjs';
 import { ANALYTICS_TOKEN } from './config.mjs';
 
@@ -2435,9 +2435,13 @@ for (const r of allTitlePages) {
        above a page saying the platform has not confirmed it is the
        contradiction a reader meets first, in the search result, before they
        ever reach the page. See `hedged`. */
+    /* "OTT" in the tag: 445 of the top 1,000 queries in Search Console carry
+       the word and the old tag ("Watch X on Prime Video") never did. "watch"
+       stays, after it — the watch-online queries convert at 10%, against 1%
+       for release-date ones. Hedged pages never reach this branch. */
     title:
       streaming.length && !upcoming
-        ? `Watch ${r.title} on ${lead}${alsoOn}${suffix}`
+        ? `${r.title} OTT: watch on ${lead}${alsoOn}${suffix}`
         : streaming.length
           ? `${r.title} ${hedged ? 'expected on' : 'on'} ${lead}${alsoOn} from ${opensOn}${suffix}`
           : streamsOn
@@ -2464,9 +2468,12 @@ for (const r of allTitlePages) {
      * date, no implied platform: a reader who clicks finds exactly what the
      * snippet promised.
      */
+    /* The streaming description opens with the question as it is typed
+       ("jeevan bheema yojana movie on which ott") and answers it in the
+       next three words, then says what else is on the page. */
     description:
       streaming.length && !upcoming
-        ? `${named} is streaming now on ${on} in India — cast, runtime, certificate and trailer. ${BRAND}.`
+        ? `Which OTT is ${named} on? ${on} — streaming now in India. Cast, runtime, trailer and similar films. ${BRAND}.`
         : streaming.length
           ? `${named} ${hedged ? 'is expected on' : 'lands on'} ${on} in India on ${opensOn} — cast, runtime, certificate and trailer. ${BRAND}.`
           : streamsOn
@@ -2477,7 +2484,12 @@ for (const r of allTitlePages) {
               : `${named} opens in Indian cinemas on ${opensOn} — cast, runtime, certificate and trailer, plus its OTT date the day it lands. ${BRAND}.`
             : est?.tag
               ? `${named} OTT release date: ${est.headline.replace(/^Expected/, 'expected')}, based on ${ottEstimate.basis.films} similar releases. In cinemas since ${opensOn}. Cast and trailer. ${BRAND}.`
-              : `${named} — in cinemas ${opensOn}. Cast, runtime, certificate and trailer, and the OTT release date here the day it is announced. ${BRAND}.`,
+              : est?.phase === 'late'
+                /* Was "the OTT release date here the day it is announced" —
+                   which tells a searcher there is nothing to find, and at #2
+                   for its query 98% believed it. Say where it stands. */
+                ? `${named} OTT release date: not announced yet, and running later than the usual ${weeksLabel(ottEstimate.days)} for ${ottEstimate.basis.language ? lname(ottEstimate.basis.language) : 'Indian'} films. In cinemas since ${opensOn}. Cast, trailer and the date the moment it lands. ${BRAND}.`
+                : `${named} OTT release date and where to watch it online: in cinemas since ${opensOn}, streaming date not announced yet. Cast, runtime and trailer. ${BRAND}.`,
     /**
      * The heading asked "When is X coming to OTT?" even when the answer block
      * directly beneath it said "Streaming now on Netflix" — the page
