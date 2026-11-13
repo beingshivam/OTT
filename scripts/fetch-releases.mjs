@@ -1518,7 +1518,10 @@ await mkdir(dirname(OUT), { recursive: true });
 await writeFile(
   OUT,
   JSON.stringify(
-    { generatedAt: new Date().toISOString(), source: 'tmdb', weeks, trending },
+    /* weeksBack: how many finished weeks got the full build rather than the
+       cinema-only one, so eval knows which weeks must still hold their
+       streaming arrivals (see "Streaming arrivals kept"). */
+    { generatedAt: new Date().toISOString(), source: 'tmdb', weeksBack: WEEKS_BACK, weeks, trending },
     null,
     2,
   ) + '\n',

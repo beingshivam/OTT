@@ -1133,6 +1133,72 @@ const S9 = 'Guessed platforms';
  * decides the delay on a mid-range phone; the wire cost is about a fifth of
  * it after gzip.
  */
+// --- arrivals kept -----------------------------------------------------------
+
+/*
+ * A streaming arrival, once seen, stays on its week.
+ *
+ * On 13 Nov the feed had quietly lost 146 theatre-to-OTT arrivals — Jailer 2
+ * on Prime among them, the week's biggest — because the pass that dates an
+ * arrival only runs for weeks not yet over, and nothing compared one day's
+ * calendar with the last. It had been happening every week, and every other
+ * check passed throughout: each looks at the feed as it is, and the fault was
+ * what it no longer had.
+ *
+ * fetch-releases now restores a finished week's arrivals from the archive.
+ * This is the alarm for when that, or anything else, stops holding: every
+ * arrival the archive saw still listed on or after its own date must be on its
+ * week in the new feed, by id or by title. The rules mirror the restore, so a
+ * healthy refresh scores zero and any miss is real. Failing here blocks the
+ * commit, which keeps yesterday's good calendar live instead of today's gap.
+ *
+ * Only finished weeks the refresh fully rebuilds: the `weeksBack` weeks before
+ * the current one, as fetch-releases records it (3 when a feed predates the
+ * field — the workflow's setting). Older weeks are rebuilt cinema-only by
+ * design, and the current week's arrivals are still the digital pass's to
+ * decide. The first version guessed "any streaming row" instead, and failed a
+ * healthy feed: a cinema-only week still holds cinema rows that have since
+ * gained a service, Jailer 2's among them.
+ */
+const S14 = 'Streaming arrivals kept';
+{
+  const norm = (t) =>
+    (t ?? '').normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  const streams = (r) => (r.platforms ?? []).some((p) => p !== 'theatres');
+  const ordered = [...(feed?.weeks ?? [])].sort((a, b) => a.id.localeCompare(b.id));
+  const current = ordered.findIndex((w) => w.start <= TODAY && TODAY <= w.end);
+  const weeksBack = Number.isInteger(feed?.weeksBack) ? feed.weeksBack : 3;
+  const finished = new Map(
+    (current < 0 ? [] : ordered.slice(Math.max(0, current - weeksBack), current)).map((w) => [w.id, w]),
+  );
+  if (!feed || !archive) skip(S14, 'no finished week has lost a streaming arrival', 'needs the feed and the archive');
+  else if (!finished.size) skip(S14, 'no finished week has lost a streaming arrival', 'no finished week in the feed');
+  else {
+    const expected = (archive.titles ?? []).filter(
+      (r) =>
+        String(r.id).endsWith('~ott') &&
+        finished.has(r.weekId) &&
+        !r.sample &&
+        !r.drop &&
+        r.platforms?.length &&
+        r.releaseDate &&
+        r.lastSeen &&
+        r.lastSeen >= r.releaseDate,
+    );
+    const lost = expected.filter((r) => {
+      const week = finished.get(r.weekId);
+      return !week.releases.some((x) => x.id === r.id || (streams(x) && norm(x.title) === norm(r.title)));
+    });
+    lost.length
+      ? fail(S14, 'no finished week has lost a streaming arrival',
+          `${lost.length} of ${expected.length} arrivals the archive saw are missing from their week — ` +
+            'see the restore in fetch-releases.mjs',
+          lost.slice(0, 6).map((r) => `${r.weekId}: ${r.title} → ${r.platforms.join(', ')} (${r.releaseDate})`))
+      : pass(S14, 'no finished week has lost a streaming arrival',
+          `${expected.length} arrivals across ${finished.size} finished week(s), all present`);
+  }
+}
+
 const S8b = 'What a phone downloads';
 {
   const BROWSE_BUDGET_KB = 900;
