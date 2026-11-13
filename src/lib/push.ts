@@ -99,3 +99,29 @@ export async function unfollow(titleId: string): Promise<void> {
     /* Best effort: a stale follow only ever produces one notification. */
   }
 }
+
+/* --------------------------------------------------------------- email --
+ * The fallback channel, for browsers that cannot take a push. Offered only
+ * when the Worker reports a sender configured (RESEND_API_KEY). */
+
+let mailConfig: Promise<boolean> | null = null;
+export function mailAvailable(): Promise<boolean> {
+  mailConfig ??= fetch('/api/push/config')
+    .then((r) => (r.ok ? r.json() : { email: false }))
+    .then((c) => Boolean(c?.email))
+    .catch(() => false);
+  return mailConfig;
+}
+
+export async function emailFollow(t: { id: string; title: string; slug?: string; email: string }): Promise<boolean> {
+  try {
+    const res = await fetch('/api/push/email-follow', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ email: t.email, titleId: t.id, title: t.title, slug: t.slug }),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}

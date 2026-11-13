@@ -143,3 +143,36 @@ every subscriber the form earns.
   still static in every way that matters.
 - **Deletion is manual.** One `DELETE`, run the day it is asked for. Nobody is
   going to do it for you.
+
+---
+
+## "Email me when it streams" — title alerts via Resend
+
+Separate from the weekly list above. A reader on a title page with no OTT date
+can leave an address; they get one confirmation and one alert the day the
+title gets an OTT date (worker/push.js, worker/mail.js). The form stays hidden
+on the site until this is set up, so nobody is ever signed up for mail that
+cannot be sent.
+
+### Setup — about ten minutes
+
+1. **Account.** Sign up at resend.com (free tier: 3,000 emails a month,
+   100 a day).
+2. **Domain.** Resend → Domains → Add domain → `newonott.in`. Choose the
+   Cloudflare option to add the DNS records automatically, or copy the SPF,
+   DKIM and MX records it lists into Cloudflare → DNS by hand. Wait until the
+   domain shows **Verified**.
+3. **Key.** Resend → API Keys → Create, with "Sending access" for
+   `newonott.in`. Copy it.
+4. **Secret.** Cloudflare dashboard → Workers & Pages → the `dropday` Worker →
+   Settings → Variables and Secrets → Add → type **Secret**, name
+   `RESEND_API_KEY`, paste the key. Deploy.
+
+Check: `https://newonott.in/api/push/config` reads `{"email":true}`, and the
+form appears on, for example, /ott-release-date/mookuthi-amman-2 in Safari on
+an iPhone.
+
+Sent from `mail@newonott.in`. Every message carries a one-click unsubscribe
+(List-Unsubscribe + List-Unsubscribe-Post), which Gmail and Yahoo require.
+Addresses live in D1 (`email_follows`), one row per address and title, and the
+row is deleted the moment its owner unsubscribes.
