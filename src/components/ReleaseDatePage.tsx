@@ -10,6 +10,7 @@ import { shareLine, shareUrl } from '../lib/share';
 import { ShareButtons } from './ShareButtons';
 import type { Release, ReleaseFeed } from '../types';
 import { BRAND } from '../data/brand';
+import { estimateCopy } from '../lib/ott-estimate.mjs';
 
 /**
  * "When is <film> coming to OTT?"
@@ -68,6 +69,12 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
    *  "in N days" line beside it can never disagree. */
   const upcoming = daysOut < 0;
   const daysToGo = -daysOut;
+  /* The same estimate, in the same words, as the prerendered page — the build
+     attached it to the row; this only formats it. */
+  const est = estimateCopy(release.ottEstimate, new Date().toISOString().slice(0, 10), {
+    languageLabel: languageName,
+    formatDate: fmtDate,
+  });
 
   /**
    * How long a date is still news, and how long this site can vouch for it.
@@ -244,8 +251,20 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
               <>
                 <strong>In cinemas from {fmtDate(release.releaseDate)}</strong>
                 {daysToGo > 0 && ` — ${daysToGo === 1 ? 'tomorrow' : `${daysToGo} days away`}`}.{' '}
-                No streaming date yet: a film is normally picked up by a platform after its
-                theatrical run. This page updates automatically the day one announces.
+                {est ? (
+                  <>
+                    <strong>{est.headline}.</strong> {est.detail}
+                  </>
+                ) : (
+                  <>
+                    No streaming date yet: a film is normally picked up by a platform after its
+                    theatrical run. This page updates automatically the day one announces.
+                  </>
+                )}
+              </>
+            ) : est ? (
+              <>
+                <strong>{est.headline}.</strong> {est.detail}
               </>
             ) : (
               <>
@@ -297,6 +316,12 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
                 )}
               </dd>
             </div>
+            {est?.fact && (
+              <div>
+                <dt>Expected on OTT</dt>
+                <dd>{est.fact}</dd>
+              </div>
+            )}
             {release.languages?.length > 0 && (
               <div>
                 <dt>Language</dt>

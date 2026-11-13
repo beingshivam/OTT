@@ -111,6 +111,12 @@ export interface Release {
    */
   imdbRating?: number;
   imdbVotes?: number;
+  /**
+   * When a film still only in cinemas is likely to reach OTT, measured by the
+   * build from the archive's own theatre-to-OTT gaps (src/lib/ott-estimate.mjs).
+   * Present only while nothing has been announced; always shown as an estimate.
+   */
+  ottEstimate?: import('./lib/ott-estimate.mjs').OttEstimate;
   synopsis?: string;
   cast?: string[];
   director?: string;

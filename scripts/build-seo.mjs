@@ -33,6 +33,7 @@ const TAGLINE_LONG =
 import { slugify } from './slug.mjs';
 import { inRegion, loadRegistry } from './platform-registry.mjs';
 import { onlyGuessed, suppliers, stated } from '../src/lib/platform-claim.mjs';
+import { estimateCopy, estimateFor, gapPairs, windowStats } from '../src/lib/ott-estimate.mjs';
 import { byDay, dayLabel, phrase } from '../src/lib/changes.mjs';
 import { ANALYTICS_TOKEN } from './config.mjs';
 
@@ -1009,6 +1010,16 @@ const DIGITAL_SUFFIX = 'ott';
 const archived = await readFile(resolve(ROOT, 'data/archive.json'), 'utf8')
   .then((s) => JSON.parse(s).titles)
   .catch(() => []);
+
+/**
+ * How long Indian films take to go from cinemas to OTT, measured from every
+ * film the archive saw on both sides — see src/lib/ott-estimate.mjs. A title
+ * page with no streaming date answers with this window instead of a bare
+ * "not announced", and `estimateById` carries each film's estimate into the
+ * shipped feed so the app says the same thing once it hydrates.
+ */
+const OTT_WINDOWS = windowStats(gapPairs(archived));
+const estimateById = new Map();
 
 /**
  * The back catalogue, read here rather than where its own page is built,
@@ -2158,6 +2169,13 @@ for (const r of allTitlePages) {
   const landsOn = streamsOn ? dated.platforms.map(pname).join(', ') : '';
   const landsDate = streamsOn ? formatDate(streamsOn) : '';
 
+  /* Nothing announced: the measured window for films like this one, labelled
+     as an estimate everywhere it appears. Never when a service or a date is
+     already known — those are better answers than any pattern. */
+  const ottEstimate = !streaming.length && !streamsOn ? estimateFor(r, OTT_WINDOWS) : null;
+  const est = estimateCopy(ottEstimate, TODAY, { languageLabel: lname, formatDate });
+  if (ottEstimate) estimateById.set(r.id, ottEstimate);
+
   /* Upcoming first, for the reason given at the title tag below: a streaming
      row dated in the future is not available, and "Streaming now" about it is
      the one sentence on this page that would be a lie. */
@@ -2233,8 +2251,12 @@ for (const r of allTitlePages) {
         ? `Expected on ${landsOn} from ${landsDate} — announced, not yet confirmed by the platform. This page updates automatically when it is.`
         : `Streaming on ${landsOn} from ${landsDate}.`
       : upcoming
-        ? `In cinemas from ${opensOn}. No streaming date yet — a film is normally picked up by a platform after its theatrical run, and this page updates automatically when one announces.`
-        : `Not announced yet — no streaming date has been confirmed. This page updates automatically; every platform is re-checked every day.`;
+        ? est
+          ? `In cinemas from ${opensOn}. ${est.headline}. ${est.detail}`
+          : `In cinemas from ${opensOn}. No streaming date yet — a film is normally picked up by a platform after its theatrical run, and this page updates automatically when one announces.`
+        : est
+          ? `${est.headline}. ${est.detail}`
+          : `Not announced yet — no streaming date has been confirmed. This page updates automatically; every platform is re-checked every day.`;
 
   const langs = (r.languages ?? []).map(lname);
   /* "Aasha (Malayalam)" — written once because all five description states
@@ -2324,7 +2346,7 @@ for (const r of allTitlePages) {
     rows: [r],
     /** Carried into the page so it still renders once this title has aged out
      *  of the feed the app loads. See the head assembly in renderPage. */
-    embed: { ...r, slug },
+    embed: { ...r, slug, ...(ottEstimate ? { ottEstimate } : {}) },
     /**
      * Three states, and the tag tracks them because the query does.
      *
@@ -2387,7 +2409,9 @@ for (const r of allTitlePages) {
             ? `${qualified} OTT release date — ${hedged ? 'expected on ' : ''}${landsOn} from ${landsDate}`
             : upcoming
               ? `${qualified} release date — in cinemas ${opensOn}`
-              : `${qualified} OTT release date — where to watch online`,
+              : est?.tag
+                ? `${qualified} OTT release date — ${est.tag}`
+                : `${qualified} OTT release date — where to watch online`,
     /*
      * The description is the click, and the last one was arguing against it.
      *
@@ -2413,8 +2437,12 @@ for (const r of allTitlePages) {
           : streamsOn
             ? `${named} ${hedged ? 'is expected to start streaming on' : 'starts streaming on'} ${landsOn} from ${landsDate}, after cinemas on ${opensOn}. Cast, runtime and trailer. ${BRAND}.`
             : upcoming
-            ? `${named} opens in Indian cinemas on ${opensOn} — cast, runtime, certificate and trailer, plus its OTT date the day it lands. ${BRAND}.`
-            : `${named} — in cinemas ${opensOn}. Cast, runtime, certificate and trailer, and the OTT release date here the day it is announced. ${BRAND}.`,
+            ? est?.tag
+              ? `${named} opens in Indian cinemas on ${opensOn}; OTT ${est.tag}, based on ${ottEstimate.basis.films} similar releases. Cast, runtime and trailer. ${BRAND}.`
+              : `${named} opens in Indian cinemas on ${opensOn} — cast, runtime, certificate and trailer, plus its OTT date the day it lands. ${BRAND}.`
+            : est?.tag
+              ? `${named} OTT release date: ${est.headline.replace(/^Expected/, 'expected')}, based on ${ottEstimate.basis.films} similar releases. In cinemas since ${opensOn}. Cast and trailer. ${BRAND}.`
+              : `${named} — in cinemas ${opensOn}. Cast, runtime, certificate and trailer, and the OTT release date here the day it is announced. ${BRAND}.`,
     /**
      * The heading asked "When is X coming to OTT?" even when the answer block
      * directly beneath it said "Streaming now on Netflix" — the page
@@ -2448,6 +2476,7 @@ for (const r of allTitlePages) {
          is the one a reader scans for the answer, and it read "Watch on:
          Netflix" under a sentence saying the platform had not confirmed it. */
       (inCinemas ? '' : `<p><strong>${hedged ? 'Expected on' : 'Watch on'}:</strong> ${esc(on || 'streaming')}</p>`) +
+      (est?.fact ? `<p><strong>Expected on OTT:</strong> ${esc(est.fact)}</p>` : '') +
       (langs.length ? `<p><strong>Language:</strong> ${esc(langs.join(', '))}</p>` : '') +
       (r.genres?.length ? `<p><strong>Genre:</strong> ${esc(r.genres.join(', '))}</p>` : '') +
       (r.certification ? `<p><strong>Certificate:</strong> ${esc(r.certification)}</p>` : '') +
@@ -2574,6 +2603,15 @@ await writeFile(resolve(ROOT, 'dist/sitemap.xml'), sitemap);
  * drift on the first title with a colon in it, and the failure would be
  * silent: the page exists, the link points at it, and the app renders nothing.
  */
+/* And each film's OTT window, so the app's title page and sheet show the
+   estimate the prerendered page was built with. */
+for (const w of feed.weeks) {
+  for (const r of w.releases) {
+    const e = estimateById.get(r.id);
+    if (e) r.ottEstimate = e;
+    else delete r.ottEstimate;
+  }
+}
 await writeFile(FEED, JSON.stringify(feed));
 
 /**
