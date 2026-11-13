@@ -44,6 +44,9 @@ const PLATFORM = {
 };
 const LANG = { hi: 'Hindi', ta: 'Tamil', ml: 'Malayalam', te: 'Telugu', kn: 'Kannada', bn: 'Bengali' };
 
+/* Each app's real icon, from the same list the site's platform chips use. */
+const LOGOS = JSON.parse(await readFile(resolve(ROOT, 'public/data/logos.json'), 'utf8'));
+
 const feed = JSON.parse(await readFile(FEED, 'utf8'));
 const archive = JSON.parse(await readFile(ARCHIVE, 'utf8')).titles;
 const archived = Array.isArray(archive) ? archive : Object.values(archive);
@@ -82,7 +85,8 @@ async function img(url, size) {
   if (!cache.has(path)) {
     const res = await fetch(`${SITE}${path}`);
     if (!res.ok) throw new Error(`${path}: ${res.status}`);
-    cache.set(path, `data:image/jpeg;base64,${Buffer.from(await res.arrayBuffer()).toString('base64')}`);
+    const mime = path.endsWith('.png') ? 'image/png' : 'image/jpeg';
+    cache.set(path, `data:${mime};base64,${Buffer.from(await res.arrayBuffer()).toString('base64')}`);
   }
   return cache.get(path);
 }
@@ -90,8 +94,12 @@ async function img(url, size) {
 const picks = PICKS.map((p) => {
   const row = rowFor(p);
   const arrived = arrivedOn(row, p.platform);
+  if (!LOGOS[p.platform]) throw new Error(`No logo for ${p.platform} in public/data/logos.json.`);
   return { ...p, row, arrived, ...PLATFORM[p.platform] };
 });
+for (const p of picks) p.icon = await img(LOGOS[p.platform], 'w300');
+const icon = (p, size, radius = 0.22) =>
+  `<img src="${p.icon}" style="width:${size}px;height:${size}px;border-radius:${Math.round(size * radius)}px;flex:none;display:block;box-shadow:0 10px 30px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.12)">`;
 
 const head = `<!doctype html><meta charset="utf-8">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&display=swap" rel="stylesheet">
@@ -122,7 +130,8 @@ async function cover() {
   for (const [i, p] of picks.entries()) {
     strips.push(`<div style="flex:1;display:flex;flex-direction:column;gap:14px;transform:translateY(${[30, 0, 40, 10, 50][i]}px)">
       <div style="aspect-ratio:2/3;border-radius:20px;background:#151926 url(${await img(p.row.posterUrl, 'w500')}) center/cover;box-shadow:0 24px 60px rgba(0,0,0,.6)"></div>
-      <div style="font-size:21px;font-weight:900;color:${p.colour};text-align:center">${esc(p.name)}</div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:10px">${icon(p, 72)}
+        <div style="font-size:20px;font-weight:800;color:#e7eaf2;text-align:center">${esc(p.name)}</div></div>
     </div>`);
   }
   return `<div class="slide" style="background:radial-gradient(90% 50% at 50% 0%,#2a1020 0%,#06070a 70%)">
@@ -160,8 +169,11 @@ async function platformSlide(p, i) {
     <div style="position:absolute;inset:0;background:radial-gradient(80% 40% at 0% 100%,${p.glow}cc,transparent 70%)"></div>
     ${top(`OPTION ${i + 1} OF 5`)}
     <div style="margin-top:40px;position:relative;display:flex;align-items:center;gap:20px">
-      <div class="letter" style="background:${p.colour}">${p.letter}</div>
-      <div style="font-size:62px;font-weight:900;letter-spacing:-.03em;color:${p.colour}">Keep ${esc(p.name)}</div>
+      ${icon(p, 96)}
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="font-size:60px;font-weight:900;letter-spacing:-.03em;line-height:1">Keep ${esc(p.name)}</div>
+        <div style="font-size:22px;font-weight:800;letter-spacing:.12em;color:#c9cfdb">VOTE <span style="color:#06070a;background:${p.colour};border-radius:8px;padding:2px 10px;margin-left:4px">${p.letter}</span></div>
+      </div>
     </div>
     <div style="flex:1"></div>
     <div style="position:relative;display:flex;gap:40px;align-items:flex-end">
@@ -184,7 +196,9 @@ async function vote() {
   const rows = [];
   for (const p of picks) {
     rows.push(`<div style="display:flex;align-items:center;gap:24px;padding:18px 0;border-bottom:1px solid #1c2130">
-      <div class="letter" style="background:${p.colour}">${p.letter}</div>
+      <div style="width:56px;height:56px;border-radius:50%;display:grid;place-items:center;flex:none;
+        background:#ffb03a;color:#06070a;font-size:30px;font-weight:900">${p.letter}</div>
+      ${icon(p, 84)}
       <div style="width:66px;flex:none;aspect-ratio:2/3;border-radius:10px;background:#151926 url(${await img(p.row.posterUrl, 'w500')}) center/cover"></div>
       <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
         <div style="font-size:36px;font-weight:900;letter-spacing:-.02em">${esc(p.name)}</div>
