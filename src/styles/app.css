@@ -5091,3 +5091,143 @@ a.changes__title:hover {
     display: none;
   }
 }
+
+/* ── New on your apps (components/YourApps.tsx) ─────────────────────────────
+   The homepage's personal row. Framed rather than bare like the rails below
+   it, with the amber of ★ My apps, so it reads as "yours" at a glance. */
+.yourapps {
+  margin: 14px 0 6px;
+  padding: 14px 14px 10px;
+  border: 1px solid rgba(255, 176, 58, 0.28);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(255, 176, 58, 0.08), rgba(255, 176, 58, 0.02) 60%, transparent);
+  min-width: 0;
+}
+.yourapps__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.yourapps__title {
+  margin: 0;
+}
+.yourapps__star {
+  color: #ffb03a;
+}
+.yourapps__link,
+.yourapps__all {
+  background: none;
+  border: 0;
+  font: inherit;
+  font-size: 13px;
+  color: var(--text-2);
+  cursor: pointer;
+  min-height: 44px;
+  padding: 0 4px;
+}
+.yourapps__link {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.yourapps__all {
+  color: #ffb03a;
+  font-weight: 600;
+  padding: 0;
+}
+.yourapps__link:hover,
+.yourapps__all:hover {
+  color: var(--text);
+}
+.yourapps__sum {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-3);
+}
+.yourapps__apps {
+  display: flex;
+  gap: 8px;
+  margin: 6px 0 2px;
+  padding: 0 0 2px;
+  list-style: none;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.yourapps__apps::-webkit-scrollbar {
+  display: none;
+}
+.yourapps__app {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 0 12px 0 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+}
+.yourapps__app:hover {
+  border-color: rgba(255, 176, 58, 0.55);
+}
+.yourapps__app[data-empty] {
+  opacity: 0.5;
+}
+.yourapps__quiet {
+  margin: 8px 0 0;
+  font-size: 14px;
+  color: var(--text-2);
+}
+.yourapps .landed {
+  margin-top: 6px;
+  margin-bottom: 4px;
+}
+
+/* The invitation: one slim line, never a card that competes with the rails. */
+.yourapps--nudge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 6px 6px 14px;
+}
+.yourapps--nudge p {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-2);
+}
+.yourapps--nudge strong {
+  color: var(--text);
+}
+.yourapps__pick {
+  flex: none;
+  min-height: 44px;
+  border-color: rgba(255, 176, 58, 0.55);
+  color: #ffb03a;
+  font-weight: 600;
+}
+.yourapps__x {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: none;
+  color: var(--text-3);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+@media (max-width: 420px) {
+  .yourapps--nudge p {
+    font-size: 13px;
+  }
+  .yourapps--nudge p span {
+    display: none;
+  }
+}

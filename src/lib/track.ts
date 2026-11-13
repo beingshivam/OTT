@@ -12,7 +12,11 @@ export type TrackEvent =
   | 'myapps_set'
   | 'myapps_on'
   | 'outbound'
-  | 'share';
+  | 'share'
+  | 'return_apps'
+  | 'foryou_open'
+  | 'foryou_app'
+  | 'nudge_open';
 
 export function track(n: TrackEvent): void {
   try {
@@ -27,6 +31,10 @@ export function track(n: TrackEvent): void {
 }
 
 const KEY = 'newonott:seen';
+let returning = false;
+
+/** True when this device had been here on an earlier day. */
+export const isReturning = () => returning;
 
 /** Once per page load: the day's visit, a return, and outbound clicks. */
 export function startTracking(): void {
@@ -36,12 +44,25 @@ export function startTracking(): void {
     try {
       last = localStorage.getItem(KEY);
       localStorage.setItem(KEY, today);
+      /* The first day this device came, kept so "returning" stays true for
+         every load on a later day, not only the first one of it. */
+      const first = localStorage.getItem(`${KEY}:first`) ?? last ?? today;
+      localStorage.setItem(`${KEY}:first`, first);
+      returning = first < today;
     } catch {
       /* Private mode: count the visit, not the return. */
     }
     if (last !== today) {
       track('visit');
-      if (last) track('return');
+      if (last) {
+        track('return');
+        /* The retention number for "My apps": returns by devices that set them. */
+        try {
+          if ((JSON.parse(localStorage.getItem('dropday.prefs.v1') ?? '{}').apps ?? []).length) track('return_apps');
+        } catch {
+          /* ignore */
+        }
+      }
     }
     document.addEventListener(
       'click',

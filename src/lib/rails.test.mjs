@@ -42,6 +42,7 @@ const {
   TRENDING_IN_CINEMAS,
   NEW_IN_CINEMAS,
   NARROWED_DAYS,
+  yourApps,
 } = await import(join(dir, 'rails.mjs'));
 
 const TODAY = new Date('2026-09-07T12:00:00');
@@ -1045,4 +1046,32 @@ test('the badged head never fills the visible row on its own', () => {
     TRENDING_IN_CINEMAS < VISIBLE_ON_A_PHONE,
     `${TRENDING_IN_CINEMAS} badged cards leaves no room for news in ${VISIBLE_ON_A_PHONE}`,
   );
+});
+
+
+test('New on your apps: only the reader\'s apps, out then coming, honest counts', () => {
+  const rows = [
+    row({ title: 'On mine', platforms: ['zee5'], releaseDate: iso(2) }),
+    row({ title: 'Mine, too old', platforms: ['zee5'], releaseDate: iso(9) }),
+    row({ title: 'Not mine', platforms: ['netflix'], releaseDate: iso(1) }),
+    row({ title: 'Guessed', platforms: ['zee5'], namedBy: 'note', releaseDate: iso(-2) }),
+    row({ title: 'Original', platforms: ['zee5'], namedBy: 'network', releaseDate: iso(-3) }),
+    row({ title: 'Shared', platforms: ['netflix', 'sonyliv'], releaseDate: iso(0) }),
+  ];
+  const y = yourApps(rows, 'IN', ['zee5', 'sonyliv'], TODAY);
+  assert.deepEqual(y.out.map((r) => r.title).sort(), ['On mine', 'Shared']);
+  assert.deepEqual(y.soon.map((r) => r.title), ['Original'], 'a free-text guess was offered as coming to their app');
+  assert.deepEqual(y.perApp, [
+    { id: 'zee5', count: 2 },
+    { id: 'sonyliv', count: 1 },
+  ]);
+  assert.equal(y.total, 3);
+  assert.deepEqual(y.latest, [], 'the fallback showed on a week that had something');
+});
+
+test('New on your apps: a quiet week shows the latest arrivals instead of nothing', () => {
+  const rows = [row({ title: 'Older', platforms: ['aha'], releaseDate: iso(20) }), row({ title: 'Old', platforms: ['aha'], releaseDate: iso(12) })];
+  const y = yourApps(rows, 'IN', ['aha'], TODAY);
+  assert.equal(y.total, 0);
+  assert.deepEqual(y.latest.map((r) => r.title), ['Old', 'Older']);
 });

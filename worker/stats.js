@@ -24,6 +24,10 @@ export const EVENTS = {
   myapps_on: 'My apps switched on',
   outbound: 'Clicks out to a platform',
   share: 'Shares',
+  return_apps: 'Returning visits — with My apps set',
+  foryou_open: 'Taps on New on your apps',
+  foryou_app: 'App chip taps',
+  nudge_open: 'Pick my apps prompt taps',
 };
 
 const SCHEMA = [

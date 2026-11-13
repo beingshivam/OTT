@@ -11,6 +11,8 @@ import { DetailSheet } from './components/DetailSheet';
 import { CatalogueSheet } from './components/CatalogueSheet';
 import { PersonSheet } from './components/PersonSheet';
 import { EmailSignup } from './components/EmailSignup';
+import { YourApps, YourAppsNudge } from './components/YourApps';
+import { MyAppsPicker } from './components/MyApps';
 import { ReleaseCard } from './components/ReleaseCard';
 import { GlobalSearch } from './components/GlobalSearch';
 import { HeaderMenu } from './components/HeaderMenu';
@@ -68,6 +70,8 @@ export default function App() {
   const [feed, setFeed] = useState<ReleaseFeed | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [prefs, setPrefs] = useState<Prefs>(DEFAULT_PREFS);
+  /* The My apps picker, opened from the homepage row (Controls has its own). */
+  const [pickingApps, setPickingApps] = useState(false);
   const [selected, setSelected] = useState<Release | null>(null);
   /**
    * The back catalogue, once someone asks for it.
@@ -903,6 +907,39 @@ export default function App() {
       */}
       {!offBoard && feed && !error && facets.total > 0 && !span && !route?.catalogue && showRails && (
         <div className="shell">
+          {/* Personal first: what is new on the apps this reader pays for.
+              Stands down under any filter, when the rails below are already
+              narrowed to their choice. See components/YourApps.tsx. */}
+          {!narrowed &&
+            (prefs.apps.length > 0 ? (
+              <YourApps
+                all={allRows}
+                region={filters.region}
+                apps={prefs.apps}
+                today={today}
+                onOpen={setSelected}
+                onEdit={() => setPickingApps(true)}
+                onOnly={(id) => update({ platforms: [id] })}
+                onAll={() => {
+                  track('myapps_on');
+                  update({ platforms: [...prefs.apps] });
+                }}
+              />
+            ) : (
+              <YourAppsNudge onPick={() => setPickingApps(true)} />
+            ))}
+          {pickingApps && (
+            <MyAppsPicker
+              initial={prefs.apps}
+              region={filters.region}
+              onClose={() => setPickingApps(false)}
+              onSave={(apps) => {
+                if (apps.length) track('myapps_set');
+                updatePrefs({ apps });
+                setPickingApps(false);
+              }}
+            />
+          )}
           {showSoon ? (
             /*
               Nothing from this selection is out yet, so the band says what it

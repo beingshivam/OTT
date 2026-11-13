@@ -633,3 +633,77 @@ export function popularNow(catalogue: Release[], region: string): Release[] {
   );
   return interleaveByLanguage(scoped, (a, b) => a.popRank! - b.popRank!).slice(0, MAX_ITEMS);
 }
+
+/**
+ * "New on your apps": the week, seen through the subscriptions a reader has
+ * told us they pay for (components/MyApps.tsx).
+ *
+ * Seven days back and seven forward rather than the board's Friday-to-Thursday
+ * week, because the question is relative to today — "what has landed on my
+ * apps lately, and what is about to" — and a Thursday visitor's calendar week
+ * is nearly over. Out-now first (Indian first, then platform, then newest, as
+ * every row is ordered), then what is coming, nearest first.
+ *
+ * What may be claimed, per side. This row speaks for a reader's own
+ * subscriptions, so a wrong service here is the site telling them something
+ * is on an app they pay for when it is not.
+ *   Out now: confirmed, as in "On OTT".
+ *   Coming: confirmed, or a platform's own original (`network` — the service
+ *     that commissioned a series is where it airs; measured, those agreed with
+ *     the later provider data every time). Without them the side was empty for
+ *     every combination of apps on 13 Nov 2026: all eight streaming rows of
+ *     the next week were originals. Free-text and studio guesses stay out.
+ *
+ * And when a reader's apps had nothing at all this week — aha and Sun NXT did
+ * not, that same day — `latest` carries their most recent arrivals from the
+ * last two months, so the section answers "when did my apps last get
+ * something" instead of showing an empty box.
+ */
+export const YOUR_APPS_DAYS = 7;
+export const YOUR_APPS_FALLBACK_DAYS = 60;
+
+export interface YourApps {
+  out: Release[];
+  soon: Release[];
+  /** Only when out and soon are both empty: the most recent arrivals. */
+  latest: Release[];
+  /** Per app, in the order the reader chose them: titles out + coming, uncapped. */
+  perApp: { id: string; count: number }[];
+  total: number;
+}
+
+export function yourApps(all: Release[], region: string, apps: string[], today: Date = new Date()): YourApps {
+  const iso = toISODate(today);
+  const mine = new Set(apps);
+  const day = (n: number) => toISODate(new Date(today.getTime() + n * 86_400_000));
+  const on = (r: Release) => platformsFor(r.platforms, region).filter((p) => mine.has(p));
+  const outWhere = (r: Release) => streaming(r) && confirmed(r, iso) && on(r).length > 0;
+  const soonWhere = (r: Release) =>
+    streaming(r) && (!r.namedBy || r.namedBy === 'network') && on(r).length > 0;
+
+  const out = chronicle(all, region, { from: day(-(YOUR_APPS_DAYS - 1)), to: iso, newestFirst: true, where: outWhere });
+  const soon = chronicle(all, region, { from: day(1), to: day(YOUR_APPS_DAYS), newestFirst: false, where: soonWhere });
+  /* Indian-first suits "what's out"; for "what's coming" the question is when. */
+  const soonByDate = [...soon.releases].sort((a, b) => a.releaseDate.localeCompare(b.releaseDate));
+
+  /* Counted over every qualifying row, not the capped ones the rail shows. */
+  const counted = all.filter(
+    (r) =>
+      r.regions?.includes(region) &&
+      r.posterUrl &&
+      ((r.releaseDate >= day(-(YOUR_APPS_DAYS - 1)) && r.releaseDate <= iso && outWhere(r)) ||
+        (r.releaseDate >= day(1) && r.releaseDate <= day(YOUR_APPS_DAYS) && soonWhere(r))),
+  );
+  const seen = new Set<string>();
+  const unique = counted.filter((r) => !seen.has(r.id) && seen.add(r.id));
+  const perApp = apps.map((id) => ({ id, count: unique.filter((r) => on(r).includes(id)).length }));
+
+  const latest =
+    out.releases.length || soonByDate.length
+      ? []
+      : chronicle(all, region, { from: day(-(YOUR_APPS_FALLBACK_DAYS - 1)), to: iso, newestFirst: true, where: outWhere })
+          .releases.sort((a, b) => b.releaseDate.localeCompare(a.releaseDate))
+          .slice(0, 8);
+
+  return { out: out.releases, soon: soonByDate, latest, perApp, total: unique.length };
+}
