@@ -4842,3 +4842,12 @@ a.changes__title:hover {
   opacity: 0.6;
   cursor: default;
 }
+
+/* "Notify me when it streams" — the hint under the button (blocked, iPhone). */
+.notify__hint {
+  flex-basis: 100%;
+  margin: 2px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--muted, #8d94a4);
+}

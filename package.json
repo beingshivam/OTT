@@ -28,6 +28,7 @@
     "explain": "node scripts/build-explainer.mjs",
     "title": "node scripts/build-mirzapur.mjs",
     "test:worker": "node worker/index.test.mjs",
+    "test:push": "node --test worker/push.test.mjs",
     "ratings": "node scripts/enrich-ratings.mjs",
     "test:omdb": "node scripts/omdb.test.mjs",
     "catalogue": "node scripts/fetch-catalogue.mjs",

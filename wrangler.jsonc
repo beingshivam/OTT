@@ -67,7 +67,9 @@
    * Saturday and does not expect a build that has not happened yet.
    */
   ,"triggers": {
-    "crons": ["0 12 * * *"]
+    /* 12:00 is the freshness check above; :17 every hour is the push sweep
+       (worker/push.js), off the hour so it never queues behind the rest. */
+    "crons": ["0 12 * * *", "17 * * * *"]
   }
 
   /**

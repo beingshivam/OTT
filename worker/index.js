@@ -1,3 +1,4 @@
+import { handlePush, dispatch as dispatchPush } from './push.js';
 /**
  * The one thing that runs at request time.
  *
@@ -1192,6 +1193,8 @@ export default {
     if (url.pathname === '/api/title') return titleFromTmdb(request, url, env, ctx);
     if (url.pathname === '/api/person') return personFromTmdb(request, url, env, ctx);
     if (url.pathname === '/api/browse') return browseTmdb(request, url, env, ctx);
+    /* "Notify me when it streams" — see worker/push.js. */
+    if (url.pathname.startsWith('/api/push/')) return handlePush(request, url, env);
 
     if (url.pathname !== '/api/subscribe') return env.ASSETS.fetch(request);
 
@@ -1305,7 +1308,15 @@ export default {
    * It cannot fix anything. It exists so that silence stops meaning "fine".
    */
   async scheduled(event, env, ctx) {
-    ctx?.waitUntil?.(checkFreshness(env));
+    /* Two crons share this handler: the daily freshness check, and the
+       hourly sweep that sends "your film is on OTT" pushes. */
+    if (event?.cron === '0 12 * * *') ctx?.waitUntil?.(checkFreshness(env));
+    ctx?.waitUntil?.(
+      dispatchPush(env).then(
+        (s) => s.matched && console.log('push: sweep', JSON.stringify(s)),
+        (err) => console.error('push: sweep failed', err),
+      ),
+    );
   },
 };
 
