@@ -26,6 +26,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { BRAND } from './brand.mjs';
+import { INDIAN_LANGUAGES, estimateFor, gapPairs, windowStats } from '../src/lib/ott-estimate.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const FEED = resolve(ROOT, 'public/data/releases.json');
@@ -34,8 +35,6 @@ const OUT = resolve(ROOT, 'email');
 const SITE_URL = (process.env.SITE_URL ?? 'https://newonott.in').replace(/\/$/, '');
 const REGION = (process.env.REGIONS ?? 'IN').split(',')[0].trim() || 'IN';
 
-/** How many titles the teaser names before it stops and points at the site. */
-const TEASER = 6;
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const esc = (s) =>
@@ -94,146 +93,149 @@ if (!week) {
   process.exit(1);
 }
 
-const rows = week.releases
-  .filter((r) => r.regions.includes(REGION))
-  .sort((a, b) => (b.heat ?? 0) - (a.heat ?? 0));
+const local = (r) => (r.origin?.length ? r.origin.includes('IN') : INDIAN_LANGUAGES.has(r.languages?.[0] ?? ''));
+/* Indian titles lead, then everything else, each by attention: this list is
+   for an Indian inbox, and a global-popularity sort led with Spanish and
+   French series on 13 Nov. */
+const byInterest = (a, b) => Number(local(b)) - Number(local(a)) || (b.heat ?? 0) - (a.heat ?? 0);
+const rows = week.releases.filter((r) => r.regions.includes(REGION) && r.posterUrl);
+const streaming = rows.filter((r) => r.platforms.some((p) => p !== 'theatres')).sort(byInterest);
+const cinemas = rows.filter((r) => r.platforms.every((p) => p === 'theatres')).sort(byInterest);
 
 const range = formatRange(week.id);
-const top = rows.slice(0, TEASER);
-const rest = rows.length - top.length;
-const platformCount = new Set(rows.flatMap((r) => r.platforms)).size;
-/**
- * The week's own page, not the homepage filtered to it.
- *
- * `/?w=<id>` was written before /w/<id> existed as a real page. Two reasons to
- * prefer the page now. An email is read late — on the following Tuesday, or out
- * of an archive in March — and the homepage by then shows whichever week is
- * current, so a dated email would open on undated content. And every click is a
- * visit to a URL that is trying to rank for "OTT releases 4–10 Sep 2026", which
- * is exactly the query the page is built for; sending that traffic to the
- * homepage instead spends it on a page that does not need it.
- */
+const STREAM_N = 6;
+const CINEMA_N = 3;
+const topStream = streaming.slice(0, STREAM_N);
+const topCinema = cinemas.slice(0, CINEMA_N);
+const rest = rows.length - topStream.length - topCinema.length;
+const platformCount = new Set(rows.flatMap((r) => r.platforms).filter((p) => p !== 'theatres')).size;
 const link = `${SITE_URL}/w/${week.id}`;
 
-/** "Film · Hindi · Crime" — the three things that decide whether it is for you. */
+/* The expected OTT window for the films in cinemas — the one thing in this
+   email nobody else sends. Same rule as the title pages. */
+const archive = JSON.parse(await readFile(resolve(ROOT, 'data/archive.json'), 'utf8').catch(() => '{"titles":[]}')).titles;
+const ottWindows = windowStats(gapPairs(Array.isArray(archive) ? archive : Object.values(archive)));
+const shortDate = (iso) => {
+  const d = new Date(`${iso}T00:00:00Z`);
+  return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]}`;
+};
+
 const KIND = { film: 'Film', series: 'Series', documentary: 'Documentary', reality: 'Reality', anime: 'Anime', special: 'Special' };
 function meta(r) {
   const kind = KIND[r.kind] ?? r.kind;
-  const genre = (r.genres ?? []).find((g) => g.toLowerCase() !== kind.toLowerCase());
-  return [kind, (r.languages ?? []).map(lname).slice(0, 2).join(', '), genre].filter(Boolean).join(' · ');
+  return [kind, (r.languages ?? []).map(lname).slice(0, 2).join(', ')].filter(Boolean).join(' · ');
 }
+const page = (r) => (r.slug ? `${SITE_URL}/ott-release-date/${r.slug}` : link);
+const poster = (r) => {
+  const m = String(r.posterUrl ?? '').match(/\/w\d+\/([A-Za-z0-9_-]+\.(?:jpg|jpeg|png))$/);
+  return m ? `${SITE_URL}/img/w154/${m[1]}` : null;
+};
 
 // --- subject and preheader ---------------------------------------------------
 // Names two titles rather than a count: "Mirzapur and Dhamaal 4 are out" is a
 // reason to open, "30 new releases" is a statistic.
-const headline = top.slice(0, 2).map((r) => r.title).join(' and ');
-const subject = `${range}: ${headline}${rest > 0 ? ` + ${rows.length - 2} more` : ''}`;
-const preheader = `${rows.length} releases across ${platformCount} platforms this week.`;
+const lead = [...topStream, ...topCinema].sort(byInterest).slice(0, 2).map((r) => r.title);
+const subject = `${range}: ${lead.join(' and ')}${rows.length > 2 ? ` + ${rows.length - 2} more` : ''}`;
+const preheader = `${streaming.length} new on OTT and ${cinemas.length} in cinemas this week — and when the big ones reach OTT.`;
 
 // --- html --------------------------------------------------------------------
-const item = (r) => `
-              <tr>
-                <td style="padding:0 0 18px 0;">
-                  <div style="font:600 17px/1.35 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#14161c;">
-                    ${esc(r.title)}
-                  </div>
-                  <div style="font:400 14px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#6b7280;padding-top:2px;">
-                    ${esc(r.platforms.map(pname).join(' · '))} &nbsp;•&nbsp; ${esc(meta(r))}
-                  </div>
-                </td>
-              </tr>`;
+/* The site's look, as the alert emails have it (worker/mail.js): near-black,
+   the orange play mark, amber accents, posters. Tables and inline styles, with
+   colours as attributes too, because that is what renders the same everywhere. */
+const FONT = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+const BG = '#06070a', CARD = '#10131c', LINE = '#1f2432', TEXT = '#f2f4f9', MUTED = '#9aa3b6', AMBER = '#ffb03a';
+
+const row = (r, note) => {
+  const img = poster(r);
+  return `
+          <tr><td style="padding:0 0 14px 0;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+              ${img ? `<td width="62" style="width:62px;vertical-align:top;padding-right:14px;"><a href="${esc(page(r))}"><img src="${esc(img)}" width="62" alt="" style="display:block;width:62px;height:auto;border-radius:8px;border:0;"></a></td>` : ''}
+              <td style="vertical-align:top;">
+                <a href="${esc(page(r))}" style="font:700 17px/1.3 ${FONT};color:${TEXT};text-decoration:none;">${esc(r.title)}</a>
+                <div style="font:400 14px/1.5 ${FONT};color:${MUTED};padding-top:3px;">${esc(meta(r))}</div>
+                <div style="font:700 14px/1.5 ${FONT};color:${AMBER};padding-top:2px;">${esc(note)}</div>
+              </td>
+            </tr></table>
+          </td></tr>`;
+};
+const streamNote = (r) =>
+  `${r.platforms.filter((p) => p !== 'theatres').map(pname).join(' · ')}${r.releaseDate ? ` · ${shortDate(r.releaseDate)}` : ''}`;
+const cinemaNote = (r) => {
+  const est = estimateFor(r, ottWindows);
+  return est ? `In cinemas · OTT expected around ${shortDate(est.likely)}` : `In cinemas from ${shortDate(r.releaseDate)}`;
+};
+
+const section = (title, list, note) =>
+  list.length
+    ? `
+        <tr><td style="padding:6px 0 14px;font:800 12px/1 ${FONT};letter-spacing:1.6px;text-transform:uppercase;color:${AMBER};">${esc(title)}</td></tr>
+        ${list.map((r) => row(r, note(r))).join('')}`
+    : '';
 
 const html = `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="supported-color-schemes" content="dark">
 <title>${esc(subject)}</title>
 </head>
-<body style="margin:0;padding:0;background:#f4f5f7;">
-  <!-- Preheader: the grey line beside the subject in most inboxes. Hidden in
-       the body itself, which is why it carries its own zero-size styling. -->
-  <div style="display:none;font-size:1px;color:#f4f5f7;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">
-    ${esc(preheader)}
-  </div>
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f4f5f7;">
-    <tr>
-      <td align="center" style="padding:28px 12px;">
-        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;background:#ffffff;border-radius:14px;overflow:hidden;">
-          <tr>
-            <td style="padding:26px 28px 6px 28px;">
-              <div style="font:700 18px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#14161c;">
-                ${esc(BRAND)}
-              </div>
-              <div style="font:400 14px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#6b7280;padding-top:4px;">
-                ${esc(range)} &nbsp;•&nbsp; ${rows.length} releases across ${platformCount} platforms
-              </div>
+<body style="margin:0;padding:0;background:${BG};" bgcolor="${BG}">
+<div style="display:none;font-size:1px;color:${BG};line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">${esc(preheader)}</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${BG}" style="background:${BG};">
+<tr><td align="center" style="padding:28px 12px;">
+  <table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:560px;">
+    <tr><td style="padding:0 4px 18px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+        <td style="vertical-align:middle;padding-right:10px;"><a href="${SITE_URL}/"><img src="${SITE_URL}/icon-192.png" width="34" height="34" alt="" style="display:block;width:34px;height:34px;border-radius:9px;border:0;"></a></td>
+        <td style="vertical-align:middle;font:700 19px/1 ${FONT};color:${TEXT};"><a href="${SITE_URL}/" style="color:${TEXT};text-decoration:none;">${esc(BRAND)}</a></td>
+      </tr></table>
+    </td></tr>
+    <tr><td bgcolor="${CARD}" style="background:${CARD};border:1px solid ${LINE};border-radius:18px;padding:24px 22px 8px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr><td style="font:800 26px/1.15 ${FONT};color:${TEXT};letter-spacing:-0.4px;padding-bottom:6px;">This week, ${esc(range)}</td></tr>
+        <tr><td style="font:400 15px/1.5 ${FONT};color:${MUTED};padding-bottom:20px;">${streaming.length} new on OTT across ${platformCount} platforms, ${cinemas.length} in cinemas.</td></tr>
+        ${section('New on OTT this week', topStream, streamNote)}
+        ${section('In cinemas now', topCinema, cinemaNote)}
+        ${rest > 0 ? `<tr><td style="font:400 14px/1.5 ${FONT};color:${MUTED};padding:2px 0 16px;">…and ${rest} more on the full list.</td></tr>` : ''}
+        <tr><td style="padding:4px 0 20px;">
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+            <td bgcolor="${AMBER}" style="border-radius:999px;background:${AMBER};background-image:linear-gradient(90deg,#ff5a4d,#ffb03a);">
+              <a href="${esc(link)}" style="display:inline-block;padding:13px 22px;font:800 15px/1 ${FONT};color:#111111;text-decoration:none;border-radius:999px;">See the full week &rarr;</a>
             </td>
-          </tr>
-          <tr>
-            <td style="padding:20px 28px 0 28px;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                ${top.map(item).join('')}
-              </table>
-            </td>
-          </tr>
-          ${
-            rest > 0
-              ? `<tr>
-            <td style="padding:0 28px 6px 28px;">
-              <div style="font:400 14px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#6b7280;">
-                …and ${rest} more, including everything in cinemas.
-              </div>
-            </td>
-          </tr>`
-              : ''
-          }
-          <tr>
-            <td style="padding:22px 28px 30px 28px;">
-              <!-- The point of the email. Bulletproof enough for Outlook: a
-                   table cell with a background, not a styled <button>. -->
-              <table role="presentation" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <td align="center" bgcolor="#14161c" style="border-radius:999px;">
-                    <a href="${esc(link)}" style="display:inline-block;padding:13px 26px;font:600 15px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;border-radius:999px;">
-                      See the full week
-                    </a>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding:0 28px 26px 28px;border-top:1px solid #e6e8ec;">
-              <div style="font:400 12px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#9aa1ad;padding-top:16px;">
-                Every new release, every platform, one page — <a href="${esc(SITE_URL)}/" style="color:#6b7280;">${esc(SITE_URL.replace(/^https?:\/\//, ''))}</a><br>
-                Ratings and release data from TMDB. This product uses the TMDB API but is not endorsed or certified by TMDB.<br>
-                <!-- Most providers substitute their own unsubscribe link for this token; check yours. -->
-                {{ unsubscribe }}
-              </div>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
+          </tr></table>
+        </td></tr>
+      </table>
+    </td></tr>
+    <tr><td style="padding:20px 6px 0;font:400 13px/1.6 ${FONT};color:${MUTED};">
+      <a href="${SITE_URL}/" style="color:${TEXT};text-decoration:none;font-weight:700;">newonott.in</a>
+      &nbsp;·&nbsp; Every new release, every platform, one page.
+      &nbsp;·&nbsp; <a href="https://www.instagram.com/newonott.in/" style="color:${MUTED};">Instagram</a>
+    </td></tr>
+    <tr><td style="padding:8px 6px 0;font:400 12px/1.6 ${FONT};color:#6b7385;">
+      You're getting this because you subscribed at newonott.in. {{ unsubscribe }}<br>
+      Release data from TMDB. This product uses the TMDB API but is not endorsed or certified by TMDB.
+    </td></tr>
   </table>
+</td></tr>
+</table>
 </body>
 </html>
 `;
 
 // --- plain text --------------------------------------------------------------
-// Not an afterthought: it is what some clients show, and what spam filters read
-// when the HTML part is all they otherwise have.
 const text = [
   `${BRAND} — ${range}`,
-  `${rows.length} releases across ${platformCount} platforms.`,
+  `${streaming.length} new on OTT, ${cinemas.length} in cinemas.`,
   '',
-  ...top.map((r) => `• ${r.title} — ${r.platforms.map(pname).join(' · ')} — ${meta(r)}`),
-  ...(rest > 0 ? ['', `…and ${rest} more, including everything in cinemas.`] : []),
-  '',
+  ...(topStream.length ? ['NEW ON OTT THIS WEEK', ...topStream.map((r) => `• ${r.title} — ${streamNote(r)} — ${meta(r)}`), ''] : []),
+  ...(topCinema.length ? ['IN CINEMAS NOW', ...topCinema.map((r) => `• ${r.title} — ${cinemaNote(r)}`), ''] : []),
+  ...(rest > 0 ? [`…and ${rest} more.`, ''] : []),
   `See the full week: ${link}`,
   '',
-  'Ratings and release data from TMDB. This product uses the TMDB API but is not endorsed or certified by TMDB.',
+  'Release data from TMDB. This product uses the TMDB API but is not endorsed or certified by TMDB.',
   '{{ unsubscribe }}',
   '',
 ].join('\n');
@@ -242,7 +244,9 @@ await mkdir(OUT, { recursive: true });
 await writeFile(resolve(OUT, 'subject.txt'), `${subject}\n`);
 await writeFile(resolve(OUT, 'latest.html'), html);
 await writeFile(resolve(OUT, 'latest.txt'), text);
+/* Which week this is, so the Worker sends each week once (worker/newsletter.js). */
+await writeFile(resolve(OUT, 'meta.json'), `${JSON.stringify({ weekId: week.id, builtAt: new Date().toISOString() })}\n`);
 
 console.log(`Digest for ${range}: "${subject}"`);
-console.log(`  ${top.length} titles teased, ${rest} held back, link -> ${link}`);
-console.log(`  wrote email/subject.txt, email/latest.html, email/latest.txt`);
+console.log(`  ${topStream.length} streaming + ${topCinema.length} in cinemas featured, ${rest} more on the site`);
+console.log(`  wrote email/subject.txt, latest.html, latest.txt, meta.json`);
