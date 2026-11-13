@@ -150,15 +150,15 @@ const slides = [
 
   /* 5 — the ask, and one the site can keep. */
   `<div class="slide" style="background:radial-gradient(110% 55% at 50% 100%,#2a1020 0%,#06070a 60%)">
-    ${top('YOUR TURN')}
+    ${top('TRY IT')}
     <div style="flex:1"></div>
     <div style="display:flex;flex-direction:column;gap:28px">
       <h1 style="font-size:104px">Waiting for a film to hit <span class="grad">OTT?</span></h1>
-      <div class="sub" style="font-size:36px">Comment its name 👇<br>We'll reply with its expected OTT date.</div>
+      <div class="sub" style="font-size:36px">Search it on newonott.in for its expected OTT date —<br>then tap Notify me and stop checking.</div>
     </div>
     <div style="flex:1"></div>
     <div style="display:flex;flex-direction:column;gap:14px;padding:30px 34px;border-radius:28px;background:#10131c;border:1px solid #1f2432">
-      <div style="font-size:26px;font-weight:700;color:#9aa3b6">Or check it yourself — and turn on alerts:</div>
+      <div style="font-size:26px;font-weight:700;color:#9aa3b6">Check it now:</div>
       <div style="font-size:52px;font-weight:900;letter-spacing:-.02em" class="grad">newonott.in</div>
       <div style="font-size:24px;font-weight:600;color:#9aa3b6">Link in bio · every new release, every platform</div>
     </div>
@@ -185,7 +185,7 @@ const caption = [
   'How long films take to reach OTT right now:',
   ...windows.map((w) => `• ${w.name}: ${weeks(w.median)}`),
   '',
-  'Waiting for a film? Comment its name 👇 we\'ll reply with its expected OTT date.',
+  'Waiting for a film? Check its expected OTT date on newonott.in and tap Notify me 🔔',
   'Save this for the next time someone asks "OTT pe kab aayegi?"',
   '',
   '🔗 newonott.in (link in bio)',
