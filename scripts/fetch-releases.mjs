@@ -1356,10 +1356,83 @@ for (const row of handPlaced) {
 }
 if (handAdded) console.log(`Merged ${handAdded} hand-placed streaming date(s).`);
 
+/**
+ * Streaming arrivals a finished week can no longer find for itself.
+ *
+ * An `~ott` row — a film reaching a service on a date of its own — comes only
+ * from the digital pass, and the digital pass only runs for weeks that have
+ * not ended (see `to >= TODAY` in buildWeek). The provider pass that stands in
+ * for it afterwards asks discover by the film's *primary* release date, which
+ * for anything that opened in cinemas is the theatrical one. So the day after
+ * a week closed, every theatre-to-OTT arrival in it vanished from its calendar.
+ *
+ * Measured on 13 Nov: 146 arrivals across the eight weeks still in the feed,
+ * Jailer 2 on Prime among them. Its only surviving row was the 15 Oct cinema
+ * listing, now carrying Prime too, which is too old for "On OTT" and, being
+ * streaming, excluded from "In cinemas" — so the week's biggest arrival was on
+ * no rail at all. Haiwaan, I'm Game, Mirzapur: The Movie, the same.
+ *
+ * The archive kept every one of them, with when it was seen. A finished week
+ * gets back the arrivals the archive holds for it, on one condition: the row
+ * was still listed on or after its own date. That is the line between a film
+ * that arrived and a guess that was withdrawn before the day came — Under My
+ * Skin was last seen four days before its date and stays gone.
+ *
+ * Carried, not trusted further than it was. A row inferred from a release
+ * note stays marked as inferred, unless the rebuilt feed now has the same film
+ * on the same service from a real provider — then it is a confirmed arrival
+ * and reads as one.
+ */
+const ARCHIVE_IN = resolve(ROOT, process.env.ARCHIVE_IN ?? 'data/archive.json');
+const archived = await readFile(ARCHIVE_IN, 'utf8')
+  .then((raw) => {
+    const titles = JSON.parse(raw).titles ?? [];
+    return Array.isArray(titles) ? titles : Object.values(titles);
+  })
+  .catch(() => []);
+/* The feed's own fields. The archive adds bookkeeping of its own (when seen,
+   popularity history, renames) that has no business in a calendar row. */
+const FEED_FIELDS = [
+  'id', 'title', 'kind', 'platforms', 'languages', 'genres', 'releaseDate', 'regions',
+  'rating', 'votes', 'heat', 'synopsis', 'posterUrl', 'backdropUrl', 'imdbId',
+  'runtimeMinutes', 'cast', 'director', 'trailerUrl', 'certification', 'theatrical',
+  'origin', 'slug', 'imdbRating', 'imdbVotes', 'namedBy',
+];
+const arrivalsByWeek = new Map();
+for (const r of archived) {
+  if (!String(r.id).endsWith('~ott') || !r.weekId || r.sample || r.drop) continue;
+  if (!r.platforms?.length || !r.releaseDate || !r.lastSeen || r.lastSeen < r.releaseDate) continue;
+  const row = Object.fromEntries(FEED_FIELDS.filter((k) => r[k] !== undefined).map((k) => [k, r[k]]));
+  const list = arrivalsByWeek.get(r.weekId) ?? [];
+  list.push(row);
+  arrivalsByWeek.set(r.weekId, list);
+}
+
+const restoredIds = new Set();
+function restoreArrivals(week) {
+  if (week.end >= TODAY) return 0;
+  const present = new Set(week.releases.map((r) => r.id));
+  const streamingTitles = new Set(
+    week.releases.filter((r) => r.platforms.some((p) => p !== theatricalId)).map((r) => normTitle(r.title)),
+  );
+  let restored = 0;
+  for (const row of arrivalsByWeek.get(week.id) ?? []) {
+    if (present.has(row.id) || streamingTitles.has(normTitle(row.title))) continue;
+    present.add(row.id);
+    streamingTitles.add(normTitle(row.title));
+    week.releases.push({ ...row });
+    restoredIds.add(row.id);
+    restored++;
+  }
+  return restored;
+}
+
 const weeks = [];
+let restoredTotal = 0;
 for (const { id, cinemaOnly } of weekIds()) {
   process.stdout.write(`Building week ${id}${cinemaOnly ? ' (cinema only)' : ''} … `);
   const week = await buildWeek(id, platforms, index, cinemaOnly);
+  if (!cinemaOnly) restoredTotal += restoreArrivals(week);
 
   const curated = curatedByWeek.get(id) ?? [];
   if (curated.length) {
@@ -1404,6 +1477,32 @@ for (const week of weeks) {
   });
 }
 if (repeats) console.log(`Collapsed ${repeats} repeat cinema listing(s) to their opening week.`);
+
+/* A restored arrival inferred from a note is confirmed once a real provider
+   puts the same film on the same service anywhere in the rebuilt feed. */
+if (restoredTotal) {
+  const provided = new Map();
+  for (const r of weeks.flatMap((w) => w.releases)) {
+    if (r.namedBy) continue;
+    const base = String(r.id).replace(/~ott$/, '');
+    const set = provided.get(base) ?? new Set();
+    for (const p of r.platforms) set.add(p);
+    provided.set(base, set);
+  }
+  let confirmedNow = 0;
+  for (const r of weeks.flatMap((w) => w.releases)) {
+    if (!restoredIds.has(r.id) || !r.namedBy) continue;
+    const real = provided.get(String(r.id).replace(/~ott$/, ''));
+    if (real && r.platforms.every((p) => real.has(p))) {
+      delete r.namedBy;
+      confirmedNow++;
+    }
+  }
+  console.log(
+    `Restored ${restoredTotal} streaming arrival(s) to finished weeks from the archive` +
+      (confirmedNow ? `, ${confirmedNow} now confirmed by a provider.` : '.'),
+  );
+}
 
 process.stdout.write('Building trending … ');
 const trending = await buildTrending(index);

@@ -172,8 +172,12 @@ globalThis.fetch = async (url) => {
 };
 `;
 
-function run(weeksBack = '0', theatreWeeksBack = '0') {
+function run(weeksBack = '0', theatreWeeksBack = '0', archive = null) {
   const dir = mkdtempSync(join(tmpdir(), 'feed-'));
+  // The real data/archive.json would leak real titles into every run; each run
+  // gets the archive it is given, or none.
+  const archiveIn = join(dir, 'archive.json');
+  if (archive) writeFileSync(archiveIn, JSON.stringify({ titles: archive }));
   const out = join(dir, 'releases.json');
   const today = new Date().toISOString().slice(0, 10);
   // Three days out, so the pre-release case and the arrived case are both in
@@ -202,6 +206,7 @@ function run(weeksBack = '0', theatreWeeksBack = '0') {
         REGIONS: 'IN',
         FEED_OUT: out,
         CALL_LOG: join(dir, 'calls.json'),
+        ARCHIVE_IN: archiveIn,
       },
     },
   );
@@ -575,5 +580,49 @@ test('the badge a card will wear is the one most readers can use', () => {
       ['netflix', 'crunchyroll'],
       `got ${r.platforms.join(', ')}`,
     );
+  }
+});
+
+test('a finished week keeps the streaming arrivals it had', () => {
+  /*
+   * Reported: Jailer 2 was the biggest arrival of its week and on no rail.
+   * The digital pass that dates an arrival only runs for weeks not yet over,
+   * so the day after a week closed every theatre-to-OTT row in it vanished —
+   * 146 of them across the feed on 13 Nov. The archive had kept them all.
+   */
+  const DAY = 86_400_000;
+  const d = new Date();
+  const today = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+  const thisWeek = new Date(today.getTime() - ((today.getUTCDay() + 2) % 7) * DAY);
+  const iso = (t) => new Date(t).toISOString().slice(0, 10);
+  const lastWeek = iso(thisWeek.getTime() - 7 * DAY);
+  const row = (id, over) => ({
+    id, title: `Archived ${id}`, kind: 'film', platforms: ['netflix'], languages: ['hi'],
+    genres: [], regions: ['IN'], weekId: lastWeek, releaseDate: iso(thisWeek.getTime() - 5 * DAY),
+    firstSeen: iso(thisWeek.getTime() - 9 * DAY), posterUrl: 'https://image.tmdb.org/t/p/w500/x.jpg',
+    namedBy: 'note', popRank: 3, ...over,
+  });
+  const archive = [
+    // Arrived: still listed two days after its date.
+    row('m-900~ott', { lastSeen: iso(thisWeek.getTime() - 3 * DAY) }),
+    // Withdrawn before its date came: a guess, not an arrival.
+    row('m-901~ott', { lastSeen: iso(thisWeek.getTime() - 6 * DAY) }),
+    // This week is still being built by the digital pass itself.
+    row('m-902~ott', { weekId: iso(thisWeek), releaseDate: iso(thisWeek), lastSeen: iso(today) }),
+    // Not an arrival row at all.
+    row('m-903', { platforms: ['theatres'], lastSeen: iso(today) }),
+  ];
+  const { feed: f } = run('1', '0', archive);
+  const last = f.weeks.find((w) => w.id === lastWeek);
+  assert.ok(last, `no week ${lastWeek} in the feed`);
+  const ids = new Set(f.weeks.flatMap((w) => w.releases.map((r) => r.id)));
+  const back = last.releases.find((r) => r.id === 'm-900~ott');
+  assert.ok(back, 'the arrival was not restored to its week');
+  assert.ok(!ids.has('m-901~ott'), 'a guess withdrawn before its date came back');
+  assert.ok(!ids.has('m-902~ott'), 'an unfinished week took a row from the archive');
+  assert.ok(!ids.has('m-903'), 'a cinema row was restored as an arrival');
+  assert.equal(back.namedBy, 'note', 'an inferred platform was promoted with no provider behind it');
+  for (const k of ['weekId', 'firstSeen', 'lastSeen', 'popRank']) {
+    assert.ok(!(k in back), `archive bookkeeping "${k}" leaked into the feed`);
   }
 });

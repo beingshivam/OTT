@@ -34,6 +34,7 @@ const {
   popularNow,
   inCinemas,
   landedOnOtt,
+  TRENDING_ON_OTT,
   CINEMA_DAYS,
   WINDOW_DAYS,
   SOON_DAYS,
@@ -528,7 +529,10 @@ test('the streaming row leads on attention and then returns to its calendar', ()
   );
   const out = landedOnOtt([...today, big], 'IN', TODAY);
   assert.equal(out.releases[0].title, 'The big one', `the row opened on ${out.releases[0].title}`);
-  assert.equal(out.trending, TRENDING_IN_CINEMAS);
+  // Behind it, the next-biggest of the fortnight: the row leads with the most
+  // trending few (asked for, 13 Nov), then returns to its calendar.
+  assert.equal(out.trending, TRENDING_ON_OTT);
+  assert.equal(out.releases[1].title, 'Quiet 8', `second was ${out.releases[1].title}, not the next by attention`);
   const tail = out.releases.slice(out.trending).map((r) => r.releaseDate);
   assert.deepEqual([...tail].sort().reverse(), tail, 'the tail lost its date order');
 });
@@ -1025,6 +1029,13 @@ test('the head of each row changes when something new lands', () => {
     ottAfter,
     ottBefore,
     `the streaming row looks identical two days running: ${ottAfter}`,
+  );
+});
+
+test('the streaming row ranks its head and still leaves room for news', () => {
+  assert.ok(
+    TRENDING_ON_OTT < VISIBLE_ON_A_PHONE,
+    `${TRENDING_ON_OTT} ranked cards leaves no room for news in ${VISIBLE_ON_A_PHONE}`,
   );
 });
 
