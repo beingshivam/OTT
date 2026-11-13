@@ -1165,8 +1165,12 @@ const S14 = 'Streaming arrivals kept';
   const norm = (t) =>
     (t ?? '').normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
   const streams = (r) => (r.platforms ?? []).some((p) => p !== 'theatres');
+  /* "Finished" as of when the feed was built, not when this runs: the restore
+     judged by its own clock, and a refresh that crosses Thursday midnight UTC
+     would otherwise see a week end between the two and fail a healthy feed. */
+  const asOf = feed?.asOf ?? ((feed?.generatedAt ?? '').slice(0, 10) || TODAY);
   const ordered = [...(feed?.weeks ?? [])].sort((a, b) => a.id.localeCompare(b.id));
-  const current = ordered.findIndex((w) => w.start <= TODAY && TODAY <= w.end);
+  const current = ordered.findIndex((w) => w.start <= asOf && asOf <= w.end);
   const weeksBack = Number.isInteger(feed?.weeksBack) ? feed.weeksBack : 3;
   const finished = new Map(
     (current < 0 ? [] : ordered.slice(Math.max(0, current - weeksBack), current)).map((w) => [w.id, w]),
