@@ -284,10 +284,11 @@ jobs:
         continue-on-error: true
         run: node scripts/archive.mjs
 
-      # Draft a news article for each fresh Indian OTT date announcement.
-      # Drafts only — nothing is published until a person runs the "Publish
-      # article" workflow. See scripts/news-draft.mjs for why.
-      - name: Draft news articles
+      # The newsroom: drafts an article for each fresh Indian OTT date
+      # announcement and publishes drafts whose date is now verified, three a
+      # day at most. No person in the loop — see scripts/news-draft.mjs. Runs
+      # before validation, so a bad article fails the build like bad data.
+      - name: Draft and publish news
         if: steps.fetch.outcome == 'success'
         continue-on-error: true
         run: node scripts/news-draft.mjs

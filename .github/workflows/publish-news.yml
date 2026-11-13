@@ -1,9 +1,9 @@
 name: Publish article
 
-# The one step a person takes before a news article goes live. Drafts are
-# written by the daily refresh (scripts/news-draft.mjs) into data/news; read
-# one on GitHub, edit it if needed, then run this with its name. Works from
-# the GitHub app on a phone: Actions → Publish article → Run workflow.
+# Optional. Articles publish themselves once their date is verified (see
+# scripts/news-draft.mjs, run by the daily refresh). This is the manual
+# override: publish a draft early, or take an article down with "unpublish".
+# Works from the GitHub app on a phone: Actions → Publish article → Run.
 #
 # Leave "slug" empty to list the drafts waiting in the run's log.
 

@@ -74,6 +74,7 @@ jobs:
           npm run typecheck
           npm run test:rail
           npm run test:estimate
+          npm run test:news
           npm run test:rank
           npm run test:fetch
           npm run test:affiliates

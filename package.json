@@ -35,6 +35,7 @@
     "eval": "node scripts/eval.mjs",
     "test:rail": "node --test src/lib/rails.test.mjs",
     "test:estimate": "node --test src/lib/ott-estimate.test.mjs",
+    "test:news": "node --test scripts/news-draft.test.mjs",
     "test:rank": "node --test scripts/rank-movement.test.mjs",
     "test:fetch": "node --test scripts/fetch-releases.test.mjs",
     "e2e": "node scripts/e2e.mjs",
