@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { track } from '../lib/track';
 import { IconCalendar, IconClose } from './icons';
 import { EMAIL_ENDPOINT } from '../data/config';
 
@@ -83,6 +84,7 @@ export function EmailSignup({ variant = 'footer' }: { variant?: 'footer' | 'bann
         body: JSON.stringify({ email: address, email_address: address }),
       });
       if (!res.ok) throw new Error(String(res.status));
+      track('subscribe');
       setState('done');
       setEmail('');
       remember('done');

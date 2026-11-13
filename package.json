@@ -30,6 +30,7 @@
     "test:worker": "node worker/index.test.mjs",
     "test:push": "node --test worker/push.test.mjs",
     "test:newsletter": "node --test worker/newsletter.test.mjs",
+    "test:stats": "node --test worker/stats.test.mjs",
     "ratings": "node scripts/enrich-ratings.mjs",
     "test:omdb": "node scripts/omdb.test.mjs",
     "catalogue": "node scripts/fetch-catalogue.mjs",

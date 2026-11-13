@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { track } from './lib/track';
 import { Board } from './components/Board';
 import { BrowseLinks } from './components/BrowseLinks';
 import { GenreBrowse } from './components/GenreBrowse';
@@ -190,7 +191,7 @@ export default function App() {
   // region never visibly flips underneath the user.
   useEffect(() => {
     const stored = loadPrefs();
-    const resolved: Prefs = { region: stored.region || guessRegion() };
+    const resolved: Prefs = { region: stored.region || guessRegion(), apps: stored.apps };
     setPrefs(resolved);
     const fromUrl = new URLSearchParams(window.location.search).get('r');
     if (!fromUrl) setFilters((f) => ({ ...f, region: resolved.region }));
@@ -1029,6 +1030,14 @@ export default function App() {
 
       {!offBoard && (
       <Controls
+        myApps={{
+          apps: prefs.apps,
+          onSave: (apps) => {
+            if (apps.length) track('myapps_set');
+            updatePrefs({ apps });
+            update({ platforms: apps });
+          },
+        }}
         filters={filters}
         facets={facets}
         resultCount={visible.length}

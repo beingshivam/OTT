@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react';
+import { track } from '../lib/track';
 import { emailFollow, follow, isFollowing, mailAvailable, pushSupport, unfollow } from '../lib/push';
 
 /**
@@ -46,13 +47,17 @@ export function NotifyButton({ id, title, slug, poster }: { id: string; title: s
       return;
     }
     setPush('busy');
-    setPush(await follow({ id, title, slug }));
+    const r = await follow({ id, title, slug });
+    if (r === 'following') track('follow_push');
+    setPush(r);
   };
 
   const onMail = async (e: FormEvent) => {
     e.preventDefault();
     setMail('busy');
-    setMail((await emailFollow({ id, title, slug, poster, email: address })) ? 'done' : 'failed');
+    const ok = await emailFollow({ id, title, slug, poster, email: address });
+    if (ok) track('follow_email');
+    setMail(ok ? 'done' : 'failed');
   };
 
   if (!pushOk && !canMail && support !== 'ios-install') return null;

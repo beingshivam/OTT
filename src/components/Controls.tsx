@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { track } from '../lib/track';
 import {
   IconChevronDown,
   IconChevronLeft,
@@ -8,6 +9,7 @@ import {
   IconSliders,
 } from './icons';
 import { PlatformLogo } from './PlatformLogo';
+import { MyAppsButton, MyAppsPicker } from './MyApps';
 import { KIND_LABEL, REGIONS, languageName, platform } from '../data/platforms';
 import { activeFilterCount, toggle } from '../lib/filters';
 import type { Filters, SortKey, TitleKind } from '../types';
@@ -36,6 +38,8 @@ interface Facets {
  * filters, which narrow the board and nothing else.
  */
 interface Props {
+  /** "My apps" — omitted where the control has no place (see MyApps.tsx). */
+  myApps?: { apps: string[]; onSave: (apps: string[]) => void };
   filters: Filters;
   facets: Facets;
   resultCount: number;
@@ -106,6 +110,7 @@ function Chip({
 }
 
 export function Controls({
+  myApps,
   filters,
   facets,
   resultCount,
@@ -121,6 +126,17 @@ export function Controls({
   onRegion,
 }: Props) {
   const [open, setOpen] = useState(false);
+  const [pickingApps, setPickingApps] = useState(false);
+  const appsOn =
+    !!myApps &&
+    myApps.apps.length > 0 &&
+    filters.platforms.length === myApps.apps.length &&
+    myApps.apps.every((a) => filters.platforms.includes(a));
+  const toggleApps = () => {
+    if (!myApps) return;
+    if (!appsOn) track('myapps_on');
+    onChange({ platforms: appsOn ? [] : [...myApps.apps] });
+  };
   const active = activeFilterCount(filters);
 
   return (
@@ -187,6 +203,35 @@ export function Controls({
             </button>
           </span>
 
+          {myApps && (
+            <MyAppsButton
+              wide
+              apps={myApps.apps}
+              active={
+                myApps.apps.length > 0 &&
+                filters.platforms.length === myApps.apps.length &&
+                myApps.apps.every((a) => filters.platforms.includes(a))
+              }
+              onToggle={() => {
+                const on =
+                  filters.platforms.length === myApps.apps.length && myApps.apps.every((a) => filters.platforms.includes(a));
+                if (!on) track('myapps_on');
+                onChange({ platforms: on ? [] : [...myApps.apps] });
+              }}
+              onEdit={() => setPickingApps(true)}
+            />
+          )}
+          {myApps && pickingApps && (
+            <MyAppsPicker
+              initial={myApps.apps}
+              region={filters.region}
+              onClose={() => setPickingApps(false)}
+              onSave={(next) => {
+                setPickingApps(false);
+                myApps.onSave(next);
+              }}
+            />
+          )}
           <button className="btn" aria-label="Filters" data-active={open} onClick={() => setOpen((v) => !v)} aria-expanded={open}>
             <IconSliders />
             <span className="btn__text">Filters</span>
@@ -227,6 +272,18 @@ export function Controls({
 
         {open && (
           <div className="panel">
+            {/* The way to change "My apps" on a phone, where the toolbar has no
+                room for an Edit link beside the button. */}
+            {myApps && (
+              <div className="panel__group">
+                <span className="panel__label">My apps</span>
+                <div className="panel__chips">
+                  <button className="chip" onClick={() => setPickingApps(true)}>
+                    {myApps.apps.length ? `★ ${myApps.apps.length} chosen · Edit` : '★ Choose my apps'}
+                  </button>
+                </div>
+              </div>
+            )}
             <div className="panel__group">
               <span className="panel__label">Type</span>
               <div className="panel__chips">
@@ -316,6 +373,14 @@ export function Controls({
                 Reset filters
               </button>
             </div>
+          </div>
+        )}
+
+        {/* On a narrow phone the toolbar has no room for ★ My apps without
+            squeezing the week heading, so it gets a slim line of its own. */}
+        {myApps && (
+          <div className="myapps__row">
+            <MyAppsButton apps={myApps.apps} active={appsOn} onToggle={toggleApps} onEdit={() => setPickingApps(true)} />
           </div>
         )}
 

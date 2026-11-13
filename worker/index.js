@@ -1,5 +1,6 @@
 import { handlePush, dispatch as dispatchPush } from './push.js';
 import { handleUnsubscribe, welcome, weekly } from './newsletter.js';
+import { handleEvent, mondayReport } from './stats.js';
 /**
  * The one thing that runs at request time.
  *
@@ -1198,6 +1199,8 @@ export default {
     if (url.pathname.startsWith('/api/push/')) return handlePush(request, url, env);
     /* The Friday list's one-click way out — see worker/newsletter.js. */
     if (url.pathname === '/api/subscribe/unsubscribe') return handleUnsubscribe(request, url, env);
+    /* Counts only — see worker/stats.js. */
+    if (url.pathname === '/api/e') return handleEvent(request, url, env);
 
     if (url.pathname !== '/api/subscribe') return env.ASSETS.fetch(request);
 
@@ -1318,12 +1321,18 @@ export default {
    */
   async scheduled(event, env, ctx) {
     /* Two crons share this handler: the daily freshness check, and the
-       hourly sweep that sends "your film is on OTT" pushes. */
+       hourly sweep (alerts, the Friday list, the Monday numbers). */
     if (event?.cron === '0 12 * * *') ctx?.waitUntil?.(checkFreshness(env));
     ctx?.waitUntil?.(
       weekly(env).then(
         (r) => r.sent && console.log('newsletter: sent', JSON.stringify(r)),
         (err) => console.error('newsletter: weekly failed', err),
+      ),
+    );
+    ctx?.waitUntil?.(
+      mondayReport(env).then(
+        (r) => r.sent && console.log('report: sent', r.sent),
+        (err) => console.error('report: failed', err),
       ),
     );
     ctx?.waitUntil?.(

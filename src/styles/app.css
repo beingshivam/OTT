@@ -4959,3 +4959,135 @@ a.changes__title:hover {
     padding-right: 26px;
   }
 }
+
+/* "My apps" — the toolbar button, its edit link, and the picker sheet. */
+.myapps {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.myapps .btn[data-active] {
+  border-color: #ffb03a;
+  color: #ffb03a;
+}
+.myapps__edit {
+  background: none;
+  border: 0;
+  padding: 4px 6px;
+  font: inherit;
+  font-size: 12px;
+  color: var(--text-3);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.myapps__scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+@media (min-width: 640px) {
+  .myapps__scrim {
+    align-items: center;
+  }
+}
+.myapps__sheet {
+  width: min(560px, 100%);
+  max-height: 88vh;
+  overflow: auto;
+  background: #10131c; /* solid: the page must not show through the sheet */
+  border: 1px solid var(--line);
+  border-radius: 22px 22px 0 0;
+  padding: 22px 18px 18px;
+}
+@media (min-width: 640px) {
+  .myapps__sheet {
+    border-radius: 22px;
+    padding: 26px;
+  }
+}
+.myapps__sheet h2 {
+  margin: 0 0 6px;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+}
+.myapps__sheet > p {
+  margin: 0 0 16px;
+  font-size: 14px;
+  color: var(--text-2);
+}
+.myapps__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+}
+.myapps__opt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--surface-2, #151926);
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+.myapps__opt span:nth-child(2) {
+  flex: 1;
+  min-width: 0;
+}
+.myapps__opt[data-on] {
+  border-color: #ffb03a;
+  background: rgba(255, 176, 58, 0.1);
+}
+.myapps__tick {
+  color: #ffb03a;
+  font-weight: 900;
+}
+.myapps__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 18px;
+}
+.myapps__save {
+  color: #111;
+  font-weight: 750;
+  border: 0;
+  background: linear-gradient(90deg, #ff5a4d, #ffb03a);
+}
+
+/* Which copy of ★ My apps shows: the toolbar one, or — on a narrow phone,
+   where it would squeeze the week heading — its own slim line below. */
+.myapps__row {
+  display: none;
+}
+@media (max-width: 420px) {
+  .myapps--toolbar {
+    display: none;
+  }
+  .myapps__row {
+    display: flex;
+    margin-top: 8px;
+  }
+  .myapps--line .btn .btn__text {
+    display: inline !important;
+  }
+  .myapps--line .btn,
+  .myapps--line .myapps__edit {
+    min-height: 44px;
+  }
+}
+@media (min-width: 421px) and (max-width: 560px) {
+  .myapps--toolbar .myapps__edit,
+  .myapps--toolbar .btn__count {
+    display: none;
+  }
+}

@@ -13,10 +13,13 @@ const LEGACY_KEY = 'firstday.prefs.v1';
 
 export interface Prefs {
   region: string;
+  /** "My apps": the platforms this reader subscribes to. See components/MyApps.tsx. */
+  apps: string[];
 }
 
 export const DEFAULT_PREFS: Prefs = {
   region: 'IN',
+  apps: [],
 };
 
 export function loadPrefs(): Prefs {
@@ -28,7 +31,10 @@ export function loadPrefs(): Prefs {
     // through an onboarding card that no longer exists, so the keys are read
     // past rather than migrated — the filter bar covers the same ground, and
     // the URL carries it, without interrupting anyone on arrival.
-    return { region: typeof parsed.region === 'string' ? parsed.region : DEFAULT_PREFS.region };
+    return {
+      region: typeof parsed.region === 'string' ? parsed.region : DEFAULT_PREFS.region,
+      apps: Array.isArray(parsed.apps) ? parsed.apps.filter((a): a is string => typeof a === 'string').slice(0, 30) : [],
+    };
   } catch {
     // Private mode, blocked storage, corrupted value — none of it should break the page.
     return DEFAULT_PREFS;
