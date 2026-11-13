@@ -33,7 +33,7 @@ const TAGLINE_LONG =
 import { slugify } from './slug.mjs';
 import { inRegion, loadRegistry } from './platform-registry.mjs';
 import { onlyGuessed, suppliers, stated } from '../src/lib/platform-claim.mjs';
-import { estimateCopy, estimateFor, gapPairs, windowStats } from '../src/lib/ott-estimate.mjs';
+import { INDIAN_LANGUAGES, estimateCopy, estimateFor, gapPairs, windowStats } from '../src/lib/ott-estimate.mjs';
 import { byDay, dayLabel, phrase } from '../src/lib/changes.mjs';
 import { ANALYTICS_TOKEN } from './config.mjs';
 
@@ -360,6 +360,11 @@ function browseMarkup(pages) {
     `</div></div>`;
   return (
     `<nav class="browse">` +
+    (mostSearched.length
+      ? `<div><h2>Most searched OTT release dates</h2><div>` +
+        mostSearched.map((t) => `<a href="/ott-release-date/${esc(t.slug)}">${esc(t.title)}</a>`).join(' ') +
+        `</div></div>`
+      : '') +
     /*
      * The lens row, which was missing and took /streaming with it.
      *
@@ -1311,6 +1316,36 @@ const platformsPresent = PLATFORM_ROWS.filter(
 const languagesPresent = [...languageName].filter(
   ([code]) => publishable.filter((r) => (r.languages ?? []).includes(code)).length >= MIN_PAGE_ROWS,
 );
+
+/**
+ * The titles people are still searching for, linked from every page.
+ *
+ * On 22 Oct Toxic, Jeevan Bheema Yojana and Silo rolled out of the eight-week
+ * feed. Their pages lived on through the archive, but the homepage, /upcoming
+ * and the language hubs stopped linking them — and four days later the
+ * site's search impressions fell from ~1,500 a day to ~25. Those three pages
+ * had carried over 15,000 of them. A page Google sees its own site stop
+ * linking is a page the site has told Google it no longer cares about.
+ *
+ * So the films with the most attention right now are linked from every page,
+ * whether or not they are still in the feed: recent Indian titles (opened in
+ * the last four months or opening within a month), ranked by TMDB attention.
+ * The same list ships as data/most-searched.json so the app renders the same
+ * links once it hydrates — the crawler and the reader see one set.
+ */
+const MOST_SEARCHED_N = 16;
+const mostSearched = (() => {
+  const from = new Date(Date.parse(`${TODAY}T00:00:00Z`) - 120 * 86_400_000).toISOString().slice(0, 10);
+  const to = new Date(Date.parse(`${TODAY}T00:00:00Z`) + 30 * 86_400_000).toISOString().slice(0, 10);
+  const local = (r) => (r.origin?.length ? r.origin.includes('IN') : INDIAN_LANGUAGES.has(r.languages?.[0] ?? ''));
+  const seen = new Set();
+  return titleCandidates
+    .filter((r) => r.slug && local(r) && r.releaseDate >= from && r.releaseDate <= to)
+    .sort((a, b) => (b.heat ?? 0) - (a.heat ?? 0))
+    .filter((r) => !seen.has(r.slug) && seen.add(r.slug))
+    .slice(0, MOST_SEARCHED_N)
+    .map((r) => ({ title: r.title, slug: r.slug, language: r.languages?.[0] ?? '' }));
+})();
 
 const pages = [];
 
@@ -2613,6 +2648,7 @@ for (const w of feed.weeks) {
   }
 }
 await writeFile(FEED, JSON.stringify(feed));
+await writeFile(resolve(ROOT, 'dist/data/most-searched.json'), JSON.stringify({ titles: mostSearched }));
 
 /**
  * The back catalogue as the browser needs it, which is half of what it is.
