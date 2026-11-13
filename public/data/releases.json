@@ -1,5 +1,6 @@
 {
-  "generatedAt": "2026-11-13T14:16:05.351Z",
+  "generatedAt": "2026-11-13T16:38:17.488Z",
+  "asOf": "2026-11-13",
   "source": "tmdb",
   "weeksBack": 3,
   "weeks": [
@@ -70,7 +71,7 @@
             "US"
           ],
           "rating": 7,
-          "votes": 685,
+          "votes": 686,
           "heat": 76,
           "synopsis": "Lowen Ashleigh, hired to ghostwrite for best-selling author Verity Crawford, uncovers Verity's autobiographical notes, and becomes involved in what may prove to be a lethal conspiracy.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/rmaNMA1seHqpjtnYKzyynFAr1g8.jpg",
@@ -131,9 +132,7 @@
           "origin": [
             "US",
             "IL"
-          ],
-          "imdbRating": 7.1,
-          "imdbVotes": 5019
+          ]
         },
         {
           "id": "m-1437396",
@@ -146,7 +145,6 @@
             "en"
           ],
           "genres": [
-            "Action",
             "Drama",
             "Crime",
             "Thriller"
@@ -528,9 +526,7 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 8.9,
-          "imdbVotes": 1084
+          ]
         },
         {
           "id": "m-1269325",
@@ -554,7 +550,7 @@
             "US"
           ],
           "rating": 7.6,
-          "votes": 11,
+          "votes": 12,
           "heat": 27,
           "synopsis": "Years after outsmarting the police, Vijay Salgaonkar's past resurfaces when a new evidence threatens to expose his secret. As the investigation reopens, he must outwit the system once again to save his family.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/67FsF2kpgEZ1T5Qos4adgqm9dLf.jpg",
@@ -616,9 +612,7 @@
           "theatrical": "wide",
           "origin": [
             "JP"
-          ],
-          "imdbRating": 6.2,
-          "imdbVotes": 257
+          ]
         },
         {
           "id": "m-1709391",
@@ -740,9 +734,7 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 8.1,
-          "imdbVotes": 67
+          ]
         },
         {
           "id": "m-1395215",
@@ -904,9 +896,7 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 8.8,
-          "imdbVotes": 188
+          ]
         },
         {
           "id": "m-1811964",
@@ -948,9 +938,7 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 5.2,
-          "imdbVotes": 45
+          ]
         },
         {
           "id": "m-1640396",
@@ -987,9 +975,7 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 3.7,
-          "imdbVotes": 104
+          ]
         },
         {
           "id": "m-1715215",
@@ -1104,9 +1090,7 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 6.4,
-          "imdbVotes": 7
+          ]
         },
         {
           "id": "m-1771882",
@@ -1297,9 +1281,7 @@
           "origin": [
             "US",
             "GB"
-          ],
-          "imdbRating": 7.8,
-          "imdbVotes": 392842
+          ]
         },
         {
           "id": "m-1236045",
@@ -1386,9 +1368,7 @@
             "DK",
             "SE",
             "US"
-          ],
-          "imdbRating": 7.6,
-          "imdbVotes": 4193
+          ]
         },
         {
           "id": "m-1281331",
@@ -1474,9 +1454,7 @@
             "AU",
             "GB",
             "US"
-          ],
-          "imdbRating": 7.7,
-          "imdbVotes": 289
+          ]
         },
         {
           "id": "m-1755291",
@@ -1512,9 +1490,7 @@
           "origin": [
             "US",
             "GB"
-          ],
-          "imdbRating": 7.9,
-          "imdbVotes": 3173
+          ]
         },
         {
           "id": "m-1673439",
@@ -1713,9 +1689,7 @@
           "origin": [
             "US",
             "AE"
-          ],
-          "imdbRating": 6.7,
-          "imdbVotes": 73
+          ]
         },
         {
           "id": "m-1185344",
@@ -1991,9 +1965,7 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 9.9,
-          "imdbVotes": 1085
+          ]
         },
         {
           "id": "m-1607833",
@@ -2223,9 +2195,7 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 7.4,
-          "imdbVotes": 586
+          ]
         },
         {
           "id": "m-1576389",
@@ -2264,9 +2234,7 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 8.7,
-          "imdbVotes": 4292
+          ]
         },
         {
           "id": "m-1564177",
@@ -2362,9 +2330,7 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 9.8,
-          "imdbVotes": 13
+          ]
         },
         {
           "id": "m-1736395",
@@ -2434,9 +2400,7 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 9.2,
-          "imdbVotes": 1094
+          ]
         },
         {
           "id": "m-1010608",
@@ -2591,9 +2555,7 @@
           "origin": [
             "ES",
             "FR"
-          ],
-          "imdbRating": 7,
-          "imdbVotes": 820
+          ]
         },
         {
           "id": "m-1765072",
@@ -2631,9 +2593,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=IEx8D1Wb__U",
           "origin": [
             "US"
-          ],
-          "imdbRating": 7.9,
-          "imdbVotes": 165
+          ]
         },
         {
           "id": "m-1153576",
@@ -2676,9 +2636,7 @@
           "origin": [
             "JP",
             "US"
-          ],
-          "imdbRating": 6.2,
-          "imdbVotes": 1231
+          ]
         },
         {
           "id": "m-1503762",
@@ -2718,9 +2676,7 @@
           "origin": [
             "GB",
             "US"
-          ],
-          "imdbRating": 7.2,
-          "imdbVotes": 1752
+          ]
         },
         {
           "id": "m-1376400",
@@ -2759,9 +2715,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=4DowjB87tRE",
           "origin": [
             "US"
-          ],
-          "imdbRating": 4.8,
-          "imdbVotes": 72
+          ]
         },
         {
           "id": "m-1255833",
@@ -2781,7 +2735,7 @@
             "US"
           ],
           "rating": 6.6,
-          "votes": 144,
+          "votes": 145,
           "heat": 61,
           "synopsis": "Following the death of his father, Jay Gardiner goes diving off the central Coast of California in search of his remains, but is swallowed by a massive sperm whale. While trapped inside its belly with only one hour of oxygen left, Jay comes to realize that the hard-earned lessons his father imparted may be the key to his escape.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/vjTYUTgh9nO88i6HZ4YPRhiFL05.jpg",
@@ -3306,9 +3260,7 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 9.5,
-          "imdbVotes": 507
+          ]
         },
         {
           "id": "m-1608666",
@@ -3720,9 +3672,7 @@
           "theatrical": "wide",
           "origin": [
             "KR"
-          ],
-          "imdbRating": 6.9,
-          "imdbVotes": 4367
+          ]
         },
         {
           "id": "m-1596275",
@@ -3846,9 +3796,7 @@
           "theatrical": "wide",
           "origin": [
             "US"
-          ],
-          "imdbRating": 8.7,
-          "imdbVotes": 15186
+          ]
         },
         {
           "id": "m-1657630",
@@ -3934,9 +3882,7 @@
           "theatrical": "wide",
           "origin": [
             "US"
-          ],
-          "imdbRating": 7.5,
-          "imdbVotes": 37372
+          ]
         },
         {
           "id": "t-292741",
@@ -3966,11 +3912,11 @@
           "backdropUrl": "https://image.tmdb.org/t/p/w780/614k6C9doThoMe6GyH0nTnGgLXt.jpg",
           "imdbId": "tt26598805",
           "cast": [
+            "Stephen Graham",
             "Liev Schreiber",
             "Zazie Beetz",
-            "Stephen Graham",
-            "Bill Camp",
-            "Rory Culkin"
+            "Chrissy Metz",
+            "Gary Carr"
           ],
           "trailerUrl": "https://www.youtube.com/watch?v=AaEy1f2Dgys",
           "certification": "A",
@@ -4055,9 +4001,7 @@
           "origin": [
             "KR",
             "US"
-          ],
-          "imdbRating": 7.7,
-          "imdbVotes": 23
+          ]
         },
         {
           "id": "m-1195803",
@@ -4098,9 +4042,7 @@
           "origin": [
             "GB",
             "US"
-          ],
-          "imdbRating": 7.4,
-          "imdbVotes": 4315
+          ]
         },
         {
           "id": "m-1437696",
@@ -4143,9 +4085,7 @@
             "FR",
             "IT",
             "GB"
-          ],
-          "imdbRating": 7.3,
-          "imdbVotes": 1773
+          ]
         },
         {
           "id": "m-1727734",
@@ -4226,9 +4166,7 @@
           "origin": [
             "HK",
             "CN"
-          ],
-          "imdbRating": 5.7,
-          "imdbVotes": 953
+          ]
         },
         {
           "id": "m-1453407",
@@ -4510,9 +4448,7 @@
           "theatrical": "wide",
           "origin": [
             "CN"
-          ],
-          "imdbRating": 3.3,
-          "imdbVotes": 1008
+          ]
         },
         {
           "id": "m-1528009",
@@ -5146,9 +5082,7 @@
           ],
           "origin": [
             "IN"
-          ],
-          "imdbRating": 7.5,
-          "imdbVotes": 174
+          ]
         },
         {
           "id": "t-339754",
@@ -5186,9 +5120,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=v2IksvXLQgo",
           "origin": [
             "GB"
-          ],
-          "imdbRating": 7.7,
-          "imdbVotes": 97
+          ]
         },
         {
           "id": "m-1772549",
@@ -5268,9 +5200,7 @@
             "IT",
             "FR",
             "US"
-          ],
-          "imdbRating": 7.3,
-          "imdbVotes": 25
+          ]
         },
         {
           "id": "t-337950",
@@ -5567,9 +5497,7 @@
           "origin": [
             "AR",
             "US"
-          ],
-          "imdbRating": 6.1,
-          "imdbVotes": 32
+          ]
         },
         {
           "id": "m-1785611",
@@ -5739,9 +5667,7 @@
           "director": "Ashish Panda",
           "trailerUrl": "https://www.youtube.com/watch?v=K3wqtAWeveU",
           "certification": "U/A 16+",
-          "theatrical": "wide",
-          "imdbRating": 8.5,
-          "imdbVotes": 3055
+          "theatrical": "wide"
         },
         {
           "id": "m-1797392",
@@ -6044,9 +5970,7 @@
           "director": "Zainab Johnson",
           "origin": [
             "US"
-          ],
-          "imdbRating": 8.2,
-          "imdbVotes": 27
+          ]
         },
         {
           "id": "m-1807926",
@@ -6423,7 +6347,7 @@
             "US"
           ],
           "rating": 7,
-          "votes": 685,
+          "votes": 686,
           "heat": 77,
           "synopsis": "Lowen Ashleigh, hired to ghostwrite for best-selling author Verity Crawford, uncovers Verity's autobiographical notes, and becomes involved in what may prove to be a lethal conspiracy.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/rmaNMA1seHqpjtnYKzyynFAr1g8.jpg",
@@ -6850,7 +6774,7 @@
             "IN"
           ],
           "rating": 8.2,
-          "votes": 73,
+          "votes": 74,
           "heat": 86,
           "synopsis": "Beloved Empress Navier rules the Eastern Empire alongside Emperor Sovieshu. But when Sovieshu falls for a runaway slave and demands a divorce, Navier will agree on one condition: that she's given approval to remarry rival Prince Heinrey of the Western Kingdom.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/zn3IXZzGavH3qle3o3g1r32eXDy.jpg",
@@ -6930,7 +6854,7 @@
             "US"
           ],
           "rating": 7.8,
-          "votes": 168,
+          "votes": 171,
           "heat": 81,
           "synopsis": "War reduced Japan to zero, and Godzilla plunged it into minus. Two years have passed since then, and the country has faced agonizing struggles to achieve recovery and finally reclaim its daily life. Just as humanity managed to cling to a hard-won peace, a new threat strikes, crushing hope in an instant. There is no third time. Everything ends here.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/hSmIJluOJmTWvJs4d7kHRxjc8s8.jpg",
@@ -7587,9 +7511,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=5J6ZiYIyIiA",
           "origin": [
             "KR"
-          ],
-          "imdbRating": 8.1,
-          "imdbVotes": 16
+          ]
         },
         {
           "id": "m-1733243",
@@ -7775,9 +7697,7 @@
           "certification": "U/A 13+",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 7,
-          "imdbVotes": 142
+          ]
         },
         {
           "id": "t-340453",
@@ -7916,9 +7836,7 @@
             "Hussain Al-Mansour",
             "Asmahan Tawfiq"
           ],
-          "director": "Said El Marouk",
-          "imdbRating": 4.4,
-          "imdbVotes": 85
+          "director": "Said El Marouk"
         },
         {
           "id": "m-1603262",
@@ -7957,9 +7875,7 @@
             "US",
             "CN",
             "NP"
-          ],
-          "imdbRating": 7.9,
-          "imdbVotes": 11
+          ]
         },
         {
           "id": "m-1642568",
@@ -7999,9 +7915,7 @@
           "origin": [
             "GB",
             "US"
-          ],
-          "imdbRating": 7.1,
-          "imdbVotes": 41
+          ]
         },
         {
           "id": "m-1458300",
@@ -8099,9 +8013,7 @@
           "director": "Alex Stapleton",
           "origin": [
             "US"
-          ],
-          "imdbRating": 5.7,
-          "imdbVotes": 10
+          ]
         },
         {
           "id": "m-1473148",
@@ -8144,9 +8056,7 @@
             "SE",
             "SG",
             "FI"
-          ],
-          "imdbRating": 5.5,
-          "imdbVotes": 85
+          ]
         },
         {
           "id": "t-336241",
@@ -8183,9 +8093,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=e1e0ZlP5o08",
           "origin": [
             "ZA"
-          ],
-          "imdbRating": 5.8,
-          "imdbVotes": 30
+          ]
         },
         {
           "id": "m-1819380",
@@ -8259,9 +8167,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=UVyH8QYENxI",
           "origin": [
             "GB"
-          ],
-          "imdbRating": 7.9,
-          "imdbVotes": 52
+          ]
         },
         {
           "id": "m-1810711",
@@ -8758,9 +8664,7 @@
           "origin": [
             "US",
             "CA"
-          ],
-          "imdbRating": 6.3,
-          "imdbVotes": 82
+          ]
         },
         {
           "id": "t-340681",
@@ -10126,7 +10030,7 @@
             "US"
           ],
           "rating": 6.2,
-          "votes": 197,
+          "votes": 198,
           "heat": 85,
           "synopsis": "The Canary Islands have become Europe’s last refuge following the outbreak of the TSJ virus. When a special mission sets out for the mainland in search of vital supplies, Roberto joins the team with questionable intentions. The dangerous operation turns into a desperate race for survival, and Roberto and his companions find themselves caught between hordes of infected and divided loyalties.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/wXln4DUrwcyjcFPwgQxFPYTlG1Z.jpg",
@@ -10341,8 +10245,8 @@
             "IN",
             "US"
           ],
-          "rating": 9,
-          "votes": 8,
+          "rating": 9.1,
+          "votes": 9,
           "heat": 57,
           "synopsis": "Henry “Fitz” Fitzgerald has spent years living quietly off the grid, hiding from a past few people know anything about. But when a powerful foreign corporation moves into his hometown to seize his neighbors’ land for a massive payday, Fitz is forced to reveal who he really is: a former Special Forces soldier and advanced weapons developer. Armed with experimental technology, lethal combat skills, and an unwavering code of justice, Fitz wages a one-man war against an enemy that never saw him coming.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/8Y4oJ5iUs3hgPcDB3SIEmsNYjZk.jpg",
@@ -10404,6 +10308,47 @@
           ]
         },
         {
+          "id": "m-1616687",
+          "title": "Never Surrender",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "id"
+          ],
+          "genres": [
+            "Action",
+            "Crime",
+            "Thriller"
+          ],
+          "releaseDate": "2026-11-12",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "rating": 6.9,
+          "votes": 8,
+          "heat": 52,
+          "synopsis": "When a deadly gang descends on his remote home, a guilt-ridden veteran and the estranged grandchildren he barely knows must unite to survive.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/hKROmLddpzpjkxKKVFYFRAOXX1b.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/umxN2kMcUm6VoxSOdcEcQoXuC4q.jpg",
+          "imdbId": "tt39370926",
+          "runtimeMinutes": 137,
+          "cast": [
+            "Lukman Sardi",
+            "Callista Arum",
+            "Sulthan Hamonangan",
+            "Derby Romero",
+            "Donny Alamsyah"
+          ],
+          "director": "Sidharta Tata",
+          "trailerUrl": "https://www.youtube.com/watch?v=o0d1IA85D9o",
+          "origin": [
+            "ID"
+          ]
+        },
+        {
           "id": "m-1165366",
           "title": "De Gaulle: Résistance",
           "kind": "film",
@@ -10443,9 +10388,7 @@
             "FR",
             "BE",
             "US"
-          ],
-          "imdbRating": 7.8,
-          "imdbVotes": 2804
+          ]
         },
         {
           "id": "m-1117898",
@@ -10491,9 +10434,7 @@
           "origin": [
             "GB",
             "US"
-          ],
-          "imdbRating": 6.7,
-          "imdbVotes": 49
+          ]
         },
         {
           "id": "m-1798383",
@@ -10613,6 +10554,48 @@
           ]
         },
         {
+          "id": "m-1518204",
+          "title": "Allen",
+          "kind": "film",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Science Fiction",
+            "Adventure",
+            "Comedy",
+            "Family"
+          ],
+          "releaseDate": "2026-11-12",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "rating": 6.4,
+          "votes": 7,
+          "heat": 43,
+          "synopsis": "20 years after his encounter with an alien, Petey never moved on. Now his old friend has returned, and the reason why is complicated — and unexpected.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/alhhrpj1PSAn5bfz4Os1k7Bweoj.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/51fGmBW7WjyJouP9TjIcxRpCUNk.jpg",
+          "imdbId": "tt37675123",
+          "runtimeMinutes": 105,
+          "cast": [
+            "T.J. Power",
+            "Charlotte Nicdao",
+            "Josh Helman",
+            "Emily Barclay",
+            "Benedict Hardie"
+          ],
+          "director": "Daley Pearson",
+          "trailerUrl": "https://www.youtube.com/watch?v=P8G5Y25W3eA",
+          "origin": [
+            "AU"
+          ]
+        },
+        {
           "id": "m-10404",
           "title": "Raise the Red Lantern",
           "kind": "film",
@@ -10649,9 +10632,7 @@
           "origin": [
             "CN",
             "HK"
-          ],
-          "imdbRating": 8.1,
-          "imdbVotes": 38549
+          ]
         },
         {
           "id": "m-1559980",
@@ -10732,6 +10713,42 @@
           ]
         },
         {
+          "id": "t-312661",
+          "title": "Miracles of the ER",
+          "kind": "series",
+          "platforms": [
+            "netflix"
+          ],
+          "languages": [
+            "zh"
+          ],
+          "genres": [
+            "Drama"
+          ],
+          "releaseDate": "2026-11-12",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "votes": 2,
+          "heat": 41,
+          "synopsis": "A bold decision brings an average med student to an elite ER team, where he encounters medical crises, ethical dilemmas, and personal growth.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/AaeU5NdIyoRl3qXy1z2sT5hDyio.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/ginRZDiTKS1VmkLPaSFZlmLcVnm.jpg",
+          "imdbId": "tt39494650",
+          "cast": [
+            "Wallace Huo",
+            "Cheryl Yang",
+            "Kent Tsai",
+            "Chan Tzu-hsuan",
+            "Peng Cian-you"
+          ],
+          "director": "Lee Chih-chiang",
+          "origin": [
+            "TW"
+          ]
+        },
+        {
           "id": "m-1241478",
           "title": "Jimmy",
           "kind": "film",
@@ -10767,43 +10784,6 @@
           "trailerUrl": "https://www.youtube.com/watch?v=4nrB_T3F53Y",
           "origin": [
             "US"
-          ]
-        },
-        {
-          "id": "t-312661",
-          "title": "Miracles of the ER",
-          "kind": "series",
-          "platforms": [
-            "netflix"
-          ],
-          "namedBy": "network",
-          "languages": [
-            "zh"
-          ],
-          "genres": [
-            "Drama"
-          ],
-          "releaseDate": "2026-11-12",
-          "regions": [
-            "IN",
-            "US"
-          ],
-          "votes": 2,
-          "heat": 41,
-          "synopsis": "A bold decision brings an average med student to an elite ER team, where he encounters medical crises, ethical dilemmas, and personal growth.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/AaeU5NdIyoRl3qXy1z2sT5hDyio.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/ginRZDiTKS1VmkLPaSFZlmLcVnm.jpg",
-          "imdbId": "tt39494650",
-          "cast": [
-            "Wallace Huo",
-            "Cheryl Yang",
-            "Kent Tsai",
-            "Chan Tzu-hsuan",
-            "Peng Cian-you"
-          ],
-          "director": "Lee Chih-chiang",
-          "origin": [
-            "TW"
           ]
         },
         {
@@ -10905,8 +10885,8 @@
             "IN",
             "US"
           ],
-          "rating": 5.6,
-          "votes": 5,
+          "rating": 5.7,
+          "votes": 6,
           "heat": 37,
           "synopsis": "When her carefully built life comes undone, Alicia returns to practicing law and discovers that rebuilding her career also means redefining herself.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/7o9nY3GO97jyeVWdtWr12nR0Qpt.jpg",
@@ -11110,7 +11090,7 @@
             "David Hyde Pierce",
             "Tara Mallen"
           ],
-          "director": "Alex Thompson",
+          "director": "Kelly O'Sullivan",
           "trailerUrl": "https://www.youtube.com/watch?v=sfvh4VZsFuY",
           "origin": [
             "US"
@@ -11223,9 +11203,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=guKEdb_iRXw",
           "origin": [
             "US"
-          ],
-          "imdbRating": 8.1,
-          "imdbVotes": 427
+          ]
         },
         {
           "id": "m-1662511",
@@ -11263,9 +11241,44 @@
           "trailerUrl": "https://www.youtube.com/watch?v=DqopaY31gB4",
           "origin": [
             "US"
+          ]
+        },
+        {
+          "id": "t-320507",
+          "title": "The Secret Lives of Mormon Wives: Orange County",
+          "kind": "reality",
+          "platforms": [
+            "jiohotstar",
+            "hulu"
           ],
-          "imdbRating": 7,
-          "imdbVotes": 7
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Reality"
+          ],
+          "releaseDate": "2026-11-12",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "votes": 1,
+          "heat": 26,
+          "synopsis": "A new group of dynamic young mothers in Orange County collide in a community where beliefs are not just their religion; they are their identity. While some defend their way of life, fighting against modernity, others embrace change, becoming a platform to disrupt the status quo. Scandals and secrets will be revealed, facades will crumble, and families and friendships will change forever on both sides of the battlefield as this group of strong, game-changing influencers comes together to build their answer to #MomTok.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/rEcJkRhfs663zsjWCJhtsbRWv7g.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/ztlemjhfgbj6wtYosghkUjBOj8o.jpg",
+          "imdbId": "tt42006761",
+          "cast": [
+            "Ashleigh Pease",
+            "Aspyn Ovard",
+            "Avery Woods",
+            "Bobbi Althoff",
+            "Jen Affleck"
+          ],
+          "trailerUrl": "https://www.youtube.com/watch?v=0JLdH0cPdnc",
+          "origin": [
+            "US"
+          ]
         },
         {
           "id": "t-306179",
@@ -11339,43 +11352,6 @@
           ]
         },
         {
-          "id": "t-320507",
-          "title": "The Secret Lives of Mormon Wives: Orange County",
-          "kind": "reality",
-          "platforms": [
-            "hulu"
-          ],
-          "namedBy": "network",
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Reality"
-          ],
-          "releaseDate": "2026-11-12",
-          "regions": [
-            "IN",
-            "US"
-          ],
-          "votes": 1,
-          "heat": 26,
-          "synopsis": "A new group of dynamic young mothers in Orange County collide in a community where beliefs are not just their religion; they are their identity. While some defend their way of life, fighting against modernity, others embrace change, becoming a platform to disrupt the status quo. Scandals and secrets will be revealed, facades will crumble, and families and friendships will change forever on both sides of the battlefield as this group of strong, game-changing influencers comes together to build their answer to #MomTok.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/rEcJkRhfs663zsjWCJhtsbRWv7g.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/ztlemjhfgbj6wtYosghkUjBOj8o.jpg",
-          "imdbId": "tt42006761",
-          "cast": [
-            "Ashleigh Pease",
-            "Aspyn Ovard",
-            "Avery Woods",
-            "Bobbi Althoff",
-            "Jen Affleck"
-          ],
-          "trailerUrl": "https://www.youtube.com/watch?v=0JLdH0cPdnc",
-          "origin": [
-            "US"
-          ]
-        },
-        {
           "id": "m-1666787",
           "title": "Avedon",
           "kind": "documentary",
@@ -11407,9 +11383,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=q5ZYcXzV1L0",
           "origin": [
             "US"
-          ],
-          "imdbRating": 6.7,
-          "imdbVotes": 9
+          ]
         },
         {
           "id": "m-1612811",
@@ -11468,10 +11442,11 @@
             "IN",
             "US"
           ],
-          "votes": 3,
+          "rating": 8,
+          "votes": 5,
           "heat": 22,
           "synopsis": "Scrappy, defiant, and done being treated like a burden, Judy Heumann turns her outrage into a revolution. In 1977, she and more than 100 disability rights protestors send a very loud message: The system is broken—not us.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/Ai0cPxFka7bBOF7mPrLxQThPyS0.jpg",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/ouGH1PS0xjDyfTQOhppn7QzJqQZ.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/25aB8RXP4mfQLFRSuEEhk0d0sTC.jpg",
           "imdbId": "tt15095848",
           "runtimeMinutes": 127,
@@ -11771,6 +11746,7 @@
           "title": "Style Wars",
           "kind": "reality",
           "platforms": [
+            "disney",
             "hulu"
           ],
           "languages": [
@@ -11822,7 +11798,7 @@
           "heat": 14,
           "synopsis": "Eager to get off Santa's naughty list, Snoopy goes all out to be the nicest beagle in town.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/9wZAvvAZgwp2Lxbhjkp9N6HHJBm.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/AkcxwZUldIwD6JSUknmzEgeoN4.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/a3DzS9AUB6AgYiELaeTn2n8EfNz.jpg",
           "imdbId": "tt47791876",
           "runtimeMinutes": 33,
           "cast": [
@@ -12416,89 +12392,6 @@
           "slug": "playdate",
           "imdbRating": 5.5,
           "imdbVotes": 32277
-        },
-        {
-          "id": "m-1518204~ott",
-          "title": "Allen",
-          "kind": "film",
-          "platforms": [
-            "netflix"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Science Fiction",
-            "Adventure",
-            "Comedy",
-            "Family"
-          ],
-          "releaseDate": "2026-11-12",
-          "regions": [
-            "US"
-          ],
-          "rating": 6.4,
-          "votes": 7,
-          "heat": 14,
-          "synopsis": "20 years after his encounter with an alien, Petey never moved on. Now his old friend has returned, and the reason why is complicated — and unexpected.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/alhhrpj1PSAn5bfz4Os1k7Bweoj.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/51fGmBW7WjyJouP9TjIcxRpCUNk.jpg",
-          "imdbId": "tt37675123",
-          "runtimeMinutes": 105,
-          "cast": [
-            "T.J. Power",
-            "Charlotte Nicdao",
-            "Josh Helman",
-            "Emily Barclay",
-            "Benedict Hardie"
-          ],
-          "director": "Daley Pearson",
-          "trailerUrl": "https://www.youtube.com/watch?v=P8G5Y25W3eA",
-          "origin": [
-            "AU"
-          ],
-          "namedBy": "note"
-        },
-        {
-          "id": "m-1616687~ott",
-          "title": "Never Surrender",
-          "kind": "film",
-          "platforms": [
-            "netflix"
-          ],
-          "languages": [
-            "id"
-          ],
-          "genres": [
-            "Action",
-            "Crime",
-            "Thriller"
-          ],
-          "releaseDate": "2026-11-12",
-          "regions": [
-            "US"
-          ],
-          "rating": 6.9,
-          "votes": 8,
-          "heat": 16,
-          "synopsis": "An ex-soldier and his grandchildren battle against ruthless criminals in a remote village. To survive, they must also confront their fears and regrets.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/hKROmLddpzpjkxKKVFYFRAOXX1b.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/umxN2kMcUm6VoxSOdcEcQoXuC4q.jpg",
-          "imdbId": "tt39370926",
-          "runtimeMinutes": 137,
-          "cast": [
-            "Lukman Sardi",
-            "Callista Arum",
-            "Sulthan Hamonangan",
-            "Derby Romero",
-            "Donny Alamsyah"
-          ],
-          "director": "Sidharta Tata",
-          "trailerUrl": "https://www.youtube.com/watch?v=o0d1IA85D9o",
-          "origin": [
-            "ID"
-          ],
-          "namedBy": "note"
         },
         {
           "id": "m-1666787~ott",
@@ -13439,9 +13332,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=R-9dlnkY448",
           "origin": [
             "ES"
-          ],
-          "imdbRating": 6.3,
-          "imdbVotes": 4901
+          ]
         },
         {
           "id": "m-1379486",
@@ -13479,9 +13370,7 @@
           "origin": [
             "US",
             "GB"
-          ],
-          "imdbRating": 6.1,
-          "imdbVotes": 497
+          ]
         },
         {
           "id": "m-1314786",
@@ -13565,9 +13454,7 @@
             "CY",
             "GB",
             "QA"
-          ],
-          "imdbRating": 7,
-          "imdbVotes": 556
+          ]
         },
         {
           "id": "t-271338",
@@ -13914,9 +13801,7 @@
             "SE",
             "SG",
             "FI"
-          ],
-          "imdbRating": 5.5,
-          "imdbVotes": 85
+          ]
         },
         {
           "id": "t-334412",
@@ -14050,6 +13935,7 @@
           "posterUrl": "https://image.tmdb.org/t/p/w500/jwcM2ESEQXCZQHuLV0BmSuA7Q62.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/5fnZe4ZoTyKTZnwHwn0fHW9s4uV.jpg",
           "imdbId": "tt41075537",
+          "runtimeMinutes": 133,
           "cast": [
             "Naslen",
             "Kunchacko Boban",
@@ -14101,9 +13987,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=5YBe-Fju2To",
           "origin": [
             "CN"
-          ],
-          "imdbRating": 6.3,
-          "imdbVotes": 52
+          ]
         },
         {
           "id": "m-1798903~ott",
@@ -14393,6 +14277,41 @@
           "trailerUrl": "https://www.youtube.com/watch?v=A6EijmwiNnc"
         },
         {
+          "id": "t-332683",
+          "title": "ROCK PAPER LANDMINE",
+          "kind": "series",
+          "platforms": [
+            "prime"
+          ],
+          "languages": [
+            "ja"
+          ],
+          "genres": [
+            "Drama"
+          ],
+          "releaseDate": "2026-11-13",
+          "regions": [
+            "IN",
+            "US"
+          ],
+          "heat": 12,
+          "synopsis": "Glico, Daruma-san ga Koronda... A game everyone knows—transformed into the ultimate battle of wits!?",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/kK5p5DJTS2rAzOVrvjhLMg7rsmm.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/cYadzbippVl2kgHtImsCqIPpEmV.jpg",
+          "imdbId": "tt44914557",
+          "cast": [
+            "Nana Mori",
+            "Aju Makita",
+            "Mayu Hotta",
+            "Mizuki Yamashita",
+            "Kentaro Maeda"
+          ],
+          "origin": [
+            "JP",
+            "US"
+          ]
+        },
+        {
           "id": "m-1584779",
           "title": "The Body in the Locker",
           "kind": "film",
@@ -14537,9 +14456,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=Y6fNuySFktc",
           "origin": [
             "JP"
-          ],
-          "imdbRating": 6.2,
-          "imdbVotes": 74
+          ]
         },
         {
           "id": "m-1013057~ott",
@@ -14580,44 +14497,6 @@
           "theatrical": "wide",
           "origin": [
             "IN"
-          ],
-          "imdbRating": 4.4,
-          "imdbVotes": 924
-        },
-        {
-          "id": "t-332683",
-          "title": "ROCK PAPER LANDMINE",
-          "kind": "series",
-          "platforms": [
-            "prime"
-          ],
-          "namedBy": "network",
-          "languages": [
-            "ja"
-          ],
-          "genres": [
-            "Drama"
-          ],
-          "releaseDate": "2026-11-13",
-          "regions": [
-            "IN",
-            "US"
-          ],
-          "heat": 12,
-          "synopsis": "Glico, Daruma-san ga Koronda... A game everyone knows—transformed into the ultimate battle of wits!?",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/kK5p5DJTS2rAzOVrvjhLMg7rsmm.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/cYadzbippVl2kgHtImsCqIPpEmV.jpg",
-          "imdbId": "tt44914557",
-          "cast": [
-            "Nana Mori",
-            "Aju Makita",
-            "Mayu Hotta",
-            "Mizuki Yamashita",
-            "Kentaro Maeda"
-          ],
-          "origin": [
-            "JP",
-            "US"
           ]
         },
         {
@@ -14646,6 +14525,13 @@
           "posterUrl": "https://image.tmdb.org/t/p/w500/JQ5PUa6arDleXdbmjMs9YjqN3E.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/bbCCaAlzJkCv8C8AFr8l1rBWJyt.jpg",
           "imdbId": "tt38961437",
+          "cast": [
+            "Tomasz Schuchardt",
+            "Adam Woronowicz",
+            "Justyna Wasilewska",
+            "Tomasz Włosok",
+            "Dariusz Chojnacki"
+          ],
           "origin": [
             "PL"
           ]
@@ -15220,6 +15106,8 @@
           "heat": 4,
           "synopsis": "From comedy stardom to a criminal trial, inside voices and archive footage charts British comedian Russell Brand's meteoric rise and steep fall following allegations of sexual offences.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/jUgmPXOvB3U9aRJ7fFUz4mTo3H1.jpg",
+          "imdbId": "tt50969289",
+          "runtimeMinutes": 84,
           "cast": [
             "Russell Brand",
             "Katy Perry",
@@ -15477,9 +15365,7 @@
             "FR",
             "BE",
             "DE"
-          ],
-          "imdbRating": 8,
-          "imdbVotes": 83
+          ]
         },
         {
           "id": "m-848700",
@@ -15515,7 +15401,7 @@
             "Juris Žagars",
             "Anatoliy Belyy"
           ],
-          "director": "Andrey Zvyagintsev",
+          "director": "Andrei Zvyagintsev",
           "trailerUrl": "https://www.youtube.com/watch?v=wdFIMrC4oW8",
           "origin": [
             "FR",
@@ -15523,9 +15409,7 @@
             "US",
             "CH",
             "DE"
-          ],
-          "imdbRating": 7.6,
-          "imdbVotes": 55
+          ]
         },
         {
           "id": "m-1538497",
@@ -15664,6 +15548,7 @@
           "posterUrl": "https://image.tmdb.org/t/p/w500/thX8Rs7nfgmPHfCgjoFuRovy49l.jpg",
           "backdropUrl": "https://image.tmdb.org/t/p/w780/qqPspJFy0XrEoVTKZdp0Em7kej6.jpg",
           "imdbId": "tt36408401",
+          "runtimeMinutes": 141,
           "cast": [
             "Brad Pitt",
             "Elizabeth Debicki",
@@ -16212,9 +16097,7 @@
           "certification": "U/A 13+",
           "origin": [
             "US"
-          ],
-          "imdbRating": 5.7,
-          "imdbVotes": 41
+          ]
         },
         {
           "id": "m-1287520",
@@ -16498,9 +16381,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=E8olY56RpkU",
           "origin": [
             "US"
-          ],
-          "imdbRating": 8.4,
-          "imdbVotes": 23
+          ]
         },
         {
           "id": "t-302837",
@@ -16602,9 +16483,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=r_VkrKFAiuA",
           "origin": [
             "US"
-          ],
-          "imdbRating": 5,
-          "imdbVotes": 7
+          ]
         },
         {
           "id": "m-1322273",
@@ -17295,9 +17174,7 @@
           "origin": [
             "ES",
             "FR"
-          ],
-          "imdbRating": 7,
-          "imdbVotes": 820
+          ]
         },
         {
           "id": "m-947502",
@@ -17339,9 +17216,7 @@
             "FR",
             "BE",
             "US"
-          ],
-          "imdbRating": 6,
-          "imdbVotes": 24
+          ]
         },
         {
           "id": "m-1709391~ott",
@@ -17608,9 +17483,7 @@
           "origin": [
             "US",
             "CA"
-          ],
-          "imdbRating": 7.6,
-          "imdbVotes": 99
+          ]
         },
         {
           "id": "m-1480665~ott",
@@ -17790,9 +17663,7 @@
             "NO",
             "RW",
             "FR"
-          ],
-          "imdbRating": 6.7,
-          "imdbVotes": 16
+          ]
         },
         {
           "id": "m-1728047",
@@ -18266,9 +18137,7 @@
           "origin": [
             "US",
             "CA"
-          ],
-          "imdbRating": 6.3,
-          "imdbVotes": 82
+          ]
         },
         {
           "id": "m-1654912",
@@ -18972,7 +18841,7 @@
             "US"
           ],
           "rating": 8.5,
-          "votes": 6767,
+          "votes": 6772,
           "heat": 90,
           "synopsis": "Fighting crime full-time as Spider-Man in a world that doesn't remember him—and the pressure of seeing his old friends move on without him—sparks a change in Peter Parker he may not have the power to control. But that transformation might also be the only thing that can stop a shocking new threat to the city and those he loves - a powerful villain no one can even see.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/bjiS5ipwxb9JFy3XRRN4OAilSeX.jpg",
@@ -18992,9 +18861,7 @@
           "theatrical": "wide",
           "origin": [
             "US"
-          ],
-          "imdbRating": 8,
-          "imdbVotes": 327986
+          ]
         },
         {
           "id": "m-1165369",
@@ -19036,9 +18903,7 @@
             "FR",
             "BE",
             "US"
-          ],
-          "imdbRating": 8,
-          "imdbVotes": 1748
+          ]
         },
         {
           "id": "m-1078446",
@@ -19195,9 +19060,7 @@
             "GB",
             "CA",
             "US"
-          ],
-          "imdbRating": 5.9,
-          "imdbVotes": 623
+          ]
         },
         {
           "id": "t-270596",
@@ -19717,9 +19580,7 @@
           "origin": [
             "GB",
             "CA"
-          ],
-          "imdbRating": 7.1,
-          "imdbVotes": 10
+          ]
         },
         {
           "id": "t-340516",
@@ -19860,9 +19721,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=ld465IU0NGY",
           "origin": [
             "US"
-          ],
-          "imdbRating": 7.8,
-          "imdbVotes": 45
+          ]
         },
         {
           "id": "m-1601652~ott",
@@ -19895,9 +19754,7 @@
           "trailerUrl": "https://www.youtube.com/watch?v=gHV06F8JJKQ",
           "origin": [
             "US"
-          ],
-          "imdbRating": 7.8,
-          "imdbVotes": 17
+          ]
         },
         {
           "id": "m-1736335",
@@ -21299,43 +21156,6 @@
           ]
         },
         {
-          "id": "m-1596276",
-          "title": "To Hold a Mountain",
-          "kind": "documentary",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "sr"
-          ],
-          "genres": [
-            "Documentary"
-          ],
-          "releaseDate": "2026-12-16",
-          "regions": [
-            "US"
-          ],
-          "heat": 9,
-          "synopsis": "In the remote highlands of Montenegro, a shepherd mother and daughter proudly defend their ancestral mountain from the threat of becoming a NATO military training ground, stirring memories of the violence that shattered their family.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/pdfOMNE7uXZ2BRoO0xwDQlwd4U.jpg",
-          "backdropUrl": "https://image.tmdb.org/t/p/w780/fgTEyr4hpdEXdsnzZOssqQtipTj.jpg",
-          "imdbId": "tt39150043",
-          "runtimeMinutes": 105,
-          "cast": [
-            "Mileva Gara Jovanović",
-            "Nada Stanišić"
-          ],
-          "director": "Biljana Tutorov",
-          "origin": [
-            "RS",
-            "FR",
-            "ME",
-            "SI",
-            "HR",
-            "BE"
-          ]
-        },
-        {
           "id": "m-1358274",
           "title": "Starlight",
           "kind": "film",
@@ -21407,6 +21227,43 @@
           "origin": [
             "US",
             "GB"
+          ]
+        },
+        {
+          "id": "m-1596276",
+          "title": "To Hold a Mountain",
+          "kind": "documentary",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "sr"
+          ],
+          "genres": [
+            "Documentary"
+          ],
+          "releaseDate": "2026-12-16",
+          "regions": [
+            "US"
+          ],
+          "heat": 9,
+          "synopsis": "In the remote highlands of Montenegro, a shepherd mother and daughter proudly defend their ancestral mountain from the threat of becoming a NATO military training ground, stirring memories of the violence that shattered their family.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/pdfOMNE7uXZ2BRoO0xwDQlwd4U.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/fgTEyr4hpdEXdsnzZOssqQtipTj.jpg",
+          "imdbId": "tt39150043",
+          "runtimeMinutes": 105,
+          "cast": [
+            "Mileva Gara Jovanović",
+            "Nada Stanišić"
+          ],
+          "director": "Biljana Tutorov",
+          "origin": [
+            "RS",
+            "FR",
+            "ME",
+            "SI",
+            "HR",
+            "BE"
           ]
         },
         {
@@ -21784,6 +21641,38 @@
           ]
         },
         {
+          "id": "m-1552504",
+          "title": "The Holiday Trilogy",
+          "kind": "film",
+          "platforms": [
+            "theatres"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Drama",
+            "Horror",
+            "Romance"
+          ],
+          "releaseDate": "2026-12-11",
+          "regions": [
+            "US"
+          ],
+          "heat": 6,
+          "synopsis": "Three interconnected tales of distorted human connection come together to form a melancholic portrait about the complicated emotions that surround the holidays.  Each chapter is shot by a different Los Angeles-based SOV (Shot-on-Video) filmmaker .",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/tl2Jw6mOVjgn8U9n4oy4ZV4jAfA.jpg",
+          "runtimeMinutes": 70,
+          "cast": [
+            "Angela Fusillo",
+            "Denis Churgel",
+            "Charles Pinion",
+            "Robert Broski",
+            "Lucé Tomlin-Brenner"
+          ],
+          "director": "Case Esparros"
+        },
+        {
           "id": "m-1250854",
           "title": "Duped (The Jezbel Experience)",
           "kind": "film",
@@ -21844,39 +21733,6 @@
             "Starletta DuPois"
           ],
           "director": "Salvatore Sclafani",
-          "origin": [
-            "US"
-          ]
-        },
-        {
-          "id": "m-1492146",
-          "title": "American Baby",
-          "kind": "film",
-          "platforms": [
-            "theatres"
-          ],
-          "languages": [
-            "en"
-          ],
-          "genres": [
-            "Drama"
-          ],
-          "releaseDate": "2026-12-11",
-          "regions": [
-            "US"
-          ],
-          "heat": 5,
-          "synopsis": "Oli becomes an outcast in her community when she gets pregnant at 15. As she seeks out the suddenly absent teenage father-to-be, Oli confronts the growing isolation from her community.",
-          "posterUrl": "https://image.tmdb.org/t/p/w500/8f0lwA1Um83FnXUWpOQAcmM0zeg.jpg",
-          "imdbId": "tt28279536",
-          "runtimeMinutes": 86,
-          "cast": [
-            "Abigail Pniowsky",
-            "Elisha Henig",
-            "Claire Capek",
-            "Janel Koloski"
-          ],
-          "director": "Ellen Rodnianski",
           "origin": [
             "US"
           ]
@@ -22065,7 +21921,7 @@
         "US"
       ],
       "rating": 7.2,
-      "votes": 4056,
+      "votes": 4059,
       "heat": 97,
       "synopsis": "Beginning in a time of relative peace, we follow an ensemble cast of characters as they confront the re-emergence of evil to Middle-earth. From the darkest depths of the Misty Mountains, to the majestic forests of Lindon, to the breathtaking island kingdom of Númenor, to the furthest reaches of the map, these kingdoms and characters will carve out legacies that live on long after they are gone.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/bMXWXKM9ydUmMTNvDnYo9QtCBRt.jpg",
@@ -22119,62 +21975,39 @@
         "US"
       ],
       "rating": 8.4,
-      "votes": 439,
+      "votes": 442,
       "heat": 90,
       "synopsis": "With a bounty on his head, Vision must confront his nature and resist Ultron's influence to survive.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/WGyAyBPncfuu8MZhLY9RtfZPM0.jpg",
       "backdropUrl": "https://image.tmdb.org/t/p/w780/31o1Ufd7bStD5dGEcpzapOjwaqx.jpg"
     },
     {
-      "id": "trend-t-279246",
-      "title": "The Remarried Empress",
+      "id": "trend-t-259909",
+      "title": "Dexter: Resurrection",
       "kind": "series",
       "platforms": [
-        "disney",
-        "hulu"
-      ],
-      "languages": [
-        "ko"
-      ],
-      "genres": [
-        "Drama",
-        "Sci-Fi & Fantasy"
-      ],
-      "releaseDate": "2026-11-03",
-      "regions": [
-        "US"
-      ],
-      "rating": 8.2,
-      "votes": 74,
-      "heat": 86,
-      "synopsis": "Beloved Empress Navier rules the Eastern Empire alongside Emperor Sovieshu. But when Sovieshu falls for a runaway slave and demands a divorce, Navier will agree on one condition: that she's given approval to remarry rival Prince Heinrey of the Western Kingdom.",
-      "posterUrl": "https://image.tmdb.org/t/p/w500/zn3IXZzGavH3qle3o3g1r32eXDy.jpg",
-      "backdropUrl": "https://image.tmdb.org/t/p/w780/fNcpHmuZLKoyhNMBEzdqzX8iIvg.jpg"
-    },
-    {
-      "id": "trend-m-1294189",
-      "title": "The Mongoose",
-      "kind": "film",
-      "platforms": [
-        "prime"
+        "prime",
+        "paramount"
       ],
       "languages": [
         "en"
       ],
       "genres": [
-        "Action",
-        "Thriller"
+        "Crime",
+        "Drama",
+        "Mystery"
       ],
-      "releaseDate": "2026-10-29",
+      "releaseDate": "2025-07-13",
       "regions": [
-        "IN"
+        "IN",
+        "US"
       ],
-      "rating": 6.2,
-      "votes": 145,
+      "rating": 8.6,
+      "votes": 753,
       "heat": 74,
-      "synopsis": "A falsely accused war hero with nothing to lose leads police on an epic televised cross-country car chase, helped by members of his former Special Forces Army battalion and closely monitored by a fascinated public rooting for his safe getaway.",
-      "posterUrl": "https://image.tmdb.org/t/p/w500/eSS5mvSG84UUuvtbHel5Yu3Wik4.jpg",
-      "backdropUrl": "https://image.tmdb.org/t/p/w780/bySCyjQXNPgsnLTlgJpSMnRazPD.jpg"
+      "synopsis": "Set 10 weeks after Dexter: New Blood, Dexter Morgan chases a missing Harrison to New York City, where Captain Angel Batista is hot on their trail from way down in Miami.",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/o2Oyi3boT100bY5kCP4MBiTeetO.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w780/vcpj6rRDS93ImHCLPY8bwBuFGjR.jpg"
     },
     {
       "id": "trend-t-1489",
@@ -22225,8 +22058,33 @@
       "synopsis": "A laid-off worker and his wife cross paths with a documentary filmmaker and her spouse and confront their hidden desires.",
       "posterUrl": "https://image.tmdb.org/t/p/w500/1ERGPNiKtnEcsvJS1ywsmqmcIDO.jpg",
       "backdropUrl": "https://image.tmdb.org/t/p/w780/k0BY5D4Ya6NHhsvNYMmaabpvUtS.jpg"
+    },
+    {
+      "id": "trend-m-1050981",
+      "title": "Being Heumann",
+      "kind": "film",
+      "platforms": [
+        "appletv"
+      ],
+      "languages": [
+        "en"
+      ],
+      "genres": [
+        "Drama",
+        "History"
+      ],
+      "releaseDate": "2026-11-06",
+      "regions": [
+        "IN",
+        "US"
+      ],
+      "votes": 3,
+      "heat": 22,
+      "synopsis": "Scrappy, defiant, and done being treated like a burden, Judy Heumann turns her outrage into a revolution. In 1977, she and more than 100 disability rights protestors send a very loud message: The system is broken—not us.",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/Ai0cPxFka7bBOF7mPrLxQThPyS0.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w780/25aB8RXP4mfQLFRSuEEhk0d0sTC.jpg"
     }
   ],
-  "enrichedAt": "2026-11-13T14:16:20.924Z",
-  "ratedAt": "2026-11-13T14:16:39.380Z"
+  "enrichedAt": "2026-11-13T16:38:47.494Z",
+  "ratedAt": "2026-11-13T16:38:47.772Z"
 }
