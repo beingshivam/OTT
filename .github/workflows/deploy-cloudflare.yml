@@ -74,10 +74,12 @@ jobs:
           npm run typecheck
           npm run test:rail
           npm run test:estimate
+          npm run test:news
           npm run test:rank
           npm run test:fetch
           npm run test:affiliates
           npm run test:worker
+          npm run test:push
           # Written alongside the features they cover and never wired in here,
           # which meant four suites that only ran when somebody remembered to
           # run them. They take under ten seconds between them.

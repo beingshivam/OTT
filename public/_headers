@@ -63,3 +63,8 @@
 /email/*
   X-Robots-Tag: noindex
   Cache-Control: public, max-age=300, must-revalidate
+
+# The push service worker (public/sw.js). Revalidated every time so a fix to
+# it reaches every device on the next visit rather than after a cache expiry.
+/sw.js
+  Cache-Control: no-cache

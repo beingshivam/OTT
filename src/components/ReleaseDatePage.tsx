@@ -11,6 +11,7 @@ import { ShareButtons } from './ShareButtons';
 import type { Release, ReleaseFeed } from '../types';
 import { BRAND } from '../data/brand';
 import { estimateCopy } from '../lib/ott-estimate.mjs';
+import { NotifyButton } from './NotifyButton';
 
 /**
  * "When is <film> coming to OTT?"
@@ -371,6 +372,11 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
           </dl>
 
           <div className="titlepage__actions">
+            {/* First, because on a title with no OTT date it is the one thing
+                the reader came for that this page can still give them. */}
+            {!streaming.length && !streamsOn && (
+              <NotifyButton id={String(release.id).replace(/~ott$/, '')} title={release.title} slug={release.slug} />
+            )}
             {release.trailerUrl && (
               <a className="btn btn--lg" href={release.trailerUrl} target="_blank" rel="noreferrer">
                 <IconPlay />

@@ -14,11 +14,9 @@
  *   News. For Indian entertainment, Google Discover and Top Stories carry far
  *   more traffic than the ten blue links, and both want news articles: a
  *   headline, a date, a byline, a large image, NewsArticle markup. The
- *   refresh drafts one when a film's OTT date is announced
- *   (scripts/news-draft.mjs); nothing here is published until a person flips
- *   it (scripts/news-publish.mjs, or the "Publish article" workflow). Mass
- *   auto-published articles are scaled content in Google's spam policy, and
- *   the review step is what keeps this on the right side of it.
+ *   refresh drafts one when a film's OTT date is announced and publishes it
+ *   once the date is verified, a few a day at most (scripts/news-draft.mjs).
+ *   This file renders whatever is marked published.
  *
  *   Trust. A site with no named people, no policy and no contact page reads
  *   to Google's quality raters as nobody's. /about, /editorial-policy and
@@ -246,7 +244,7 @@ await write(
       `<h1>Editorial policy</h1>` +
       `<h2>Sources</h2><p>A streaming date is stated as fact only when the platform lists the title in India (via TMDB's provider data). A date taken from a release announcement is labelled as announced until the platform confirms it. Every page is re-checked daily.</p>` +
       `<h2>Estimates</h2><p>For films still in cinemas we publish an expected OTT window. It is always labelled as an estimate, always shown beside "not announced", and always names the evidence: how many recent films in the same language it is based on, and their typical gap between cinema and OTT.</p>` +
-      `<h2>News articles</h2><p>Articles are drafted from confirmed data and reviewed by a person before publication. We do not publish rumours, leaked dates or unattributed claims.</p>` +
+      `<h2>News articles</h2><p>OTT release articles are written automatically from the same verified data as the calendar, and published only once the date is verified: the platform's own India listing confirms it, or the announced date has arrived. Each names its source. An article whose date is withdrawn is never published. We do not publish rumours, leaked dates or unattributed claims.</p>` +
       `<h2>Ratings</h2><p>Audience scores come from IMDb or TMDB, are attributed to their source, and are hidden until enough people have voted for them to mean something.</p>` +
       `<h2>Corrections</h2><p>Spotted a wrong date or platform? Email <a href="mailto:${esc(CONTACT_EMAIL)}">${esc(CONTACT_EMAIL)}</a>. Corrections are made the same day and noted on the article.</p>` +
       `<h2>Independence</h2><p>${esc(BRAND)} is not affiliated with any streaming platform or studio. Some links to platforms may be affiliate links; they never decide what we list or how.</p>`,
