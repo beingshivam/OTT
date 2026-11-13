@@ -1,3 +1,5 @@
+import { mailConfigured, renderMail, sendMail } from './mail.js';
+
 /**
  * "Notify me when it streams" — browser push, end to end on this Worker.
  *
@@ -60,7 +62,17 @@ const SCHEMA = [
   `CREATE TABLE IF NOT EXISTS push_subs (endpoint TEXT PRIMARY KEY, created_at TEXT NOT NULL, country TEXT, failures INTEGER NOT NULL DEFAULT 0)`,
   `CREATE TABLE IF NOT EXISTS push_follows (endpoint TEXT NOT NULL, title_id TEXT NOT NULL, title TEXT NOT NULL, slug TEXT, created_at TEXT NOT NULL, message TEXT, notified_at TEXT, delivered_at TEXT, PRIMARY KEY (endpoint, title_id))`,
   `CREATE INDEX IF NOT EXISTS push_follows_waiting ON push_follows (notified_at)`,
+  /* The email half, for readers whose browser cannot take a push (iPhone
+     outside a home-screen app, mostly). One row per address and title; the
+     token is the unsubscribe link. */
+  `CREATE TABLE IF NOT EXISTS email_follows (email TEXT NOT NULL, title_id TEXT NOT NULL, title TEXT NOT NULL, slug TEXT, token TEXT NOT NULL UNIQUE, created_at TEXT NOT NULL, country TEXT, notified_at TEXT, PRIMARY KEY (email, title_id))`,
+  `CREATE INDEX IF NOT EXISTS email_follows_waiting ON email_follows (notified_at)`,
 ];
+
+const LOOKS_LIKE_EMAIL = /^[^\s@]+@[^\s@.]+\.[^\s@]{2,}$/;
+const MAX_FOLLOWS_PER_EMAIL = 50;
+const SITE = 'https://newonott.in';
+const unsubscribeUrl = (token) => `${SITE}/api/push/unsubscribe?t=${encodeURIComponent(token)}`;
 
 /* Created on first use rather than by a migration step somebody has to run.
    IF NOT EXISTS makes every later call a no-op; the flag spares the round
@@ -153,8 +165,69 @@ export async function handlePush(request, url, env) {
       const { publicKey } = await vapidKeys(env.DB);
       return json(200, { publicKey });
     }
+    /* What the page may offer: email only once a sender is configured. */
+    if (route === 'config' && request.method === 'GET') {
+      return json(200, { email: mailConfigured(env) });
+    }
+    /* GET from the link in the email, POST from a mail client's one-click
+       unsubscribe (RFC 8058). Either way the token is the whole credential. */
+    if (route === 'unsubscribe') {
+      const token = url.searchParams.get('t') ?? '';
+      await ensureSchema(env.DB);
+      const row = token
+        ? await env.DB.prepare('SELECT title FROM email_follows WHERE token = ?1').bind(token).first()
+        : null;
+      if (row) await env.DB.prepare('DELETE FROM email_follows WHERE token = ?1').bind(token).run();
+      if (request.method === 'POST') return json(200, { ok: true });
+      const msg = row ? `You won't get any more emails about ${row.title}.` : 'This link has already been used — you are unsubscribed.';
+      return new Response(
+        `<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">` +
+          `<title>Unsubscribed — New on OTT</title><body style="font-family:system-ui,sans-serif;background:#0b0c10;color:#e8eaf0;padding:40px 20px;max-width:520px;margin:auto">` +
+          `<h1 style="font-size:22px">Unsubscribed</h1><p>${msg.replace(/[<>&]/g, '')}</p><p><a style="color:#ffb03a" href="/">Back to New on OTT</a></p></body>`,
+        { status: 200, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' } },
+      );
+    }
     if (request.method !== 'POST') return json(405, { error: 'method_not_allowed' });
     const b = await body(request);
+
+    if (route === 'email-follow') {
+      if (!mailConfigured(env)) return json(503, { error: 'not_configured' });
+      const email = String(b.email ?? '').trim();
+      const key = email.toLowerCase();
+      const titleId = String(b.titleId ?? '').slice(0, 64);
+      const title = String(b.title ?? '').slice(0, 200);
+      const slug = b.slug ? String(b.slug).slice(0, 200) : null;
+      if (!LOOKS_LIKE_EMAIL.test(email) || email.length > 254) return json(400, { error: 'bad_email' });
+      if (!titleId || !title) return json(400, { error: 'bad_title' });
+      await ensureSchema(env.DB);
+      const count = await env.DB.prepare('SELECT COUNT(*) AS n FROM email_follows WHERE email = ?1').bind(key).first();
+      if ((count?.n ?? 0) >= MAX_FOLLOWS_PER_EMAIL) return json(429, { error: 'too_many' });
+      const already = await env.DB.prepare('SELECT 1 AS x FROM email_follows WHERE email = ?1 AND title_id = ?2')
+        .bind(key, titleId)
+        .first();
+      if (already) return json(200, { ok: true });
+      const token = crypto.randomUUID();
+      await env.DB.prepare(
+        `INSERT INTO email_follows (email, title_id, title, slug, token, created_at, country) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)`,
+      )
+        .bind(key, titleId, title, slug, token, new Date().toISOString(), request.cf?.country ?? null)
+        .run();
+      /* The confirmation is the receipt and the way out in one: whoever owns
+         the address learns what was asked for and can stop it in one tap. */
+      const page = slug ? `${SITE}/ott-release-date/${slug}` : SITE;
+      const mail = renderMail({
+        heading: `We'll email you when ${title} streams`,
+        lines: [
+          `You'll get one email from New on OTT the day ${title} gets an OTT date — which platform, and when.`,
+          `That's the only email this sends.`,
+        ],
+        cta: { label: `See ${title}`, url: page },
+        unsubscribeUrl: unsubscribeUrl(token),
+      });
+      await sendMail(env, { to: email, subject: `We'll tell you when ${title} is on OTT`, ...mail, unsubscribeUrl: unsubscribeUrl(token) });
+      return json(200, { ok: true });
+    }
+
     const endpoint = b?.endpoint ?? b?.subscription?.endpoint;
     if (!validEndpoint(endpoint)) return json(400, { error: 'bad_endpoint' });
     await ensureSchema(env.DB);
@@ -254,8 +327,11 @@ export async function dispatch(env, { send = fetch, today = new Date().toISOStri
   const waiting = (
     await env.DB.prepare('SELECT endpoint, title_id FROM push_follows WHERE notified_at IS NULL').all()
   )?.results ?? [];
-  const stats = { waiting: waiting.length, matched: 0, sent: 0, gone: 0, failed: 0 };
-  if (!waiting.length) return stats;
+  const emailWaiting = mailConfigured(env)
+    ? ((await env.DB.prepare('SELECT COUNT(*) AS n FROM email_follows WHERE notified_at IS NULL').first())?.n ?? 0)
+    : 0;
+  const stats = { waiting: waiting.length, matched: 0, sent: 0, gone: 0, failed: 0, emailed: 0, emailFailed: 0 };
+  if (!waiting.length && !emailWaiting) return stats;
 
   const res = await env.ASSETS.fetch(new Request('https://newonott.in/data/releases.json'));
   if (!res.ok) return { ...stats, error: `feed ${res.status}` };
@@ -277,6 +353,7 @@ export async function dispatch(env, { send = fetch, today = new Date().toISOStri
     stats.matched++;
     devices.add(f.endpoint);
   }
+  await dispatchEmail(env, rows, today, newsByTitle, stats, send);
   if (!devices.size) return stats;
 
   const keys = await vapidKeys(env.DB);
@@ -314,4 +391,41 @@ export async function dispatch(env, { send = fetch, today = new Date().toISOStri
     }
   }
   return stats;
+}
+
+/* Most emails one sweep sends: well inside Resend's free daily allowance,
+   and a backlog drains over the following hours rather than in one burst. */
+const MAX_EMAILS_PER_SWEEP = 80;
+
+async function dispatchEmail(env, rows, today, newsByTitle, stats, send) {
+  if (!mailConfigured(env)) return;
+  const waiting = (
+    await env.DB.prepare('SELECT email, title_id, title, slug, token FROM email_follows WHERE notified_at IS NULL').all()
+  )?.results ?? [];
+  for (const f of waiting) {
+    if (stats.emailed + stats.emailFailed >= MAX_EMAILS_PER_SWEEP) break;
+    if (!newsByTitle.has(f.title_id)) newsByTitle.set(f.title_id, ottNews(rows, f.title_id, today));
+    const news = newsByTitle.get(f.title_id);
+    if (!news) continue;
+    const page = f.slug ? `${SITE}/ott-release-date/${f.slug}` : SITE;
+    const mail = renderMail({
+      heading: `${f.title}: ${news.replace(/\.$/, '')}`,
+      lines: [`${f.title} — ${news}`, `This was the one email you asked for. Nothing more will come about this title.`],
+      cta: { label: 'Where to watch', url: page },
+      unsubscribeUrl: unsubscribeUrl(f.token),
+    });
+    const ok = await sendMail(
+      env,
+      { to: f.email, subject: `${f.title} — ${news.replace(/\.$/, '')}`, ...mail, unsubscribeUrl: unsubscribeUrl(f.token) },
+      send,
+    ).catch(() => false);
+    if (ok) {
+      await env.DB.prepare('UPDATE email_follows SET notified_at = ?3 WHERE email = ?1 AND title_id = ?2')
+        .bind(f.email, f.title_id, new Date().toISOString())
+        .run();
+      stats.emailed++;
+    } else {
+      stats.emailFailed++;
+    }
+  }
 }

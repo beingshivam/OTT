@@ -164,3 +164,58 @@ test('the message says what is known, in the right tense', () => {
   assert.equal(ottNews(rows, 'c', '2026-11-13'), 'Now streaming on SonyLIV.');
   assert.equal(ottNews(rows, 'z', '2026-11-13'), null);
 });
+
+// ---------------------------------------------------------------- email --
+
+const mailEnv = (rows = []) => ({ DB: d1(), ASSETS: feedOf(rows), RESEND_API_KEY: 'test-key' });
+
+test('email is offered only once a sender is configured', async () => {
+  assert.deepEqual(await (await call({ DB: d1() }, '/api/push/config')).json(), { email: false });
+  assert.deepEqual(await (await call(mailEnv(), '/api/push/config')).json(), { email: true });
+  const res = await post({ DB: d1() }, '/api/push/email-follow', { email: 'a@b.co', titleId: 'm-1', title: 'X' });
+  assert.equal(res.status, 503, 'took an address with no way to ever write to it');
+});
+
+test('an email follow sends one receipt, then one alert, each with a way out', async () => {
+  const env = mailEnv();
+  const sent = [];
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = async (url, init) => {
+    sent.push({ url: String(url), body: JSON.parse(init.body) });
+    return new Response('{}', { status: 200 });
+  };
+  try {
+    const res = await post(env, '/api/push/email-follow', { email: 'Reader@Example.com', titleId: 'm-7', title: 'Disco', slug: 'disco' });
+    assert.equal(res.status, 200);
+    await post(env, '/api/push/email-follow', { email: 'reader@example.com', titleId: 'm-7', title: 'Disco' });
+    assert.equal(sent.length, 1, 'a repeat follow sent a second receipt');
+    assert.equal(sent[0].url, 'https://api.resend.com/emails');
+    assert.deepEqual(sent[0].body.to, ['Reader@Example.com'], 'the address was not sent to as typed');
+    const unsub = sent[0].body.headers['List-Unsubscribe'].slice(1, -1);
+    assert.match(unsub, /^https:\/\/newonott\.in\/api\/push\/unsubscribe\?t=/);
+    assert.equal(sent[0].body.headers['List-Unsubscribe-Post'], 'List-Unsubscribe=One-Click');
+
+    env.ASSETS = feedOf([{ id: 'm-7~ott', title: 'Disco', platforms: ['jiohotstar'], releaseDate: '2026-11-20' }]);
+    const send = async () => new Response(null, { status: 201 });
+    let s = await dispatch(env, { send: (u, i) => (String(u).includes('resend') ? globalThis.fetch(u, i) : send(u, i)), today: '2026-11-14' });
+    assert.equal(s.emailed, 1);
+    assert.match(sent[1].body.subject, /Disco — Coming to JioHotstar on 20 Nov/);
+    s = await dispatch(env, { send: (u, i) => globalThis.fetch(u, i), today: '2026-11-21' });
+    assert.equal(sent.length, 2, 'an email follow fired twice');
+
+    // The way out works, from the link and from a mail client's one-click POST.
+    const page = await call(env, `/api/push/unsubscribe?t=${new URL(unsub).searchParams.get('t')}`);
+    assert.match(await page.text(), /won't get any more emails about Disco/);
+    const left = await env.DB.prepare('SELECT COUNT(*) AS n FROM email_follows').first();
+    assert.equal(left.n, 0);
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+});
+
+test('bad addresses are refused', async () => {
+  const env = mailEnv();
+  for (const email of ['nope', 'a@b', '', 'x'.repeat(250) + '@b.co']) {
+    assert.equal((await post(env, '/api/push/email-follow', { email, titleId: 'm', title: 't' })).status, 400, `took "${email.slice(0, 20)}"`);
+  }
+});

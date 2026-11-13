@@ -4851,3 +4851,42 @@ a.changes__title:hover {
   line-height: 1.45;
   color: var(--muted, #8d94a4);
 }
+
+/* "Email me when it streams" — the fallback for browsers without push. */
+.notify__mail {
+  flex-basis: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.notify__mail label {
+  font-size: 14px;
+  font-weight: 600;
+}
+.notify__mail > div {
+  display: flex;
+  gap: 8px;
+}
+.notify__mail input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: 16px; /* 16px stops iOS Safari zooming the page on focus */
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line, #2a2f3d);
+  background: var(--surface, #10131c);
+  color: inherit;
+}
+.notify__alt {
+  flex-basis: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-size: 13px;
+  color: var(--muted, #8d94a4);
+  text-decoration: underline;
+  cursor: pointer;
+}
