@@ -17,7 +17,7 @@ import { emailFollow, follow, isFollowing, mailAvailable, pushSupport, unfollow 
 type Push = 'idle' | 'busy' | 'following' | 'denied' | 'failed';
 type Mail = 'closed' | 'open' | 'busy' | 'done' | 'failed';
 
-export function NotifyButton({ id, title, slug }: { id: string; title: string; slug?: string }) {
+export function NotifyButton({ id, title, slug, poster }: { id: string; title: string; slug?: string; poster?: string }) {
   const [push, setPush] = useState<Push>('idle');
   const [support, setSupport] = useState<ReturnType<typeof pushSupport>>('unsupported');
   const [canMail, setCanMail] = useState(false);
@@ -52,7 +52,7 @@ export function NotifyButton({ id, title, slug }: { id: string; title: string; s
   const onMail = async (e: FormEvent) => {
     e.preventDefault();
     setMail('busy');
-    setMail((await emailFollow({ id, title, slug, email: address })) ? 'done' : 'failed');
+    setMail((await emailFollow({ id, title, slug, poster, email: address })) ? 'done' : 'failed');
   };
 
   if (!pushOk && !canMail && support !== 'ios-install') return null;
