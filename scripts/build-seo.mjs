@@ -497,6 +497,21 @@ const FALLBACK_CSS = `    <style>
 const TMDB_MIN_VOTES = 50;
 const MAX_CREDIBLE = 9.5;
 
+/**
+ * The score a title page prints, by the app's rule (src/lib/score.ts): IMDb
+ * where it has 1,000+ votes, else TMDB where it has 50+, else nothing. This
+ * line printed TMDB's raw average whatever stood behind it, so Ramayana's
+ * page said "Rating: 6.6" off eight votes in its opening week.
+ */
+function shownScore(r) {
+  if (r.imdbRating != null && r.imdbVotes != null && r.imdbVotes >= 1000 && r.imdbRating <= MAX_CREDIBLE) {
+    return `${r.imdbRating.toFixed(1)} on IMDb`;
+  }
+  if (r.rating == null || r.rating > MAX_CREDIBLE) return null;
+  if (r.votes != null && r.votes < TMDB_MIN_VOTES) return null;
+  return `${r.rating.toFixed(1)} on TMDB`;
+}
+
 function aggregateRatingFor(r) {
   if (r.rating == null || r.votes == null) return {};
   if (r.votes < TMDB_MIN_VOTES || r.rating > MAX_CREDIBLE) return {};
@@ -2437,7 +2452,7 @@ for (const r of allTitlePages) {
       (r.genres?.length ? `<p><strong>Genre:</strong> ${esc(r.genres.join(', '))}</p>` : '') +
       (r.certification ? `<p><strong>Certificate:</strong> ${esc(r.certification)}</p>` : '') +
       (r.runtimeMinutes ? `<p><strong>Runtime:</strong> ${esc(r.runtimeMinutes)} min</p>` : '') +
-      (r.rating != null ? `<p><strong>Rating:</strong> ${esc(r.rating.toFixed(1))}</p>` : ''),
+      (shownScore(r) ? `<p><strong>Rating:</strong> ${esc(shownScore(r))}</p>` : ''),
     body:
       `<section><h2>What it's about</h2><p>${esc(r.synopsis)}</p></section>` +
       (r.cast?.length ? `<section><h2>Cast</h2><p>${esc(r.cast.join(' · '))}</p></section>` : '') +

@@ -91,6 +91,19 @@ export function scoreOf(release: Release): Score | null {
   if (release.rating == null || release.rating > MAX_CREDIBLE) return null;
 
   /**
+   * Too few votes to print at all, not just to colour.
+   *
+   * Thin scores used to show in grey, on the theory that the muted colour and
+   * the vote count in the tooltip were hedge enough. Nobody reads a tooltip:
+   * Ramayana opened as the biggest film of the week and the board said 6.6,
+   * from eight TMDB votes cast before most of its audience had seen it. A grey
+   * 6.6 next to a hit reads as "mediocre", not as "too early to tell". An
+   * empty slot says the true thing, and it is how every unreleased row already
+   * looks.
+   */
+  if (release.votes != null && release.votes < TMDB_MIN_VOTES) return null;
+
+  /**
    * A missing vote count means a hand-checked curated row, not a thinly-voted
    * one — every discovered score carries its count by construction. Reading
    * undefined as zero demoted exactly the wrong titles: Silo at 8.2 rendered in

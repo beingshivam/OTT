@@ -458,6 +458,25 @@ export function inCinemas(all: Release[], region: string, today: Date = new Date
 export const NARROWED_DAYS = 365;
 
 /**
+ * How many of the fortnight's streaming arrivals lead the OTT row on attention.
+ *
+ * Asked for: "the rail should have the most trending releases shown." With one
+ * crowned card the row went back to strict chronology from the second card on,
+ * so on 13 Nov a Motu Patlu special (heat 4) sat fifth while the week's
+ * bigger Indian arrivals were further back. The cinema row keeps its single
+ * crown for its own reason — a six-week window that stood still — but this row
+ * is a fortnight, and its top four turn over as fast as the arrivals do.
+ *
+ * Two, not more, and the limit is the phone. A 360px screen shows three cards
+ * before the first swipe, and when the ranked head filled all three the row
+ * looked identical for days and readers concluded the site had stopped
+ * updating (see VISIBLE_ON_A_PHONE in the tests). Two ranked cards and the
+ * newest arrival is a row that answers "what's big" and still changes daily.
+ * Behind them the row is the calendar it always was.
+ */
+export const TRENDING_ON_OTT = 2;
+
+/**
  * The same fortnight the mixed row always used, narrowed to things you can
  * actually stream tonight.
  *
@@ -510,7 +529,7 @@ export function landedOnOtt(
   const lead = [...row.releases]
     .filter((r) => local(r))
     .sort((a, b) => (b.heat ?? 0) - (a.heat ?? 0) || b.releaseDate.localeCompare(a.releaseDate))
-    .slice(0, TRENDING_IN_CINEMAS);
+    .slice(0, TRENDING_ON_OTT);
   if (lead.length < TRENDING_IN_CINEMAS) return row;
 
   const crowned = new Set(lead.map((r) => r.id));
