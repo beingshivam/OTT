@@ -33,6 +33,7 @@ const TAGLINE_LONG =
 import { slugify } from './slug.mjs';
 import { inRegion, loadRegistry } from './platform-registry.mjs';
 import { onlyGuessed, suppliers, stated } from '../src/lib/platform-claim.mjs';
+import { INDIAN_LANGUAGES, estimateCopy, estimateFor, gapPairs, weeksLabel, windowStats } from '../src/lib/ott-estimate.mjs';
 import { byDay, dayLabel, phrase } from '../src/lib/changes.mjs';
 import { ANALYTICS_TOKEN } from './config.mjs';
 
@@ -359,6 +360,11 @@ function browseMarkup(pages) {
     `</div></div>`;
   return (
     `<nav class="browse">` +
+    (mostSearched.length
+      ? `<div><h2>Most searched OTT release dates</h2><div>` +
+        mostSearched.map((t) => `<a href="/ott-release-date/${esc(t.slug)}">${esc(t.title)}</a>`).join(' ') +
+        `</div></div>`
+      : '') +
     /*
      * The lens row, which was missing and took /streaming with it.
      *
@@ -572,6 +578,9 @@ function movieNode(r, canonical) {
     name: r.title,
     url: canonical,
     datePublished: r.releaseDate,
+    /* Google's Movie fields name dateCreated as recommended; the release date
+       is the closest truthful value this site has. */
+    dateCreated: r.releaseDate,
     ...(r.synopsis ? { description: r.synopsis } : {}),
     ...(r.posterUrl ? { image: r.posterUrl } : {}),
     ...(r.genres?.length ? { genre: r.genres } : {}),
@@ -584,7 +593,11 @@ function movieNode(r, canonical) {
       : {}),
     ...(r.director ? { director: { '@type': 'Person', name: r.director } } : {}),
     ...aggregateRatingFor(r),
-    ...(r.trailerUrl ? { trailer: { '@type': 'VideoObject', name: `${r.title} trailer`, url: r.trailerUrl } } : {}),
+    /* No `trailer` VideoObject. Google validates any VideoObject against its
+       video rules — thumbnailUrl and uploadDate required — and this site has
+       no truthful upload date for a YouTube trailer. A half-filled one only
+       earns "has issues" in URL Inspection (13 Nov); the trailer stays on
+       the page, linked, where a reader uses it. */
     ...(streamingOn.length
       ? {
           potentialAction: streamingOn.filter(platformHome).map((id) => ({
@@ -769,23 +782,35 @@ async function renderPage(page, pages) {
       ...(page.group === 'title' && page.rows[0]
         ? [movieNode(page.rows[0], canonical)]
         : []),
-      {
-        '@type': 'ItemList',
-        name: page.h1,
-        numberOfItems: page.rows.length,
-        itemListElement: page.rows.slice(0, 50).map((r, i) => ({
-          '@type': 'ListItem',
-          position: i + 1,
-          item: {
-            '@type': r.kind === 'series' ? 'TVSeries' : 'Movie',
-            name: r.title,
-            datePublished: r.releaseDate,
-            ...(r.genres?.length ? { genre: r.genres } : {}),
-            ...(r.posterUrl ? { image: r.posterUrl } : {}),
-            ...(r.synopsis ? { description: r.synopsis } : {}),
+      /*
+       * The list, in Google's "summary page" shape: each entry is a position
+       * and the URL of the title's own page, which carries the full Movie
+       * markup itself. It used to inline a Movie per entry with no URL —
+       * the all-in-one shape, which Google's carousel guide asks to carry a
+       * url on every item — and it rode on title pages too, as a one-item
+       * list repeating the Movie node above it. URL Inspection flagged
+       * enhancement issues on /ott-release-date/jailer-2 (13 Nov).
+       *
+       * Title pages have no list now; list pages link only titles that have
+       * a page, so no entry points nowhere.
+       */
+      ...(() => {
+        if (page.group === 'title') return [];
+        const linked = page.rows.filter((r) => r.slug).slice(0, 50);
+        if (!linked.length) return [];
+        return [
+          {
+            '@type': 'ItemList',
+            name: page.h1,
+            numberOfItems: linked.length,
+            itemListElement: linked.map((r, i) => ({
+              '@type': 'ListItem',
+              position: i + 1,
+              url: `${SITE_URL}/ott-release-date/${r.slug}`,
+            })),
           },
-        })),
-      },
+        ];
+      })(),
     ],
   };
 
@@ -1009,6 +1034,16 @@ const DIGITAL_SUFFIX = 'ott';
 const archived = await readFile(resolve(ROOT, 'data/archive.json'), 'utf8')
   .then((s) => JSON.parse(s).titles)
   .catch(() => []);
+
+/**
+ * How long Indian films take to go from cinemas to OTT, measured from every
+ * film the archive saw on both sides — see src/lib/ott-estimate.mjs. A title
+ * page with no streaming date answers with this window instead of a bare
+ * "not announced", and `estimateById` carries each film's estimate into the
+ * shipped feed so the app says the same thing once it hydrates.
+ */
+const OTT_WINDOWS = windowStats(gapPairs(archived));
+const estimateById = new Map();
 
 /**
  * The back catalogue, read here rather than where its own page is built,
@@ -1300,6 +1335,36 @@ const platformsPresent = PLATFORM_ROWS.filter(
 const languagesPresent = [...languageName].filter(
   ([code]) => publishable.filter((r) => (r.languages ?? []).includes(code)).length >= MIN_PAGE_ROWS,
 );
+
+/**
+ * The titles people are still searching for, linked from every page.
+ *
+ * On 22 Oct Toxic, Jeevan Bheema Yojana and Silo rolled out of the eight-week
+ * feed. Their pages lived on through the archive, but the homepage, /upcoming
+ * and the language hubs stopped linking them — and four days later the
+ * site's search impressions fell from ~1,500 a day to ~25. Those three pages
+ * had carried over 15,000 of them. A page Google sees its own site stop
+ * linking is a page the site has told Google it no longer cares about.
+ *
+ * So the films with the most attention right now are linked from every page,
+ * whether or not they are still in the feed: recent Indian titles (opened in
+ * the last four months or opening within a month), ranked by TMDB attention.
+ * The same list ships as data/most-searched.json so the app renders the same
+ * links once it hydrates — the crawler and the reader see one set.
+ */
+const MOST_SEARCHED_N = 16;
+const mostSearched = (() => {
+  const from = new Date(Date.parse(`${TODAY}T00:00:00Z`) - 120 * 86_400_000).toISOString().slice(0, 10);
+  const to = new Date(Date.parse(`${TODAY}T00:00:00Z`) + 30 * 86_400_000).toISOString().slice(0, 10);
+  const local = (r) => (r.origin?.length ? r.origin.includes('IN') : INDIAN_LANGUAGES.has(r.languages?.[0] ?? ''));
+  const seen = new Set();
+  return titleCandidates
+    .filter((r) => r.slug && local(r) && r.releaseDate >= from && r.releaseDate <= to)
+    .sort((a, b) => (b.heat ?? 0) - (a.heat ?? 0))
+    .filter((r) => !seen.has(r.slug) && seen.add(r.slug))
+    .slice(0, MOST_SEARCHED_N)
+    .map((r) => ({ title: r.title, slug: r.slug, language: r.languages?.[0] ?? '' }));
+})();
 
 const pages = [];
 
@@ -2158,6 +2223,13 @@ for (const r of allTitlePages) {
   const landsOn = streamsOn ? dated.platforms.map(pname).join(', ') : '';
   const landsDate = streamsOn ? formatDate(streamsOn) : '';
 
+  /* Nothing announced: the measured window for films like this one, labelled
+     as an estimate everywhere it appears. Never when a service or a date is
+     already known — those are better answers than any pattern. */
+  const ottEstimate = !streaming.length && !streamsOn ? estimateFor(r, OTT_WINDOWS) : null;
+  const est = estimateCopy(ottEstimate, TODAY, { languageLabel: lname, formatDate });
+  if (ottEstimate) estimateById.set(r.id, ottEstimate);
+
   /* Upcoming first, for the reason given at the title tag below: a streaming
      row dated in the future is not available, and "Streaming now" about it is
      the one sentence on this page that would be a lie. */
@@ -2233,8 +2305,12 @@ for (const r of allTitlePages) {
         ? `Expected on ${landsOn} from ${landsDate} — announced, not yet confirmed by the platform. This page updates automatically when it is.`
         : `Streaming on ${landsOn} from ${landsDate}.`
       : upcoming
-        ? `In cinemas from ${opensOn}. No streaming date yet — a film is normally picked up by a platform after its theatrical run, and this page updates automatically when one announces.`
-        : `Not announced yet — no streaming date has been confirmed. This page updates automatically; every platform is re-checked every day.`;
+        ? est
+          ? `In cinemas from ${opensOn}. ${est.headline}. ${est.detail}`
+          : `In cinemas from ${opensOn}. No streaming date yet — a film is normally picked up by a platform after its theatrical run, and this page updates automatically when one announces.`
+        : est
+          ? `${est.headline}. ${est.detail}`
+          : `Not announced yet — no streaming date has been confirmed. This page updates automatically; every platform is re-checked every day.`;
 
   const langs = (r.languages ?? []).map(lname);
   /* "Aasha (Malayalam)" — written once because all five description states
@@ -2324,7 +2400,7 @@ for (const r of allTitlePages) {
     rows: [r],
     /** Carried into the page so it still renders once this title has aged out
      *  of the feed the app loads. See the head assembly in renderPage. */
-    embed: { ...r, slug },
+    embed: { ...r, slug, ...(ottEstimate ? { ottEstimate } : {}) },
     /**
      * Three states, and the tag tracks them because the query does.
      *
@@ -2378,16 +2454,22 @@ for (const r of allTitlePages) {
        above a page saying the platform has not confirmed it is the
        contradiction a reader meets first, in the search result, before they
        ever reach the page. See `hedged`. */
+    /* "OTT" in the tag: 445 of the top 1,000 queries in Search Console carry
+       the word and the old tag ("Watch X on Prime Video") never did. "watch"
+       stays, after it — the watch-online queries convert at 10%, against 1%
+       for release-date ones. Hedged pages never reach this branch. */
     title:
       streaming.length && !upcoming
-        ? `Watch ${r.title} on ${lead}${alsoOn}${suffix}`
+        ? `${r.title} OTT: watch on ${lead}${alsoOn}${suffix}`
         : streaming.length
           ? `${r.title} ${hedged ? 'expected on' : 'on'} ${lead}${alsoOn} from ${opensOn}${suffix}`
           : streamsOn
             ? `${qualified} OTT release date — ${hedged ? 'expected on ' : ''}${landsOn} from ${landsDate}`
             : upcoming
               ? `${qualified} release date — in cinemas ${opensOn}`
-              : `${qualified} OTT release date — where to watch online`,
+              : est?.tag
+                ? `${qualified} OTT release date — ${est.tag}`
+                : `${qualified} OTT release date — where to watch online`,
     /*
      * The description is the click, and the last one was arguing against it.
      *
@@ -2405,16 +2487,28 @@ for (const r of allTitlePages) {
      * date, no implied platform: a reader who clicks finds exactly what the
      * snippet promised.
      */
+    /* The streaming description opens with the question as it is typed
+       ("jeevan bheema yojana movie on which ott") and answers it in the
+       next three words, then says what else is on the page. */
     description:
       streaming.length && !upcoming
-        ? `${named} is streaming now on ${on} in India — cast, runtime, certificate and trailer. ${BRAND}.`
+        ? `Which OTT is ${named} on? ${on} — streaming now in India. Cast, runtime, trailer and similar films. ${BRAND}.`
         : streaming.length
           ? `${named} ${hedged ? 'is expected on' : 'lands on'} ${on} in India on ${opensOn} — cast, runtime, certificate and trailer. ${BRAND}.`
           : streamsOn
             ? `${named} ${hedged ? 'is expected to start streaming on' : 'starts streaming on'} ${landsOn} from ${landsDate}, after cinemas on ${opensOn}. Cast, runtime and trailer. ${BRAND}.`
             : upcoming
-            ? `${named} opens in Indian cinemas on ${opensOn} — cast, runtime, certificate and trailer, plus its OTT date the day it lands. ${BRAND}.`
-            : `${named} — in cinemas ${opensOn}. Cast, runtime, certificate and trailer, and the OTT release date here the day it is announced. ${BRAND}.`,
+            ? est?.tag
+              ? `${named} opens in Indian cinemas on ${opensOn}; OTT ${est.tag}, based on ${ottEstimate.basis.films} similar releases. Cast, runtime and trailer. ${BRAND}.`
+              : `${named} opens in Indian cinemas on ${opensOn} — cast, runtime, certificate and trailer, plus its OTT date the day it lands. ${BRAND}.`
+            : est?.tag
+              ? `${named} OTT release date: ${est.headline.replace(/^Expected/, 'expected')}, based on ${ottEstimate.basis.films} similar releases. In cinemas since ${opensOn}. Cast and trailer. ${BRAND}.`
+              : est?.phase === 'late'
+                /* Was "the OTT release date here the day it is announced" —
+                   which tells a searcher there is nothing to find, and at #2
+                   for its query 98% believed it. Say where it stands. */
+                ? `${named} OTT release date: not announced yet, and running later than the usual ${weeksLabel(ottEstimate.days)} for ${ottEstimate.basis.language ? lname(ottEstimate.basis.language) : 'Indian'} films. In cinemas since ${opensOn}. Cast, trailer and the date the moment it lands. ${BRAND}.`
+                : `${named} OTT release date and where to watch it online: in cinemas since ${opensOn}, streaming date not announced yet. Cast, runtime and trailer. ${BRAND}.`,
     /**
      * The heading asked "When is X coming to OTT?" even when the answer block
      * directly beneath it said "Streaming now on Netflix" — the page
@@ -2448,6 +2542,7 @@ for (const r of allTitlePages) {
          is the one a reader scans for the answer, and it read "Watch on:
          Netflix" under a sentence saying the platform had not confirmed it. */
       (inCinemas ? '' : `<p><strong>${hedged ? 'Expected on' : 'Watch on'}:</strong> ${esc(on || 'streaming')}</p>`) +
+      (est?.fact ? `<p><strong>Expected on OTT:</strong> ${esc(est.fact)}</p>` : '') +
       (langs.length ? `<p><strong>Language:</strong> ${esc(langs.join(', '))}</p>` : '') +
       (r.genres?.length ? `<p><strong>Genre:</strong> ${esc(r.genres.join(', '))}</p>` : '') +
       (r.certification ? `<p><strong>Certificate:</strong> ${esc(r.certification)}</p>` : '') +
@@ -2574,7 +2669,17 @@ await writeFile(resolve(ROOT, 'dist/sitemap.xml'), sitemap);
  * drift on the first title with a colon in it, and the failure would be
  * silent: the page exists, the link points at it, and the app renders nothing.
  */
+/* And each film's OTT window, so the app's title page and sheet show the
+   estimate the prerendered page was built with. */
+for (const w of feed.weeks) {
+  for (const r of w.releases) {
+    const e = estimateById.get(r.id);
+    if (e) r.ottEstimate = e;
+    else delete r.ottEstimate;
+  }
+}
 await writeFile(FEED, JSON.stringify(feed));
+await writeFile(resolve(ROOT, 'dist/data/most-searched.json'), JSON.stringify({ titles: mostSearched }));
 
 /**
  * The back catalogue as the browser needs it, which is half of what it is.

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { PLATFORMS, LANGUAGES } from '../data/platforms';
 import type { ReleaseFeed } from '../types';
 import { formatWeekRange } from '../lib/week';
@@ -40,7 +41,33 @@ import { COLLECTIONS, inCollection } from '../data/collections';
  * rather than where it happened to read badly.
  */
 
+/** The titles people are still searching for — built by scripts/build-seo.mjs
+ *  from the feed *and* the archive, so a film that has rolled out of the
+ *  eight-week feed keeps its links. See `mostSearched` there for why. */
+interface MostSearched {
+  title: string;
+  slug: string;
+}
+
+function useMostSearched(): MostSearched[] {
+  const [titles, setTitles] = useState<MostSearched[]>([]);
+  useEffect(() => {
+    let live = true;
+    fetch('/data/most-searched.json')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (live && Array.isArray(d?.titles)) setTitles(d.titles);
+      })
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, []);
+  return titles;
+}
+
 export function BrowseLinks({ feed, region }: { feed: ReleaseFeed | null; region: string }) {
+  const mostSearched = useMostSearched();
   if (!feed) return null;
 
   /**
@@ -106,6 +133,18 @@ export function BrowseLinks({ feed, region }: { feed: ReleaseFeed | null; region
 
   return (
     <nav className="browse" aria-label="Browse releases">
+      {mostSearched.length > 0 && (
+        <div className="browse__row">
+          <h2>Most searched OTT release dates</h2>
+          <div className="browse__chips">
+            {mostSearched.map((t) => (
+              <a key={t.slug} className="browse__chip" href={`/ott-release-date/${t.slug}`}>
+                {t.title}
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
       {collections.length > 0 && (
         <div className="browse__row">
           <h2>Collections</h2>
