@@ -44,10 +44,21 @@ function remember(value: string) {
   }
 }
 
-export function EmailSignup({ variant = 'footer' }: { variant?: 'footer' | 'banner' }) {
+/* A dismissal is a "not now", not a "never": the prompt comes back after two
+   weeks. Signing up is final. Stored as "dismissed:<ms>"; the old bare
+   "dismissed" from before this rule reads as expired. */
+const DISMISS_FOR = 14 * 86_400_000;
+function hidden(): boolean {
+  const v = readState();
+  if (v === 'done') return true;
+  const at = Number(v.split(':')[1]);
+  return v.startsWith('dismissed:') && Number.isFinite(at) && Date.now() - at < DISMISS_FOR;
+}
+
+export function EmailSignup({ variant = 'footer' }: { variant?: 'footer' | 'banner' | 'card' }) {
   const [email, setEmail] = useState('');
   const [state, setState] = useState<State>('idle');
-  const [closed, setClosed] = useState(() => variant === 'banner' && readState() !== '');
+  const [closed, setClosed] = useState(() => variant !== 'footer' && hidden());
 
   if (!EMAIL_ENDPOINT || closed) return null;
 
@@ -77,7 +88,7 @@ export function EmailSignup({ variant = 'footer' }: { variant?: 'footer' | 'bann
       remember('done');
       // Say thank you, then get out of the way rather than sitting there as a
       // permanent banner about something already done.
-      if (variant === 'banner') setTimeout(() => setClosed(true), 2600);
+      if (variant === 'banner') setTimeout(() => setClosed(true), 4000);
     } catch {
       setState('error');
     }
@@ -87,15 +98,62 @@ export function EmailSignup({ variant = 'footer' }: { variant?: 'footer' | 'bann
 
   if (state === 'done') {
     return (
-      <p className={banner ? 'signup signup--banner signup--done' : 'signup signup--done'} role="status">
-        {/*
-          Says what actually happens now, not what used to.
-          Signing up sends this week's digest immediately and the next one
-          lands on Friday — telling someone to wait until Friday, seconds
-          before an email arrives, makes the arrival look like a mistake.
-        */}
-        Done — this week's list is on its way now, and the next one lands Friday.
+      <p className={banner ? 'signup signup--banner signup--done' : variant === 'card' ? 'signup signup--card signup--done' : 'signup signup--done'} role="status">
+        {/* True now that the welcome mail is sent (worker/newsletter.js):
+            this week's list arrives within a minute, the next on Friday. */}
+        ✓ You're in — this week's list is in your inbox now. The next one lands Friday evening.
       </p>
+    );
+  }
+
+  if (variant === 'card') {
+    return (
+      <section className="signup signup--card" aria-labelledby="signup-card-title">
+        <div className="signup__copy">
+          <h2 id="signup-card-title">Get the Friday list</h2>
+          <p>
+            Every Friday evening: what's new on OTT, what's in cinemas, and when the big ones reach OTT. One email,
+            free, unsubscribe in one tap.
+          </p>
+        </div>
+        <form onSubmit={submit}>
+          <label className="sr-only" htmlFor="signup-card">
+            Email address
+          </label>
+          <input
+            id="signup-card"
+            type="email"
+            inputMode="email"
+            required
+            placeholder="you@email.com"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (state === 'error') setState('idle');
+            }}
+            autoComplete="email"
+          />
+          <button className="btn btn--lg" type="submit" disabled={state === 'sending'}>
+            {state === 'sending' ? 'Subscribing…' : 'Subscribe free'}
+          </button>
+        </form>
+        {state === 'error' && (
+          <span className="signup__error" role="alert">
+            That didn't go through — check the address and try again.
+          </span>
+        )}
+        <button
+          type="button"
+          className="signup__dismiss"
+          aria-label="Not now"
+          onClick={() => {
+            remember(`dismissed:${Date.now()}`);
+            setClosed(true);
+          }}
+        >
+          <IconClose />
+        </button>
+      </section>
     );
   }
 
@@ -141,7 +199,7 @@ export function EmailSignup({ variant = 'footer' }: { variant?: 'footer' | 'bann
           className="signup__dismiss"
           aria-label="Dismiss"
           onClick={() => {
-            remember('dismissed');
+            remember(`dismissed:${Date.now()}`);
             setClosed(true);
           }}
         >

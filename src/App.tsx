@@ -1018,6 +1018,15 @@ export default function App() {
         </div>
       )}
 
+      {/* The real ask, placed after the reader has seen what the site is —
+          not before, which is why the top banner stays one slim row. Same
+          conditions as the rails above it. See components/EmailSignup.tsx. */}
+      {!offBoard && feed && !error && facets.total > 0 && !span && !route?.catalogue && showRails && (
+        <div className="shell">
+          <EmailSignup variant="card" />
+        </div>
+      )}
+
       {!offBoard && (
       <Controls
         filters={filters}

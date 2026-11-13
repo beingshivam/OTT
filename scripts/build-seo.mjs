@@ -2947,7 +2947,7 @@ const EMAIL_OUT = resolve(ROOT, 'dist', 'email');
 let emailed = 0;
 try {
   await mkdir(EMAIL_OUT, { recursive: true });
-  for (const name of ['latest.html', 'latest.txt', 'subject.txt']) {
+  for (const name of ['latest.html', 'latest.txt', 'subject.txt', 'meta.json']) {
     await writeFile(resolve(EMAIL_OUT, name), await readFile(resolve(EMAIL_SRC, name), 'utf8'));
     emailed++;
   }

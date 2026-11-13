@@ -1,4 +1,5 @@
 import { handlePush, dispatch as dispatchPush } from './push.js';
+import { handleUnsubscribe, welcome, weekly } from './newsletter.js';
 /**
  * The one thing that runs at request time.
  *
@@ -1195,6 +1196,8 @@ export default {
     if (url.pathname === '/api/browse') return browseTmdb(request, url, env, ctx);
     /* "Notify me when it streams" — see worker/push.js. */
     if (url.pathname.startsWith('/api/push/')) return handlePush(request, url, env);
+    /* The Friday list's one-click way out — see worker/newsletter.js. */
+    if (url.pathname === '/api/subscribe/unsubscribe') return handleUnsubscribe(request, url, env);
 
     if (url.pathname !== '/api/subscribe') return env.ASSETS.fetch(request);
 
@@ -1278,7 +1281,13 @@ export default {
      */
     // Optional-chained: the row is already written, and a runtime that hands
     // us no ctx must not turn a successful subscription into a 500.
-    ctx?.waitUntil?.(sendWelcome(env, address));
+    /* Resend when it is configured (worker/newsletter.js), the older Brevo
+       path otherwise. */
+    ctx?.waitUntil?.(
+      env.RESEND_API_KEY
+        ? welcome(env, address).catch((err) => console.error('welcome: failed', err))
+        : sendWelcome(env, address),
+    );
     return json(200, { ok: true });
   },
 
@@ -1311,6 +1320,12 @@ export default {
     /* Two crons share this handler: the daily freshness check, and the
        hourly sweep that sends "your film is on OTT" pushes. */
     if (event?.cron === '0 12 * * *') ctx?.waitUntil?.(checkFreshness(env));
+    ctx?.waitUntil?.(
+      weekly(env).then(
+        (r) => r.sent && console.log('newsletter: sent', JSON.stringify(r)),
+        (err) => console.error('newsletter: weekly failed', err),
+      ),
+    );
     ctx?.waitUntil?.(
       dispatchPush(env).then(
         (s) => s.matched && console.log('push: sweep', JSON.stringify(s)),
