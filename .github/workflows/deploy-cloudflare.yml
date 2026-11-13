@@ -81,6 +81,7 @@ jobs:
           npm run test:worker
           npm run test:push
           npm run test:newsletter
+          npm run test:stats
           # Written alongside the features they cover and never wired in here,
           # which meant four suites that only ran when somebody remembered to
           # run them. They take under ten seconds between them.

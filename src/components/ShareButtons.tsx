@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { track } from '../lib/track';
 import { IconWhatsApp, IconShare, IconCheck } from './icons';
 import { whatsappHref } from '../lib/share';
 
@@ -41,6 +42,7 @@ export function ShareButtons({
   const [copied, setCopied] = useState(false);
 
   async function share() {
+    track('share');
     if (navigator.share) {
       try {
         await navigator.share({ title, text: line, url });

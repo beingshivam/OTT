@@ -1060,7 +1060,7 @@ console.log('\nBoard controls');
   );
 
   // Region and sort moved into the panel; they have to be reachable there.
-  await page.locator('.controls__row .btn').first().click();
+  await page.locator('.controls__row .btn[aria-label="Filters"]').first().click();
   await page.waitForTimeout(400);
   const panel = await page.evaluate(() => ({
     region: !!document.querySelector('.panel .region select'),
@@ -1860,7 +1860,7 @@ console.log('\nTouch targets');
     return {
       week: h('.controls__row .weeknav__btn'),
       view: h('.controls__row .viewtoggle button'),
-      filters: h('.controls__row .btn'),
+      filters: h('.controls__row .btn[aria-label="Filters"]'),
       lens: h('.lens'),
       browse: h('.browse__chip'),
     };
