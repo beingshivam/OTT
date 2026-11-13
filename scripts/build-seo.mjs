@@ -578,6 +578,9 @@ function movieNode(r, canonical) {
     name: r.title,
     url: canonical,
     datePublished: r.releaseDate,
+    /* Google's Movie fields name dateCreated as recommended; the release date
+       is the closest truthful value this site has. */
+    dateCreated: r.releaseDate,
     ...(r.synopsis ? { description: r.synopsis } : {}),
     ...(r.posterUrl ? { image: r.posterUrl } : {}),
     ...(r.genres?.length ? { genre: r.genres } : {}),
@@ -590,7 +593,11 @@ function movieNode(r, canonical) {
       : {}),
     ...(r.director ? { director: { '@type': 'Person', name: r.director } } : {}),
     ...aggregateRatingFor(r),
-    ...(r.trailerUrl ? { trailer: { '@type': 'VideoObject', name: `${r.title} trailer`, url: r.trailerUrl } } : {}),
+    /* No `trailer` VideoObject. Google validates any VideoObject against its
+       video rules — thumbnailUrl and uploadDate required — and this site has
+       no truthful upload date for a YouTube trailer. A half-filled one only
+       earns "has issues" in URL Inspection (13 Nov); the trailer stays on
+       the page, linked, where a reader uses it. */
     ...(streamingOn.length
       ? {
           potentialAction: streamingOn.filter(platformHome).map((id) => ({
@@ -775,23 +782,35 @@ async function renderPage(page, pages) {
       ...(page.group === 'title' && page.rows[0]
         ? [movieNode(page.rows[0], canonical)]
         : []),
-      {
-        '@type': 'ItemList',
-        name: page.h1,
-        numberOfItems: page.rows.length,
-        itemListElement: page.rows.slice(0, 50).map((r, i) => ({
-          '@type': 'ListItem',
-          position: i + 1,
-          item: {
-            '@type': r.kind === 'series' ? 'TVSeries' : 'Movie',
-            name: r.title,
-            datePublished: r.releaseDate,
-            ...(r.genres?.length ? { genre: r.genres } : {}),
-            ...(r.posterUrl ? { image: r.posterUrl } : {}),
-            ...(r.synopsis ? { description: r.synopsis } : {}),
+      /*
+       * The list, in Google's "summary page" shape: each entry is a position
+       * and the URL of the title's own page, which carries the full Movie
+       * markup itself. It used to inline a Movie per entry with no URL —
+       * the all-in-one shape, which Google's carousel guide asks to carry a
+       * url on every item — and it rode on title pages too, as a one-item
+       * list repeating the Movie node above it. URL Inspection flagged
+       * enhancement issues on /ott-release-date/jailer-2 (13 Nov).
+       *
+       * Title pages have no list now; list pages link only titles that have
+       * a page, so no entry points nowhere.
+       */
+      ...(() => {
+        if (page.group === 'title') return [];
+        const linked = page.rows.filter((r) => r.slug).slice(0, 50);
+        if (!linked.length) return [];
+        return [
+          {
+            '@type': 'ItemList',
+            name: page.h1,
+            numberOfItems: linked.length,
+            itemListElement: linked.map((r, i) => ({
+              '@type': 'ListItem',
+              position: i + 1,
+              url: `${SITE_URL}/ott-release-date/${r.slug}`,
+            })),
           },
-        })),
-      },
+        ];
+      })(),
     ],
   };
 
