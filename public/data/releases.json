@@ -1,6 +1,7 @@
 {
-  "generatedAt": "2026-11-13T14:01:35.967Z",
+  "generatedAt": "2026-11-13T14:16:05.351Z",
   "source": "tmdb",
+  "weeksBack": 3,
   "weeks": [
     {
       "id": "2026-10-02",
@@ -6546,6 +6547,7 @@
           "regions": [
             "US"
           ],
+          "rating": 7.9,
           "votes": 7,
           "heat": 28,
           "synopsis": "It’s nighttime in LA: a pill-addled screenwriter struggles with writer’s block; across town, two young drifters with a lost dog search for their stolen car.",
@@ -6567,8 +6569,7 @@
           ],
           "imdbRating": 5.4,
           "imdbVotes": 156,
-          "namedBy": "note",
-          "rating": 7.9
+          "namedBy": "note"
         },
         {
           "id": "m-1186823~ott",
@@ -6714,6 +6715,7 @@
             "IN",
             "US"
           ],
+          "rating": 7.2,
           "votes": 8,
           "heat": 28,
           "synopsis": "On the morning of his wedding, 36-year-old Kuttan wakes from a disturbing dream about his own death. As the day unfolds, familiar moments begin to repeat, and reality becomes increasingly difficult to distinguish from memory. Realising that something is terribly wrong, Kuttan races to uncover the truth before the day repeats itself.",
@@ -6735,8 +6737,7 @@
           "origin": [
             "IN"
           ],
-          "slug": "dhoomakethu",
-          "rating": 7.2
+          "slug": "dhoomakethu"
         },
         {
           "id": "m-1596294~ott",
@@ -9545,14 +9546,14 @@
             "Nandini Rai"
           ],
           "director": "Khagesh Tammineni",
+          "trailerUrl": "https://www.youtube.com/watch?v=a4EzLJL6BNU",
           "certification": "A",
           "theatrical": "wide",
           "origin": [
             "IN"
           ],
           "slug": "anakapalli",
-          "namedBy": "note",
-          "trailerUrl": "https://www.youtube.com/watch?v=a4EzLJL6BNU"
+          "namedBy": "note"
         },
         {
           "id": "m-79464~ott",
@@ -12123,6 +12124,29 @@
           "runtimeMinutes": 66
         },
         {
+          "id": "m-1822227",
+          "title": "Tadej Pogacar: Anatomy of a G.O.A.T.",
+          "kind": "documentary",
+          "platforms": [
+            "hbomax"
+          ],
+          "languages": [
+            "en"
+          ],
+          "genres": [
+            "Documentary"
+          ],
+          "releaseDate": "2026-11-07",
+          "regions": [
+            "US"
+          ],
+          "heat": 4,
+          "synopsis": "Through expert analysis and first-hand insights, this documentary examines the genetics, mindset and team support that have helped make Tadej Pogačar one of cycling's most successful riders.",
+          "posterUrl": "https://image.tmdb.org/t/p/w500/enzXE2ddn8cliLGlF5NiOevOU1X.jpg",
+          "backdropUrl": "https://image.tmdb.org/t/p/w780/osup0HHJ9fzp7Q44fBymK4T5cdX.jpg",
+          "runtimeMinutes": 46
+        },
+        {
           "id": "m-1820980",
           "title": "Saheb's stolen Redmi",
           "kind": "film",
@@ -12227,6 +12251,36 @@
           "origin": [
             "IN"
           ]
+        },
+        {
+          "id": "m-1815678",
+          "title": "DON'T TRUST",
+          "kind": "film",
+          "platforms": [
+            "prime"
+          ],
+          "languages": [
+            "pt"
+          ],
+          "genres": [
+            "Thriller",
+            "Mystery",
+            "Horror"
+          ],
+          "releaseDate": "2026-11-06",
+          "regions": [
+            "US"
+          ],
+          "heat": 2,
+          "posterUrl": "https://image.tmdb.org/t/p/w500/nXVltaqBSLbPur5zRbp5KoTDJJJ.jpg",
+          "cast": [
+            "Maria Tartaglia",
+            "Guilherme Ferreira Conceição",
+            "Caio Ravazzani",
+            "Julia Pereira",
+            "Ayandra Passos"
+          ],
+          "director": "Millena Alves da Silva Oliveira"
         },
         {
           "id": "m-1801799",
@@ -12383,6 +12437,8 @@
           "regions": [
             "US"
           ],
+          "rating": 6.4,
+          "votes": 7,
           "heat": 14,
           "synopsis": "20 years after his encounter with an alien, Petey never moved on. Now his old friend has returned, and the reason why is complicated — and unexpected.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/alhhrpj1PSAn5bfz4Os1k7Bweoj.jpg",
@@ -12401,9 +12457,7 @@
           "origin": [
             "AU"
           ],
-          "namedBy": "note",
-          "rating": 6.4,
-          "votes": 7
+          "namedBy": "note"
         },
         {
           "id": "m-1616687~ott",
@@ -12424,6 +12478,8 @@
           "regions": [
             "US"
           ],
+          "rating": 6.9,
+          "votes": 8,
           "heat": 16,
           "synopsis": "An ex-soldier and his grandchildren battle against ruthless criminals in a remote village. To survive, they must also confront their fears and regrets.",
           "posterUrl": "https://image.tmdb.org/t/p/w500/hKROmLddpzpjkxKKVFYFRAOXX1b.jpg",
@@ -12442,9 +12498,7 @@
           "origin": [
             "ID"
           ],
-          "namedBy": "note",
-          "rating": 6.9,
-          "votes": 8
+          "namedBy": "note"
         },
         {
           "id": "m-1666787~ott",
@@ -12474,14 +12528,14 @@
             "Richard Avedon"
           ],
           "director": "Ron Howard",
+          "trailerUrl": "https://www.youtube.com/watch?v=q5ZYcXzV1L0",
           "origin": [
             "US"
           ],
           "slug": "avedon",
           "imdbRating": 6.7,
           "imdbVotes": 9,
-          "namedBy": "note",
-          "trailerUrl": "https://www.youtube.com/watch?v=q5ZYcXzV1L0"
+          "namedBy": "note"
         },
         {
           "id": "m-1381221~ott",
@@ -20681,9 +20735,7 @@
           "origin": [
             "AT",
             "DE"
-          ],
-          "imdbRating": 7.5,
-          "imdbVotes": 2345
+          ]
         },
         {
           "id": "m-947502~ott",
@@ -20726,9 +20778,7 @@
             "FR",
             "BE",
             "US"
-          ],
-          "imdbRating": 6,
-          "imdbVotes": 24
+          ]
         },
         {
           "id": "m-1391239",
@@ -20882,9 +20932,7 @@
             "GB",
             "US",
             "FR"
-          ],
-          "imdbRating": 6.8,
-          "imdbVotes": 103
+          ]
         },
         {
           "id": "m-1649403",
@@ -21179,9 +21227,7 @@
           "origin": [
             "US",
             "NG"
-          ],
-          "imdbRating": 6.2,
-          "imdbVotes": 19
+          ]
         },
         {
           "id": "m-1528721",
@@ -21287,9 +21333,7 @@
             "SI",
             "HR",
             "BE"
-          ],
-          "imdbRating": 7.7,
-          "imdbVotes": 26
+          ]
         },
         {
           "id": "m-1358274",
@@ -21363,9 +21407,7 @@
           "origin": [
             "US",
             "GB"
-          ],
-          "imdbRating": 7.2,
-          "imdbVotes": 151
+          ]
         },
         {
           "id": "m-1481097",
@@ -22185,6 +22227,6 @@
       "backdropUrl": "https://image.tmdb.org/t/p/w780/k0BY5D4Ya6NHhsvNYMmaabpvUtS.jpg"
     }
   ],
-  "enrichedAt": "2026-11-13T14:02:07.649Z",
-  "ratedAt": "2026-11-13T14:02:36.930Z"
+  "enrichedAt": "2026-11-13T14:16:20.924Z",
+  "ratedAt": "2026-11-13T14:16:39.380Z"
 }
