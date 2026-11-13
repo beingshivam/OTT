@@ -1520,8 +1520,9 @@ await writeFile(
   JSON.stringify(
     /* weeksBack: how many finished weeks got the full build rather than the
        cinema-only one, so eval knows which weeks must still hold their
-       streaming arrivals (see "Streaming arrivals kept"). */
-    { generatedAt: new Date().toISOString(), source: 'tmdb', weeksBack: WEEKS_BACK, weeks, trending },
+       streaming arrivals (see "Streaming arrivals kept"). asOf: the day this
+       run judged weeks finished by, which eval must use rather than its own. */
+    { generatedAt: new Date().toISOString(), asOf: TODAY, source: 'tmdb', weeksBack: WEEKS_BACK, weeks, trending },
     null,
     2,
   ) + '\n',
