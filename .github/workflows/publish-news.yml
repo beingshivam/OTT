@@ -1,0 +1,53 @@
+name: Publish article
+
+# The one step a person takes before a news article goes live. Drafts are
+# written by the daily refresh (scripts/news-draft.mjs) into data/news; read
+# one on GitHub, edit it if needed, then run this with its name. Works from
+# the GitHub app on a phone: Actions → Publish article → Run workflow.
+#
+# Leave "slug" empty to list the drafts waiting in the run's log.
+
+on:
+  workflow_dispatch:
+    inputs:
+      slug:
+        description: 'Article to publish (file name in data/news, without .json). Empty lists the drafts.'
+        required: false
+        default: ''
+      unpublish:
+        description: 'Take it down instead'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-releases
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Publish
+        env:
+          SLUG: ${{ inputs.slug }}
+          UNPUBLISH: ${{ inputs.unpublish }}
+        run: |
+          if [ -z "$SLUG" ]; then node scripts/news-publish.mjs; exit 0; fi
+          case "$SLUG" in *[!a-z0-9-]*) echo "::error::Not an article name: $SLUG"; exit 1;; esac
+          if [ "$UNPUBLISH" = "true" ]; then node scripts/news-publish.mjs "$SLUG" --unpublish; else node scripts/news-publish.mjs "$SLUG"; fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/news
+          git commit -m "news: $([ "$UNPUBLISH" = "true" ] && echo unpublish || echo publish) $SLUG"
+          for attempt in 1 2 3; do
+            git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            sleep $((attempt * 5))
+          done
+          exit 1

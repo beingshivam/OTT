@@ -284,6 +284,14 @@ jobs:
         continue-on-error: true
         run: node scripts/archive.mjs
 
+      # Draft a news article for each fresh Indian OTT date announcement.
+      # Drafts only — nothing is published until a person runs the "Publish
+      # article" workflow. See scripts/news-draft.mjs for why.
+      - name: Draft news articles
+        if: steps.fetch.outcome == 'success'
+        continue-on-error: true
+        run: node scripts/news-draft.mjs
+
       # Write down how long each film took to reach streaming.
       #
       # "When will this come to OTT?" is the most-searched question in this
@@ -438,9 +446,11 @@ jobs:
       - name: Commit the updated calendar
         if: steps.fetch.outcome == 'success' && steps.validate.outcome == 'success'
         run: |
-          FILES="public/data/releases.json public/data/logos.json data/archive.json public/data/catalogue.json email"
+          FILES="public/data/releases.json public/data/logos.json data/archive.json public/data/catalogue.json email data/news"
 
-          if git diff --quiet -- $FILES; then
+          # status rather than diff: a new draft in data/news is an untracked
+          # file, which `git diff` does not see.
+          if [ -z "$(git status --porcelain -- $FILES)" ]; then
             echo "::notice::Calendar already up to date — nothing to commit."
             exit 0
           fi

@@ -353,6 +353,13 @@ const sectionMarkup = (groups, heading) =>
  * person never sees is cloaking, and an early version of this drifted: the
  * prerender said "In cinemas" where the component said "New on In Theatres".
  */
+const SITE_PAGES = [
+  ['/news', 'OTT news'],
+  ['/about', 'About'],
+  ['/editorial-policy', 'Editorial policy'],
+  ['/contact', 'Contact'],
+];
+
 function browseMarkup(pages) {
   const row = (label, list) =>
     `<div><h2>${esc(label)}</h2><div>` +
@@ -384,6 +391,12 @@ function browseMarkup(pages) {
     row('Languages', pages.filter((p) => p.group === 'language')) +
     row('Months', pages.filter((p) => p.group === 'month')) +
     row('Weeks', pages.filter((p) => p.group === 'week')) +
+    /* The standalone pages (scripts/build-static.mjs): news, and who runs the
+       site. Linked from every page — a publisher nobody can find from the
+       pages it publishes is the trust problem those pages exist to fix. */
+    `<div><h2>${esc(BRAND)}</h2><div>` +
+    SITE_PAGES.map(([href, label]) => `<a href="${href}">${esc(label)}</a>`).join(' ') +
+    `</div></div>` +
     `</nav>`
   );
 }
