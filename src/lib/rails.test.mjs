@@ -332,31 +332,29 @@ test('a cinema-only film never appears on the OTT side', () => {
  * somebody they can press play tonight. Only a watch provider can support
  * that.
  */
-test('a platform nobody confirmed is not something you can watch tonight', () => {
-  const guessed = [row({ platforms: ['zee5'], namedBy: 'note' })];
-  assert.equal(
-    landedOnOtt(guessed, 'IN', TODAY).releases.length,
-    0,
-    'a contributor note put a film in the rail that promises you can watch it',
-  );
-
-  /* Every weaker source, not just the one that was reported — a studio
-     inference and a broadcaster are guesses by the same argument. */
+test('a release note whose day has come is on the row, as the sheet already says', () => {
+  /* Was: no guess on this row at all, after Toxic. Revised 13 Nov on request,
+     to the rule the sheet and the title page already share (platform-claim):
+     a guessed service is stated once its date arrives — 33 of 33 later
+     confirmed agreed. This row ends today, so every guess in it has arrived. */
   for (const namedBy of ['note', 'studio', 'network']) {
     assert.equal(
       landedOnOtt([row({ platforms: ['netflix'], namedBy })], 'IN', TODAY).releases.length,
-      0,
-      `${namedBy} was treated as confirmation`,
+      1,
+      `${namedBy} with its date arrived was still kept off the row`,
     );
   }
-
-  /* And the rail still works. This is the failure worth guarding against: a
-     rule that empties the row is not a fix, it is the same bug pointing the
-     other way. */
   assert.equal(
     landedOnOtt([row({ platforms: ['netflix'] })], 'IN', TODAY).releases.length,
     1,
-    'a provider-confirmed title fell out of the rail too',
+    'a provider-confirmed title fell out of the rail',
+  );
+  /* And a guess about a date still ahead is not a landing: the window ends
+     today, so it can never reach this row. */
+  assert.equal(
+    landedOnOtt([row({ platforms: ['zee5'], namedBy: 'note', releaseDate: iso(-3) })], 'IN', TODAY).releases.length,
+    0,
+    'a note about next week put a film on "On right now"',
   );
 });
 
@@ -374,8 +372,8 @@ test('the subtitle counts what the row is allowed to show', () => {
     row({ platforms: ['prime'] }),
   ];
   const rail = landedOnOtt(mixed, 'IN', TODAY);
-  assert.equal(rail.releases.length, 2);
-  assert.equal(rail.total, 2, `the heading still counted the guess (said ${rail.total})`);
+  assert.equal(rail.releases.length, 3);
+  assert.equal(rail.total, rail.releases.length, `the heading said ${rail.total} over ${rail.releases.length}`);
 });
 
 test('both sides are newest first', () => {

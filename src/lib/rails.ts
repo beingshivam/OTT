@@ -1,6 +1,7 @@
 import { interleaveByLanguage } from './rank';
 import { toISODate, weekIdFor } from './week';
 import { INDIAN_LANGUAGES, platformsFor, rowRank } from '../data/platforms';
+import { stated } from './platform-claim.mjs';
 import type { Release } from '../types';
 
 /**
@@ -199,7 +200,18 @@ const streaming = (r: Release) => r.platforms.some((p) => p !== 'theatres');
  * flatly as if the film were playing. UNABOMBER, two cards along, was the
  * same.
  */
-const confirmed = (r: Release) => !r.namedBy;
+/*
+ * Revised 13 Nov, asked for: Daayra (Netflix), Haiwaan (SonyLIV), I'm Game
+ * (JioHotstar) and Last Man in Tower (ZEE5) were the week's biggest Indian
+ * arrivals and all four were kept off this row, because each one's service
+ * came from its release note. The detail sheet stopped hedging such rows on
+ * their day after "Gajab Raat is already on Netflix", on a measurement — of
+ * 180 guessed rows, 33 later got a provider and all 33 agreed — and this row
+ * was the one place still applying the rule from before it. It now asks the
+ * same question the sheet and the title page ask (platform-claim.mjs): a guess
+ * whose date has come is stated, with its source said in the sheet.
+ */
+const confirmed = (r: Release, today: string) => !r.namedBy || stated(r, today);
 
 /**
  * Whose audience the attention number describes.
@@ -510,7 +522,7 @@ export function landedOnOtt(
     from: toISODate(new Date(today.getTime() - (days - 1) * 86_400_000)),
     to: toISODate(today),
     newestFirst: true,
-    where: (r) => streaming(r) && confirmed(r),
+    where: (r) => streaming(r) && confirmed(r, toISODate(today)),
   });
 
   /* The badge says "Trending", which is a claim about now. Across a widened
