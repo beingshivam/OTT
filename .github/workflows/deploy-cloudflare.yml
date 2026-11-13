@@ -29,7 +29,8 @@ on:
   # run against the new calendar, which is how a bad refresh gets noticed
   # rather than quietly served.
   workflow_run:
-    workflows: ['Refresh release calendar']
+    # And after an article is published, for the same reason.
+    workflows: ['Refresh release calendar', 'Publish article']
     types: [completed]
   workflow_dispatch:
 

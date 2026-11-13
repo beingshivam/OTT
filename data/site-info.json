@@ -1,0 +1,9 @@
+{
+  "_note": "Who stands behind the site. Shown on /about and as the byline on news articles. Fill in editor.name and editor.bio to put a person's name on the work; until then articles are credited to the desk.",
+  "editor": {
+    "name": null,
+    "bio": null
+  },
+  "desk": "New on OTT Desk",
+  "founded": "2026"
+}

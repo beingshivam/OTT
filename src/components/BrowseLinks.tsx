@@ -4,6 +4,14 @@ import type { ReleaseFeed } from '../types';
 import { formatWeekRange } from '../lib/week';
 import { MIN_PAGE_ROWS, MAX_PAGE_SHARE, MONTH_SLUGS } from '../lib/route';
 import { COLLECTIONS, inCollection } from '../data/collections';
+import { BRAND } from '../data/brand';
+
+const SITE_PAGES: [string, string][] = [
+  ['/news', 'OTT news'],
+  ['/about', 'About'],
+  ['/editorial-policy', 'Editorial policy'],
+  ['/contact', 'Contact'],
+];
 
 /**
  * The way in to every other page on the site.
@@ -212,6 +220,18 @@ export function BrowseLinks({ feed, region }: { feed: ReleaseFeed | null; region
           {weeks.map((w) => (
             <a key={w.id} className="browse__chip" href={`/w/${w.id}`}>
               {formatWeekRange(w.id)}
+            </a>
+          ))}
+        </div>
+      </div>
+      {/* The standalone pages built by scripts/build-static.mjs — the same
+          row the prerendered markup carries. */}
+      <div className="browse__row">
+        <h2>{BRAND}</h2>
+        <div className="browse__chips">
+          {SITE_PAGES.map(([href, label]) => (
+            <a key={href} className="browse__chip" href={href}>
+              {label}
             </a>
           ))}
         </div>
