@@ -113,12 +113,12 @@ export function mailAvailable(): Promise<boolean> {
   return mailConfig;
 }
 
-export async function emailFollow(t: { id: string; title: string; slug?: string; email: string }): Promise<boolean> {
+export async function emailFollow(t: { id: string; title: string; slug?: string; email: string; poster?: string }): Promise<boolean> {
   try {
     const res = await fetch('/api/push/email-follow', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ email: t.email, titleId: t.id, title: t.title, slug: t.slug }),
+      body: JSON.stringify({ email: t.email, titleId: t.id, title: t.title, slug: t.slug, poster: t.poster }),
     });
     return res.ok;
   } catch {

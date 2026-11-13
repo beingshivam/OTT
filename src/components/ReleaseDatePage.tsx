@@ -375,7 +375,7 @@ export function ReleaseDatePage({ release, feed, region }: Props) {
             {/* First, because on a title with no OTT date it is the one thing
                 the reader came for that this page can still give them. */}
             {!streaming.length && !streamsOn && (
-              <NotifyButton id={String(release.id).replace(/~ott$/, '')} title={release.title} slug={release.slug} />
+              <NotifyButton id={String(release.id).replace(/~ott$/, '')} title={release.title} slug={release.slug} poster={release.posterUrl} />
             )}
             {release.trailerUrl && (
               <a className="btn btn--lg" href={release.trailerUrl} target="_blank" rel="noreferrer">

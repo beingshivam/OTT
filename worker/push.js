@@ -216,10 +216,14 @@ export async function handlePush(request, url, env) {
          the address learns what was asked for and can stop it in one tap. */
       const page = slug ? `${SITE}/ott-release-date/${slug}` : SITE;
       const mail = renderMail({
-        heading: `We'll email you when ${title} streams`,
+        preheader: `One email the day ${title} gets an OTT date.`,
+        kicker: "You're on the list",
+        heading: title,
+        status: "We'll email you the day it gets an OTT date.",
+        poster: b.poster,
         lines: [
-          `You'll get one email from New on OTT the day ${title} gets an OTT date — which platform, and when.`,
-          `That's the only email this sends.`,
+          `Which platform, and when — one email, the moment it's announced. That's the only email this sends.`,
+          `Until then, the page has the expected OTT window and everything else known about it.`,
         ],
         cta: { label: `See ${title}`, url: page },
         unsubscribeUrl: unsubscribeUrl(token),
@@ -402,15 +406,27 @@ async function dispatchEmail(env, rows, today, newsByTitle, stats, send) {
   const waiting = (
     await env.DB.prepare('SELECT email, title_id, title, slug, token FROM email_follows WHERE notified_at IS NULL').all()
   )?.results ?? [];
+  if (!waiting.length) return;
+  /* The platforms' own app icons, the same list the site's chips use. */
+  const logos = await env.ASSETS.fetch(new Request(`${SITE}/data/logos.json`))
+    .then((r) => (r.ok ? r.json() : null))
+    .catch(() => null);
   for (const f of waiting) {
     if (stats.emailed + stats.emailFailed >= MAX_EMAILS_PER_SWEEP) break;
     if (!newsByTitle.has(f.title_id)) newsByTitle.set(f.title_id, ottNews(rows, f.title_id, today));
     const news = newsByTitle.get(f.title_id);
     if (!news) continue;
     const page = f.slug ? `${SITE}/ott-release-date/${f.slug}` : SITE;
+    const facts = ottFacts(rows, f.title_id);
+    const icon = facts?.platform ? logos?.[facts.platform] : null;
     const mail = renderMail({
-      heading: `${f.title}: ${news.replace(/\.$/, '')}`,
-      lines: [`${f.title} — ${news}`, `This was the one email you asked for. Nothing more will come about this title.`],
+      preheader: news,
+      kicker: 'OTT alert',
+      heading: f.title,
+      status: news.replace(/\.$/, ''),
+      platform: facts?.platform ? { name: facts.platformName, icon } : null,
+      poster: facts?.poster,
+      lines: [`This is the one email you asked for about ${f.title}. Nothing more will come about it.`],
       cta: { label: 'Where to watch', url: page },
       unsubscribeUrl: unsubscribeUrl(f.token),
     });
@@ -428,4 +444,16 @@ async function dispatchEmail(env, rows, today, newsByTitle, stats, send) {
       stats.emailFailed++;
     }
   }
+}
+
+/** The poster and platform behind a title's OTT news, for the email. */
+export function ottFacts(rows, titleId) {
+  const ott = rows.find((r) => r.id === `${titleId}~ott`);
+  const base = rows.find((r) => r.id === titleId);
+  const platform = (ott?.platforms ?? base?.platforms ?? []).find((p) => p !== 'theatres') ?? null;
+  return {
+    poster: base?.posterUrl ?? ott?.posterUrl ?? null,
+    platform,
+    platformName: platform ? platformName(platform) : null,
+  };
 }
