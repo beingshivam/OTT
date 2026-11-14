@@ -5231,3 +5231,11 @@ a.changes__title:hover {
     display: none;
   }
 }
+
+/* A panel below the fold is skipped by layout and paint until it is near the
+   screen — the board on Now streaming is twenty-odd panels, and a phone shows
+   two. The size hint keeps the scrollbar honest meanwhile. */
+.panel-card {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 360px;
+}

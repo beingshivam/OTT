@@ -1072,6 +1072,42 @@ console.log('\nBoard controls');
   await ctx.close();
 }
 
+// --- the tabs switch in place --------------------------------------------------
+
+/**
+ * Reported twice as the site's worst moment: tapping Now streaming reloaded
+ * the whole page — script, feed, the 750 KB catalogue — for two seconds of
+ * placeholders on a phone. The three tabs now switch without a reload. This
+ * holds that, and that the address, the title, Back and the board all follow.
+ */
+console.log('\nTabs switch in place');
+{
+  const { ctx, page, errors } = await newPage(browser, { width: 390, height: 844, touch: true });
+  await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('.landedpair');
+  const origin = await page.evaluate(() => performance.timeOrigin);
+  await page.locator('a.lens[href="/streaming"]').click();
+  await page.waitForFunction(() => /Good things streaming/.test(document.body.innerText) && document.querySelectorAll('.panel-card').length > 0, null, { timeout: 15000 }).catch(() => {});
+  const s = await page.evaluate(() => ({ path: location.pathname, title: document.title, current: document.querySelector('a.lens[aria-current="page"]')?.getAttribute('href'), t: performance.timeOrigin }));
+  is(s.t === origin, 'tapping Now streaming does not reload the page', 'it reloaded');
+  is(s.path === '/streaming', 'and the address says /streaming', s.path);
+  is(/streaming/i.test(s.title), 'and the tab title follows', s.title);
+  is(s.current === '/streaming', 'and the tab shows as current', String(s.current));
+  await page.waitForTimeout(400);
+  is((await page.locator('.panel-card').count()) > 4, 'every panel arrives, not only the first few', String(await page.locator('.panel-card').count()));
+  await page.locator('a.lens[href="/upcoming"]').click();
+  await page.waitForTimeout(600);
+  await page.goBack();
+  await page.waitForTimeout(600);
+  const back = await page.evaluate(() => ({ path: location.pathname, streaming: /Good things streaming/.test(document.body.innerText), t: performance.timeOrigin }));
+  is(back.path === '/streaming' && back.streaming, 'Back returns to Now streaming', JSON.stringify(back));
+  await page.locator('a.lens[href="/"]').click();
+  await page.waitForSelector('.landedpair', { timeout: 15000 }).catch(() => {});
+  is((await page.evaluate(() => performance.timeOrigin)) === origin, 'and This week again, still without a reload', 'it reloaded');
+  is(errors.length === 0, 'no console errors', errors[0]);
+  await ctx.close();
+}
+
 // --- search reaches past the week on screen ----------------------------------
 
 /**

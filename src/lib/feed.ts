@@ -5,7 +5,32 @@ import type { ReleaseFeed, ReleaseWeek } from '../types';
  * Friday GitHub Action). Keeping it static means the browser never holds an API
  * key, the page is cacheable at the CDN edge, and the site survives TMDB downtime.
  */
-export async function loadFeed(signal?: AbortSignal): Promise<ReleaseFeed> {
+/**
+ * One download per page life.
+ *
+ * The three tabs switch in place now (App.tsx, `go`), and every switch re-ran
+ * the effect that loads this — another round trip and another 450 KB parse
+ * for data already in memory. The promise is kept; a caller that stops caring
+ * passes a signal and is simply told it was aborted.
+ */
+let cachedFeed: Promise<ReleaseFeed> | null = null;
+
+export function loadFeed(signal?: AbortSignal): Promise<ReleaseFeed> {
+  if (!cachedFeed) {
+    cachedFeed = fetchFeed().catch((e) => {
+      cachedFeed = null;
+      throw e;
+    });
+  }
+  if (!signal) return cachedFeed;
+  return new Promise((resolve, reject) => {
+    if (signal.aborted) return reject(new DOMException('Aborted', 'AbortError'));
+    signal.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')), { once: true });
+    cachedFeed!.then(resolve, reject);
+  });
+}
+
+async function fetchFeed(signal?: AbortSignal): Promise<ReleaseFeed> {
   // Single-file builds embed the feed in the page so the whole app is one
   // self-contained HTML file that works from a file:// URL or a paste-in host.
   const embedded = document.getElementById('release-feed')?.textContent;
