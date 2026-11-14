@@ -452,6 +452,11 @@ const FALLBACK_CSS = `    <style>
       .seo-fallback h1 { color: #f2f4f9; font-size: 28px; margin: 0 0 4px; }
       .seo-fallback h2 { color: #b6bdcc; font-size: 15px; margin: 24px 0 6px; }
       .seo-fallback ul { margin: 0; padding-left: 18px; line-height: 1.7; }
+      /* Reported slow: /streaming carries 2,500+ links here, and a mid-range
+         phone spent ~0.8s laying them out before the app could start — for a
+         list the app replaces a moment later. Off-screen sections are skipped
+         by layout until scrolled to; the text stays in the page for crawlers. */
+      .seo-fallback > section, .seo-fallback .browse { content-visibility: auto; contain-intrinsic-size: auto 600px; }
       .seo-fallback a { color: #b6bdcc; text-decoration: none; }
       .crumbs { font-size: 12px; color: #6a7080; margin-bottom: 10px; }
       .crumbs a { color: #6a7080; }
@@ -827,7 +832,22 @@ async function renderPage(page, pages) {
     ],
   };
 
+  /*
+   * The data the app fetches on this page, asked for by the HTML itself.
+   *
+   * Reported: "Now streaming page is taking lot of time to load". The app
+   * asked for its data only once its own script had downloaded and run, so on
+   * a phone the files queued one behind another: script, then feed, then the
+   * 750 KB catalogue — about a second of grey placeholders on every tab tap.
+   * A preload starts each download alongside the script instead. The URLs and
+   * CORS mode match the app's own fetch() calls exactly, or the browser would
+   * download everything twice. The catalogue only on the page that shows it.
+   */
+  const preload = (href) => `    <link rel="preload" href="/data/${href}" as="fetch" crossorigin="anonymous" />\n`;
   const head =
+    preload('releases.json') +
+    preload('logos.json') +
+    (page.path === 'streaming' ? preload('browse.json') : '') +
     `    <link rel="canonical" href="${canonical}" />\n` +
     /* The feed has existed at /changes.xml the whole time and nothing pointed
        at it, so no reader, aggregator or crawler could find it except by
