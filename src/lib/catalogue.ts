@@ -32,6 +32,10 @@ export interface Catalogue {
 }
 
 let cached: Promise<Catalogue> | null = null;
+let resolved: Catalogue | null = null;
+
+/** The catalogue if it has already arrived (see main.tsx). */
+export const peekCatalogue = (): Catalogue | null => resolved;
 
 /**
  * Memoised on the promise rather than the result, so two lens switches in quick
@@ -53,6 +57,7 @@ export function loadCatalogue(): Promise<Catalogue> {
         if (!res.ok) throw new Error(`Could not load the catalogue (${res.status})`);
         return res.json() as Promise<Catalogue>;
       })
+      .then((c) => (resolved = c))
       .catch((e) => {
         // Cleared so a failed load can be retried by switching lens again,
         // rather than poisoning every later attempt with the same rejection.

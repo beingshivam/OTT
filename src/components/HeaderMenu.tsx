@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { IconCalendar, IconClose, IconGrid, IconSparkle, IconTicket } from './icons';
 import { EmailSignup } from './EmailSignup';
-import { ShareWeek } from './ShareWeek';
 import { EMAIL_ENDPOINT } from '../data/config';
 import type { Filters, Release } from '../types';
+
+/* The share card generator (canvas, layout) is only needed once the menu opens. */
+const ShareWeek = lazy(() => import('./ShareWeek').then((m) => ({ default: m.ShareWeek })));
 
 /**
  * Everything that used to live beside the wordmark.
@@ -122,7 +124,9 @@ export function HeaderMenu({ releases, filters, canShare }: Props) {
             {canShare && (
               <div className="hmenu__group">
                 <p className="hmenu__label">Share this week</p>
-                <ShareWeek releases={releases} filters={filters} inline />
+                <Suspense fallback={null}>
+                  <ShareWeek releases={releases} filters={filters} inline />
+                </Suspense>
               </div>
             )}
 

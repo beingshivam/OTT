@@ -29,6 +29,11 @@
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 
+# Self-hosted webfonts (see index.html). Not content-hashed, but a font file
+# never changes in place — a new version would get a new name.
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
 # The calendar is rewritten twice a week; a short TTL means a refresh shows up
 # quickly without hammering the origin.
 /data/releases.json

@@ -1,15 +1,12 @@
-import { startTransition, useCallback, useEffect, useMemo, useState } from 'react';
+import { lazy, startTransition, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { track } from './lib/track';
 import { Board } from './components/Board';
 import { BrowseLinks } from './components/BrowseLinks';
 import { GenreBrowse } from './components/GenreBrowse';
 import { PageIntro } from './components/PageIntro';
 import { ReleaseDatePage } from './components/ReleaseDatePage';
-import { ChangesPage, type Change } from './components/ChangesPage';
+import type { Change } from './components/ChangesPage';
 import { Controls } from './components/Controls';
-import { DetailSheet } from './components/DetailSheet';
-import { CatalogueSheet } from './components/CatalogueSheet';
-import { PersonSheet } from './components/PersonSheet';
 import { EmailSignup } from './components/EmailSignup';
 import { YourApps, YourAppsNudge } from './components/YourApps';
 import { MyAppsPicker } from './components/MyApps';
@@ -27,8 +24,8 @@ import {
 } from './components/icons';
 import { BRAND, CONTACT_EMAIL, INSTAGRAM, INSTAGRAM_URL, SLUG, TAGLINE } from './data/brand';
 import { affiliateNetworks, hasAffiliates } from './data/affiliates';
-import { loadFeed, weekById } from './lib/feed';
-import { loadCatalogue } from './lib/catalogue';
+import { loadFeed, peekFeed, weekById } from './lib/feed';
+import { loadCatalogue, peekCatalogue } from './lib/catalogue';
 import {
   landingSoon,
   popularNow,
@@ -66,6 +63,21 @@ import type { Filters, Release, ReleaseFeed } from './types';
 /** How far the week arrows will wander from today. Beyond this there is no data worth showing. */
 const WEEK_RANGE = 8;
 
+/*
+ * Loaded when first needed, not with the page.
+ *
+ * None of these is drawn on arrival — a sheet opens on a tap, the change log
+ * is one URL — yet all of it was parsed and compiled on every page load, on
+ * the phone's main thread, before anything could respond. Each is fetched
+ * quietly once the page is idle (see the effect in App), so the first tap
+ * still opens instantly.
+ */
+const loadDetail = () => import('./components/DetailSheet');
+const DetailSheet = lazy(() => loadDetail().then((m) => ({ default: m.DetailSheet })));
+const CatalogueSheet = lazy(() => import('./components/CatalogueSheet').then((m) => ({ default: m.CatalogueSheet })));
+const PersonSheet = lazy(() => import('./components/PersonSheet').then((m) => ({ default: m.PersonSheet })));
+const ChangesPage = lazy(() => import('./components/ChangesPage').then((m) => ({ default: m.ChangesPage })));
+
 /** The three tabs that switch in place — see `go` in App. */
 const TAB_PATHS = new Set(['/', '/streaming', '/upcoming']);
 /** Each tab's own prerendered <title>, learnt on the first visit to it. */
@@ -76,7 +88,7 @@ const TAB_TITLES: Record<string, string> = {
 };
 
 export default function App() {
-  const [feed, setFeed] = useState<ReleaseFeed | null>(null);
+  const [feed, setFeed] = useState<ReleaseFeed | null>(() => peekFeed());
   const [error, setError] = useState<string | null>(null);
   const [prefs, setPrefs] = useState<Prefs>(DEFAULT_PREFS);
   /* The My apps picker, opened from the homepage row (Controls has its own). */
@@ -88,7 +100,9 @@ export default function App() {
    * A quarter of a megabyte that most visits never need, so it is fetched on
    * the first render of that lens rather than alongside the feed.
    */
-  const [catalogue, setCatalogue] = useState<Release[] | null>(null);
+  const [catalogue, setCatalogue] = useState<Release[] | null>(() =>
+    routeFilters(window.location.pathname)?.catalogue ? (peekCatalogue()?.titles ?? null) : null,
+  );
   /* A title only search can reach. Its own state rather than `selected`,
      because it is not a Release and the two sheets are different components. */
   const [remoteTitle, setRemoteTitle] = useState<{ id: string; title: string } | null>(null);
@@ -363,6 +377,15 @@ export default function App() {
     }, 2500);
     return () => window.clearTimeout(t);
   }, [feed, route, path]);
+
+  /* The detail sheet is the first thing almost anyone taps, so its code is
+     fetched as soon as the page is idle — the first tap never waits on it. */
+  useEffect(() => {
+    if (!feed) return;
+    const idle = (window as Window & { requestIdleCallback?: (cb: () => void) => number }).requestIdleCallback;
+    const t = window.setTimeout(() => (idle ?? ((cb: () => void) => cb()))(() => void loadDetail().catch(() => {})), 1500);
+    return () => window.clearTimeout(t);
+  }, [feed]);
 
   /** A plain left click switches in place; anything else is left to the browser. */
   const tab = (href: string) => (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -1233,6 +1256,7 @@ export default function App() {
             it needs the feed only for the slug lookup that turns a title into
             a link to its page. */}
         {isChanges && (
+          <Suspense fallback={null}>
           <ChangesPage
             events={changes}
             slugById={
@@ -1244,6 +1268,7 @@ export default function App() {
               )
             }
           />
+          </Suspense>
         )}
         {isTitlePage && feed && !error && titlePage === null && (
           <div className="empty">
@@ -1530,6 +1555,7 @@ export default function App() {
         </footer>
       </main>
 
+      <Suspense fallback={null}>
       {selected && (
         <DetailSheet
           release={selected}
@@ -1558,6 +1584,7 @@ export default function App() {
           onClose={() => setRemoteTitle(null)}
         />
       )}
+      </Suspense>
     </>
   );
 }
