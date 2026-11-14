@@ -14,10 +14,14 @@ import type { ReleaseFeed, ReleaseWeek } from '../types';
  * passes a signal and is simply told it was aborted.
  */
 let cachedFeed: Promise<ReleaseFeed> | null = null;
+let resolvedFeed: ReleaseFeed | null = null;
+
+/** The feed if it has already arrived, so the first render can start with it. */
+export const peekFeed = (): ReleaseFeed | null => resolvedFeed;
 
 export function loadFeed(signal?: AbortSignal): Promise<ReleaseFeed> {
   if (!cachedFeed) {
-    cachedFeed = fetchFeed().catch((e) => {
+    cachedFeed = fetchFeed().then((f) => (resolvedFeed = f)).catch((e) => {
       cachedFeed = null;
       throw e;
     });

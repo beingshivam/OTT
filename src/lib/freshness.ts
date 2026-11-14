@@ -58,11 +58,16 @@ export function nextRefresh(now = new Date()): Date | undefined {
   return upcoming(now)[0];
 }
 
+/* Built once and reused: constructing a date formatter is the expensive part,
+   ~35 ms on a throttled phone, and this label was rebuilt on every render. */
+let shortFmt: Intl.DateTimeFormat | null = null;
+let dayFmt: Intl.DateTimeFormat | null = null;
+
 export function nextRefreshLabel(now = new Date()): string {
   const next = nextRefresh(now);
-  return next
-    ? next.toLocaleString(undefined, { weekday: 'short', hour: 'numeric', minute: '2-digit' })
-    : '';
+  if (!next) return '';
+  shortFmt ??= new Intl.DateTimeFormat(undefined, { weekday: 'short', hour: 'numeric', minute: '2-digit' });
+  return shortFmt.format(next);
 }
 
 /**
@@ -83,7 +88,7 @@ export function refreshDaysLabel(now = new Date()): string {
       upcoming(now)
         .slice(0, SCHEDULE.length)
         .sort((a, b) => a.getDay() - b.getDay())
-        .map((d) => `${d.toLocaleDateString(undefined, { weekday: 'long' })}s`),
+        .map((d) => `${(dayFmt ??= new Intl.DateTimeFormat(undefined, { weekday: 'long' })).format(d)}s`),
     ),
   ];
   if (names.length >= 7) return 'daily';

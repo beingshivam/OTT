@@ -477,7 +477,7 @@ else {
   for (const [, html] of pages) {
     for (const m of html.matchAll(/href="(\/[^"#?]*)"/g)) {
       const href = m[1].replace(/\/$/, '') || '/';
-      if (!onDisk.has(href) && !/\.(png|svg|xml|txt|json|ico|webmanifest|css|js)$/.test(href)) broken.add(href);
+      if (!onDisk.has(href) && !/\.(png|svg|xml|txt|json|ico|webmanifest|css|js|woff2)$/.test(href)) broken.add(href);
     }
   }
   broken.size

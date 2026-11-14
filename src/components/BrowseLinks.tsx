@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { PLATFORMS, LANGUAGES } from '../data/platforms';
 import type { ReleaseFeed } from '../types';
 import { formatWeekRange } from '../lib/week';
@@ -74,7 +74,13 @@ function useMostSearched(): MostSearched[] {
   return titles;
 }
 
-export function BrowseLinks({ feed, region }: { feed: ReleaseFeed | null; region: string }) {
+/*
+ * Memoised: it counts every title against every platform, language and
+ * collection (~45 ms on a throttled phone) and used to redo all of it on each
+ * re-render of the app — every filter tap — for links that only change with
+ * the feed.
+ */
+export const BrowseLinks = memo(function BrowseLinks({ feed, region }: { feed: ReleaseFeed | null; region: string }) {
   const mostSearched = useMostSearched();
   if (!feed) return null;
 
@@ -238,4 +244,4 @@ export function BrowseLinks({ feed, region }: { feed: ReleaseFeed | null; region
       </div>
     </nav>
   );
-}
+});
