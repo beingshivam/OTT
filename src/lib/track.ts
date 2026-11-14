@@ -36,8 +36,22 @@ let returning = false;
 /** True when this device had been here on an earlier day. */
 export const isReturning = () => returning;
 
-/** Once per page load: the day's visit, a return, and outbound clicks. */
+/**
+ * Once per page load: the day's visit, a return, and outbound clicks.
+ *
+ * A page the browser prepared in the background (index.html, speculation
+ * rules) is not a visit until someone opens it, so it waits until then.
+ */
 export function startTracking(): void {
+  const doc = document as Document & { prerendering?: boolean };
+  if (doc.prerendering) {
+    document.addEventListener('prerenderingchange', () => begin(), { once: true });
+    return;
+  }
+  begin();
+}
+
+function begin(): void {
   try {
     const today = new Date().toISOString().slice(0, 10);
     let last: string | null = null;
