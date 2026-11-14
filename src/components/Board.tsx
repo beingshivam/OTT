@@ -85,11 +85,35 @@ export function Board({ releases, onOpen, dayLabel }: Props) {
 
   const columns = packColumns(panels, useColumnCount());
 
+  /*
+   * The first few panels now, the rest straight after the first paint.
+   *
+   * Reported as slow: Now streaming is twenty-odd panels and ~150 rows, all
+   * built before anything showed, while a phone shows two of them. Packing
+   * still runs over every panel, so nothing moves when the rest arrive — they
+   * only fill in below, a frame later, before anyone has scrolled to them.
+   */
+  const order = new Map(panels.map(([id], i) => [id, i]));
+  const [limit, setLimit] = useState(FIRST_PANELS);
+  useEffect(() => {
+    setLimit(FIRST_PANELS);
+    if (panels.length <= FIRST_PANELS) return;
+    let idle = 0;
+    const raf = requestAnimationFrame(() => {
+      idle = window.setTimeout(() => setLimit(Infinity), 0);
+    });
+    return () => {
+      cancelAnimationFrame(raf);
+      window.clearTimeout(idle);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [releases]);
+
   return (
     <div className="board">
       {columns.map((column, i) => (
         <div className="board__col" key={i}>
-          {column.map(([id, list]) => (
+          {column.filter(([id]) => (order.get(id) ?? 0) < limit).map(([id, list]) => (
             <PanelCard
               key={id}
               platformId={id}
@@ -169,6 +193,9 @@ type Panel = [string, Release[]];
  * six-title one. Pack explicitly instead: walk the panels in priority order and
  * drop each into whichever column is currently shortest.
  */
+/** Enough to fill the first screen on any width (four columns at most). */
+const FIRST_PANELS = 4;
+
 function packColumns(panels: Panel[], count: number): Panel[][] {
   const columns: Panel[][] = Array.from({ length: count }, () => []);
   const heights = new Array<number>(count).fill(0);

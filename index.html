@@ -52,15 +52,6 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@1&display=swap"
       rel="stylesheet"
     />
-    <!--
-      The three tabs are real pages, so a tap reloads. On Chrome (most of this
-      audience, on Android) the tab a finger is about to land on is prepared in
-      the background and opens instantly; elsewhere this is ignored. Same
-      origin only, and "moderate" so it fires on intent, not on every visit.
-    -->
-    <script type="speculationrules">
-      {"prerender":[{"where":{"or":[{"href_matches":"/"},{"href_matches":"/streaming"},{"href_matches":"/upcoming"}]},"eagerness":"moderate"}]}
-    </script>
   </head>
   <body>
     <div id="root"></div>

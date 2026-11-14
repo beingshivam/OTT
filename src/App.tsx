@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { startTransition, useCallback, useEffect, useMemo, useState } from 'react';
 import { track } from './lib/track';
 import { Board } from './components/Board';
 import { BrowseLinks } from './components/BrowseLinks';
@@ -66,6 +66,15 @@ import type { Filters, Release, ReleaseFeed } from './types';
 /** How far the week arrows will wander from today. Beyond this there is no data worth showing. */
 const WEEK_RANGE = 8;
 
+/** The three tabs that switch in place — see `go` in App. */
+const TAB_PATHS = new Set(['/', '/streaming', '/upcoming']);
+/** Each tab's own prerendered <title>, learnt on the first visit to it. */
+const TAB_TITLES: Record<string, string> = {
+  '/': 'New on OTT — every new release, every platform, plus cinemas',
+  '/streaming': 'Best movies and shows streaming in India right now — every platform | New on OTT',
+  '/upcoming': 'Upcoming OTT and movie releases in India — what’s coming next | New on OTT',
+};
+
 export default function App() {
   const [feed, setFeed] = useState<ReleaseFeed | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -101,7 +110,11 @@ export default function App() {
    * is every visit the site had before these pages existed — so the homepage
    * takes exactly the code path it always did.
    */
-  const route = useMemo(() => routeFilters(window.location.pathname), []);
+  const [path, setPath] = useState(() => window.location.pathname);
+  /* The tab just tapped, lit at once while its content is still drawing. */
+  const [pendingTab, setPendingTab] = useState<string | null>(null);
+  const activeTab = pendingTab ?? path;
+  const route = useMemo(() => routeFilters(path), [path]);
 
   const [filters, setFilters] = useState<Filters>(() =>
     readFilters({ weekId: weekIdFor(new Date()), region: 'IN' }, route),
@@ -294,6 +307,75 @@ export default function App() {
   const resetFilters = useCallback(() => {
     setFilters((f) => ({ ...f, ...EMPTY_FILTERS }));
   }, []);
+
+  /**
+   * The three tabs, switched in place.
+   *
+   * Reported, twice: "Now streaming page is taking lot of time to load … which
+   * is hampering the seamless nature of my site." Each tab is a real page —
+   * prerendered, indexable, shareable — and a tap was a full reload: the
+   * script again, the feed again, the 750 KB catalogue again, two seconds of
+   * placeholders on a phone. The data was already in memory the whole time.
+   *
+   * So between the three tabs the app moves itself: the address changes
+   * (pushState), the page reads its new path, and Back works. The links stay
+   * real <a href>s, so crawlers, new tabs and long-presses behave exactly as
+   * before. Anywhere else — a title page, /netflix — a link is still a page
+   * load, because those render differently enough to deserve one.
+   */
+  const go = useCallback(
+    (href: string) => {
+      if (!TAB_PATHS.has(href) || !TAB_PATHS.has(window.location.pathname)) return false;
+      TAB_TITLES[window.location.pathname] = document.title;
+      if (href !== window.location.pathname) window.history.pushState(null, '', href);
+      /* The tab lights up now; the page beneath it is drawn as a transition,
+         so the tap is acknowledged in the same frame however long that takes. */
+      setPendingTab(href);
+      window.scrollTo(0, 0);
+      startTransition(() => enter(href));
+      return true;
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [prefs.region],
+  );
+  const enter = (href: string) => {
+    setPath(href);
+    setFilters(readFilters({ weekId: weekIdFor(new Date()), region: prefs.region }, routeFilters(href)));
+    setWeekPinned(new URLSearchParams(window.location.search).has('w'));
+    setSelected(null);
+    setSearchText('');
+    document.title = TAB_TITLES[href] ?? document.title;
+    setPendingTab(null);
+    window.scrollTo(0, 0);
+  };
+  /**
+   * The catalogue, fetched quietly once the page has settled, so Now streaming
+   * opens with its data already here. Not on a data-saver connection, and not
+   * where there are no tabs to switch to.
+   */
+  useEffect(() => {
+    if (!feed || route?.catalogue || !TAB_PATHS.has(path)) return;
+    const conn = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    if (conn?.saveData) return;
+    const t = window.setTimeout(() => {
+      const idle = (window as Window & { requestIdleCallback?: (cb: () => void) => number }).requestIdleCallback;
+      (idle ?? ((cb: () => void) => window.setTimeout(cb, 0)))(() => void loadCatalogue().catch(() => {}));
+    }, 2500);
+    return () => window.clearTimeout(t);
+  }, [feed, route, path]);
+
+  /** A plain left click switches in place; anything else is left to the browser. */
+  const tab = (href: string) => (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    if (go(href)) e.preventDefault();
+  };
+  useEffect(() => {
+    TAB_TITLES[window.location.pathname] ??= document.title;
+    const onPop = () => TAB_PATHS.has(window.location.pathname) && enter(window.location.pathname);
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prefs.region]);
 
   const addWeeklyReminder = useCallback(() => {
     download(weeklyReminder(window.location.origin), `${SLUG}-friday.ics`);
@@ -845,20 +927,22 @@ export default function App() {
       {!offBoard && (
         <div className="shell lenses-row">
         <nav className="lenses" aria-label="What to show">
-          <a className="lens" href="/" aria-current={!route ? 'page' : undefined}>
+          <a className="lens" href="/" onClick={tab("/")} aria-current={activeTab === '/' ? 'page' : undefined}>
             This week
           </a>
           <a
             className="lens"
             href="/streaming"
-            aria-current={route?.catalogue ? 'page' : undefined}
+            onClick={tab('/streaming')}
+            aria-current={activeTab === '/streaming' ? 'page' : undefined}
           >
             Now streaming
           </a>
           <a
             className="lens"
             href="/upcoming"
-            aria-current={route?.span?.kind === 'upcoming' ? 'page' : undefined}
+            onClick={tab('/upcoming')}
+            aria-current={activeTab === '/upcoming' ? 'page' : undefined}
           >
             Coming soon
           </a>
