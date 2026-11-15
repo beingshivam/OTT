@@ -43,3 +43,8 @@ const mount = () => {
 };
 Promise.all(needs).then(mount);
 setTimeout(mount, MAX_WAIT);
+
+/* Real-visitor speed, in its own chunk, once the page has finished loading. */
+const vitals = () => setTimeout(() => void import('./lib/vitals').then((v) => v.startVitals()).catch(() => {}), 0);
+if (document.readyState === 'complete') vitals();
+else addEventListener('load', vitals, { once: true });
