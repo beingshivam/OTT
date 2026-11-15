@@ -33,7 +33,37 @@ export const EVENTS = {
 const SCHEMA = [
   `CREATE TABLE IF NOT EXISTS events_daily (day TEXT NOT NULL, name TEXT NOT NULL, count INTEGER NOT NULL DEFAULT 0, PRIMARY KEY (day, name))`,
   `CREATE TABLE IF NOT EXISTS report_sends (week TEXT PRIMARY KEY, sent_at TEXT NOT NULL)`,
+  `CREATE TABLE IF NOT EXISTS vitals_daily (day TEXT NOT NULL, metric TEXT NOT NULL, page TEXT NOT NULL, device TEXT NOT NULL, bucket INTEGER NOT NULL, count INTEGER NOT NULL DEFAULT 0, PRIMARY KEY (day, metric, page, device, bucket))`,
 ];
+
+/**
+ * Real visitors' Core Web Vitals.
+ *
+ * Lighthouse is a lab: one simulated phone. It reported a layout shift of 0
+ * for months while real phones saw 0.4–0.8, because its default mode hid
+ * every frame behind a blocking font. So the site measures itself where it
+ * matters: each visit reports Google's five vitals once (web-vitals, in
+ * src/lib/vitals.ts), and each lands here as a count in a value bucket — no
+ * raw values, no identifiers. The report reads the 75th percentile and the
+ * share in Google's "good" band, which is how Search ranks them.
+ *
+ * Buckets are right-closed — bucket b holds ((b-1)·w, b·w] — so a value right
+ * on a threshold (LCP of exactly 2500ms) counts as good, as Google counts it.
+ */
+export const VITALS = {
+  LCP: { label: 'Largest paint (LCP)', width: 100, max: 10000, good: 2500, poor: 4000, unit: 's' },
+  INP: { label: 'Tap response (INP)', width: 10, max: 2000, good: 200, poor: 500, unit: 'ms' },
+  CLS: { label: 'Layout shift (CLS)', width: 0.01, max: 1, good: 0.1, poor: 0.25, unit: '' },
+  FCP: { label: 'First paint (FCP)', width: 100, max: 10000, good: 1800, poor: 3000, unit: 's' },
+  TTFB: { label: 'Server response (TTFB)', width: 100, max: 10000, good: 800, poor: 1800, unit: 's' },
+};
+export const VITAL_PAGES = ['home', 'streaming', 'upcoming', 'title', 'other'];
+const DEVICES = ['mobile', 'desktop'];
+
+export const bucketOf = (metric, value) => {
+  const m = VITALS[metric];
+  return Math.min(Math.round(m.max / m.width), Math.max(0, Math.ceil(value / m.width - 1e-9)));
+};
 let ready = false;
 export function resetStatsCache() {
   ready = false;
@@ -66,6 +96,77 @@ export async function handleEvent(request, url, env, now = new Date()) {
     .bind(day(now), name)
     .run();
   return new Response(null, { status: 204 });
+}
+
+/** POST /api/v  body {"m":"LCP","v":1834.2,"p":"home","d":"mobile"} */
+export async function handleVital(request, url, env, now = new Date()) {
+  if (request.method !== 'POST') return new Response(null, { status: 405 });
+  const origin = request.headers.get('origin');
+  if (origin && new URL(origin).host !== url.host) return new Response(null, { status: 403 });
+  if (!env.DB) return new Response(null, { status: 204 });
+  let b;
+  try {
+    b = JSON.parse((await request.text()).slice(0, 300));
+  } catch {
+    return new Response(null, { status: 400 });
+  }
+  const m = String(b?.m ?? '');
+  const v = Number(b?.v);
+  const page = String(b?.p ?? '');
+  const device = String(b?.d ?? '');
+  if (!Object.hasOwn(VITALS, m) || !Number.isFinite(v) || v < 0 || !VITAL_PAGES.includes(page) || !DEVICES.includes(device)) {
+    return new Response(null, { status: 400 });
+  }
+  await ensure(env.DB);
+  await env.DB.prepare(
+    `INSERT INTO vitals_daily (day, metric, page, device, bucket, count) VALUES (?1, ?2, ?3, ?4, ?5, 1)
+     ON CONFLICT (day, metric, page, device, bucket) DO UPDATE SET count = count + 1`,
+  )
+    .bind(day(now), m, page, device, bucketOf(m, v))
+    .run();
+  return new Response(null, { status: 204 });
+}
+
+/** p75 and the good / poor shares from bucket counts. */
+export function summarise(metric, buckets) {
+  const m = VITALS[metric];
+  const n = buckets.reduce((s, x) => s + x.count, 0);
+  if (!n) return null;
+  const sorted = [...buckets].sort((a, b) => a.bucket - b.bucket);
+  let acc = 0;
+  let p75 = 0;
+  for (const x of sorted) {
+    acc += x.count;
+    if (acc >= 0.75 * n) {
+      p75 = x.bucket * m.width;
+      break;
+    }
+  }
+  const share = (f) => Math.round((100 * sorted.filter((x) => f(x.bucket * m.width)).reduce((s, x) => s + x.count, 0)) / n);
+  return { n, p75: +p75.toFixed(2), good: share((v) => v <= m.good + 1e-9), poor: share((v) => v > m.poor + 1e-9) };
+}
+
+const vitalFmt = (metric, v) => {
+  const u = VITALS[metric].unit;
+  return u === 's' ? `${(v / 1000).toFixed(1)}s` : u === 'ms' ? `${Math.round(v)}ms` : v.toFixed(2);
+};
+
+/** Mobile and desktop, every metric, plus LCP per page type on mobile. */
+async function vitalsFor(db, from, to) {
+  const rows =
+    (await db
+      .prepare('SELECT metric, page, device, bucket, SUM(count) AS count FROM vitals_daily WHERE day >= ?1 AND day < ?2 GROUP BY metric, page, device, bucket')
+      .bind(from, to)
+      .all())?.results ?? [];
+  const pick = (f) => rows.filter(f).map((r) => ({ bucket: Number(r.bucket), count: Number(r.count) }));
+  const overall = Object.keys(VITALS).map((metric) => ({
+    metric,
+    label: VITALS[metric].label,
+    mobile: summarise(metric, pick((r) => r.metric === metric && r.device === 'mobile')),
+    desktop: summarise(metric, pick((r) => r.metric === metric && r.device === 'desktop')),
+  }));
+  const byPage = VITAL_PAGES.map((page) => ({ page, lcp: summarise('LCP', pick((r) => r.metric === 'LCP' && r.page === page && r.device === 'mobile')) })).filter((x) => x.lcp);
+  return { overall, byPage };
 }
 
 async function sums(db, from, to) {
@@ -109,16 +210,30 @@ export async function buildReport(db, now = new Date()) {
   const sunday = new Date(monday.getTime() - 86_400_000);
   const fmt = (d) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
   const range = `${fmt(lastStart)} – ${fmt(sunday)}`;
-  return { week: day(monday), range, rows, totals };
+  const vitals = await vitalsFor(db, day(lastStart), day(monday));
+  return { week: day(monday), range, rows, totals, vitals };
 }
 
-export function renderReport({ range, rows, totals }) {
+const band = (metric, s) => (!s ? '#9aa3b6' : s.p75 <= VITALS[metric].good + 1e-9 ? '#4ade80' : s.p75 <= VITALS[metric].poor + 1e-9 ? '#fbbf24' : '#f87171');
+const cell = (metric, s) => (s ? `${vitalFmt(metric, s.p75)} · ${s.good}% good` : '—');
+
+export function renderReport({ range, rows, totals, vitals = { overall: [], byPage: [] } }) {
+  const measured = vitals.overall.some((v) => v.mobile || v.desktop);
+  const vitalsText = measured
+    ? [
+        '',
+        'Speed, real visitors (75th percentile · share in Google\'s "good" band)',
+        ...vitals.overall.map((v) => `${v.label}: phone ${cell(v.metric, v.mobile)} (n=${v.mobile?.n ?? 0}), desktop ${cell(v.metric, v.desktop)}`),
+        ...vitals.byPage.map((x) => `  LCP on phone, ${x.page}: ${cell('LCP', x.lcp)} (n=${x.lcp.n})`),
+      ]
+    : [];
   const text = [
     `New on OTT — week of ${range}`,
     '',
     ...rows.map((r) => `${r.label}: ${r.now} (${change(r.now, r.before)} vs ${r.before})`),
     '',
     ...totals.map(([l, n]) => `${l}: ${n}`),
+    ...vitalsText,
     '',
     'Counts only — no cookies, no identifiers.',
   ].join('\n');
@@ -140,7 +255,25 @@ export function renderReport({ range, rows, totals }) {
     `</table><h2 style="font-size:15px;margin:22px 0 8px">Running totals</h2>` +
     `<table style="width:100%;border-collapse:collapse;font-size:14px;background:#12151f;border-radius:12px">` +
     totals.map(([l, n]) => `<tr><td style="${td}">${l}</td><td style="${td}text-align:right;font-weight:700">${n}</td></tr>`).join('') +
-    `</table><p style="color:#9aa3b6;font-size:12px;margin-top:20px">Counts only — no cookies, no identifiers. <a style="color:#ffb03a" href="${SITE}">newonott.in</a></p>` +
+    `</table>` +
+    (measured
+      ? `<h2 style="font-size:15px;margin:22px 0 4px">Speed, real visitors</h2>` +
+        `<p style="color:#9aa3b6;font-size:12px;margin:0 0 8px">75th percentile, as Google ranks it. Green is Google's "good" band.</p>` +
+        `<table style="width:100%;border-collapse:collapse;font-size:14px;background:#12151f;border-radius:12px">` +
+        `<tr style="color:#9aa3b6;font-size:12px"><td style="${td}"></td><td style="${td}text-align:right">Phone</td><td style="${td}text-align:right">Desktop</td></tr>` +
+        vitals.overall
+          .map(
+            (v) =>
+              `<tr><td style="${td}">${v.label}</td><td style="${td}text-align:right;font-weight:700;color:${band(v.metric, v.mobile)}">${cell(v.metric, v.mobile)}</td>` +
+              `<td style="${td}text-align:right;color:${band(v.metric, v.desktop)}">${cell(v.metric, v.desktop)}</td></tr>`,
+          )
+          .join('') +
+        vitals.byPage
+          .map((x) => `<tr><td style="${td}color:#9aa3b6;padding-left:22px">LCP on phone · ${x.page}</td><td style="${td}text-align:right;color:${band('LCP', x.lcp)}">${cell('LCP', x.lcp)}</td><td style="${td}text-align:right;color:#9aa3b6">n=${x.lcp.n}</td></tr>`)
+          .join('') +
+        `</table>`
+      : '') +
+    `<p style="color:#9aa3b6;font-size:12px;margin-top:20px">Counts only — no cookies, no identifiers. <a style="color:#ffb03a" href="${SITE}">newonott.in</a></p>` +
     `</div></body></html>`;
   return { text, html };
 }

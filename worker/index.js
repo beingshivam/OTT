@@ -1,6 +1,6 @@
 import { handlePush, dispatch as dispatchPush } from './push.js';
 import { handleUnsubscribe, welcome, weekly } from './newsletter.js';
-import { handleEvent, mondayReport } from './stats.js';
+import { handleEvent, handleVital, mondayReport } from './stats.js';
 /**
  * The one thing that runs at request time.
  *
@@ -1201,6 +1201,7 @@ export default {
     if (url.pathname === '/api/subscribe/unsubscribe') return handleUnsubscribe(request, url, env);
     /* Counts only — see worker/stats.js. */
     if (url.pathname === '/api/e') return handleEvent(request, url, env);
+    if (url.pathname === '/api/v') return handleVital(request, url, env);
 
     if (url.pathname !== '/api/subscribe') return env.ASSETS.fetch(request);
 

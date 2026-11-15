@@ -4,7 +4,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { DatabaseSync } from 'node:sqlite';
-import { buildReport, handleEvent, mondayReport, renderReport, resetStatsCache } from './stats.js';
+import { buildReport, bucketOf, handleEvent, handleVital, mondayReport, renderReport, resetStatsCache, summarise } from './stats.js';
 
 function d1() {
   const db = new DatabaseSync(':memory:');
@@ -93,4 +93,54 @@ test('the Monday email goes once, only on Monday morning', async () => {
   assert.deepEqual(sent[0].to, ['owner@example.com']);
   assert.match(sent[0].subject, /9 Nov – 15 Nov/);
   assert.equal((await mondayReport({ DB })).skipped, 'not configured');
+});
+
+const vital = (env, body, { origin = ORIGIN, at } = {}) =>
+  handleVital(
+    new Request(`${ORIGIN}/api/v`, { method: 'POST', headers: { origin }, body: JSON.stringify(body) }),
+    new URL(`${ORIGIN}/api/v`),
+    env,
+    at ? new Date(at) : undefined,
+  );
+
+test('vitals land as bucket counts; anything malformed is refused', async () => {
+  const DB = d1();
+  const env = { DB };
+  assert.equal((await vital(env, { m: 'LCP', v: 1834.2, p: 'home', d: 'mobile' }, { at: '2026-11-12T10:00:00Z' })).status, 204);
+  await vital(env, { m: 'LCP', v: 1899, p: 'home', d: 'mobile' }, { at: '2026-11-12T11:00:00Z' });
+  for (const bad of [
+    { m: 'FID', v: 10, p: 'home', d: 'mobile' },
+    { m: 'LCP', v: 'x', p: 'home', d: 'mobile' },
+    { m: 'LCP', v: -1, p: 'home', d: 'mobile' },
+    { m: 'LCP', v: 100, p: '/secret', d: 'mobile' },
+    { m: 'LCP', v: 100, p: 'home', d: 'fridge' },
+  ]) assert.equal((await vital(env, bad)).status, 400, JSON.stringify(bad));
+  assert.equal((await vital(env, { m: 'CLS', v: 0, p: 'home', d: 'mobile' }, { origin: 'https://evil.example' })).status, 403);
+  const rows = DB.raw.prepare('SELECT metric, page, device, bucket, count FROM vitals_daily').all().map((r) => ({ ...r }));
+  assert.deepEqual(rows, [{ metric: 'LCP', page: 'home', device: 'mobile', bucket: 19, count: 2 }], 'both values sit in (1800, 1900]');
+});
+
+test('a value on a threshold is good, as Google counts it', () => {
+  assert.equal(bucketOf('LCP', 2500), 25);
+  assert.equal(bucketOf('LCP', 2500.4), 26);
+  assert.equal(bucketOf('CLS', 0.1), 10);
+  assert.equal(bucketOf('INP', 1e9), 200, 'capped');
+  const s = summarise('LCP', [{ bucket: 25, count: 3 }, { bucket: 41, count: 1 }]);
+  assert.deepEqual(s, { n: 4, p75: 2500, good: 75, poor: 25 });
+});
+
+test('the Monday report carries real-visitor speed once there is some', async () => {
+  const DB = d1();
+  const env = { DB };
+  const empty = renderReport(await buildReport(DB, new Date('2026-11-16T04:00:00Z')));
+  assert.doesNotMatch(empty.text, /Speed, real visitors/, 'an empty speed table is noise');
+  for (const v of [1200, 1500, 1900, 2600]) await vital(env, { m: 'LCP', v, p: 'title', d: 'mobile' }, { at: '2026-11-14T10:00:00Z' });
+  await vital(env, { m: 'CLS', v: 0.02, p: 'home', d: 'desktop' }, { at: '2026-11-14T10:00:00Z' });
+  await vital(env, { m: 'LCP', v: 9000, p: 'home', d: 'mobile' }, { at: '2026-11-16T03:00:00Z' }); // this week: not in last week's report
+  const r = await buildReport(DB, new Date('2026-11-16T04:00:00Z'));
+  const { text, html } = renderReport(r);
+  assert.match(text, /Largest paint \(LCP\): phone 1\.9s · 75% good \(n=4\), desktop —/);
+  assert.match(text, /Layout shift \(CLS\): phone — \(n=0\), desktop 0\.02 · 100% good/);
+  assert.match(text, /LCP on phone, title: 1\.9s · 75% good \(n=4\)/);
+  assert.match(html, /Speed, real visitors/);
 });
