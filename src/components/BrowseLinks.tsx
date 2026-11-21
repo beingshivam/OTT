@@ -149,7 +149,9 @@ export const BrowseLinks = memo(function BrowseLinks({ feed, region }: { feed: R
     <nav className="browse" aria-label="Browse releases">
       {mostSearched.length > 0 && (
         <div className="browse__row">
-          <h2>Most searched OTT release dates</h2>
+          <h2>
+            Most searched<span className="sr-only"> OTT release dates</span>
+          </h2>
           <div className="browse__chips">
             {mostSearched.map((t) => (
               <a key={t.slug} className="browse__chip" href={`/ott-release-date/${t.slug}`}>

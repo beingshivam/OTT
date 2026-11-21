@@ -1193,7 +1193,8 @@ a {
   margin-left: 0;
 }
 .controls__row > .viewtoggle:not(.weeknav + *),
-.controls__row > .btn:not(.weeknav + *):not(.viewtoggle + *) {
+.controls__row > .myapps:not(.weeknav + *):not(.viewtoggle + *),
+.controls__row > .btn:not(.weeknav + *):not(.viewtoggle + *):not(.myapps + *) {
   margin-left: auto;
 }
 .viewtoggle button {
@@ -3767,6 +3768,13 @@ select,
    * under it, which is what a phone does with a header and its actions anyway.
    * It costs about 34px of height and buys a heading that is true.
    */
+}
+/*
+ * Only where the row cannot hold it all. The wrap was written for a phone and
+ * applied to every touch screen: an iPad in landscape, with room to spare, got
+ * the date alone on one line and its controls strung across the next.
+ */
+@media (pointer: coarse) and (max-width: 900px) {
   .controls__row {
     flex-wrap: wrap;
   }
@@ -3788,7 +3796,9 @@ select,
   .controls__heading {
     flex: 0 1 auto;
   }
+}
 
+@media (pointer: coarse) {
   /*
    * The header icons, given a fingertip without being given more room.
    *
@@ -3971,7 +3981,9 @@ select,
 }
 .browse__row h2 {
   flex: none;
-  width: 78px;
+  /* Wide enough for the longest label on one line ("Collections", "New on
+     OTT"), so every row's chips start at the same edge. */
+  width: 118px;
   margin: 0;
   font-size: 10.5px;
   font-weight: 700;
@@ -3983,6 +3995,7 @@ select,
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+  min-width: 0;
 }
 /* Quieter than .chip — these sit below the fold under the week, and should
    not compete with the filter row that does the actual work up top. */
