@@ -5077,12 +5077,17 @@ a.changes__title:hover {
   background: linear-gradient(90deg, #ff5a4d, #ffb03a);
 }
 
-/* Which copy of ★ My apps shows: the toolbar one, or — on a narrow phone,
-   where it would squeeze the week heading — its own slim line below. */
+/* Which copy of ★ My apps shows.
+   On a touch phone the date already has its own line above the buttons, so
+   ★ (with its count) fits in the buttons row: a separate row for it made the
+   sticky bar three rows — ~155px, a fifth of a phone screen — on every scroll.
+   Only a narrow window without touch, where the date shares the buttons row,
+   still needs the slim line of its own — and the narrowest phones (320px),
+   where the buttons row has no room left for it. Edit lives in Filters. */
 .myapps__row {
   display: none;
 }
-@media (max-width: 420px) {
+@media (max-width: 420px) and (pointer: fine), (max-width: 340px) {
   .myapps--toolbar {
     display: none;
   }
@@ -5093,14 +5098,9 @@ a.changes__title:hover {
   .myapps--line .btn .btn__text {
     display: inline !important;
   }
-  .myapps--line .btn,
-  .myapps--line .myapps__edit {
-    min-height: 44px;
-  }
 }
-@media (min-width: 421px) and (max-width: 560px) {
-  .myapps--toolbar .myapps__edit,
-  .myapps--toolbar .btn__count {
+@media (max-width: 560px) {
+  .myapps--toolbar .myapps__edit {
     display: none;
   }
 }
