@@ -367,12 +367,21 @@ function fromIntl(code: string): string | null {
  * means "/<name> is a page", and there is no page of films without dialogue.
  * `xx` is TMDB's "No Language": silent films, wordless shorts, music pieces.
  */
+/**
+ * Languages TMDB codes outside ISO-639-1, so Intl cannot name them either.
+ * `cn` is TMDB's Cantonese (ISO has only `zh` for Chinese); it reached the
+ * feed with a Hong Kong film and printed as a bare "cn".
+ */
+const TMDB_ONLY: Record<string, string> = {
+  cn: 'Cantonese',
+};
+
 const NON_LANGUAGES: Record<string, string> = {
   xx: 'No dialogue',
 };
 
 export function languageName(code: string): string {
-  return LANGUAGES[code] ?? NON_LANGUAGES[code] ?? fromIntl(code) ?? code.toUpperCase();
+  return LANGUAGES[code] ?? NON_LANGUAGES[code] ?? TMDB_ONLY[code] ?? fromIntl(code) ?? code.toUpperCase();
 }
 
 /**
