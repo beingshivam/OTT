@@ -460,10 +460,14 @@ const FALLBACK_CSS = `    <style>
       .seo-fallback a { color: #b6bdcc; text-decoration: none; }
       .crumbs { font-size: 12px; color: #6a7080; margin-bottom: 10px; }
       .crumbs a { color: #6a7080; }
-      .browse { margin-top: 28px; padding-top: 20px; border-top: 1px solid #ffffff14; }
-      .browse > div { display: flex; align-items: baseline; gap: 14px; margin-bottom: 12px; flex-wrap: wrap; }
-      .browse h2 { flex: none; width: 78px; margin: 0; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; }
-      .browse a { display: inline-block; padding: 4px 11px; margin: 0 2px 4px 0; border: 1px solid #ffffff14; border-radius: 999px; font-size: 12px; }
+      /* Scoped to the fallback. Written as bare .browse, these also matched the
+         app's own browse links (same class) and out-ranked its stylesheet: the
+         pills lost their centring, the labels their column. Reported from an
+         iPad as "formatting looks off". */
+      .seo-fallback .browse { margin-top: 28px; padding-top: 20px; border-top: 1px solid #ffffff14; }
+      .seo-fallback .browse > div { display: flex; align-items: baseline; gap: 14px; margin-bottom: 12px; flex-wrap: wrap; }
+      .seo-fallback .browse h2 { flex: none; width: 78px; margin: 0; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; }
+      .seo-fallback .browse a { display: inline-block; padding: 4px 11px; margin: 0 2px 4px 0; border: 1px solid #ffffff14; border-radius: 999px; font-size: 12px; }
     </style>
 `;
 
